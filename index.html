@@ -1,8 +1,646 @@
 <!DOCTYPE html>
-<html>
-<head><title>School System</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management System</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1100px; margin: auto; background: #f0f0f0; }
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .online-badge { padding: 5px 12px; border-radius: 20px; font-size: 14px; }
+        .online { background: #4CAF50; color: white; }
+        .offline { background: #666; color: white; }
+        .sync-bar { background: #2196F3; color: white; padding: 10px; text-align: center; border-radius: 5px; margin: 15px 0; }
+        .module-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .module-btn { padding: 10px 20px; cursor: pointer; background: #ccc; border: none; border-radius: 5px; font-weight: bold; }
+        .module-btn.active { background: #4CAF50; color: white; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; }
+        .present { background: #4CAF50; color: white; }
+        .absent { background: #f44336; color: white; }
+        .late { background: #FF9800; color: white; }
+        .student { background: white; margin: 10px 0; padding: 15px; border-radius: 8px; }
+        .student-info { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .buttons { margin-top: 10px; }
+        .import-section, .manual-section, .exam-card, .question-card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .import-section { border: 2px dashed #9C27B0; }
+        .manual-section { border: 2px dashed #2196F3; }
+        input, select, textarea { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; width: 100%; max-width: 100%; }
+        .success { background: #4CAF50; color: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #f44336; color: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .refresh-btn { background: #2196F3; color: white; }
+        .question-item { background: #f9f9f9; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .timer { font-size: 24px; font-weight: bold; background: #333; color: white; padding: 10px; text-align: center; border-radius: 8px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 80%; overflow: auto; }
+        .close-modal { float: right; cursor: pointer; font-size: 24px; }
+        @media (max-width: 600px) { .student-info { flex-direction: column; align-items: flex-start; } }
+    </style>
+</head>
 <body>
-  <h1>School Management System</h1>
-  <p>Works on all devices.</p>
+    <div class="header">
+        <h1>🏫 School Management System</h1>
+        <span id="onlineStatus" class="online-badge offline">🔴 Offline</span>
+    </div>
+    <div class="sync-bar" id="syncBar">✅ Connected to cloud</div>
+
+    <div class="module-buttons">
+        <button id="attendanceBtn" class="module-btn active">📋 Attendance</button>
+        <button id="examsBtn" class="module-btn">📝 Mock Exams</button>
+    </div>
+
+    <!-- ATTENDANCE MODULE -->
+    <div id="attendanceModule">
+        <div class="import-section">
+            <h3>📊 Import Students from Excel</h3>
+            <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
+            <button id="importBtn" style="background:#9C27B0; color:white;">Import to Cloud</button>
+            <button id="downloadSampleBtn" style="background:#2196F3; color:white;">Download Sample</button>
+            <div id="importMessage"></div>
+        </div>
+        <div class="manual-section">
+            <h3>✏️ Add Single Student</h3>
+            <input type="text" id="newStudentId" placeholder="Student ID">
+            <input type="text" id="newStudentName" placeholder="Full Name">
+            <input type="text" id="newClass" placeholder="Class">
+            <input type="text" id="newParentPhone" placeholder="Parent Phone">
+            <input type="text" id="newParentName" placeholder="Parent Name">
+            <button id="addStudentBtn" style="background:#2196F3; color:white;">+ Add to Cloud</button>
+            <div id="manualMessage"></div>
+        </div>
+        <div>
+            <select id="classSelect"></select>
+            <button id="loadBtn">Load Students</button>
+            <button id="refreshBtn" class="refresh-btn">🔄 Refresh Students</button>
+            <button id="batchWhatsappBtn" style="background:#128C7E; color:white;">📱 Send All Reports</button>
+            <button id="classHistoryBtn" class="refresh-btn">📅 View Class History</button>
+        </div>
+        <div id="studentList"></div>
+    </div>
+
+    <!-- EXAMS MODULE -->
+    <div id="examsModule" style="display:none;">
+        <div style="margin-bottom:20px;">
+            <button id="examModeToggleBtn" class="refresh-btn">Switch to Teacher Mode</button>
+        </div>
+        <div id="examsContainer"></div>
+    </div>
+
+    <!-- Modals -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('editModal')">&times;</span>
+            <h3>Edit Student</h3>
+            <input type="text" id="editStudentId" readonly style="background:#f0f0f0;">
+            <input type="text" id="editStudentName" placeholder="Full Name">
+            <input type="text" id="editParentPhone" placeholder="Parent Phone">
+            <input type="text" id="editParentName" placeholder="Parent Name">
+            <button id="saveEditBtn" class="refresh-btn">Save Changes</button>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-modal" onclick="closeModal('historyModal')">&times;</span>
+            <h3>Attendance History</h3>
+            <div id="historyContent">Loading...</div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+    <script>
+        // Firebase config (use yours)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCE5iYGOl-ABjXs5gaS6Kl0zeGqHZf0vdg",
+            authDomain: "sierra-leone-school-attendance.firebaseapp.com",
+            projectId: "sierra-leone-school-attendance",
+            storageBucket: "sierra-leone-school-attendance.firebasestorage.app",
+            messagingSenderId: "185301289478",
+            appId: "1:185301289478:web:f3eb92954cb8570da81187"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // GLOBALS
+        let allStudents = {};
+        let studentDocMap = new Map(); // key = "class|studentId" -> firestore docId
+        let examTeacherMode = false;
+
+        // Helper functions
+        function showMessage(msg, type, elemId) {
+            const div = document.getElementById(elemId);
+            if (div) { div.innerHTML = `<div class="${type}">${msg}</div>`; setTimeout(() => div.innerHTML = '', 4000); }
+            else { alert(msg); }
+        }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]); }
+
+        // Modal helpers
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        };
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        // Online status & offline retry
+        async function updateOnlineStatus() {
+            const badge = document.getElementById('onlineStatus');
+            const syncBar = document.getElementById('syncBar');
+            if (navigator.onLine) {
+                badge.innerHTML = '🟢 Online'; badge.className = 'online-badge online';
+                syncBar.innerHTML = '✅ Connected to cloud'; syncBar.style.background = '#4CAF50';
+                await retryOfflineAttendance();
+            } else {
+                badge.innerHTML = '🔴 Offline'; badge.className = 'online-badge offline';
+                syncBar.innerHTML = '⚠️ Offline mode'; syncBar.style.background = '#FF9800';
+            }
+        }
+        async function retryOfflineAttendance() {
+            const pending = JSON.parse(localStorage.getItem('offline_attendance') || '[]');
+            if (!pending.length) return;
+            let synced = 0;
+            for (let item of pending) {
+                try {
+                    const id = `${item.date}_${item.classname}_${item.studentId}`;
+                    await db.collection('attendance').doc(id).set({
+                        studentId: item.studentId, class: item.classname, date: item.date,
+                        status: item.status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    synced++;
+                } catch (e) { return; }
+            }
+            if (synced === pending.length) { localStorage.removeItem('offline_attendance'); showMessage(`Synced ${synced} records`, 'success', 'importMessage'); renderAttendance(); }
+        }
+
+        // STUDENT CRUD
+        async function loadStudents() {
+            const snap = await db.collection('students').get();
+            allStudents = {}; studentDocMap.clear();
+            snap.forEach(doc => {
+                const s = doc.data(); const cls = s.class; const key = `${cls}|${s.id}`;
+                studentDocMap.set(key, doc.id);
+                if (!allStudents[cls]) allStudents[cls] = [];
+                allStudents[cls].push({ id: s.id, name: s.name, parentPhone: s.parentPhone, parentName: s.parentName, docId: doc.id });
+            });
+            updateClassDropdown();
+        }
+        function updateClassDropdown() {
+            const select = document.getElementById('classSelect');
+            const current = select.value;
+            select.innerHTML = '';
+            Object.keys(allStudents).sort().forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; select.appendChild(opt); });
+            if (allStudents[current]) select.value = current;
+        }
+        async function loadAttendance(classname) {
+            const today = new Date().toISOString().split('T')[0];
+            const snap = await db.collection('attendance').where('class', '==', classname).where('date', '==', today).get();
+            const att = {};
+            snap.forEach(d => att[d.data().studentId] = d.data().status);
+            return att;
+        }
+        async function saveAttendance(classname, studentId, status) {
+            const today = new Date().toISOString().split('T')[0];
+            const id = `${today}_${classname}_${studentId}`;
+            try {
+                await db.collection('attendance').doc(id).set({ studentId, class: classname, date: today, status, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                await renderAttendance();
+                if (status === 'absent') {
+                    const student = allStudents[classname]?.find(s => s.id === studentId);
+                    if (student && confirm(`Send WhatsApp to ${student.parentName}?`)) window.open(`https://wa.me/${student.parentPhone}?text=${encodeURIComponent(`${student.name} was marked ABSENT.`)}`, '_blank');
+                }
+            } catch (err) {
+                const offlineQueue = JSON.parse(localStorage.getItem('offline_attendance') || '[]');
+                offlineQueue.push({ classname, studentId, status, date: today });
+                localStorage.setItem('offline_attendance', JSON.stringify(offlineQueue));
+                showMessage("Offline: saved locally", "error", "importMessage");
+                await renderAttendance();
+            }
+        }
+
+        // Edit student
+        async function editStudent(classname, studentId) {
+            const key = `${classname}|${studentId}`;
+            const docId = studentDocMap.get(key);
+            if (!docId) { alert("Student not found"); return; }
+            const docSnap = await db.collection('students').doc(docId).get();
+            const data = docSnap.data();
+            document.getElementById('editStudentId').value = studentId;
+            document.getElementById('editStudentName').value = data.name;
+            document.getElementById('editParentPhone').value = data.parentPhone || '';
+            document.getElementById('editParentName').value = data.parentName || '';
+            openModal('editModal');
+            const saveBtn = document.getElementById('saveEditBtn');
+            const newSaveHandler = async () => {
+                const newName = document.getElementById('editStudentName').value.trim();
+                const newPhone = document.getElementById('editParentPhone').value.trim();
+                const newPName = document.getElementById('editParentName').value.trim();
+                if (!newName) { alert("Name cannot be empty"); return; }
+                await db.collection('students').doc(docId).update({
+                    name: newName,
+                    parentPhone: newPhone || "23270000000",
+                    parentName: newPName || "Parent"
+                });
+                closeModal('editModal');
+                await loadStudents();
+                await renderAttendance();
+                showMessage("Student updated", "success", "importMessage");
+                saveBtn.removeEventListener('click', newSaveHandler);
+            };
+            saveBtn.removeEventListener('click', saveBtn._listener);
+            saveBtn.addEventListener('click', newSaveHandler);
+            saveBtn._listener = newSaveHandler;
+        }
+
+        // View student history (NO INDEX version – removed orderBy)
+        async function viewStudentHistory(classname, studentId, studentName) {
+            const snap = await db.collection('attendance')
+                .where('class', '==', classname)
+                .where('studentId', '==', studentId)
+                .get();
+            const historyDiv = document.getElementById('historyContent');
+            if (snap.empty) {
+                historyDiv.innerHTML = `<p>No attendance records for ${studentName} (${studentId}).</p>`;
+            } else {
+                let html = `<p><strong>${studentName} (${studentId})</strong></p><table border="1" cellpadding="5" style="width:100%;border-collapse:collapse;">`;
+                html += `<tr><th>Date</th><th>Status</th></tr>`;
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const statusEmoji = data.status === 'present' ? '✅ Present' : data.status === 'absent' ? '❌ Absent' : '⏰ Late';
+                    html += `<tr><td>${data.date}</td><td>${statusEmoji}</td></tr>`;
+                });
+                html += `</table>`;
+                historyDiv.innerHTML = html;
+            }
+            openModal('historyModal');
+        }
+
+        // View class history (no sort)
+        async function viewClassHistory() {
+            const classname = document.getElementById('classSelect').value;
+            if (!classname || !allStudents[classname]) { alert("Select a class first."); return; }
+            const students = allStudents[classname];
+            const dateStr = prompt("Enter date (YYYY-MM-DD) or leave empty for today:", new Date().toISOString().split('T')[0]);
+            if (!dateStr) return;
+            const snap = await db.collection('attendance')
+                .where('class', '==', classname)
+                .where('date', '==', dateStr)
+                .get();
+            const historyDiv = document.getElementById('historyContent');
+            if (snap.empty) {
+                historyDiv.innerHTML = `<p>No attendance records for ${classname} on ${dateStr}.</p>`;
+            } else {
+                let html = `<p><strong>${classname} - ${dateStr}</strong></p><table border="1" cellpadding="5" style="width:100%;border-collapse:collapse;">`;
+                html += `<tr><th>Student ID</th><th>Name</th><th>Status</th></tr>`;
+                const attMap = {};
+                snap.forEach(doc => { attMap[doc.data().studentId] = doc.data().status; });
+                for (let student of students) {
+                    const status = attMap[student.id] || 'Not marked';
+                    const statusEmoji = status === 'present' ? '✅ Present' : status === 'absent' ? '❌ Absent' : status === 'late' ? '⏰ Late' : '⚪ Not marked';
+                    html += `<tr><td>${student.id}</td><td>${escapeHtml(student.name)}</td><td>${statusEmoji}</td></tr>`;
+                }
+                html += `</table>`;
+                historyDiv.innerHTML = html;
+            }
+            openModal('historyModal');
+        }
+
+        // Render attendance list with Edit and History buttons
+        async function renderAttendance() {
+            const classname = document.getElementById('classSelect').value;
+            if (!classname || !allStudents[classname]) {
+                document.getElementById('studentList').innerHTML = '<p>No students. Add via Excel or manual.</p>';
+                return;
+            }
+            const students = allStudents[classname];
+            const att = await loadAttendance(classname);
+            const container = document.getElementById('studentList');
+            container.innerHTML = '';
+            for (let s of students) {
+                const status = att[s.id] || 'none';
+                const div = document.createElement('div'); div.className = 'student';
+                div.innerHTML = `
+                    <div class="student-info">
+                        <span><strong>${escapeHtml(s.name)}</strong> (${s.id})</span>
+                        <span>${status === 'present' ? '✅ Present' : status === 'absent' ? '❌ Absent' : status === 'late' ? '⏰ Late' : '⚪ Not marked'}</span>
+                        <div>
+                            <button class="edit-student" data-class="${classname}" data-id="${s.id}">✏️ Edit</button>
+                            <button class="history-student" data-class="${classname}" data-id="${s.id}" data-name="${escapeHtml(s.name)}">📜 History</button>
+                            <button class="whatsapp-individual" data-student='${JSON.stringify(s)}' data-status="${status}">📱 WhatsApp</button>
+                            <button class="delete-student" data-class="${classname}" data-id="${s.id}" style="background:#f44336;">🗑️ Delete</button>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <button class="present" data-id="${s.id}">✅ Present</button>
+                        <button class="absent" data-id="${s.id}">❌ Absent</button>
+                        <button class="late" data-id="${s.id}">⏰ Late</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+            // Attendance buttons
+            document.querySelectorAll('.present, .absent, .late').forEach(btn => {
+                btn.onclick = async () => {
+                    const status = btn.classList.contains('present') ? 'present' : btn.classList.contains('absent') ? 'absent' : 'late';
+                    const sid = btn.getAttribute('data-id');
+                    await saveAttendance(classname, sid, status);
+                };
+            });
+            // WhatsApp
+            document.querySelectorAll('.whatsapp-individual').forEach(btn => {
+                btn.onclick = () => {
+                    const s = JSON.parse(btn.getAttribute('data-student'));
+                    const status = btn.getAttribute('data-status');
+                    if (status === 'none') alert('Mark attendance first');
+                    else window.open(`https://wa.me/${s.parentPhone}?text=${encodeURIComponent(`${s.name} was marked ${status.toUpperCase()}.`)}`, '_blank');
+                };
+            });
+            // Delete
+            document.querySelectorAll('.delete-student').forEach(btn => {
+                btn.onclick = async () => { await deleteStudent(btn.getAttribute('data-class'), btn.getAttribute('data-id')); };
+            });
+            // Edit
+            document.querySelectorAll('.edit-student').forEach(btn => {
+                btn.onclick = () => { editStudent(btn.getAttribute('data-class'), btn.getAttribute('data-id')); };
+            });
+            // History
+            document.querySelectorAll('.history-student').forEach(btn => {
+                btn.onclick = () => { viewStudentHistory(btn.getAttribute('data-class'), btn.getAttribute('data-id'), btn.getAttribute('data-name')); };
+            });
+        }
+
+        async function deleteStudent(classname, studentId) {
+            const key = `${classname}|${studentId}`; const docId = studentDocMap.get(key);
+            if (!docId) { showMessage('Student not found', 'error', 'importMessage'); return; }
+            if (!confirm(`Delete ${studentId}?`)) return;
+            await db.collection('students').doc(docId).delete();
+            const attSnap = await db.collection('attendance').where('studentId', '==', studentId).where('class', '==', classname).get();
+            attSnap.forEach(d => d.ref.delete());
+            await loadStudents(); await renderAttendance();
+            showMessage(`Deleted ${studentId}`, 'success', 'importMessage');
+        }
+
+        async function sendDailySummary() {
+            const classname = document.getElementById('classSelect').value;
+            const students = allStudents[classname] || [];
+            if (!students.length) return alert('No students');
+            const att = await loadAttendance(classname);
+            const present = students.filter(s => att[s.id] === 'present');
+            const absent = students.filter(s => att[s.id] === 'absent');
+            const late = students.filter(s => att[s.id] === 'late');
+            const choice = prompt('Send to: 1-All, 2-Absent only, 3-Late only', '1');
+            let recipients = [];
+            if (choice === '1') recipients = students;
+            else if (choice === '2') recipients = absent;
+            else if (choice === '3') recipients = late;
+            else return;
+            if (!recipients.length) return alert('No recipients');
+            const summary = `📊 Attendance ${classname} ${new Date().toLocaleDateString()}\n✅ Present: ${present.length}\n❌ Absent: ${absent.length}\n⏰ Late: ${late.length}`;
+            recipients.forEach((s, i) => setTimeout(() => { window.open(`https://wa.me/${s.parentPhone}?text=${encodeURIComponent(`Dear ${s.parentName},\n\n${summary}\n\nThank you.`)}`, '_blank'); }, i * 500));
+            alert(`Opening for ${recipients.length} parents`);
+        }
+
+        async function importExcel(file) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet);
+                let added = 0, skipped = 0;
+                for (let row of rows) {
+                    const id = row.StudentID || row.studentId, name = row.Name || row.name, cls = row.Class || row.class;
+                    const phone = row.ParentPhone || row.parentPhone || "23270000000", pname = row.ParentName || row.parentName || "Parent";
+                    if (!id || !name || !cls) { skipped++; continue; }
+                    const key = `${cls}|${id}`;
+                    if (studentDocMap.has(key)) { skipped++; continue; }
+                    await db.collection('students').add({ id: String(id), name: String(name), class: cls, parentPhone: String(phone), parentName: String(pname), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    added++;
+                }
+                await loadStudents(); await renderAttendance();
+                showMessage(`Imported ${added} new, skipped ${skipped} duplicates`, 'success', 'importMessage');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function addManualStudent() {
+            const id = document.getElementById('newStudentId').value.trim(), name = document.getElementById('newStudentName').value.trim(), cls = document.getElementById('newClass').value.trim();
+            const phone = document.getElementById('newParentPhone').value.trim() || "23270000000", pname = document.getElementById('newParentName').value.trim() || "Parent";
+            if (!id || !name || !cls) { showMessage('Fill ID, Name, Class', 'error', 'manualMessage'); return; }
+            const key = `${cls}|${id}`;
+            if (studentDocMap.has(key)) { showMessage(`Student ${id} exists`, 'error', 'manualMessage'); return; }
+            await db.collection('students').add({ id, name, class: cls, parentPhone: phone, parentName: pname, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            await loadStudents(); await renderAttendance();
+            showMessage(`Added ${name}`, 'success', 'manualMessage');
+            ['newStudentId','newStudentName','newClass','newParentPhone','newParentName'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function downloadSample() {
+            const ws = XLSX.utils.json_to_sheet([{ StudentID: "STU010", Name: "Amara Kallon", Class: "Grade 5A", ParentPhone: "23276123456", ParentName: "Mr. Kallon" }]);
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Students"); XLSX.writeFile(wb, "students_template.xlsx");
+        }
+
+        async function refreshStudents() { await loadStudents(); await renderAttendance(); showMessage("Refreshed", 'success', 'importMessage'); }
+
+        // ========== EXAMS MODULE (unchanged, working) ==========
+        async function renderExams() {
+            const container = document.getElementById('examsContainer');
+            container.innerHTML = '';
+            if (examTeacherMode) {
+                await renderTeacherPanel(container);
+            } else {
+                await renderStudentPanel(container);
+            }
+        }
+        async function renderTeacherPanel(container) {
+            const formCard = document.createElement('div'); formCard.className = 'exam-card';
+            formCard.innerHTML = `<h3>📝 Create New Exam</h3>`;
+            const titleInput = document.createElement('input'); titleInput.placeholder = 'Exam Title'; titleInput.id = 'examTitle'; titleInput.style.width = '100%';
+            const subjectInput = document.createElement('input'); subjectInput.placeholder = 'Subject'; subjectInput.id = 'examSubject'; subjectInput.style.width = '100%';
+            const classInput = document.createElement('input'); classInput.placeholder = 'Class'; classInput.id = 'examClass'; classInput.style.width = '100%';
+            const totalMarksInput = document.createElement('input'); totalMarksInput.type = 'number'; totalMarksInput.value = '50'; totalMarksInput.id = 'totalMarks'; totalMarksInput.style.width = '100px';
+            const passingInput = document.createElement('input'); passingInput.type = 'number'; passingInput.value = '25'; passingInput.id = 'passingScore'; passingInput.style.width = '100px';
+            const durationInput = document.createElement('input'); durationInput.type = 'number'; durationInput.value = '60'; durationInput.id = 'duration'; durationInput.style.width = '100px';
+            const addQuestionBtn = document.createElement('button'); addQuestionBtn.textContent = '+ Add Question'; addQuestionBtn.style.background = '#2196F3'; addQuestionBtn.style.color = 'white';
+            const questionsDiv = document.createElement('div'); questionsDiv.id = 'questionsList';
+            const saveBtn = document.createElement('button'); saveBtn.textContent = '💾 Save Exam'; saveBtn.className = 'refresh-btn';
+            formCard.append(titleInput, subjectInput, classInput, document.createElement('br'), document.createTextNode('Total Marks: '), totalMarksInput, document.createTextNode(' Passing: '), passingInput, document.createTextNode(' Duration (min): '), durationInput, document.createElement('br'), addQuestionBtn, questionsDiv, saveBtn);
+            const existingCard = document.createElement('div'); existingCard.className = 'exam-card'; existingCard.innerHTML = '<h3>📋 Existing Exams</h3><div id="existingExamsList"></div>';
+            container.append(formCard, existingCard);
+            let questions = [];
+            function refreshQuestionsUI() {
+                questionsDiv.innerHTML = '';
+                questions.forEach((q, idx) => {
+                    const qDiv = document.createElement('div'); qDiv.className = 'question-item';
+                    qDiv.innerHTML = `
+                        <label>Q${idx+1} Text:</label> <input type="text" class="q-text" value="${escapeHtml(q.text)}" style="width:100%;"><br>
+                        <label>Options (4):</label><br>
+                        ${[0,1,2,3].map(i => `<input type="text" class="q-opt-${i}" value="${escapeHtml(q.options[i] || '')}" placeholder="Option ${i+1}" style="width:23%;">`).join('')}<br>
+                        <label>Correct (0-3):</label> <input type="number" class="q-correct" value="${q.correct}" min="0" max="3">
+                        <label>Marks:</label> <input type="number" class="q-marks" value="${q.marks}" min="1">
+                        <button class="remove-question" data-idx="${idx}" style="background:#f44336;">Remove</button>
+                    `;
+                    questionsDiv.appendChild(qDiv);
+                });
+                document.querySelectorAll('.remove-question').forEach(btn => {
+                    btn.onclick = () => { const idx = parseInt(btn.getAttribute('data-idx')); questions.splice(idx, 1); refreshQuestionsUI(); };
+                });
+            }
+            addQuestionBtn.onclick = () => { questions.push({ text: '', options: ['','','',''], correct: 0, marks: 1 }); refreshQuestionsUI(); };
+            saveBtn.onclick = async () => {
+                const title = titleInput.value.trim(), subject = subjectInput.value.trim(), className = classInput.value.trim();
+                const totalMarks = parseInt(totalMarksInput.value), passingScore = parseInt(passingInput.value), duration = parseInt(durationInput.value);
+                const qDivs = document.querySelectorAll('#questionsList .question-item');
+                const finalQuestions = [];
+                for (let i=0; i<qDivs.length; i++) {
+                    const div = qDivs[i];
+                    const text = div.querySelector('.q-text')?.value || '';
+                    const options = [0,1,2,3].map(j => div.querySelector(`.q-opt-${j}`)?.value || '');
+                    const correct = parseInt(div.querySelector('.q-correct')?.value) || 0;
+                    const marks = parseInt(div.querySelector('.q-marks')?.value) || 1;
+                    finalQuestions.push({ text, options, correct, marks });
+                }
+                if (!title || !subject || !className || finalQuestions.length === 0) { alert("Fill all fields and add at least one question."); return; }
+                let computedTotal = finalQuestions.reduce((s,q)=>s+q.marks,0);
+                if (computedTotal !== totalMarks) { alert(`Total marks mismatch: ${computedTotal} vs ${totalMarks}`); return; }
+                await db.collection('exams').add({ title, subject, class: className, totalMarks, passingScore, duration, questions: finalQuestions, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                alert("Exam saved!");
+                renderExams();
+            };
+            const examsSnap = await db.collection('exams').orderBy('createdAt', 'desc').get();
+            const listDiv = document.getElementById('existingExamsList');
+            listDiv.innerHTML = '';
+            for (const doc of examsSnap.docs) {
+                const ex = doc.data();
+                const div = document.createElement('div'); div.className = 'question-item';
+                div.innerHTML = `<strong>${escapeHtml(ex.title)}</strong> (${escapeHtml(ex.subject)}) - ${escapeHtml(ex.class)}<br>Total: ${ex.totalMarks} | Passing: ${ex.passingScore}<br>
+                    <button class="view-results" data-id="${doc.id}" style="background:#2196F3;">View Results</button>
+                    <button class="delete-exam" data-id="${doc.id}" style="background:#f44336;">Delete</button>`;
+                listDiv.appendChild(div);
+            }
+            document.querySelectorAll('.view-results').forEach(btn => { btn.onclick = async () => await showExamResults(btn.getAttribute('data-id')); });
+            document.querySelectorAll('.delete-exam').forEach(btn => { btn.onclick = async () => { if (confirm('Delete exam?')) { const id = btn.getAttribute('data-id'); await db.collection('exams').doc(id).delete(); const results = await db.collection('exam_results').where('examId','==',id).get(); results.forEach(d=>d.ref.delete()); renderExams(); } }; });
+        }
+        async function showExamResults(examId) {
+            const examDoc = await db.collection('exams').doc(examId).get();
+            const exam = examDoc.data();
+            const resultsSnap = await db.collection('exam_results').where('examId', '==', examId).get();
+            const container = document.getElementById('examsContainer');
+            let html = `<div class="exam-card"><h3>Results for ${escapeHtml(exam.title)}</h3>`;
+            if (resultsSnap.empty) html += '<p>No submissions yet.</p>';
+            else {
+                html += `able border="1" cellpadding="5" style="width:100%;border-collapse:collapse;">`;
+                html += `<tr><th>Student ID</th><th>Score</th><th>%</th><th>Passed</th></tr>`;
+                resultsSnap.forEach(d => { const r = d.data(); html += `<tr><td>${escapeHtml(r.studentId)}</td><td>${r.score}/${exam.totalMarks}</td><td>${r.percentage.toFixed(1)}%</td><td>${r.passed ? '✅' : '❌'}</td></tr>`; });
+                html += `</table><br><button id="exportCsv" class="refresh-btn">Export CSV</button>`;
+            }
+            html += `<button id="closeResults" class="refresh-btn">Close</button></div>`;
+            container.innerHTML = html;
+            document.getElementById('closeResults').onclick = () => renderExams();
+            if (document.getElementById('exportCsv')) {
+                document.getElementById('exportCsv').onclick = () => {
+                    let csv = "Student ID,Score,Percentage,Passed\n";
+                    resultsSnap.forEach(d => { const r = d.data(); csv += `${r.studentId},${r.score},${r.percentage},${r.passed}\n`; });
+                    const blob = new Blob([csv], {type:'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${exam.title}_results.csv`; a.click();
+                };
+            }
+        }
+        async function renderStudentPanel(container) {
+            container.innerHTML = `<div class="exam-card"><h3>📚 Available Mock Exams</h3><div id="studentExamsList"></div></div><div id="takeExamPanel"></div>`;
+            const studentId = prompt("Enter your Student ID (e.g., STU001):", "STU001");
+            if (!studentId) return;
+            const examsSnap = await db.collection('exams').get();
+            const listDiv = document.getElementById('studentExamsList');
+            listDiv.innerHTML = '';
+            for (const doc of examsSnap.docs) {
+                const exam = doc.data();
+                const existing = await db.collection('exam_results').where('examId','==',doc.id).where('studentId','==',studentId).get();
+                const taken = !existing.empty;
+                const btn = document.createElement('button'); btn.textContent = 'Take Exam'; btn.className = 'refresh-btn';
+                if (taken) btn.disabled = true;
+                const div = document.createElement('div'); div.className = 'question-item';
+                div.innerHTML = `<strong>${escapeHtml(exam.title)}</strong> (${escapeHtml(exam.subject)}) - ${escapeHtml(exam.class)}<br>Total: ${exam.totalMarks} | Passing: ${exam.passingScore} | Duration: ${exam.duration} min ${taken ? '<span style="color:green;">(Taken)</span>' : ''}`;
+                if (!taken) div.appendChild(btn);
+                listDiv.appendChild(div);
+                if (!taken) btn.onclick = async () => { startExam(exam, doc.id, studentId); };
+            }
+        }
+        let currentTimer = null;
+        async function startExam(exam, examId, studentId) {
+            let answers = new Array(exam.questions.length).fill(null);
+            let secondsLeft = exam.duration * 60;
+            const container = document.getElementById('examsContainer');
+            container.innerHTML = `<div class="timer" id="examTimer">${formatTime(secondsLeft)}</div><div class="exam-card" id="examQuestionsContainer"></div><button id="submitExamBtn" style="background:#4CAF50;">Submit Exam</button>`;
+            const qContainer = document.getElementById('examQuestionsContainer');
+            exam.questions.forEach((q, idx) => {
+                const div = document.createElement('div'); div.className = 'question';
+                div.innerHTML = `<p><strong>Q${idx+1}. ${escapeHtml(q.text)} (${q.marks} marks)</strong></p><div class="options">${q.options.map((opt, optIdx) => `<label><input type="radio" name="q${idx}" value="${optIdx}"> ${escapeHtml(opt)}</label><br>`).join('')}</div>`;
+                qContainer.appendChild(div);
+                const radios = div.querySelectorAll(`input[name="q${idx}"]`);
+                radios.forEach(r => r.addEventListener('change', (e) => { answers[idx] = parseInt(e.target.value); }));
+            });
+            if (currentTimer) clearInterval(currentTimer);
+            currentTimer = setInterval(async () => {
+                const timerEl = document.getElementById('examTimer');
+                if (!timerEl) { clearInterval(currentTimer); return; }
+                if (secondsLeft <= 0) { clearInterval(currentTimer); alert("Time's up!"); await submitExam(exam, examId, studentId, answers); }
+                else { secondsLeft--; timerEl.innerText = formatTime(secondsLeft); }
+            }, 1000);
+            document.getElementById('submitExamBtn').onclick = async () => { clearInterval(currentTimer); await submitExam(exam, examId, studentId, answers); };
+        }
+        async function submitExam(exam, examId, studentId, answers) {
+            let totalScore = 0;
+            for (let i=0; i<exam.questions.length; i++) if (answers[i] === exam.questions[i].correct) totalScore += exam.questions[i].marks;
+            const percentage = (totalScore / exam.totalMarks) * 100;
+            const passed = percentage >= exam.passingScore;
+            await db.collection('exam_results').add({ examId, studentId, score: totalScore, percentage, passed, answers, submittedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            alert(`Score: ${totalScore}/${exam.totalMarks} (${percentage.toFixed(1)}%) - ${passed ? 'Passed ✅' : 'Failed ❌'}`);
+            renderExams();
+        }
+        function formatTime(sec) { const m = Math.floor(sec/60); const s = sec%60; return `${m}:${s<10?'0'+s:s}`; }
+
+        // ========== MODULE SWITCHING ==========
+        function switchToAttendance() {
+            document.getElementById('attendanceModule').style.display = 'block';
+            document.getElementById('examsModule').style.display = 'none';
+            document.getElementById('attendanceBtn').classList.add('active');
+            document.getElementById('examsBtn').classList.remove('active');
+            renderAttendance();
+        }
+        function switchToExams() {
+            document.getElementById('attendanceModule').style.display = 'none';
+            document.getElementById('examsModule').style.display = 'block';
+            document.getElementById('attendanceBtn').classList.remove('active');
+            document.getElementById('examsBtn').classList.add('active');
+            renderExams();
+        }
+
+        // ========== INITIALIZATION ==========
+        window.onload = async () => {
+            await loadStudents();
+            await renderAttendance();
+            await updateOnlineStatus();
+            window.addEventListener('online', () => { updateOnlineStatus(); retryOfflineAttendance(); loadStudents().then(()=>renderAttendance()); });
+            window.addEventListener('offline', updateOnlineStatus);
+            document.getElementById('attendanceBtn').onclick = switchToAttendance;
+            document.getElementById('examsBtn').onclick = switchToExams;
+            document.getElementById('importBtn').onclick = () => { const file = document.getElementById('excelFile').files[0]; if (file) importExcel(file); else alert('Select an Excel file'); };
+            document.getElementById('downloadSampleBtn').onclick = downloadSample;
+            document.getElementById('addStudentBtn').onclick = addManualStudent;
+            document.getElementById('loadBtn').onclick = renderAttendance;
+            document.getElementById('refreshBtn').onclick = refreshStudents;
+            document.getElementById('batchWhatsappBtn').onclick = sendDailySummary;
+            document.getElementById('classHistoryBtn').onclick = viewClassHistory;
+            document.getElementById('classSelect').onchange = renderAttendance;
+            const toggleBtn = document.getElementById('examModeToggleBtn');
+            toggleBtn.onclick = () => { examTeacherMode = !examTeacherMode; toggleBtn.innerText = examTeacherMode ? 'Switch to Student Mode' : 'Switch to Teacher Mode'; renderExams(); };
+        };
+    </script>
 </body>
 </html>
