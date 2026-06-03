@@ -32,7 +32,7 @@
         .error { background: #f44336; color: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
         .refresh-btn { background: #2196F3; color: white; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 85%; overflow: auto; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 550px; width: 95%; max-height: 85%; overflow: auto; }
         .close-modal { float: right; cursor: pointer; font-size: 24px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
@@ -54,6 +54,10 @@
         .assessment-btn { background: #ddd; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .assessment-btn.active { background: #2196F3; color: white; }
         .remark-input { width: 150px; padding: 5px; font-size: 12px; }
+        .fee-term-btns { display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; }
+        .fee-term-btn { background: #e0e0e0; padding: 6px 14px; border-radius: 5px; cursor: pointer; }
+        .fee-term-btn.active { background: #4CAF50; color: white; }
+        .whatsapp-btn { background: #25D366; color: white; padding: 5px 10px; font-size: 12px; }
         .logout-btn { background: #f44336; color: white; margin-left: 10px; }
         .user-info { font-size: 14px; margin-right: 10px; }
         @media (max-width: 600px) { .student-info { flex-direction: column; align-items: flex-start; } th, td { font-size: 11px; padding: 4px; } .remark-input { width: 100px; } }
@@ -100,7 +104,7 @@
                 <button id="addStudentBtn" style="background:#2196F3; color:white;">+ Add Student</button>
                 <div id="manualMessage"></div>
             </div>
-            <div><select id="classSelect"></select><button id="loadBtn">Load Students</button><button id="refreshBtn" class="refresh-btn">🔄 Refresh</button><button id="batchWhatsappBtn" style="background:#128C7E; color:white;">📱 Send Reports</button><button id="classHistoryBtn" class="refresh-btn">📅 Class History</button></div>
+            <div><select id="classSelect"></select><button id="loadBtn">Load Students</button><button id="refreshBtn" class="refresh-btn">🔄 Refresh</button><button id="batchWhatsappBtn" style="background:#128C7E; color:white;">📱 Send All Reports</button><button id="classHistoryBtn" class="refresh-btn">📅 Class History</button></div>
             <div id="studentList"></div>
         </div>
 
@@ -111,7 +115,17 @@
                 <div class="tabs"><button class="tab-btn active" data-tab="profile">📋 Profile</button><button class="tab-btn" data-tab="exams">📝 Exam Records</button><button class="tab-btn" data-tab="fees">💰 Fee Payments</button></div>
                 <div id="profileTab" class="tab-content active"><div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">✏️ Edit Profile</button></div></div>
                 <div id="examsTab" class="tab-content"><div class="card"><h3>Exam Records</h3><div class="exam-term-btns"><button class="term-btn active" data-term="term1">Term 1</button><button class="term-btn" data-term="term2">Term 2</button><button class="term-btn" data-term="term3">Term 3</button></div><div id="termAssessmentSelector"></div><div id="examRecordsContent"></div><button id="saveExamsBtn" class="refresh-btn">💾 Save Exam Records</button></div></div>
-                <div id="feesTab" class="tab-content"><div class="card"><h3>Fee Management</h3><div id="feesContent"></div><button id="recordPaymentBtn" class="refresh-btn">💰 Record Payment</button><button id="editTotalFeesBtn" class="refresh-btn" style="background:#FF9800;">✏️ Edit Total Fees</button></div></div>
+                <div id="feesTab" class="tab-content"><div class="card">
+                    <h3>Fee Management</h3>
+                    <div class="fee-term-btns">
+                        <button class="fee-term-btn active" data-fee-term="term1">📘 Term 1</button>
+                        <button class="fee-term-btn" data-fee-term="term2">📗 Term 2</button>
+                        <button class="fee-term-btn" data-fee-term="term3">📙 Term 3</button>
+                    </div>
+                    <div id="feesContent"></div>
+                    <button id="recordPaymentBtn" class="refresh-btn">💰 Record Payment</button>
+                    <button id="editTotalFeesBtn" class="refresh-btn" style="background:#FF9800;">✏️ Edit Term Fees</button>
+                </div></div>
             </div>
         </div>
 
@@ -129,7 +143,7 @@
             <div class="card"><h3>📋 All Teachers</h3><div id="allTeachersList"></div></div>
         </div>
 
-        <!-- ADMIN MODULE -->
+        <!-- ADMIN MODULE (removed Create User tab) -->
         <div id="adminModule" style="display:none;">
             <div class="tabs" id="adminTabs">
                 <button class="admin-tab-btn active" data-tab="staff">👥 Staff Attendance</button>
@@ -158,9 +172,20 @@
         </div>
     </div>
 
-    <!-- MODALS (existing) -->
+    <!-- MODALS -->
     <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student</h3><input type="text" id="editProfileName"><select id="editProfileClassLevel"><option value="JSS1">JSS1</option><option value="JSS2">JSS2</option><option value="JSS3">JSS3</option><option value="SSS1">SSS1</option><option value="SSS2">SSS2</option><option value="SSS3">SSS3</option></select><select id="editProfileStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save</button></div></div>
-    <div id="paymentModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('paymentModal')">&times;</span><h3>Record Payment</h3><input type="number" id="paymentAmount" placeholder="Amount"><select id="paymentType"><option value="full">Full Payment</option><option value="partial">Partial Payment</option></select><input type="text" id="paymentNote" placeholder="Note"><button id="submitPaymentBtn" class="refresh-btn">Submit</button></div></div>
+    <div id="paymentModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('paymentModal')">&times;</span><h3>Record Payment - <span id="paymentTermLabel">Term 1</span></h3>
+        <input type="number" id="paymentAmount" placeholder="Amount (Le)" step="0.01">
+        <select id="paymentType"><option value="full">Full Payment</option><option value="partial">Partial Payment</option></select>
+        <input type="text" id="paymentNote" placeholder="Note (optional)">
+        <button id="submitPaymentBtn" class="refresh-btn">Submit Payment</button>
+    </div></div>
+    <div id="editFeesModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editFeesModal')">&times;</span><h3>Edit Term Fees</h3>
+        <label>Term 1 Total Fees (Le):</label><input type="number" id="editTerm1Fees" placeholder="Term 1 Fees" step="0.01">
+        <label>Term 2 Total Fees (Le):</label><input type="number" id="editTerm2Fees" placeholder="Term 2 Fees" step="0.01">
+        <label>Term 3 Total Fees (Le):</label><input type="number" id="editTerm3Fees" placeholder="Term 3 Fees" step="0.01">
+        <button id="saveFeesBtn" class="refresh-btn">Save Changes</button>
+    </div></div>
     <div id="historyModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('historyModal')">&times;</span><h3>Attendance History</h3><div id="historyContent"></div></div></div>
     <div id="editModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editModal')">&times;</span><h3>Edit Student (Attendance)</h3><input type="text" id="editStudentId" readonly><input type="text" id="editStudentName"><input type="text" id="editParentPhone"><input type="text" id="editParentName"><button id="saveEditBtn" class="refresh-btn">Save</button></div></div>
 
@@ -180,7 +205,6 @@
             messagingSenderId: "185301289478",
             appId: "1:185301289478:web:f3eb92954cb8570da81187"
         };
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
@@ -192,6 +216,7 @@
         let currentStudentDoc = null;
         let currentTerm = 'term1';
         let currentAssessment = 'test1';
+        let currentFeeTerm = 'term1';
         let currentUserRole = null;
         let currentTeacherClass = null;
         let currentParentStudentId = null;
@@ -248,12 +273,10 @@
                 teachersBtn.style.display = 'none';
                 adminBtn.style.display = 'none';
                 recordsBtn.style.display = 'inline-block';
-                // Disable adding/importing students for teachers
                 const addSection = document.querySelector('.manual-section');
                 if (addSection) addSection.style.display = 'none';
                 const importSection = document.querySelector('.import-section');
                 if (importSection) importSection.style.display = 'none';
-                // Force class dropdown to teacher's class
                 const classSelect = document.getElementById('classSelect');
                 if (classSelect && currentTeacherClass) {
                     classSelect.innerHTML = `<option value="${currentTeacherClass}">${currentTeacherClass}</option>`;
@@ -269,7 +292,6 @@
                 if (importSection) importSection.style.display = 'none';
                 const batchWhatsapp = document.getElementById('batchWhatsappBtn');
                 if (batchWhatsapp) batchWhatsapp.style.display = 'none';
-                // Auto-search child
                 if (currentParentStudentId) {
                     setTimeout(() => {
                         document.getElementById('studentSearchInput').value = currentParentStudentId;
@@ -279,7 +301,7 @@
             }
         }
 
-        // Login
+        // Login / Logout
         document.getElementById('loginBtn').onclick = async () => {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -305,7 +327,6 @@
             }
         };
 
-        // Logout
         document.getElementById('logoutBtn').onclick = async () => {
             await auth.signOut();
             location.reload();
@@ -343,7 +364,13 @@
                     const key = `${cls}|${s.id}`;
                     studentDocMap.set(key, doc.id);
                     if(!allStudents[cls]) allStudents[cls] = [];
-                    allStudents[cls].push({ id: s.id, name: s.name, parentPhone: s.parentPhone, parentName: s.parentName, docId: doc.id });
+                    allStudents[cls].push({ 
+                        id: s.id, 
+                        name: s.name, 
+                        parentPhone: s.parentPhone, 
+                        parentName: s.parentName, 
+                        docId: doc.id 
+                    });
                 });
                 updateClassDropdown();
             } catch(e) { console.error(e); showMessage("Error loading students: "+e.message, "error", "importMessage"); }
@@ -351,7 +378,7 @@
         function updateClassDropdown() {
             const select = document.getElementById('classSelect');
             if(!select) return;
-            if (currentUserRole === 'teacher' && currentTeacherClass) return; // already disabled and set
+            if (currentUserRole === 'teacher' && currentTeacherClass) return;
             const current = select.value;
             select.innerHTML = '';
             const levels = ['JSS1','JSS2','JSS3','SSS1','SSS2','SSS3'];
@@ -377,6 +404,39 @@
                 renderAttendance();
             } catch(e) { showMessage("Offline: saved locally", "error", "importMessage"); renderAttendance(); }
         }
+        
+        // WhatsApp function for individual student
+        function sendWhatsApp(student, status, remark, classname) {
+            const statusText = status === 'present' ? 'PRESENT ✅' : status === 'absent' ? 'ABSENT ❌' : 'LATE ⏰';
+            const message = `🏫 Attendance Update - ${classname}\n\nStudent: ${student.name} (${student.id})\nStatus: ${statusText}\nRemark: ${remark}\nDate: ${new Date().toLocaleDateString()}\n\nThank you.`;
+            window.open(`https://wa.me/${student.parentPhone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+        
+        // Batch WhatsApp for all/absent/late students
+        async function sendBatchWhatsApp() {
+            if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert("Only admin/teacher can send reports."); return; }
+            const classname = document.getElementById('classSelect').value;
+            const students = allStudents[classname] || [];
+            if(!students.length) { alert("No students"); return; }
+            const att = await loadAttendance(classname);
+            const present = students.filter(s => att[s.id]?.status === 'present');
+            const absent = students.filter(s => att[s.id]?.status === 'absent');
+            const late = students.filter(s => att[s.id]?.status === 'late');
+            const choice = prompt('Send to:\n1 - All parents\n2 - Absent only\n3 - Late only\n\nEnter 1, 2, or 3:', '1');
+            let recipients = [];
+            if (choice === '1') recipients = students;
+            else if (choice === '2') recipients = absent;
+            else if (choice === '3') recipients = late;
+            else return;
+            if(!recipients.length) { alert("No recipients"); return; }
+            const summary = `📊 Attendance Report - ${classname} (${new Date().toLocaleDateString()})\n✅ Present: ${present.length}\n❌ Absent: ${absent.length}\n⏰ Late: ${late.length}`;
+            recipients.forEach((s, i) => setTimeout(() => {
+                const msg = `Dear ${s.parentName},\n\n${summary}\n\nThank you.`;
+                window.open(`https://wa.me/${s.parentPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+            }, i * 500));
+            alert(`Opening WhatsApp for ${recipients.length} parents.`);
+        }
+        
         async function renderAttendance() {
             const classname = document.getElementById('classSelect').value;
             if(!classname || !allStudents[classname]) {
@@ -397,6 +457,7 @@
                         <div>
                             ${currentUserRole === 'admin' || currentUserRole === 'teacher' ? `<button class="edit-student" data-class="${classname}" data-id="${s.id}">✏️ Edit</button>` : ''}
                             <button class="history-student" data-class="${classname}" data-id="${s.id}" data-name="${escapeHtml(s.name)}">📜 History</button>
+                            <button class="whatsapp-individual" data-student='${JSON.stringify(s)}' data-status="${att.status}" data-remark="${escapeHtml(att.remark)}" data-class="${classname}" class="whatsapp-btn">📱 WhatsApp</button>
                             ${currentUserRole === 'admin' || currentUserRole === 'teacher' ? `<button class="delete-student" data-class="${classname}" data-id="${s.id}" style="background:#f44336;">🗑️ Delete</button>` : ''}
                         </div>
                     </div>
@@ -458,18 +519,33 @@
                     };
                 });
             }
+            // WhatsApp individual button handler
+            document.querySelectorAll('.whatsapp-individual').forEach(btn => {
+                btn.onclick = () => {
+                    const student = JSON.parse(btn.getAttribute('data-student'));
+                    const status = btn.getAttribute('data-status');
+                    const remark = btn.getAttribute('data-remark');
+                    const classname = btn.getAttribute('data-class');
+                    if (status === 'none') {
+                        alert('Please mark attendance first before sending WhatsApp.');
+                        return;
+                    }
+                    sendWhatsApp(student, status, remark, classname);
+                };
+            });
             document.querySelectorAll('.history-student').forEach(btn => {
                 btn.onclick = async () => {
                     const cls = btn.getAttribute('data-class'), sid = btn.getAttribute('data-id'), name = btn.getAttribute('data-name');
                     const snap = await db.collection('attendance').where('class','==',cls).where('studentId','==',sid).get();
                     let html = `<p><strong>${escapeHtml(name)} (${sid})</strong></p><table border="1"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
-                    snap.forEach(d => { const data = d.data(); const emoji = data.status === 'present' ? '✅ Present' : data.status === 'absent' ? '❌ Absent' : '⏰ Late'; html += `<tr><td>${data.date}</td><td>${emoji}</td><td>${escapeHtml(data.remark||'')}NonNullListCell--></td></tr>`; });
+                    snap.forEach(d => { const data = d.data(); const emoji = data.status === 'present' ? '✅ Present' : data.status === 'absent' ? '❌ Absent' : '⏰ Late'; html += `<tr><td>${data.date}</td><td>${emoji}</td><td>${escapeHtml(data.remark||'')}</td></tr>`; });
                     html += `</tbody></table>`;
                     document.getElementById('historyContent').innerHTML = html;
                     openModal('historyModal');
                 };
             });
         }
+        
         async function viewClassHistory() {
             const classname = document.getElementById('classSelect').value;
             if(!classname || !allStudents[classname]) { alert("Select a class first."); return; }
@@ -483,26 +559,13 @@
             for(let student of students) {
                 const att = attMap[student.id] || { status: 'Not marked', remark: '' };
                 const emoji = att.status === 'present' ? '✅ Present' : att.status === 'absent' ? '❌ Absent' : att.status === 'late' ? '⏰ Late' : '⚪ Not marked';
-                html += `<tr><td>${student.id}</td><td>${escapeHtml(student.name)}NonNullListCell-->NonNullListCell--></td><td class="remark-cell">${escapeHtml(att.remark)}</td></tr>`;
+                html += `<tr><td>${student.id}</td><td>${escapeHtml(student.name)}</td><td>${emoji}</td><td>${escapeHtml(att.remark)}</td></tr>`;
             }
             html += `</tbody></table>`;
             document.getElementById('historyContent').innerHTML = html;
             openModal('historyModal');
         }
-        async function sendDailySummary() {
-            if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert("Only admin/teacher can send reports."); return; }
-            const classname = document.getElementById('classSelect').value;
-            const students = allStudents[classname] || [];
-            if(!students.length) { alert("No students"); return; }
-            const att = await loadAttendance(classname);
-            const absent = students.filter(s => att[s.id]?.status === 'absent');
-            const choice = prompt('Send to: 1-All, 2-Absent only', '1');
-            let recipients = choice === '1' ? students : (choice === '2' ? absent : []);
-            if(!recipients.length) return;
-            const summary = `Attendance ${classname} ${new Date().toLocaleDateString()}`;
-            recipients.forEach((s,i) => setTimeout(() => window.open(`https://wa.me/${s.parentPhone}?text=${encodeURIComponent(`Dear ${s.parentName},\n\n${summary}`)}`, '_blank'), i*500));
-            alert(`Opening for ${recipients.length} parents`);
-        }
+        
         async function importExcel(file) {
             if (currentUserRole !== 'admin') { alert("Only admin can import students."); return; }
             const reader = new FileReader();
@@ -542,7 +605,7 @@
         }
         async function refreshStudents() { await loadStudents(); await renderAttendance(); showMessage("Refreshed", 'success', 'importMessage'); }
 
-        // ========== STUDENT RECORDS ==========
+        // ========== STUDENT RECORDS (simplified) ==========
         async function searchStudent() {
             const query = document.getElementById('studentSearchInput').value.trim().toLowerCase();
             if(!query) { alert("Enter Student ID or Name"); return; }
@@ -605,7 +668,7 @@
                 const score = records[key] || '';
                 let grade='', remarks='';
                 if(score) { const ns=parseFloat(score); if(ns>=75){grade='A';remarks='Excellent';}else if(ns>=65){grade='B';remarks='Good';}else if(ns>=55){grade='C';remarks='Average';}else if(ns>=45){grade='D';remarks='Pass';}else{grade='F';remarks='Fail';} }
-                html += `<tr><td class="subject-cell">${escapeHtml(sub)}</td><td class="score-cell"><input type="number" class="exam-score" data-term="${currentTerm}" data-assessment="${currentAssessment}" data-subject="${sub}" value="${score}" step="0.01" style="width:80px;"></td><td class="grade-cell">${grade}</td><td class="remarks-cell">${remarks}</td></tr>`;
+                html += `<tr><td>${escapeHtml(sub)}</td><td><input type="number" class="exam-score" data-term="${currentTerm}" data-assessment="${currentAssessment}" data-subject="${sub}" value="${score}" step="0.01" style="width:80px;"></td><td class="grade-cell">${grade}</td><td class="remarks-cell">${remarks}</td></tr>`;
             }
             html += `</tbody></table>`;
             document.getElementById('examRecordsContent').innerHTML = html;
@@ -626,49 +689,94 @@
             await db.collection('exam_records').doc(currentStudentDoc.docId).set(records, { merge: true });
             alert("Exam records saved!");
         }
+
+        // ========== FEE MANAGEMENT WITH THREE TERMS ==========
         async function loadFeeUI() {
             if(!currentStudentDoc) return;
             const feeDoc = await db.collection('fee_records').doc(currentStudentDoc.docId).get();
-            const feeData = feeDoc.exists ? feeDoc.data() : { totalFees: 1000000, paid: 0, transactions: [] };
-            const balance = feeData.totalFees - feeData.paid;
-            const statusClass = balance <= 0 ? 'fee-paid' : (feeData.paid > 0 ? 'fee-partial' : 'fee-unpaid');
-            let html = `<div class="${statusClass}" style="padding:15px;border-radius:5px"><strong>Total Fees:</strong> ${feeData.totalFees.toLocaleString()} Le<br><strong>Paid:</strong> ${feeData.paid.toLocaleString()} Le<br><strong>Balance:</strong> ${balance.toLocaleString()} Le<br><strong>Status:</strong> ${balance<=0?'✅ Fully Paid':(feeData.paid>0?'⚠️ Partial':'❌ Not Paid')}</div><h4>Payment History</h4><table border="1"><thead><tr><th>Date</th><th>Amount</th><th>Type</th><th>Note</th></tr></thead><tbody>`;
-            for(let t of (feeData.transactions||[])) html += `<tr><td>${t.date}</td><td class="amount-cell">${t.amount.toLocaleString()} Le</td><td class="type-cell">${t.type}</td><td class="note-cell">${escapeHtml(t.note||'')}</td></tr>`;
+            const feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
+            
+            const termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] };
+            const balance = termData.total - termData.paid;
+            const statusClass = balance <= 0 ? 'fee-paid' : (termData.paid > 0 ? 'fee-partial' : 'fee-unpaid');
+            const termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
+            
+            let html = `<div class="${statusClass}" style="padding:15px;border-radius:5px"><strong>${termNames[currentFeeTerm]} - Total Fees:</strong> ${termData.total.toLocaleString()} Le<br>
+                        <strong>Paid:</strong> ${termData.paid.toLocaleString()} Le<br>
+                        <strong>Balance:</strong> ${balance.toLocaleString()} Le<br>
+                        <strong>Status:</strong> ${balance <= 0 ? '✅ Fully Paid' : (termData.paid > 0 ? '⚠️ Partial Payment' : '❌ Not Paid')}</div>
+                        <h4>Payment History - ${termNames[currentFeeTerm]}</h4>
+                        <table border="1"><thead><tr><th>Date</th><th>Amount (Le)</th><th>Type</th><th>Note</th></tr></thead><tbody>`;
+            for(let t of (termData.transactions || [])) {
+                html += `<tr><td>${t.date}</td><td>${t.amount.toLocaleString()}</td><td>${t.type}</td><td>${escapeHtml(t.note||'')}</td></tr>`;
+            }
             html += `</tbody></table>`;
             document.getElementById('feesContent').innerHTML = html;
         }
+        
         async function recordPayment() {
             if (currentUserRole !== 'admin') { alert("Only admin can record payments."); return; }
             if(!currentStudentDoc) return;
+            const termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
+            document.getElementById('paymentTermLabel').innerText = termNames[currentFeeTerm];
             openModal('paymentModal');
             const submitBtn = document.getElementById('submitPaymentBtn');
             const handler = async () => {
-                const amount = parseFloat(document.getElementById('paymentAmount').value), type = document.getElementById('paymentType').value, note = document.getElementById('paymentNote').value;
-                if(isNaN(amount) || amount<=0) { alert("Enter valid amount"); return; }
+                const amount = parseFloat(document.getElementById('paymentAmount').value);
+                const type = document.getElementById('paymentType').value;
+                const note = document.getElementById('paymentNote').value;
+                if(isNaN(amount) || amount <= 0) { alert("Enter valid amount"); return; }
+                
                 const feeDoc = await db.collection('fee_records').doc(currentStudentDoc.docId).get();
-                const feeData = feeDoc.exists ? feeDoc.data() : { totalFees: 1000000, paid: 0, transactions: [] };
-                let newPaid = feeData.paid + amount;
-                if(type === 'full') newPaid = feeData.totalFees;
-                await db.collection('fee_records').doc(currentStudentDoc.docId).set({ totalFees: feeData.totalFees, paid: newPaid, transactions: [...(feeData.transactions||[]), { date: new Date().toLocaleDateString(), amount, type, note }] });
+                const feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
+                
+                const termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] };
+                let newPaid = termData.paid + amount;
+                if(type === 'full') newPaid = termData.total;
+                
+                const transaction = { date: new Date().toLocaleDateString(), amount, type, note };
+                termData.paid = newPaid;
+                termData.transactions = [...(termData.transactions || []), transaction];
+                feeData[currentFeeTerm] = termData;
+                
+                await db.collection('fee_records').doc(currentStudentDoc.docId).set(feeData);
                 closeModal('paymentModal');
-                document.getElementById('paymentAmount').value = ''; document.getElementById('paymentNote').value = '';
-                loadFeeUI(); alert("Payment recorded!");
+                document.getElementById('paymentAmount').value = '';
+                document.getElementById('paymentNote').value = '';
+                loadFeeUI();
+                alert("Payment recorded!");
                 submitBtn.removeEventListener('click', handler);
             };
             submitBtn.removeEventListener('click', submitBtn._listener);
             submitBtn.addEventListener('click', handler);
             submitBtn._listener = handler;
         }
+        
         async function editTotalFees() {
-            if (currentUserRole !== 'admin') { alert("Only admin can edit total fees."); return; }
+            if (currentUserRole !== 'admin') { alert("Only admin can edit fee amounts."); return; }
             if(!currentStudentDoc) return;
-            const newTotal = prompt("Enter new total fees (Le):", "1000000");
-            if(newTotal && !isNaN(parseFloat(newTotal))) {
-                const feeDoc = await db.collection('fee_records').doc(currentStudentDoc.docId).get();
-                const feeData = feeDoc.exists ? feeDoc.data() : { totalFees: 1000000, paid: 0, transactions: [] };
-                await db.collection('fee_records').doc(currentStudentDoc.docId).set({ ...feeData, totalFees: parseFloat(newTotal) }, { merge: true });
+            const feeDoc = await db.collection('fee_records').doc(currentStudentDoc.docId).get();
+            const feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
+            
+            document.getElementById('editTerm1Fees').value = feeData.term1?.total || 500000;
+            document.getElementById('editTerm2Fees').value = feeData.term2?.total || 500000;
+            document.getElementById('editTerm3Fees').value = feeData.term3?.total || 500000;
+            openModal('editFeesModal');
+            
+            const saveBtn = document.getElementById('saveFeesBtn');
+            const handler = async () => {
+                feeData.term1 = { ...feeData.term1, total: parseFloat(document.getElementById('editTerm1Fees').value), paid: feeData.term1?.paid || 0, transactions: feeData.term1?.transactions || [] };
+                feeData.term2 = { ...feeData.term2, total: parseFloat(document.getElementById('editTerm2Fees').value), paid: feeData.term2?.paid || 0, transactions: feeData.term2?.transactions || [] };
+                feeData.term3 = { ...feeData.term3, total: parseFloat(document.getElementById('editTerm3Fees').value), paid: feeData.term3?.paid || 0, transactions: feeData.term3?.transactions || [] };
+                await db.collection('fee_records').doc(currentStudentDoc.docId).set(feeData);
+                closeModal('editFeesModal');
                 loadFeeUI();
-            }
+                alert("Fee amounts updated!");
+                saveBtn.removeEventListener('click', handler);
+            };
+            saveBtn.removeEventListener('click', saveBtn._listener);
+            saveBtn.addEventListener('click', handler);
+            saveBtn._listener = handler;
         }
 
         // ========== TEACHER MANAGEMENT ==========
@@ -680,7 +788,7 @@
             let html = `<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Department</th><th>Actions</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const t = doc.data();
-                html += `<tr><td class="id-cell">${escapeHtml(t.id)}</td><td class="name-cell">${escapeHtml(t.name)}</td><td class="dept-cell">${escapeHtml(t.department||'N/A')}</td><td class="actions-cell"><button class="delete-teacher" data-id="${doc.id}">Delete</button></td></tr>`;
+                html += `<tr><td>${escapeHtml(t.id)}</td><td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.department||'N/A')}</td><td><button class="delete-teacher" data-id="${doc.id}">Delete</button></td></tr>`;
             }
             html += `</tbody></table>`;
             listDiv.innerHTML = html;
@@ -743,7 +851,7 @@
                 const today = new Date().toISOString().split('T')[0];
                 const attDoc = await db.collection('staff_attendance').doc(`${today}_${s.id}`).get();
                 const att = attDoc.exists ? attDoc.data() : null;
-                html += `<tr><td class="id-cell">${escapeHtml(s.id)}</td><td class="name-cell">${escapeHtml(s.name)}</td><td class="type-cell">${escapeHtml(s.type)}</td><td class="checkin-cell">${att?.checkInTime || 'Not checked in'}</td><td class="checkout-cell">${att?.checkOutTime || 'Not checked out'}</td><td class="action-cell">${!att ? `<button class="checkin-staff" data-id="${s.id}">Check In</button>` : (!att.checkOutTime ? `<button class="checkout-staff" data-id="${s.id}">Check Out</button>` : 'Completed')}</td></tr>`;
+                html += `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.type)}</td><td>${att?.checkInTime || 'Not checked in'}</td><td>${att?.checkOutTime || 'Not checked out'}</td><td>${!att ? `<button class="checkin-staff" data-id="${s.id}">Check In</button>` : (!att.checkOutTime ? `<button class="checkout-staff" data-id="${s.id}">Check Out</button>` : 'Completed')}</td></tr>`;
             }
             html += `</tbody></table>`;
             container.innerHTML = html;
@@ -794,7 +902,7 @@
             let html = `<table border="1"><thead><tr><th>Title</th><th>File</th><th>Size</th><th>Actions</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const f = doc.data();
-                html += `<tr><td class="title-cell">${escapeHtml(f.title)}</td><td class="filename-cell">${escapeHtml(f.fileName)}</td><td class="size-cell">${(f.fileSize/1024).toFixed(1)} KB</td><td class="actions-cell"><a href="${f.downloadURL}" target="_blank" class="refresh-btn">📥 Download</a> <button class="delete-file" data-id="${doc.id}" data-url="${f.downloadURL}" style="background:#f44336;">Delete</button></td></tr>`;
+                html += `<tr><td>${escapeHtml(f.title)}</td><td>${escapeHtml(f.fileName)}</td><td>${(f.fileSize/1024).toFixed(1)} KB</td><td><a href="${f.downloadURL}" target="_blank" class="refresh-btn">📥 Download</a> <button class="delete-file" data-id="${doc.id}" data-url="${f.downloadURL}" style="background:#f44336;">Delete</button></td></tr>`;
             }
             html += `</tbody></table>`;
             container.innerHTML = html;
@@ -816,7 +924,7 @@
             let html = `<table border="1"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const a = doc.data();
-                html += `<tr><td class="name-cell">${escapeHtml(a.name)}</td><td class="location-cell">${escapeHtml(a.location||'N/A')}</td><td class="status-cell">${a.status}</td><td class="actions-cell"><button class="delete-asset" data-id="${doc.id}">Delete</button></td></tr>`;
+                html += `<tr><td>${escapeHtml(a.name)}</td><td>${escapeHtml(a.location||'N/A')}</td><td>${a.status}</td><td><button class="delete-asset" data-id="${doc.id}">Delete</button></td></tr>`;
             }
             html += `</tbody></table>`;
             listDiv.innerHTML = html;
@@ -835,12 +943,12 @@
             const snap = await db.collection('visitors').orderBy('checkInTime','desc').limit(30).get();
             const listDiv = document.getElementById('visitorsList');
             if(snap.empty) { listDiv.innerHTML = '<p>No visitors</p>'; return; }
-            let html = `<table border="1"><thead><td><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>`;
+            let html = `<table border="1"><thead><tr><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const v = doc.data();
-                html += `<tr><td class="name-cell">${escapeHtml(v.name)}</td><td class="purpose-cell">${escapeHtml(v.purpose)}</td><td class="tosee-cell">${escapeHtml(v.toSee||'N/A')}</td><td class="checkin-cell">${v.checkInTime}</td><td class="checkout-cell">${v.checkOutTime||'Not checked out'}</td></tr>`;
+                html += `<tr><td>${escapeHtml(v.name)}</td><td>${escapeHtml(v.purpose)}</td><td>${escapeHtml(v.toSee||'N/A')}</td><td>${v.checkInTime}</td><td>${v.checkOutTime||'Not checked out'}</td></tr>`;
             }
-            html += `</tbody></tr>`;
+            html += `</tbody></table>`;
             listDiv.innerHTML = html;
         }
         async function checkInVisitor() {
@@ -859,7 +967,7 @@
             let html = `<table border="1"><thead><tr><th>Item</th><th>Quantity</th><th>Unit</th><th>Actions</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const i = doc.data();
-                html += `<tr><td class="name-cell">${escapeHtml(i.name)}</td><td class="qty-cell">${i.quantity}</td><td class="unit-cell">${escapeHtml(i.unit||'')}</td><td class="actions-cell"><button class="edit-inventory" data-id="${doc.id}">Edit</button> <button class="delete-inventory" data-id="${doc.id}">Delete</button></td></tr>`;
+                html += `<tr><td>${escapeHtml(i.name)}</td><td>${i.quantity}</td><td>${escapeHtml(i.unit||'')}</td><td><button class="edit-inventory" data-id="${doc.id}">Edit</button> <button class="delete-inventory" data-id="${doc.id}">Delete</button></td></tr>`;
             }
             html += `</tbody></table>`;
             listDiv.innerHTML = html;
@@ -934,6 +1042,17 @@
             initAdminTabs();
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
+            
+            // Fee term buttons
+            document.querySelectorAll('.fee-term-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.fee-term-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFeeTerm = btn.getAttribute('data-fee-term');
+                    if(currentStudentDoc) loadFeeUI();
+                };
+            });
+            
             document.getElementById('attendanceBtn').onclick = switchToAttendance;
             document.getElementById('recordsBtn').onclick = switchToRecords;
             document.getElementById('teachersBtn').onclick = switchToTeachers;
@@ -943,7 +1062,7 @@
             document.getElementById('addStudentBtn').onclick = addManualStudent;
             document.getElementById('loadBtn').onclick = renderAttendance;
             document.getElementById('refreshBtn').onclick = refreshStudents;
-            document.getElementById('batchWhatsappBtn').onclick = sendDailySummary;
+            document.getElementById('batchWhatsappBtn').onclick = sendBatchWhatsApp;
             document.getElementById('classHistoryBtn').onclick = viewClassHistory;
             document.getElementById('classSelect').onchange = renderAttendance;
             document.getElementById('searchStudentBtn').onclick = searchStudent;
@@ -963,6 +1082,7 @@
             document.getElementById('addAssetBtn').onclick = addAsset;
             document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
             document.getElementById('addInventoryBtn').onclick = addInventory;
+            
             document.querySelectorAll('.term-btn').forEach(btn => {
                 btn.onclick = () => {
                     document.querySelectorAll('.term-btn').forEach(b => b.classList.remove('active'));
@@ -979,6 +1099,9 @@
                     document.getElementById(btn.getAttribute('data-tab') + 'Tab').classList.add('active');
                 };
             });
+            
+            await loadStudents();
+            await renderAttendance();
         };
     </script>
 </body>
