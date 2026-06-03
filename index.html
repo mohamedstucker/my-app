@@ -60,6 +60,9 @@
         .whatsapp-btn { background: #25D366; color: white; padding: 5px 10px; font-size: 12px; }
         .logout-btn { background: #f44336; color: white; margin-left: 10px; }
         .user-info { font-size: 14px; margin-right: 10px; }
+        .exam-level-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .exam-level-btn { background: #e0e0e0; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .exam-level-btn.active { background: #4CAF50; color: white; }
         @media (max-width: 600px) { .student-info { flex-direction: column; align-items: flex-start; } th, td { font-size: 11px; padding: 4px; } .remark-input { width: 100px; } }
     </style>
 </head>
@@ -114,7 +117,26 @@
             <div id="studentRecordsPanel" style="display:none;">
                 <div class="tabs"><button class="tab-btn active" data-tab="profile">📋 Profile</button><button class="tab-btn" data-tab="exams">📝 Exam Records</button><button class="tab-btn" data-tab="fees">💰 Fee Payments</button></div>
                 <div id="profileTab" class="tab-content active"><div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">✏️ Edit Profile</button></div></div>
-                <div id="examsTab" class="tab-content"><div class="card"><h3>Exam Records</h3><div class="exam-term-btns"><button class="term-btn active" data-term="term1">Term 1</button><button class="term-btn" data-term="term2">Term 2</button><button class="term-btn" data-term="term3">Term 3</button></div><div id="termAssessmentSelector"></div><div id="examRecordsContent"></div><button id="saveExamsBtn" class="refresh-btn">💾 Save Exam Records</button></div></div>
+                <div id="examsTab" class="tab-content">
+                    <div class="card">
+                        <h3>Exam Records</h3>
+                        <div class="exam-term-btns">
+                            <button class="term-btn active" data-term="term1">Term 1</button>
+                            <button class="term-btn" data-term="term2">Term 2</button>
+                            <button class="term-btn" data-term="term3">Term 3</button>
+                        </div>
+                        <div class="exam-level-buttons">
+                            <button class="exam-level-btn active" data-exam-level="npse">NPSE</button>
+                            <button class="exam-level-btn" data-exam-level="bece">BECE</button>
+                            <button class="exam-level-btn" data-exam-level="wasce">WASSCE</button>
+                            <button class="exam-level-btn" data-exam-level="jss">JSS (1-3)</button>
+                            <button class="exam-level-btn" data-exam-level="sss">SSS (1-3)</button>
+                        </div>
+                        <div id="termAssessmentSelector"></div>
+                        <div id="examRecordsContent"></div>
+                        <button id="saveExamsBtn" class="refresh-btn">💾 Save Exam Records</button>
+                    </div>
+                </div>
                 <div id="feesTab" class="tab-content"><div class="card">
                     <h3>Fee Management</h3>
                     <div class="fee-term-btns">
@@ -143,7 +165,7 @@
             <div class="card"><h3>📋 All Teachers</h3><div id="allTeachersList"></div></div>
         </div>
 
-        <!-- ADMIN MODULE (removed Create User tab) -->
+        <!-- ADMIN MODULE -->
         <div id="adminModule" style="display:none;">
             <div class="tabs" id="adminTabs">
                 <button class="admin-tab-btn active" data-tab="staff">👥 Staff Attendance</button>
@@ -196,7 +218,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
     <script>
-        // ==================== FIREBASE CONFIGURATION ====================
         const firebaseConfig = {
             apiKey: "AIzaSyCE5iYGOl-ABjXs5gaS6Kl0zeGqHZf0vdg",
             authDomain: "sierra-leone-school-attendance.firebaseapp.com",
@@ -210,27 +231,25 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // ==================== GLOBAL VARIABLES ====================
         let allStudents = {};
         let studentDocMap = new Map();
         let currentStudentDoc = null;
         let currentTerm = 'term1';
+        let currentExamLevel = 'npse';
         let currentAssessment = 'test1';
         let currentFeeTerm = 'term1';
         let currentUserRole = null;
         let currentTeacherClass = null;
         let currentParentStudentId = null;
 
-        const subjectsByClass = {
-            JSS1: ['English','Mathematics','Basic Science','Basic Technology','Social Studies','Civic Education','Christian/Islamic Studies','Agricultural Science','Home Economics','Business Studies','French','Computer Studies','Physical & Health Education'],
-            JSS2: ['English','Mathematics','Basic Science','Basic Technology','Social Studies','Civic Education','Christian/Islamic Studies','Agricultural Science','Home Economics','Business Studies','French','Computer Studies','Physical & Health Education'],
-            JSS3: ['English','Mathematics','Basic Science','Basic Technology','Social Studies','Civic Education','Christian/Islamic Studies','Agricultural Science','Home Economics','Business Studies','French','Computer Studies','Physical & Health Education'],
-            SSS1: ['English','Mathematics','Physics','Chemistry','Biology','Economics','Geography','Government','Literature in English'],
-            SSS2: ['English','Mathematics','Physics','Chemistry','Biology','Economics','Geography','Government','Literature in English'],
-            SSS3: ['English','Mathematics','Physics','Chemistry','Biology','Economics','Geography','Government','Literature in English']
+        const examSubjects = {
+            npse: ['English', 'Mathematics', 'General Science', 'Social Studies', 'Quantitative Reasoning', 'Verbal Reasoning'],
+            bece: ['English', 'Mathematics', 'Basic Science', 'Basic Technology', 'Social Studies', 'Civic Education', 'Christian/Islamic Studies', 'Agricultural Science'],
+            wasce: ['English', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'Economics', 'Geography', 'Government', 'Literature in English'],
+            jss: ['English', 'Mathematics', 'Basic Science', 'Basic Technology', 'Social Studies', 'Civic Education', 'Christian/Islamic Studies', 'Agricultural Science', 'Home Economics', 'Business Studies', 'French', 'Computer Studies', 'Physical & Health Education'],
+            sss: ['English', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'Economics', 'Geography', 'Government', 'Literature in English']
         };
 
-        // Helper functions
         function showMessage(msg, type, elemId) {
             const div = document.getElementById(elemId);
             if(div) { div.innerHTML = `<div class="${type}">${msg}</div>`; setTimeout(() => div.innerHTML = '', 4000); }
@@ -241,7 +260,6 @@
         function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
         function calculateAge(dob) { if(!dob) return 'N/A'; const b = new Date(dob), t = new Date(); let a = t.getFullYear() - b.getFullYear(); const m = t.getMonth() - b.getMonth(); if(m < 0 || (m===0 && t.getDate() < b.getDate())) a--; return a; }
 
-        // ========== AUTHENTICATION ==========
         async function checkUserRole(user) {
             if (!user) return null;
             const doc = await db.collection('users').doc(user.uid).get();
@@ -301,7 +319,6 @@
             }
         }
 
-        // Login / Logout
         document.getElementById('loginBtn').onclick = async () => {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -332,7 +349,6 @@
             location.reload();
         };
 
-        // ========== ONLINE STATUS ==========
         async function updateOnlineStatus() {
             const badge = document.getElementById('onlineStatus');
             const syncBar = document.getElementById('syncBar');
@@ -345,7 +361,6 @@
             }
         }
 
-        // ========== ATTENDANCE MODULE ==========
         async function loadStudents() {
             try {
                 let query = db.collection('students');
@@ -364,13 +379,7 @@
                     const key = `${cls}|${s.id}`;
                     studentDocMap.set(key, doc.id);
                     if(!allStudents[cls]) allStudents[cls] = [];
-                    allStudents[cls].push({ 
-                        id: s.id, 
-                        name: s.name, 
-                        parentPhone: s.parentPhone, 
-                        parentName: s.parentName, 
-                        docId: doc.id 
-                    });
+                    allStudents[cls].push({ id: s.id, name: s.name, parentPhone: s.parentPhone, parentName: s.parentName, docId: doc.id });
                 });
                 updateClassDropdown();
             } catch(e) { console.error(e); showMessage("Error loading students: "+e.message, "error", "importMessage"); }
@@ -402,17 +411,21 @@
             try {
                 await db.collection('attendance').doc(id).set({ studentId, class: classname, date: today, status, remark, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
                 renderAttendance();
+                if (status === 'absent') {
+                    const student = allStudents[classname]?.find(s => s.id === studentId);
+                    if (student && confirm(`Send WhatsApp to ${student.parentName} about absence?`)) {
+                        sendWhatsApp(student, status, remark, classname);
+                    }
+                }
             } catch(e) { showMessage("Offline: saved locally", "error", "importMessage"); renderAttendance(); }
         }
-        
-        // WhatsApp function for individual student
+
         function sendWhatsApp(student, status, remark, classname) {
             const statusText = status === 'present' ? 'PRESENT ✅' : status === 'absent' ? 'ABSENT ❌' : 'LATE ⏰';
             const message = `🏫 Attendance Update - ${classname}\n\nStudent: ${student.name} (${student.id})\nStatus: ${statusText}\nRemark: ${remark}\nDate: ${new Date().toLocaleDateString()}\n\nThank you.`;
             window.open(`https://wa.me/${student.parentPhone}?text=${encodeURIComponent(message)}`, '_blank');
         }
-        
-        // Batch WhatsApp for all/absent/late students
+
         async function sendBatchWhatsApp() {
             if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert("Only admin/teacher can send reports."); return; }
             const classname = document.getElementById('classSelect').value;
@@ -436,7 +449,7 @@
             }, i * 500));
             alert(`Opening WhatsApp for ${recipients.length} parents.`);
         }
-        
+
         async function renderAttendance() {
             const classname = document.getElementById('classSelect').value;
             if(!classname || !allStudents[classname]) {
@@ -519,7 +532,6 @@
                     };
                 });
             }
-            // WhatsApp individual button handler
             document.querySelectorAll('.whatsapp-individual').forEach(btn => {
                 btn.onclick = () => {
                     const student = JSON.parse(btn.getAttribute('data-student'));
@@ -545,7 +557,7 @@
                 };
             });
         }
-        
+
         async function viewClassHistory() {
             const classname = document.getElementById('classSelect').value;
             if(!classname || !allStudents[classname]) { alert("Select a class first."); return; }
@@ -565,7 +577,7 @@
             document.getElementById('historyContent').innerHTML = html;
             openModal('historyModal');
         }
-        
+
         async function importExcel(file) {
             if (currentUserRole !== 'admin') { alert("Only admin can import students."); return; }
             const reader = new FileReader();
@@ -605,7 +617,6 @@
         }
         async function refreshStudents() { await loadStudents(); await renderAttendance(); showMessage("Refreshed", 'success', 'importMessage'); }
 
-        // ========== STUDENT RECORDS (simplified) ==========
         async function searchStudent() {
             const query = document.getElementById('studentSearchInput').value.trim().toLowerCase();
             if(!query) { alert("Enter Student ID or Name"); return; }
@@ -655,20 +666,22 @@
             saveBtn.addEventListener('click', handler);
             saveBtn._listener = handler;
         }
+
         async function loadExamUI() {
             if(!currentStudentDoc) return;
-            const subjects = subjectsByClass[currentStudentDoc.class] || subjectsByClass.JSS1;
-            document.getElementById('termAssessmentSelector').innerHTML = `<div class="assessment-btns"><button class="assessment-btn ${currentAssessment==='test1'?'active':''}" data-assessment="test1">Test 1</button><button class="assessment-btn ${currentAssessment==='test2'?'active':''}" data-assessment="test2">Test 2</button><button class="assessment-btn ${currentAssessment==='exam'?'active':''}" data-assessment="exam">Exam</button></div>`;
+            const subjects = examSubjects[currentExamLevel] || examSubjects.npse;
+            const termSelector = document.getElementById('termAssessmentSelector');
+            termSelector.innerHTML = `<div class="assessment-btns"><button class="assessment-btn ${currentAssessment==='test1'?'active':''}" data-assessment="test1">Test 1</button><button class="assessment-btn ${currentAssessment==='test2'?'active':''}" data-assessment="test2">Test 2</button><button class="assessment-btn ${currentAssessment==='exam'?'active':''}" data-assessment="exam">Exam</button></div>`;
             document.querySelectorAll('.assessment-btn').forEach(btn => { btn.onclick = () => { document.querySelectorAll('.assessment-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentAssessment=btn.getAttribute('data-assessment'); loadExamUI(); }; });
             const examDoc = await db.collection('exam_records').doc(currentStudentDoc.docId).get();
             const records = examDoc.exists ? examDoc.data() : {};
             let html = `<table class="exam-table"><thead><tr><th>Subject</th><th>Score</th><th>Grade</th><th>Remarks</th></tr></thead><tbody>`;
             for(let sub of subjects) {
-                const key = `${currentTerm}_${currentAssessment}_${sub}`;
+                const key = `${currentExamLevel}_${currentTerm}_${currentAssessment}_${sub}`;
                 const score = records[key] || '';
                 let grade='', remarks='';
                 if(score) { const ns=parseFloat(score); if(ns>=75){grade='A';remarks='Excellent';}else if(ns>=65){grade='B';remarks='Good';}else if(ns>=55){grade='C';remarks='Average';}else if(ns>=45){grade='D';remarks='Pass';}else{grade='F';remarks='Fail';} }
-                html += `<tr><td>${escapeHtml(sub)}</td><td><input type="number" class="exam-score" data-term="${currentTerm}" data-assessment="${currentAssessment}" data-subject="${sub}" value="${score}" step="0.01" style="width:80px;"></td><td class="grade-cell">${grade}</td><td class="remarks-cell">${remarks}</td></tr>`;
+                html += `<tr><td>${escapeHtml(sub)}</td><td><input type="number" class="exam-score" data-subject="${sub}" data-term="${currentTerm}" data-assessment="${currentAssessment}" data-level="${currentExamLevel}" value="${score}" step="0.01" style="width:80px;"></td><td class="grade-cell">${grade}</td><td class="remarks-cell">${remarks}</td></tr>`;
             }
             html += `</tbody></table>`;
             document.getElementById('examRecordsContent').innerHTML = html;
@@ -683,24 +696,25 @@
             if(!currentStudentDoc) return;
             const records = {};
             document.querySelectorAll('.exam-score').forEach(inp => {
-                const term = inp.getAttribute('data-term'), assessment = inp.getAttribute('data-assessment'), subject = inp.getAttribute('data-subject'), score = inp.value;
-                if(score) records[`${term}_${assessment}_${subject}`] = parseFloat(score);
+                const level = inp.getAttribute('data-level');
+                const term = inp.getAttribute('data-term');
+                const assessment = inp.getAttribute('data-assessment');
+                const subject = inp.getAttribute('data-subject');
+                const score = inp.value;
+                if(score) records[`${level}_${term}_${assessment}_${subject}`] = parseFloat(score);
             });
             await db.collection('exam_records').doc(currentStudentDoc.docId).set(records, { merge: true });
             alert("Exam records saved!");
         }
 
-        // ========== FEE MANAGEMENT WITH THREE TERMS ==========
         async function loadFeeUI() {
             if(!currentStudentDoc) return;
             const feeDoc = await db.collection('fee_records').doc(currentStudentDoc.docId).get();
             const feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
-            
             const termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] };
             const balance = termData.total - termData.paid;
             const statusClass = balance <= 0 ? 'fee-paid' : (termData.paid > 0 ? 'fee-partial' : 'fee-unpaid');
             const termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
-            
             let html = `<div class="${statusClass}" style="padding:15px;border-radius:5px"><strong>${termNames[currentFeeTerm]} - Total Fees:</strong> ${termData.total.toLocaleString()} Le<br>
                         <strong>Paid:</strong> ${termData.paid.toLocaleString()} Le<br>
                         <strong>Balance:</strong> ${balance.toLocaleString()} Le<br>
@@ -713,7 +727,7 @@
             html += `</tbody></table>`;
             document.getElementById('feesContent').innerHTML = html;
         }
-        
+
         async function recordPayment() {
             if (currentUserRole !== 'admin') { alert("Only admin can record payments."); return; }
             if(!currentStudentDoc) return;
@@ -726,19 +740,15 @@
                 const type = document.getElementById('paymentType').value;
                 const note = document.getElementById('paymentNote').value;
                 if(isNaN(amount) || amount <= 0) { alert("Enter valid amount"); return; }
-                
                 const feeDoc = await db.collection('fee_records').doc(currentStudentDoc.docId).get();
                 const feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
-                
                 const termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] };
                 let newPaid = termData.paid + amount;
                 if(type === 'full') newPaid = termData.total;
-                
                 const transaction = { date: new Date().toLocaleDateString(), amount, type, note };
                 termData.paid = newPaid;
                 termData.transactions = [...(termData.transactions || []), transaction];
                 feeData[currentFeeTerm] = termData;
-                
                 await db.collection('fee_records').doc(currentStudentDoc.docId).set(feeData);
                 closeModal('paymentModal');
                 document.getElementById('paymentAmount').value = '';
@@ -751,18 +761,16 @@
             submitBtn.addEventListener('click', handler);
             submitBtn._listener = handler;
         }
-        
+
         async function editTotalFees() {
             if (currentUserRole !== 'admin') { alert("Only admin can edit fee amounts."); return; }
             if(!currentStudentDoc) return;
             const feeDoc = await db.collection('fee_records').doc(currentStudentDoc.docId).get();
             const feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
-            
             document.getElementById('editTerm1Fees').value = feeData.term1?.total || 500000;
             document.getElementById('editTerm2Fees').value = feeData.term2?.total || 500000;
             document.getElementById('editTerm3Fees').value = feeData.term3?.total || 500000;
             openModal('editFeesModal');
-            
             const saveBtn = document.getElementById('saveFeesBtn');
             const handler = async () => {
                 feeData.term1 = { ...feeData.term1, total: parseFloat(document.getElementById('editTerm1Fees').value), paid: feeData.term1?.paid || 0, transactions: feeData.term1?.transactions || [] };
@@ -779,7 +787,6 @@
             saveBtn._listener = handler;
         }
 
-        // ========== TEACHER MANAGEMENT ==========
         async function loadTeachers() {
             if (currentUserRole !== 'admin') return;
             const snap = await db.collection('teachers').get();
@@ -839,7 +846,6 @@
             resultsDiv.innerHTML = `<div class="success"><strong>${escapeHtml(found.name)} (${found.id})</strong><br>Department: ${escapeHtml(found.department||'N/A')}</div>`;
         }
 
-        // ========== STAFF ATTENDANCE ==========
         async function loadStaffList() {
             if (currentUserRole !== 'admin') return;
             const snap = await db.collection('staff').get();
@@ -877,7 +883,6 @@
             document.getElementById('staffId').value = ''; document.getElementById('staffName').value = ''; loadStaffList();
         }
 
-        // ========== FILE STORAGE ==========
         async function uploadFile() {
             if (currentUserRole !== 'admin') { alert("Only admin can upload files."); return; }
             const file = document.getElementById('uploadFile').files[0];
@@ -915,7 +920,6 @@
             });
         }
 
-        // ========== ASSETS, VISITORS, INVENTORY ==========
         async function loadAssets() {
             if (currentUserRole !== 'admin') return;
             const snap = await db.collection('assets').get();
@@ -985,7 +989,6 @@
             document.getElementById('itemName').value = ''; document.getElementById('itemQuantity').value = ''; document.getElementById('itemUnit').value = ''; loadInventory();
         }
 
-        // ========== MODULE SWITCHING ==========
         function switchToAttendance() {
             document.getElementById('attendanceModule').style.display='block'; document.getElementById('recordsModule').style.display='none';
             document.getElementById('teachersModule').style.display='none'; document.getElementById('adminModule').style.display='none';
@@ -1014,7 +1017,6 @@
             loadStaffList(); loadAssets(); loadVisitors(); loadInventory(); loadFiles();
         }
 
-        // ========== ADMIN TABS INIT ==========
         function initAdminTabs() {
             const tabs = document.querySelectorAll('#adminTabs .admin-tab-btn');
             const contents = document.querySelectorAll('#adminModule .admin-tab');
@@ -1036,20 +1038,26 @@
             });
         }
 
-        // ========== INITIALIZATION ==========
         window.onload = async () => {
             await updateOnlineStatus();
             initAdminTabs();
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
             
-            // Fee term buttons
             document.querySelectorAll('.fee-term-btn').forEach(btn => {
                 btn.onclick = () => {
                     document.querySelectorAll('.fee-term-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentFeeTerm = btn.getAttribute('data-fee-term');
                     if(currentStudentDoc) loadFeeUI();
+                };
+            });
+            document.querySelectorAll('.exam-level-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.exam-level-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentExamLevel = btn.getAttribute('data-exam-level');
+                    if(currentStudentDoc) loadExamUI();
                 };
             });
             
