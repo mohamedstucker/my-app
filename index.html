@@ -32,7 +32,7 @@
         .error { background: #f44336; color: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
         .refresh-btn { background: #2196F3; color: white; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 900px; width: 95%; max-height: 85%; overflow: auto; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 85%; overflow: auto; }
         .close-modal { float: right; cursor: pointer; font-size: 24px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
@@ -54,92 +54,111 @@
         .assessment-btn { background: #ddd; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .assessment-btn.active { background: #2196F3; color: white; }
         .remark-input { width: 150px; padding: 5px; font-size: 12px; }
-        .file-preview-img { max-width: 100px; max-height: 100px; border-radius: 5px; }
-        @media (max-width: 600px) { .student-info { flex-direction: column; align-items: flex-start; } th, td { font-size: 11px; padding: 4px; } .remark-input { width: 100px; } .admin-tab-btn { font-size: 12px; padding: 6px 10px; } }
+        .logout-btn { background: #f44336; color: white; margin-left: 10px; }
+        .user-info { font-size: 14px; margin-right: 10px; }
+        @media (max-width: 600px) { .student-info { flex-direction: column; align-items: flex-start; } th, td { font-size: 11px; padding: 4px; } .remark-input { width: 100px; } }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🏫 School Management System</h1>
-        <span id="onlineStatus" class="online-badge offline">🔴 Connecting...</span>
+        <div style="display: flex; align-items: center;">
+            <span id="userInfo" class="user-info"></span>
+            <button id="logoutBtn" class="logout-btn" style="display:none;">Logout</button>
+            <span id="onlineStatus" class="online-badge offline">🔴 Connecting...</span>
+        </div>
     </div>
     <div class="sync-bar" id="syncBar">⏳ Initializing...</div>
 
-    <div class="module-buttons">
-        <button id="attendanceBtn" class="module-btn active">📋 Attendance</button>
-        <button id="recordsBtn" class="module-btn">📚 Student Records</button>
-        <button id="teachersBtn" class="module-btn">👩‍🏫 Teachers</button>
-        <button id="adminBtn" class="module-btn">⚙️ Admin</button>
+    <div id="mainApp" style="display:none;">
+        <div class="module-buttons">
+            <button id="attendanceBtn" class="module-btn active">📋 Attendance</button>
+            <button id="recordsBtn" class="module-btn">📚 Student Records</button>
+            <button id="teachersBtn" class="module-btn">👩‍🏫 Teachers</button>
+            <button id="adminBtn" class="module-btn">⚙️ Admin</button>
+        </div>
+
+        <!-- ATTENDANCE MODULE -->
+        <div id="attendanceModule">
+            <div class="import-section"><h3>📊 Import Students from Excel</h3>
+                <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
+                <button id="importBtn" style="background:#9C27B0; color:white;">Import to Cloud</button>
+                <button id="downloadSampleBtn" style="background:#2196F3; color:white;">Download Sample</button>
+                <div id="importMessage"></div>
+            </div>
+            <div class="manual-section"><h3>✏️ Add Single Student</h3>
+                <input type="text" id="newStudentId" placeholder="Student ID">
+                <input type="text" id="newStudentName" placeholder="Full Name">
+                <input type="text" id="newStudentDob" placeholder="DOB (YYYY-MM-DD)">
+                <select id="newClassLevel"><option value="JSS1">JSS1</option><option value="JSS2">JSS2</option><option value="JSS3">JSS3</option><option value="SSS1">SSS1</option><option value="SSS2">SSS2</option><option value="SSS3">SSS3</option></select>
+                <select id="newDepartment"><option value="">Select Department</option><option value="Arts">Arts</option><option value="Science & Technology">Science & Technology</option><option value="Business & Technology">Business & Technology</option></select>
+                <input type="text" id="newParentPhone" placeholder="Parent Phone">
+                <input type="text" id="newParentName" placeholder="Parent Name">
+                <input type="text" id="newAddress" placeholder="Address">
+                <input type="text" id="newGuardian" placeholder="Guardian">
+                <select id="newStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+                <button id="addStudentBtn" style="background:#2196F3; color:white;">+ Add Student</button>
+                <div id="manualMessage"></div>
+            </div>
+            <div><select id="classSelect"></select><button id="loadBtn">Load Students</button><button id="refreshBtn" class="refresh-btn">🔄 Refresh</button><button id="batchWhatsappBtn" style="background:#128C7E; color:white;">📱 Send Reports</button><button id="classHistoryBtn" class="refresh-btn">📅 Class History</button></div>
+            <div id="studentList"></div>
+        </div>
+
+        <!-- STUDENT RECORDS MODULE -->
+        <div id="recordsModule" style="display:none;">
+            <div class="card"><h3>🔍 Find Student</h3><div class="search-box"><input type="text" id="studentSearchInput" placeholder="Student ID or Name"><button id="searchStudentBtn" class="refresh-btn">Search</button><button id="clearSearchBtn" style="background:#f44336;">Clear</button></div><div id="searchResults"></div></div>
+            <div id="studentRecordsPanel" style="display:none;">
+                <div class="tabs"><button class="tab-btn active" data-tab="profile">📋 Profile</button><button class="tab-btn" data-tab="exams">📝 Exam Records</button><button class="tab-btn" data-tab="fees">💰 Fee Payments</button></div>
+                <div id="profileTab" class="tab-content active"><div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">✏️ Edit Profile</button></div></div>
+                <div id="examsTab" class="tab-content"><div class="card"><h3>Exam Records</h3><div class="exam-term-btns"><button class="term-btn active" data-term="term1">Term 1</button><button class="term-btn" data-term="term2">Term 2</button><button class="term-btn" data-term="term3">Term 3</button></div><div id="termAssessmentSelector"></div><div id="examRecordsContent"></div><button id="saveExamsBtn" class="refresh-btn">💾 Save Exam Records</button></div></div>
+                <div id="feesTab" class="tab-content"><div class="card"><h3>Fee Management</h3><div id="feesContent"></div><button id="recordPaymentBtn" class="refresh-btn">💰 Record Payment</button><button id="editTotalFeesBtn" class="refresh-btn" style="background:#FF9800;">✏️ Edit Total Fees</button></div></div>
+            </div>
+        </div>
+
+        <!-- TEACHERS MODULE -->
+        <div id="teachersModule" style="display:none;">
+            <div class="card"><h3>👩‍🏫 Add New Teacher</h3>
+                <input type="text" id="teacherId" placeholder="Teacher ID"><input type="text" id="teacherName" placeholder="Full Name">
+                <input type="text" id="teacherDob" placeholder="DOB"><input type="text" id="teacherEmploymentDate" placeholder="Employment Date">
+                <select id="teacherDepartment"><option value="">Select Department</option><option value="Science">Science</option><option value="Mathematics">Mathematics</option><option value="English">English</option><option value="Arts">Arts</option><option value="Social Sciences">Social Sciences</option><option value="Business & Economics">Business & Economics</option><option value="Vocational">Vocational</option><option value="Administration">Administration</option></select>
+                <input type="text" id="teacherSubjects" placeholder="Subjects"><input type="number" id="teacherSalary" placeholder="Salary"><select id="teacherStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+                <button id="addTeacherBtn" class="refresh-btn">➕ Add Teacher</button><div id="teacherMessage"></div>
+            </div>
+            <div class="card"><h3>📥 Import Staff from Excel</h3><input type="file" id="staffExcelFile" accept=".xlsx,.xls,.csv"><button id="importStaffBtn" class="refresh-btn">Import Staff Excel</button><button id="downloadStaffSampleBtn" class="refresh-btn">Download Sample</button><div id="staffImportMessage"></div></div>
+            <div class="card"><h3>🔍 Find Teacher</h3><div class="search-box"><input type="text" id="teacherSearchInput" placeholder="Search"><button id="searchTeacherBtn" class="refresh-btn">Search</button><button id="clearTeacherSearchBtn" style="background:#f44336;">Clear</button></div><div id="teacherSearchResults"></div></div>
+            <div class="card"><h3>📋 All Teachers</h3><div id="allTeachersList"></div></div>
+        </div>
+
+        <!-- ADMIN MODULE -->
+        <div id="adminModule" style="display:none;">
+            <div class="tabs" id="adminTabs">
+                <button class="admin-tab-btn active" data-tab="staff">👥 Staff Attendance</button>
+                <button class="admin-tab-btn" data-tab="filestorage">📁 File Storage</button>
+                <button class="admin-tab-btn" data-tab="assets">🏫 Assets</button>
+                <button class="admin-tab-btn" data-tab="visitors">📝 Visitors</button>
+                <button class="admin-tab-btn" data-tab="inventory">📦 Inventory</button>
+            </div>
+            <div id="staffTab" class="admin-tab active"><div class="card"><h3>➕ Register Staff</h3><input type="text" id="staffId" placeholder="Staff ID"><input type="text" id="staffName" placeholder="Full Name"><select id="staffType"><option value="Teacher">Teacher</option><option value="Admin">Admin</option><option value="Cleaner">Cleaner</option><option value="Security">Security</option><option value="Driver">Driver</option><option value="Other">Other</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div></div><div class="card"><h3>📋 Today's Staff Attendance</h3><div id="staffAttendanceList"></div></div></div>
+            <div id="filestorageTab" class="admin-tab" style="display:none;"><div class="card"><h3>📤 Upload File</h3><select id="fileCategory"><option value="students">Students</option><option value="staff">Staff</option><option value="general">General</option></select><input type="text" id="fileTitle" placeholder="File Title"><input type="file" id="uploadFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xlsx,.txt"><button id="uploadFileBtn" class="refresh-btn">📤 Upload</button><div id="uploadMessage"></div></div><div class="card"><h3>📁 Stored Files</h3><select id="viewFileCategory"><option value="students">Students</option><option value="staff">Staff</option><option value="general">General</option></select><button id="refreshFilesBtn" class="refresh-btn">🔄 Refresh</button><div id="filesList"></div></div></div>
+            <div id="assetsTab" class="admin-tab" style="display:none;"><div class="card"><h3>➕ Add Asset</h3><input type="text" id="assetName" placeholder="Asset Name"><input type="text" id="assetLocation" placeholder="Location"><select id="assetStatus"><option value="Good">Good</option><option value="Fair">Fair</option><option value="Poor">Poor</option></select><button id="addAssetBtn" class="refresh-btn">Add Asset</button><div id="assetMessage"></div></div><div class="card"><h3>📋 Assets List</h3><div id="assetsList"></div></div></div>
+            <div id="visitorsTab" class="admin-tab" style="display:none;"><div class="card"><h3>📝 Check-In Visitor</h3><input type="text" id="visitorName" placeholder="Visitor Name"><input type="text" id="visitorPurpose" placeholder="Purpose"><input type="text" id="visitorToSee" placeholder="Person to See"><button id="checkInVisitorBtn" class="refresh-btn">Check In</button><div id="visitorMessage"></div></div><div class="card"><h3>📋 Visitors Log</h3><div id="visitorsList"></div></div></div>
+            <div id="inventoryTab" class="admin-tab" style="display:none;"><div class="card"><h3>➕ Add Inventory</h3><input type="text" id="itemName" placeholder="Item Name"><input type="number" id="itemQuantity" placeholder="Quantity"><input type="text" id="itemUnit" placeholder="Unit"><button id="addInventoryBtn" class="refresh-btn">Add Item</button><div id="inventoryMessage"></div></div><div class="card"><h3>📦 Inventory Items</h3><div id="inventoryList"></div></div></div>
+        </div>
     </div>
 
-    <!-- ATTENDANCE MODULE -->
-    <div id="attendanceModule">
-        <div class="import-section"><h3>📊 Import Students from Excel</h3>
-            <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
-            <button id="importBtn" style="background:#9C27B0; color:white;">Import to Cloud</button>
-            <button id="downloadSampleBtn" style="background:#2196F3; color:white;">Download Sample</button>
-            <div id="importMessage"></div>
-        </div>
-        <div class="manual-section"><h3>✏️ Add Single Student</h3>
-            <input type="text" id="newStudentId" placeholder="Student ID">
-            <input type="text" id="newStudentName" placeholder="Full Name">
-            <input type="text" id="newStudentDob" placeholder="DOB (YYYY-MM-DD)">
-            <select id="newClassLevel"><option value="JSS1">JSS1</option><option value="JSS2">JSS2</option><option value="JSS3">JSS3</option><option value="SSS1">SSS1</option><option value="SSS2">SSS2</option><option value="SSS3">SSS3</option></select>
-            <select id="newDepartment"><option value="">Select Department</option><option value="Arts">Arts</option><option value="Science & Technology">Science & Technology</option><option value="Business & Technology">Business & Technology</option></select>
-            <input type="text" id="newParentPhone" placeholder="Parent Phone">
-            <input type="text" id="newParentName" placeholder="Parent Name">
-            <input type="text" id="newAddress" placeholder="Address">
-            <input type="text" id="newGuardian" placeholder="Guardian">
-            <select id="newStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select>
-            <button id="addStudentBtn" style="background:#2196F3; color:white;">+ Add Student</button>
-            <div id="manualMessage"></div>
-        </div>
-        <div><select id="classSelect"></select><button id="loadBtn">Load Students</button><button id="refreshBtn" class="refresh-btn">🔄 Refresh</button><button id="batchWhatsappBtn" style="background:#128C7E; color:white;">📱 Send Reports</button><button id="classHistoryBtn" class="refresh-btn">📅 Class History</button></div>
-        <div id="studentList"></div>
-    </div>
-
-    <!-- STUDENT RECORDS MODULE -->
-    <div id="recordsModule" style="display:none;">
-        <div class="card"><h3>🔍 Find Student</h3><div class="search-box"><input type="text" id="studentSearchInput" placeholder="Student ID or Name"><button id="searchStudentBtn" class="refresh-btn">Search</button><button id="clearSearchBtn" style="background:#f44336;">Clear</button></div><div id="searchResults"></div></div>
-        <div id="studentRecordsPanel" style="display:none;">
-            <div class="tabs"><button class="tab-btn active" data-tab="profile">📋 Profile</button><button class="tab-btn" data-tab="exams">📝 Exam Records</button><button class="tab-btn" data-tab="fees">💰 Fee Payments</button></div>
-            <div id="profileTab" class="tab-content active"><div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">✏️ Edit Profile</button></div></div>
-            <div id="examsTab" class="tab-content"><div class="card"><h3>Exam Records</h3><div class="exam-term-btns"><button class="term-btn active" data-term="term1">Term 1</button><button class="term-btn" data-term="term2">Term 2</button><button class="term-btn" data-term="term3">Term 3</button></div><div id="termAssessmentSelector"></div><div id="examRecordsContent"></div><button id="saveExamsBtn" class="refresh-btn">💾 Save Exam Records</button></div></div>
-            <div id="feesTab" class="tab-content"><div class="card"><h3>Fee Management</h3><div id="feesContent"></div><button id="recordPaymentBtn" class="refresh-btn">💰 Record Payment</button><button id="editTotalFeesBtn" class="refresh-btn" style="background:#FF9800;">✏️ Edit Total Fees</button></div></div>
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal" style="display:flex;">
+        <div class="modal-content">
+            <h3>🔐 Login to School Management System</h3>
+            <input type="email" id="loginEmail" placeholder="Email" style="width:100%;">
+            <input type="password" id="loginPassword" placeholder="Password" style="width:100%;">
+            <button id="loginBtn" class="refresh-btn">Login</button>
+            <p style="margin-top:10px; font-size:12px;">Contact admin for credentials.</p>
+            <div id="loginMessage"></div>
         </div>
     </div>
 
-    <!-- TEACHERS MODULE -->
-    <div id="teachersModule" style="display:none;">
-        <div class="card"><h3>👩‍🏫 Add New Teacher</h3>
-            <input type="text" id="teacherId" placeholder="Teacher ID"><input type="text" id="teacherName" placeholder="Full Name">
-            <input type="text" id="teacherDob" placeholder="DOB"><input type="text" id="teacherEmploymentDate" placeholder="Employment Date">
-            <select id="teacherDepartment"><option value="">Select Department</option><option value="Science">Science</option><option value="Mathematics">Mathematics</option><option value="English">English</option><option value="Arts">Arts</option><option value="Social Sciences">Social Sciences</option><option value="Business & Economics">Business & Economics</option><option value="Vocational">Vocational</option><option value="Administration">Administration</option><option value="Other">Other</option></select>
-            <input type="text" id="teacherSubjects" placeholder="Subjects"><input type="number" id="teacherSalary" placeholder="Salary"><select id="teacherStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select>
-            <button id="addTeacherBtn" class="refresh-btn">➕ Add Teacher</button><div id="teacherMessage"></div>
-        </div>
-        <div class="card"><h3>📥 Import Staff from Excel</h3><input type="file" id="staffExcelFile" accept=".xlsx,.xls,.csv"><button id="importStaffBtn" class="refresh-btn">Import Staff Excel</button><button id="downloadStaffSampleBtn" class="refresh-btn">Download Sample</button><div id="staffImportMessage"></div></div>
-        <div class="card"><h3>🔍 Find Teacher</h3><div class="search-box"><input type="text" id="teacherSearchInput" placeholder="Search"><button id="searchTeacherBtn" class="refresh-btn">Search</button><button id="clearTeacherSearchBtn" style="background:#f44336;">Clear</button></div><div id="teacherSearchResults"></div></div>
-        <div class="card"><h3>📋 All Teachers</h3><div id="allTeachersList"></div></div>
-    </div>
-
-    <!-- ADMIN MODULE (with all sub-tabs) -->
-    <div id="adminModule" style="display:none;">
-        <div class="tabs" id="adminTabs">
-            <button class="admin-tab-btn active" data-tab="staff">👥 Staff Attendance</button>
-            <button class="admin-tab-btn" data-tab="filestorage">📁 File Storage</button>
-            <button class="admin-tab-btn" data-tab="assets">🏫 Assets</button>
-            <button class="admin-tab-btn" data-tab="visitors">📝 Visitors</button>
-            <button class="admin-tab-btn" data-tab="inventory">📦 Inventory</button>
-        </div>
-        <div id="staffTab" class="admin-tab active"><div class="card"><h3>➕ Register Staff</h3><input type="text" id="staffId" placeholder="Staff ID"><input type="text" id="staffName" placeholder="Full Name"><select id="staffType"><option value="Teacher">Teacher</option><option value="Admin">Admin</option><option value="Cleaner">Cleaner</option><option value="Security">Security</option><option value="Driver">Driver</option><option value="Other">Other</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div></div><div class="card"><h3>📋 Today's Staff Attendance</h3><div id="staffAttendanceList"></div></div></div>
-        <div id="filestorageTab" class="admin-tab" style="display:none;"><div class="card"><h3>📤 Upload File</h3><select id="fileCategory"><option value="students">Students</option><option value="staff">Staff</option><option value="general">General</option></select><input type="text" id="fileTitle" placeholder="File Title"><input type="file" id="uploadFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xlsx,.txt"><button id="uploadFileBtn" class="refresh-btn">📤 Upload</button><div id="uploadMessage"></div></div><div class="card"><h3>📁 Stored Files</h3><select id="viewFileCategory"><option value="students">Students</option><option value="staff">Staff</option><option value="general">General</option></select><button id="refreshFilesBtn" class="refresh-btn">🔄 Refresh</button><div id="filesList"></div></div></div>
-        <div id="assetsTab" class="admin-tab" style="display:none;"><div class="card"><h3>➕ Add Asset</h3><input type="text" id="assetName" placeholder="Asset Name"><input type="text" id="assetLocation" placeholder="Location"><select id="assetStatus"><option value="Good">Good</option><option value="Fair">Fair</option><option value="Poor">Poor</option></select><button id="addAssetBtn" class="refresh-btn">Add Asset</button><div id="assetMessage"></div></div><div class="card"><h3>📋 Assets List</h3><div id="assetsList"></div></div></div>
-        <div id="visitorsTab" class="admin-tab" style="display:none;"><div class="card"><h3>📝 Check-In Visitor</h3><input type="text" id="visitorName" placeholder="Visitor Name"><input type="text" id="visitorPurpose" placeholder="Purpose"><input type="text" id="visitorToSee" placeholder="Person to See"><button id="checkInVisitorBtn" class="refresh-btn">Check In</button><div id="visitorMessage"></div></div><div class="card"><h3>📋 Visitors Log</h3><div id="visitorsList"></div></div></div>
-        <div id="inventoryTab" class="admin-tab" style="display:none;"><div class="card"><h3>➕ Add Inventory</h3><input type="text" id="itemName" placeholder="Item Name"><input type="number" id="itemQuantity" placeholder="Quantity"><input type="text" id="itemUnit" placeholder="Unit"><button id="addInventoryBtn" class="refresh-btn">Add Item</button><div id="inventoryMessage"></div></div><div class="card"><h3>📦 Inventory Items</h3><div id="inventoryList"></div></div></div>
-    </div>
-
-    <!-- MODALS -->
+    <!-- MODALS (existing) -->
     <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student</h3><input type="text" id="editProfileName"><select id="editProfileClassLevel"><option value="JSS1">JSS1</option><option value="JSS2">JSS2</option><option value="JSS3">JSS3</option><option value="SSS1">SSS1</option><option value="SSS2">SSS2</option><option value="SSS3">SSS3</option></select><select id="editProfileStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save</button></div></div>
     <div id="paymentModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('paymentModal')">&times;</span><h3>Record Payment</h3><input type="number" id="paymentAmount" placeholder="Amount"><select id="paymentType"><option value="full">Full Payment</option><option value="partial">Partial Payment</option></select><input type="text" id="paymentNote" placeholder="Note"><button id="submitPaymentBtn" class="refresh-btn">Submit</button></div></div>
     <div id="historyModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('historyModal')">&times;</span><h3>Attendance History</h3><div id="historyContent"></div></div></div>
@@ -148,11 +167,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
     <script>
         // ==================== FIREBASE CONFIGURATION ====================
-        // Replace with your actual Firebase config if different
         const firebaseConfig = {
             apiKey: "AIzaSyCE5iYGOl-ABjXs5gaS6Kl0zeGqHZf0vdg",
             authDomain: "sierra-leone-school-attendance.firebaseapp.com",
@@ -162,13 +181,10 @@
             appId: "1:185301289478:web:f3eb92954cb8570da81187"
         };
         // Initialize Firebase
-        let db, storage;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            storage = firebase.storage();
-            console.log("Firebase initialized");
-        } catch(e) { console.error("Firebase init error:", e); }
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
         // ==================== GLOBAL VARIABLES ====================
         let allStudents = {};
@@ -176,6 +192,9 @@
         let currentStudentDoc = null;
         let currentTerm = 'term1';
         let currentAssessment = 'test1';
+        let currentUserRole = null;
+        let currentTeacherClass = null;
+        let currentParentStudentId = null;
 
         const subjectsByClass = {
             JSS1: ['English','Mathematics','Basic Science','Basic Technology','Social Studies','Civic Education','Christian/Islamic Studies','Agricultural Science','Home Economics','Business Studies','French','Computer Studies','Physical & Health Education'],
@@ -186,7 +205,7 @@
             SSS3: ['English','Mathematics','Physics','Chemistry','Biology','Economics','Geography','Government','Literature in English']
         };
 
-        // ==================== HELPERS ====================
+        // Helper functions
         function showMessage(msg, type, elemId) {
             const div = document.getElementById(elemId);
             if(div) { div.innerHTML = `<div class="${type}">${msg}</div>`; setTimeout(() => div.innerHTML = '', 4000); }
@@ -197,7 +216,102 @@
         function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
         function calculateAge(dob) { if(!dob) return 'N/A'; const b = new Date(dob), t = new Date(); let a = t.getFullYear() - b.getFullYear(); const m = t.getMonth() - b.getMonth(); if(m < 0 || (m===0 && t.getDate() < b.getDate())) a--; return a; }
 
-        // ==================== ONLINE STATUS ====================
+        // ========== AUTHENTICATION ==========
+        async function checkUserRole(user) {
+            if (!user) return null;
+            const doc = await db.collection('users').doc(user.uid).get();
+            if (!doc.exists) return null;
+            return doc.data();
+        }
+
+        function updateUIForRole(roleData) {
+            if (!roleData) {
+                document.getElementById('mainApp').style.display = 'none';
+                return;
+            }
+            const role = roleData.role;
+            currentUserRole = role;
+            currentTeacherClass = role === 'teacher' ? roleData.class : null;
+            currentParentStudentId = role === 'parent' ? roleData.studentId : null;
+            
+            document.getElementById('mainApp').style.display = 'block';
+            
+            const teachersBtn = document.getElementById('teachersBtn');
+            const adminBtn = document.getElementById('adminBtn');
+            const recordsBtn = document.getElementById('recordsBtn');
+            
+            if (role === 'admin') {
+                teachersBtn.style.display = 'inline-block';
+                adminBtn.style.display = 'inline-block';
+                recordsBtn.style.display = 'inline-block';
+            } else if (role === 'teacher') {
+                teachersBtn.style.display = 'none';
+                adminBtn.style.display = 'none';
+                recordsBtn.style.display = 'inline-block';
+                // Disable adding/importing students for teachers
+                const addSection = document.querySelector('.manual-section');
+                if (addSection) addSection.style.display = 'none';
+                const importSection = document.querySelector('.import-section');
+                if (importSection) importSection.style.display = 'none';
+                // Force class dropdown to teacher's class
+                const classSelect = document.getElementById('classSelect');
+                if (classSelect && currentTeacherClass) {
+                    classSelect.innerHTML = `<option value="${currentTeacherClass}">${currentTeacherClass}</option>`;
+                    classSelect.disabled = true;
+                }
+            } else if (role === 'parent') {
+                teachersBtn.style.display = 'none';
+                adminBtn.style.display = 'none';
+                recordsBtn.style.display = 'inline-block';
+                const addSection = document.querySelector('.manual-section');
+                if (addSection) addSection.style.display = 'none';
+                const importSection = document.querySelector('.import-section');
+                if (importSection) importSection.style.display = 'none';
+                const batchWhatsapp = document.getElementById('batchWhatsappBtn');
+                if (batchWhatsapp) batchWhatsapp.style.display = 'none';
+                // Auto-search child
+                if (currentParentStudentId) {
+                    setTimeout(() => {
+                        document.getElementById('studentSearchInput').value = currentParentStudentId;
+                        searchStudent();
+                    }, 1000);
+                }
+            }
+        }
+
+        // Login
+        document.getElementById('loginBtn').onclick = async () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const msgDiv = document.getElementById('loginMessage');
+            try {
+                const cred = await auth.signInWithEmailAndPassword(email, password);
+                const user = cred.user;
+                const roleData = await checkUserRole(user);
+                if (!roleData) {
+                    await auth.signOut();
+                    msgDiv.innerHTML = '<div class="error">No role assigned. Contact admin.</div>';
+                    return;
+                }
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('userInfo').innerText = `${roleData.role.toUpperCase()}: ${user.email}`;
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                updateUIForRole(roleData);
+                await loadStudents();
+                await renderAttendance();
+                updateOnlineStatus();
+            } catch(e) {
+                msgDiv.innerHTML = `<div class="error">${e.message}</div>`;
+            }
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').onclick = async () => {
+            await auth.signOut();
+            location.reload();
+        };
+
+        // ========== ONLINE STATUS ==========
         async function updateOnlineStatus() {
             const badge = document.getElementById('onlineStatus');
             const syncBar = document.getElementById('syncBar');
@@ -210,10 +324,16 @@
             }
         }
 
-        // ==================== ATTENDANCE MODULE ====================
+        // ========== ATTENDANCE MODULE ==========
         async function loadStudents() {
             try {
-                const snap = await db.collection('students').get();
+                let query = db.collection('students');
+                if (currentUserRole === 'teacher' && currentTeacherClass) {
+                    query = query.where('class', '==', currentTeacherClass);
+                } else if (currentUserRole === 'parent' && currentParentStudentId) {
+                    query = query.where('id', '==', currentParentStudentId);
+                }
+                const snap = await query.get();
                 allStudents = {}; studentDocMap.clear();
                 snap.forEach(doc => {
                     const s = doc.data();
@@ -226,10 +346,12 @@
                     allStudents[cls].push({ id: s.id, name: s.name, parentPhone: s.parentPhone, parentName: s.parentName, docId: doc.id });
                 });
                 updateClassDropdown();
-            } catch(e) { console.error("Load students error:", e); showMessage("Error loading students: "+e.message, "error", "importMessage"); }
+            } catch(e) { console.error(e); showMessage("Error loading students: "+e.message, "error", "importMessage"); }
         }
         function updateClassDropdown() {
             const select = document.getElementById('classSelect');
+            if(!select) return;
+            if (currentUserRole === 'teacher' && currentTeacherClass) return; // already disabled and set
             const current = select.value;
             select.innerHTML = '';
             const levels = ['JSS1','JSS2','JSS3','SSS1','SSS2','SSS3'];
@@ -241,7 +363,8 @@
         }
         async function loadAttendance(classname) {
             const today = new Date().toISOString().split('T')[0];
-            const snap = await db.collection('attendance').where('class','==',classname).where('date','==',today).get();
+            let query = db.collection('attendance').where('class','==',classname).where('date','==',today);
+            const snap = await query.get();
             const att = {};
             snap.forEach(d => { att[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' }; });
             return att;
@@ -257,7 +380,7 @@
         async function renderAttendance() {
             const classname = document.getElementById('classSelect').value;
             if(!classname || !allStudents[classname]) {
-                document.getElementById('studentList').innerHTML = '<p>No students in this class. Add via Excel or manual.</p>';
+                document.getElementById('studentList').innerHTML = '<p>No students in this class.</p>';
                 return;
             }
             const students = allStudents[classname];
@@ -272,72 +395,75 @@
                         <span><strong>${escapeHtml(s.name)}</strong> (${s.id})</span>
                         <span>${att.status === 'present' ? '✅ Present' : att.status === 'absent' ? '❌ Absent' : att.status === 'late' ? '⏰ Late' : '⚪ Not marked'}</span>
                         <div>
-                            <button class="edit-student" data-class="${classname}" data-id="${s.id}">✏️ Edit</button>
+                            ${currentUserRole === 'admin' || currentUserRole === 'teacher' ? `<button class="edit-student" data-class="${classname}" data-id="${s.id}">✏️ Edit</button>` : ''}
                             <button class="history-student" data-class="${classname}" data-id="${s.id}" data-name="${escapeHtml(s.name)}">📜 History</button>
-                            <button class="delete-student" data-class="${classname}" data-id="${s.id}" style="background:#f44336;">🗑️ Delete</button>
+                            ${currentUserRole === 'admin' || currentUserRole === 'teacher' ? `<button class="delete-student" data-class="${classname}" data-id="${s.id}" style="background:#f44336;">🗑️ Delete</button>` : ''}
                         </div>
                     </div>
                     <div class="buttons">
-                        <button class="present" data-id="${s.id}">✅ Present</button>
-                        <button class="absent" data-id="${s.id}">❌ Absent</button>
-                        <button class="late" data-id="${s.id}">⏰ Late</button>
-                        <input type="text" class="remark-input" data-id="${s.id}" placeholder="Remark" value="${escapeHtml(att.remark)}" style="width:120px;">
+                        ${currentUserRole === 'admin' || currentUserRole === 'teacher' ? `
+                            <button class="present" data-id="${s.id}">✅ Present</button>
+                            <button class="absent" data-id="${s.id}">❌ Absent</button>
+                            <button class="late" data-id="${s.id}">⏰ Late</button>
+                            <input type="text" class="remark-input" data-id="${s.id}" placeholder="Remark" value="${escapeHtml(att.remark)}" style="width:120px;">
+                        ` : `<span>${att.status === 'present' ? '✅ Present' : att.status === 'absent' ? '❌ Absent' : att.status === 'late' ? '⏰ Late' : '⚪ Not marked'}</span>`}
                     </div>
                 `;
                 container.appendChild(div);
             }
-            // Attach events
-            document.querySelectorAll('.present, .absent, .late').forEach(btn => {
-                btn.onclick = async () => {
-                    const status = btn.classList.contains('present') ? 'present' : btn.classList.contains('absent') ? 'absent' : 'late';
-                    const sid = btn.getAttribute('data-id');
-                    const remark = document.querySelector(`.remark-input[data-id="${sid}"]`)?.value || '';
-                    await saveAttendance(classname, sid, status, remark);
-                };
-            });
-            document.querySelectorAll('.delete-student').forEach(btn => {
-                btn.onclick = async () => {
-                    const cls = btn.getAttribute('data-class'), sid = btn.getAttribute('data-id');
-                    const key = `${cls}|${sid}`, docId = studentDocMap.get(key);
-                    if(docId && confirm(`Delete ${sid}?`)) {
-                        await db.collection('students').doc(docId).delete();
-                        await loadStudents(); await renderAttendance();
-                    }
-                };
-            });
-            document.querySelectorAll('.edit-student').forEach(btn => {
-                btn.onclick = () => {
-                    const cls = btn.getAttribute('data-class'), sid = btn.getAttribute('data-id');
-                    const student = allStudents[cls]?.find(s => s.id === sid);
-                    if(student) {
-                        document.getElementById('editStudentId').value = student.id;
-                        document.getElementById('editStudentName').value = student.name;
-                        document.getElementById('editParentPhone').value = student.parentPhone || '';
-                        document.getElementById('editParentName').value = student.parentName || '';
-                        openModal('editModal');
-                        const saveBtn = document.getElementById('saveEditBtn');
-                        const handler = async () => {
-                            await db.collection('students').doc(student.docId).update({
-                                name: document.getElementById('editStudentName').value.trim(),
-                                parentPhone: document.getElementById('editParentPhone').value.trim() || "23270000000",
-                                parentName: document.getElementById('editParentName').value.trim() || "Parent"
-                            });
-                            closeModal('editModal');
+            if (currentUserRole === 'admin' || currentUserRole === 'teacher') {
+                document.querySelectorAll('.present, .absent, .late').forEach(btn => {
+                    btn.onclick = async () => {
+                        const status = btn.classList.contains('present') ? 'present' : btn.classList.contains('absent') ? 'absent' : 'late';
+                        const sid = btn.getAttribute('data-id');
+                        const remark = document.querySelector(`.remark-input[data-id="${sid}"]`)?.value || '';
+                        await saveAttendance(classname, sid, status, remark);
+                    };
+                });
+                document.querySelectorAll('.delete-student').forEach(btn => {
+                    btn.onclick = async () => {
+                        const cls = btn.getAttribute('data-class'), sid = btn.getAttribute('data-id');
+                        const key = `${cls}|${sid}`, docId = studentDocMap.get(key);
+                        if(docId && confirm(`Delete ${sid}?`)) {
+                            await db.collection('students').doc(docId).delete();
                             await loadStudents(); await renderAttendance();
-                            saveBtn.removeEventListener('click', handler);
-                        };
-                        saveBtn.removeEventListener('click', saveBtn._listener);
-                        saveBtn.addEventListener('click', handler);
-                        saveBtn._listener = handler;
-                    }
-                };
-            });
+                        }
+                    };
+                });
+                document.querySelectorAll('.edit-student').forEach(btn => {
+                    btn.onclick = () => {
+                        const cls = btn.getAttribute('data-class'), sid = btn.getAttribute('data-id');
+                        const student = allStudents[cls]?.find(s => s.id === sid);
+                        if(student) {
+                            document.getElementById('editStudentId').value = student.id;
+                            document.getElementById('editStudentName').value = student.name;
+                            document.getElementById('editParentPhone').value = student.parentPhone || '';
+                            document.getElementById('editParentName').value = student.parentName || '';
+                            openModal('editModal');
+                            const saveBtn = document.getElementById('saveEditBtn');
+                            const handler = async () => {
+                                await db.collection('students').doc(student.docId).update({
+                                    name: document.getElementById('editStudentName').value.trim(),
+                                    parentPhone: document.getElementById('editParentPhone').value.trim() || "23270000000",
+                                    parentName: document.getElementById('editParentName').value.trim() || "Parent"
+                                });
+                                closeModal('editModal');
+                                await loadStudents(); await renderAttendance();
+                                saveBtn.removeEventListener('click', handler);
+                            };
+                            saveBtn.removeEventListener('click', saveBtn._listener);
+                            saveBtn.addEventListener('click', handler);
+                            saveBtn._listener = handler;
+                        }
+                    };
+                });
+            }
             document.querySelectorAll('.history-student').forEach(btn => {
                 btn.onclick = async () => {
                     const cls = btn.getAttribute('data-class'), sid = btn.getAttribute('data-id'), name = btn.getAttribute('data-name');
                     const snap = await db.collection('attendance').where('class','==',cls).where('studentId','==',sid).get();
                     let html = `<p><strong>${escapeHtml(name)} (${sid})</strong></p><table border="1"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
-                    snap.forEach(d => { const data = d.data(); const emoji = data.status === 'present' ? '✅ Present' : data.status === 'absent' ? '❌ Absent' : '⏰ Late'; html += `<tr><td>${data.date}</td><td>${emoji}</td><td>${escapeHtml(data.remark||'')}</td></tr>`; });
+                    snap.forEach(d => { const data = d.data(); const emoji = data.status === 'present' ? '✅ Present' : data.status === 'absent' ? '❌ Absent' : '⏰ Late'; html += `<tr><td>${data.date}</td><td>${emoji}</td><td>${escapeHtml(data.remark||'')}NonNullListCell--></td></tr>`; });
                     html += `</tbody></table>`;
                     document.getElementById('historyContent').innerHTML = html;
                     openModal('historyModal');
@@ -357,13 +483,14 @@
             for(let student of students) {
                 const att = attMap[student.id] || { status: 'Not marked', remark: '' };
                 const emoji = att.status === 'present' ? '✅ Present' : att.status === 'absent' ? '❌ Absent' : att.status === 'late' ? '⏰ Late' : '⚪ Not marked';
-                html += `<tr><td>${student.id}</td><td>${escapeHtml(student.name)}</td><td>${emoji}</td><td>${escapeHtml(att.remark)}</td></tr>`;
+                html += `<tr><td>${student.id}</td><td>${escapeHtml(student.name)}NonNullListCell-->NonNullListCell--></td><td class="remark-cell">${escapeHtml(att.remark)}</td></tr>`;
             }
             html += `</tbody></table>`;
             document.getElementById('historyContent').innerHTML = html;
             openModal('historyModal');
         }
         async function sendDailySummary() {
+            if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert("Only admin/teacher can send reports."); return; }
             const classname = document.getElementById('classSelect').value;
             const students = allStudents[classname] || [];
             if(!students.length) { alert("No students"); return; }
@@ -377,6 +504,7 @@
             alert(`Opening for ${recipients.length} parents`);
         }
         async function importExcel(file) {
+            if (currentUserRole !== 'admin') { alert("Only admin can import students."); return; }
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const data = new Uint8Array(e.target.result);
@@ -398,6 +526,7 @@
             reader.readAsArrayBuffer(file);
         }
         async function addManualStudent() {
+            if (currentUserRole !== 'admin') { alert("Only admin can add students."); return; }
             const id = document.getElementById('newStudentId').value.trim(), name = document.getElementById('newStudentName').value.trim(), cls = document.getElementById('newClassLevel').value;
             if(!id || !name || !cls) { showMessage('Fill ID, Name, Class', 'error', 'manualMessage'); return; }
             const key = `${cls}|${id}`;
@@ -413,25 +542,34 @@
         }
         async function refreshStudents() { await loadStudents(); await renderAttendance(); showMessage("Refreshed", 'success', 'importMessage'); }
 
-        // ==================== STUDENT RECORDS ====================
+        // ========== STUDENT RECORDS ==========
         async function searchStudent() {
             const query = document.getElementById('studentSearchInput').value.trim().toLowerCase();
             if(!query) { alert("Enter Student ID or Name"); return; }
-            const snap = await db.collection('students').get();
+            let studentsQuery = db.collection('students');
+            if (currentUserRole === 'teacher' && currentTeacherClass) {
+                studentsQuery = studentsQuery.where('class', '==', currentTeacherClass);
+            } else if (currentUserRole === 'parent' && currentParentStudentId) {
+                studentsQuery = studentsQuery.where('id', '==', currentParentStudentId);
+            }
+            const snap = await studentsQuery.get();
             let found = null;
             for(const doc of snap.docs) {
                 const data = doc.data();
                 if(data.id.toLowerCase() === query || data.name.toLowerCase().includes(query)) { found = { docId: doc.id, ...data }; break; }
             }
             const resultsDiv = document.getElementById('searchResults');
-            if(!found) { resultsDiv.innerHTML = '<div class="error">Student not found</div>'; document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+            if(!found) { resultsDiv.innerHTML = '<div class="error">Student not found or not accessible.</div>'; document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
             resultsDiv.innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
             currentStudentDoc = found;
             document.getElementById('profileContent').innerHTML = `<p><strong>ID:</strong> ${escapeHtml(found.id)}</p><p><strong>Name:</strong> ${escapeHtml(found.name)}</p><p><strong>Class:</strong> ${escapeHtml(found.class)}</p><p><strong>Status:</strong> ${found.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`;
             document.getElementById('studentRecordsPanel').style.display = 'block';
-            loadExamUI(); loadFeeUI();
+            if (currentUserRole === 'admin' || (currentUserRole === 'teacher' && currentTeacherClass === found.class) || currentUserRole === 'parent') {
+                loadExamUI(); loadFeeUI();
+            }
         }
         async function editProfile() {
+            if (currentUserRole !== 'admin') { alert("Only admin can edit profiles."); return; }
             if(!currentStudentDoc) return;
             document.getElementById('editProfileName').value = currentStudentDoc.name;
             document.getElementById('editProfileClassLevel').value = currentStudentDoc.class;
@@ -439,7 +577,11 @@
             openModal('editProfileModal');
             const saveBtn = document.getElementById('saveProfileBtn');
             const handler = async () => {
-                await db.collection('students').doc(currentStudentDoc.docId).update({ name: document.getElementById('editProfileName').value.trim(), class: document.getElementById('editProfileClassLevel').value, status: document.getElementById('editProfileStatus').value });
+                await db.collection('students').doc(currentStudentDoc.docId).update({
+                    name: document.getElementById('editProfileName').value.trim(),
+                    class: document.getElementById('editProfileClassLevel').value,
+                    status: document.getElementById('editProfileStatus').value
+                });
                 Object.assign(currentStudentDoc, { name: document.getElementById('editProfileName').value.trim(), class: document.getElementById('editProfileClassLevel').value, status: document.getElementById('editProfileStatus').value });
                 document.getElementById('profileContent').innerHTML = `<p><strong>ID:</strong> ${escapeHtml(currentStudentDoc.id)}</p><p><strong>Name:</strong> ${escapeHtml(currentStudentDoc.name)}</p><p><strong>Class:</strong> ${escapeHtml(currentStudentDoc.class)}</p><p><strong>Status:</strong> ${currentStudentDoc.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`;
                 closeModal('editProfileModal');
@@ -463,7 +605,7 @@
                 const score = records[key] || '';
                 let grade='', remarks='';
                 if(score) { const ns=parseFloat(score); if(ns>=75){grade='A';remarks='Excellent';}else if(ns>=65){grade='B';remarks='Good';}else if(ns>=55){grade='C';remarks='Average';}else if(ns>=45){grade='D';remarks='Pass';}else{grade='F';remarks='Fail';} }
-                html += `<tr><td>${escapeHtml(sub)}</td><td><input type="number" class="exam-score" data-term="${currentTerm}" data-assessment="${currentAssessment}" data-subject="${sub}" value="${score}" step="0.01" style="width:80px;"></td><td class="grade-cell">${grade}</td><td class="remarks-cell">${remarks}</td></tr>`;
+                html += `<tr><td class="subject-cell">${escapeHtml(sub)}</td><td class="score-cell"><input type="number" class="exam-score" data-term="${currentTerm}" data-assessment="${currentAssessment}" data-subject="${sub}" value="${score}" step="0.01" style="width:80px;"></td><td class="grade-cell">${grade}</td><td class="remarks-cell">${remarks}</td></tr>`;
             }
             html += `</tbody></table>`;
             document.getElementById('examRecordsContent').innerHTML = html;
@@ -474,6 +616,7 @@
             }));
         }
         async function saveExamRecords() {
+            if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert("Only admin/teacher can edit exam records."); return; }
             if(!currentStudentDoc) return;
             const records = {};
             document.querySelectorAll('.exam-score').forEach(inp => {
@@ -490,11 +633,12 @@
             const balance = feeData.totalFees - feeData.paid;
             const statusClass = balance <= 0 ? 'fee-paid' : (feeData.paid > 0 ? 'fee-partial' : 'fee-unpaid');
             let html = `<div class="${statusClass}" style="padding:15px;border-radius:5px"><strong>Total Fees:</strong> ${feeData.totalFees.toLocaleString()} Le<br><strong>Paid:</strong> ${feeData.paid.toLocaleString()} Le<br><strong>Balance:</strong> ${balance.toLocaleString()} Le<br><strong>Status:</strong> ${balance<=0?'✅ Fully Paid':(feeData.paid>0?'⚠️ Partial':'❌ Not Paid')}</div><h4>Payment History</h4><table border="1"><thead><tr><th>Date</th><th>Amount</th><th>Type</th><th>Note</th></tr></thead><tbody>`;
-            for(let t of (feeData.transactions||[])) html += `<tr><td>${t.date}</td><td>${t.amount.toLocaleString()}</td><td>${t.type}</td><td>${escapeHtml(t.note||'')}</td></tr>`;
+            for(let t of (feeData.transactions||[])) html += `<tr><td>${t.date}</td><td class="amount-cell">${t.amount.toLocaleString()} Le</td><td class="type-cell">${t.type}</td><td class="note-cell">${escapeHtml(t.note||'')}</td></tr>`;
             html += `</tbody></table>`;
             document.getElementById('feesContent').innerHTML = html;
         }
         async function recordPayment() {
+            if (currentUserRole !== 'admin') { alert("Only admin can record payments."); return; }
             if(!currentStudentDoc) return;
             openModal('paymentModal');
             const submitBtn = document.getElementById('submitPaymentBtn');
@@ -516,6 +660,7 @@
             submitBtn._listener = handler;
         }
         async function editTotalFees() {
+            if (currentUserRole !== 'admin') { alert("Only admin can edit total fees."); return; }
             if(!currentStudentDoc) return;
             const newTotal = prompt("Enter new total fees (Le):", "1000000");
             if(newTotal && !isNaN(parseFloat(newTotal))) {
@@ -526,21 +671,23 @@
             }
         }
 
-        // ==================== TEACHER MANAGEMENT ====================
+        // ========== TEACHER MANAGEMENT ==========
         async function loadTeachers() {
+            if (currentUserRole !== 'admin') return;
             const snap = await db.collection('teachers').get();
             const listDiv = document.getElementById('allTeachersList');
             if(snap.empty) { listDiv.innerHTML = '<p>No teachers</p>'; return; }
             let html = `<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Department</th><th>Actions</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const t = doc.data();
-                html += `<tr><td>${escapeHtml(t.id)}</td><td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.department||'N/A')}</td><td><button class="delete-teacher" data-id="${doc.id}">Delete</button></td></tr>`;
+                html += `<tr><td class="id-cell">${escapeHtml(t.id)}</td><td class="name-cell">${escapeHtml(t.name)}</td><td class="dept-cell">${escapeHtml(t.department||'N/A')}</td><td class="actions-cell"><button class="delete-teacher" data-id="${doc.id}">Delete</button></td></tr>`;
             }
             html += `</tbody></table>`;
             listDiv.innerHTML = html;
             document.querySelectorAll('.delete-teacher').forEach(btn => btn.onclick = async () => { await db.collection('teachers').doc(btn.getAttribute('data-id')).delete(); loadTeachers(); });
         }
         async function addTeacher() {
+            if (currentUserRole !== 'admin') { alert("Only admin can add teachers."); return; }
             const id = document.getElementById('teacherId').value.trim(), name = document.getElementById('teacherName').value.trim();
             if(!id || !name) { showMessage("ID and Name required","error","teacherMessage"); return; }
             await db.collection('teachers').doc(id).set({ id, name, department: document.getElementById('teacherDepartment').value, status: 'active' });
@@ -548,6 +695,7 @@
             document.getElementById('teacherId').value = ''; document.getElementById('teacherName').value = ''; loadTeachers();
         }
         async function importStaffExcel(file) {
+            if (currentUserRole !== 'admin') { alert("Only admin can import staff."); return; }
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const data = new Uint8Array(e.target.result);
@@ -565,10 +713,27 @@
             };
             reader.readAsArrayBuffer(file);
         }
-        function downloadStaffSample() { XLSX.writeFile(XLSX.utils.book_new(), "staff_template.xlsx"); }
+        function downloadStaffSample() {
+            const ws = XLSX.utils.json_to_sheet([{ StaffID: "TCH001", Name: "John Kamara", Department: "Mathematics" }]);
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Staff"); XLSX.writeFile(wb, "staff_template.xlsx");
+        }
+        async function searchTeacher() {
+            const query = document.getElementById('teacherSearchInput').value.trim().toLowerCase();
+            if(!query) { loadTeachers(); return; }
+            const snap = await db.collection('teachers').get();
+            let found = null;
+            for(const doc of snap.docs) {
+                const t = doc.data();
+                if(t.id.toLowerCase() === query || t.name.toLowerCase().includes(query)) { found = t; break; }
+            }
+            const resultsDiv = document.getElementById('teacherSearchResults');
+            if(!found) { resultsDiv.innerHTML = '<div class="error">Teacher not found.</div>'; return; }
+            resultsDiv.innerHTML = `<div class="success"><strong>${escapeHtml(found.name)} (${found.id})</strong><br>Department: ${escapeHtml(found.department||'N/A')}</div>`;
+        }
 
-        // ==================== STAFF ATTENDANCE ====================
+        // ========== STAFF ATTENDANCE ==========
         async function loadStaffList() {
+            if (currentUserRole !== 'admin') return;
             const snap = await db.collection('staff').get();
             const container = document.getElementById('staffAttendanceList');
             if(snap.empty) { container.innerHTML = '<p>No staff</p>'; return; }
@@ -578,9 +743,9 @@
                 const today = new Date().toISOString().split('T')[0];
                 const attDoc = await db.collection('staff_attendance').doc(`${today}_${s.id}`).get();
                 const att = attDoc.exists ? attDoc.data() : null;
-                html += `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.type)}</td><td>${att?.checkInTime || 'Not checked in'}</td><td>${att?.checkOutTime || 'Not checked out'}</td><td>${!att ? `<button class="checkin-staff" data-id="${s.id}">Check In</button>` : (!att.checkOutTime ? `<button class="checkout-staff" data-id="${s.id}">Check Out</button>` : 'Completed')}</td></tr>`;
+                html += `<tr><td class="id-cell">${escapeHtml(s.id)}</td><td class="name-cell">${escapeHtml(s.name)}</td><td class="type-cell">${escapeHtml(s.type)}</td><td class="checkin-cell">${att?.checkInTime || 'Not checked in'}</td><td class="checkout-cell">${att?.checkOutTime || 'Not checked out'}</td><td class="action-cell">${!att ? `<button class="checkin-staff" data-id="${s.id}">Check In</button>` : (!att.checkOutTime ? `<button class="checkout-staff" data-id="${s.id}">Check Out</button>` : 'Completed')}</td></tr>`;
             }
-            html += `</tbody></td>`;
+            html += `</tbody></table>`;
             container.innerHTML = html;
             document.querySelectorAll('.checkin-staff').forEach(btn => btn.onclick = async () => {
                 const id = btn.getAttribute('data-id');
@@ -596,6 +761,7 @@
             });
         }
         async function addStaff() {
+            if (currentUserRole !== 'admin') { alert("Only admin can add staff."); return; }
             const id = document.getElementById('staffId').value.trim(), name = document.getElementById('staffName').value.trim();
             if(!id || !name) { showMessage("ID and Name required","error","staffMessage"); return; }
             await db.collection('staff').doc(id).set({ id, name, type: document.getElementById('staffType').value });
@@ -603,8 +769,9 @@
             document.getElementById('staffId').value = ''; document.getElementById('staffName').value = ''; loadStaffList();
         }
 
-        // ==================== FILE STORAGE ====================
+        // ========== FILE STORAGE ==========
         async function uploadFile() {
+            if (currentUserRole !== 'admin') { alert("Only admin can upload files."); return; }
             const file = document.getElementById('uploadFile').files[0];
             const category = document.getElementById('fileCategory').value;
             const title = document.getElementById('fileTitle').value.trim() || file.name;
@@ -619,6 +786,7 @@
             });
         }
         async function loadFiles() {
+            if (currentUserRole !== 'admin') return;
             const category = document.getElementById('viewFileCategory').value;
             const snap = await db.collection('files').where('category','==',category).orderBy('uploadDate','desc').get();
             const container = document.getElementById('filesList');
@@ -626,7 +794,7 @@
             let html = `<table border="1"><thead><tr><th>Title</th><th>File</th><th>Size</th><th>Actions</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const f = doc.data();
-                html += `<tr><td>${escapeHtml(f.title)}</td><td>${escapeHtml(f.fileName)}</td><td>${(f.fileSize/1024).toFixed(1)} KB</td><td><a href="${f.downloadURL}" target="_blank" class="refresh-btn">📥 Download</a> <button class="delete-file" data-id="${doc.id}" data-url="${f.downloadURL}" style="background:#f44336;">Delete</button></td></tr>`;
+                html += `<tr><td class="title-cell">${escapeHtml(f.title)}</td><td class="filename-cell">${escapeHtml(f.fileName)}</td><td class="size-cell">${(f.fileSize/1024).toFixed(1)} KB</td><td class="actions-cell"><a href="${f.downloadURL}" target="_blank" class="refresh-btn">📥 Download</a> <button class="delete-file" data-id="${doc.id}" data-url="${f.downloadURL}" style="background:#f44336;">Delete</button></td></tr>`;
             }
             html += `</tbody></table>`;
             container.innerHTML = html;
@@ -639,21 +807,23 @@
             });
         }
 
-        // ==================== ASSETS, VISITORS, INVENTORY ====================
+        // ========== ASSETS, VISITORS, INVENTORY ==========
         async function loadAssets() {
+            if (currentUserRole !== 'admin') return;
             const snap = await db.collection('assets').get();
             const listDiv = document.getElementById('assetsList');
             if(snap.empty) { listDiv.innerHTML = '<p>No assets</p>'; return; }
             let html = `<table border="1"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const a = doc.data();
-                html += `<tr><td>${escapeHtml(a.name)}</td><td>${escapeHtml(a.location||'N/A')}</td><td>${a.status}</td><td><button class="delete-asset" data-id="${doc.id}">Delete</button></td></tr>`;
+                html += `<tr><td class="name-cell">${escapeHtml(a.name)}</td><td class="location-cell">${escapeHtml(a.location||'N/A')}</td><td class="status-cell">${a.status}</td><td class="actions-cell"><button class="delete-asset" data-id="${doc.id}">Delete</button></td></tr>`;
             }
             html += `</tbody></table>`;
             listDiv.innerHTML = html;
             document.querySelectorAll('.delete-asset').forEach(btn => btn.onclick = async () => { await db.collection('assets').doc(btn.getAttribute('data-id')).delete(); loadAssets(); });
         }
         async function addAsset() {
+            if (currentUserRole !== 'admin') { alert("Only admin can add assets."); return; }
             const name = document.getElementById('assetName').value.trim();
             if(!name) { showMessage("Asset name required","error","assetMessage"); return; }
             await db.collection('assets').add({ name, location: document.getElementById('assetLocation').value, status: document.getElementById('assetStatus').value });
@@ -661,18 +831,20 @@
             document.getElementById('assetName').value = ''; loadAssets();
         }
         async function loadVisitors() {
+            if (currentUserRole !== 'admin') return;
             const snap = await db.collection('visitors').orderBy('checkInTime','desc').limit(30).get();
             const listDiv = document.getElementById('visitorsList');
             if(snap.empty) { listDiv.innerHTML = '<p>No visitors</p>'; return; }
-            let html = `<table border="1"><thead><tr><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>`;
+            let html = `<table border="1"><thead><td><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const v = doc.data();
-                html += `<tr><td>${escapeHtml(v.name)}</td><td>${escapeHtml(v.purpose)}</td><td>${escapeHtml(v.toSee||'N/A')}</td><td>${v.checkInTime}</td><td>${v.checkOutTime||'Not checked out'}</td></tr>`;
+                html += `<tr><td class="name-cell">${escapeHtml(v.name)}</td><td class="purpose-cell">${escapeHtml(v.purpose)}</td><td class="tosee-cell">${escapeHtml(v.toSee||'N/A')}</td><td class="checkin-cell">${v.checkInTime}</td><td class="checkout-cell">${v.checkOutTime||'Not checked out'}</td></tr>`;
             }
-            html += `</tbody></table>`;
+            html += `</tbody></tr>`;
             listDiv.innerHTML = html;
         }
         async function checkInVisitor() {
+            if (currentUserRole !== 'admin') { alert("Only admin can check in visitors."); return; }
             const name = document.getElementById('visitorName').value.trim(), purpose = document.getElementById('visitorPurpose').value.trim();
             if(!name || !purpose) { showMessage("Name and purpose required","error","visitorMessage"); return; }
             await db.collection('visitors').add({ name, purpose, toSee: document.getElementById('visitorToSee').value.trim(), checkInTime: new Date().toLocaleString(), checkOutTime: null });
@@ -680,13 +852,14 @@
             document.getElementById('visitorName').value = ''; document.getElementById('visitorPurpose').value = ''; document.getElementById('visitorToSee').value = ''; loadVisitors();
         }
         async function loadInventory() {
+            if (currentUserRole !== 'admin') return;
             const snap = await db.collection('inventory').get();
             const listDiv = document.getElementById('inventoryList');
             if(snap.empty) { listDiv.innerHTML = '<p>No inventory</p>'; return; }
             let html = `<table border="1"><thead><tr><th>Item</th><th>Quantity</th><th>Unit</th><th>Actions</th></tr></thead><tbody>`;
             for(const doc of snap.docs) {
                 const i = doc.data();
-                html += `<tr><td>${escapeHtml(i.name)}</td><td>${i.quantity}</td><td>${escapeHtml(i.unit||'')}</td><td><button class="edit-inventory" data-id="${doc.id}">Edit</button> <button class="delete-inventory" data-id="${doc.id}">Delete</button></td></tr>`;
+                html += `<tr><td class="name-cell">${escapeHtml(i.name)}</td><td class="qty-cell">${i.quantity}</td><td class="unit-cell">${escapeHtml(i.unit||'')}</td><td class="actions-cell"><button class="edit-inventory" data-id="${doc.id}">Edit</button> <button class="delete-inventory" data-id="${doc.id}">Delete</button></td></tr>`;
             }
             html += `</tbody></table>`;
             listDiv.innerHTML = html;
@@ -696,6 +869,7 @@
             document.querySelectorAll('.delete-inventory').forEach(btn => btn.onclick = async () => { await db.collection('inventory').doc(btn.getAttribute('data-id')).delete(); loadInventory(); });
         }
         async function addInventory() {
+            if (currentUserRole !== 'admin') { alert("Only admin can add inventory."); return; }
             const name = document.getElementById('itemName').value.trim(), quantity = parseInt(document.getElementById('itemQuantity').value);
             if(!name || isNaN(quantity)) { showMessage("Name and quantity required","error","inventoryMessage"); return; }
             await db.collection('inventory').add({ name, quantity, unit: document.getElementById('itemUnit').value.trim() });
@@ -703,7 +877,7 @@
             document.getElementById('itemName').value = ''; document.getElementById('itemQuantity').value = ''; document.getElementById('itemUnit').value = ''; loadInventory();
         }
 
-        // ==================== MODULE SWITCHING ====================
+        // ========== MODULE SWITCHING ==========
         function switchToAttendance() {
             document.getElementById('attendanceModule').style.display='block'; document.getElementById('recordsModule').style.display='none';
             document.getElementById('teachersModule').style.display='none'; document.getElementById('adminModule').style.display='none';
@@ -732,7 +906,7 @@
             loadStaffList(); loadAssets(); loadVisitors(); loadInventory(); loadFiles();
         }
 
-        // ==================== ADMIN TABS (MOBILE FIX) ====================
+        // ========== ADMIN TABS INIT ==========
         function initAdminTabs() {
             const tabs = document.querySelectorAll('#adminTabs .admin-tab-btn');
             const contents = document.querySelectorAll('#adminModule .admin-tab');
@@ -754,11 +928,9 @@
             });
         }
 
-        // ==================== INITIALIZATION ====================
+        // ========== INITIALIZATION ==========
         window.onload = async () => {
             await updateOnlineStatus();
-            await loadStudents();
-            await renderAttendance();
             initAdminTabs();
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
@@ -783,6 +955,8 @@
             document.getElementById('addTeacherBtn').onclick = addTeacher;
             document.getElementById('importStaffBtn').onclick = () => { const file = document.getElementById('staffExcelFile').files[0]; if(file) importStaffExcel(file); else alert('Select Excel file'); };
             document.getElementById('downloadStaffSampleBtn').onclick = downloadStaffSample;
+            document.getElementById('searchTeacherBtn').onclick = searchTeacher;
+            document.getElementById('clearTeacherSearchBtn').onclick = () => { document.getElementById('teacherSearchInput').value = ''; document.getElementById('teacherSearchResults').innerHTML = ''; loadTeachers(); };
             document.getElementById('addStaffBtn').onclick = addStaff;
             document.getElementById('uploadFileBtn').onclick = uploadFile;
             document.getElementById('refreshFilesBtn').onclick = loadFiles;
