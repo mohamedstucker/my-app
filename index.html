@@ -38,7 +38,6 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
         th { background: #f2f2f2; }
         .search-box { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .exam-table { font-size: 13px; }
         .fee-paid { background: #c8e6c9; }
         .fee-partial { background: #fff9c4; }
         .fee-unpaid { background: #ffcdd2; }
@@ -116,7 +115,7 @@
             <div id="studentList"></div>
         </div>
 
-        <!-- STUDENT RECORDS MODULE (with manual subjects) -->
+        <!-- STUDENT RECORDS MODULE -->
         <div id="recordsModule" style="display:none;">
             <div class="card"><h3>🔍 Find Student</h3><div class="search-box"><input type="text" id="studentSearchInput" placeholder="Student ID or Name"><button id="searchStudentBtn" class="refresh-btn">Search</button><button id="clearSearchBtn" style="background:#ffcdd2; color:#c62828;">Clear</button></div><div id="searchResults"></div></div>
             <div id="studentRecordsPanel" style="display:none;">
@@ -156,7 +155,7 @@
             </div>
         </div>
 
-        <!-- TEACHERS MODULE (with Teacher's Daily Register) -->
+        <!-- TEACHERS MODULE -->
         <div id="teachersModule" style="display:none;">
             <div class="card"><h3>👩‍🏫 Add New Teacher</h3>
                 <input type="text" id="teacherId" placeholder="Teacher ID"><input type="text" id="teacherName" placeholder="Full Name">
@@ -187,10 +186,16 @@
                 <button class="admin-tab-btn" data-tab="visitors">📝 Visitors</button>
                 <button class="admin-tab-btn" data-tab="inventory">📦 Inventory</button>
             </div>
-            <div id="staffTab" class="admin-tab active"><div class="card"><h3>➕ Register Staff</h3><input type="text" id="staffId" placeholder="Staff ID"><input type="text" id="staffName" placeholder="Full Name"><select id="staffType"><option value="Teacher">Teacher</option><option value="Admin">Admin</option><option value="Cleaner">Cleaner</option><option value="Security">Security</option><option value="Driver">Driver</option><option value="Other">Other</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div></div><div class="card"><h3>📋 Today's Staff Attendance</h3><div id="staffAttendanceList"></div></div></div>
+            <div id="staffTab" class="admin-tab active">
+                <div class="card"><h3>➕ Register Staff</h3><input type="text" id="staffId" placeholder="Staff ID"><input type="text" id="staffName" placeholder="Full Name"><select id="staffType"><option value="Teacher">Teacher</option><option value="Admin">Admin</option><option value="Cleaner">Cleaner</option><option value="Security">Security</option><option value="Driver">Driver</option><option value="Other">Other</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div></div>
+                <div class="card"><h3>📋 Today's Staff Attendance</h3><div id="staffAttendanceList"></div></div>
+            </div>
             <div id="filestorageTab" class="admin-tab" style="display:none;"><div class="card"><h3>📤 Upload File</h3><select id="fileCategory"><option value="students">Students</option><option value="staff">Staff</option><option value="general">General</option></select><input type="text" id="fileTitle" placeholder="File Title"><input type="file" id="uploadFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xlsx,.txt"><button id="uploadFileBtn" class="refresh-btn">📤 Upload</button><div id="uploadMessage"></div></div><div class="card"><h3>📁 Stored Files</h3><select id="viewFileCategory"><option value="students">Students</option><option value="staff">Staff</option><option value="general">General</option></select><button id="refreshFilesBtn" class="refresh-btn">🔄 Refresh</button><div id="filesList"></div></div></div>
             <div id="assetsTab" class="admin-tab" style="display:none;"><div class="card"><h3>➕ Add Asset</h3><input type="text" id="assetName" placeholder="Asset Name"><input type="text" id="assetLocation" placeholder="Location"><select id="assetStatus"><option value="Good">Good</option><option value="Fair">Fair</option><option value="Poor">Poor</option></select><button id="addAssetBtn" class="refresh-btn">Add Asset</button><div id="assetMessage"></div></div><div class="card"><h3>📋 Assets List</h3><div id="assetsList"></div></div></div>
-            <div id="visitorsTab" class="admin-tab" style="display:none;"><div class="card"><h3>📝 Check-In Visitor</h3><input type="text" id="visitorName" placeholder="Visitor Name"><input type="text" id="visitorPurpose" placeholder="Purpose"><input type="text" id="visitorToSee" placeholder="Person to See"><button id="checkInVisitorBtn" class="refresh-btn">Check In</button><div id="visitorMessage"></div></div><div class="card"><h3>📋 Visitors Log</h3><div id="visitorsList"></div></div></div>
+            <div id="visitorsTab" class="admin-tab" style="display:none;">
+                <div class="card"><h3>📝 Check-In Visitor</h3><input type="text" id="visitorName" placeholder="Visitor Name"><input type="text" id="visitorPurpose" placeholder="Purpose"><input type="text" id="visitorToSee" placeholder="Person to See"><button id="checkInVisitorBtn" class="refresh-btn">Check In</button><button id="checkoutAllBtn" class="refresh-btn" style="background:#FF9800;">🚪 Check Out All</button><div id="visitorMessage"></div></div>
+                <div class="card"><h3>📋 Visitors Log</h3><div id="visitorsList"></div></div>
+            </div>
             <div id="inventoryTab" class="admin-tab" style="display:none;"><div class="card"><h3>➕ Add Inventory</h3><input type="text" id="itemName" placeholder="Item Name"><input type="number" id="itemQuantity" placeholder="Quantity"><input type="text" id="itemUnit" placeholder="Unit"><button id="addInventoryBtn" class="refresh-btn">Add Item</button><div id="inventoryMessage"></div></div><div class="card"><h3>📦 Inventory Items</h3><div id="inventoryList"></div></div></div>
         </div>
     </div>
@@ -245,6 +250,17 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
+        // Enable offline persistence
+        db.enablePersistence()
+            .then(() => console.log("Firestore offline persistence enabled"))
+            .catch((err) => {
+                if (err.code === 'failed-precondition') {
+                    console.warn("Multiple tabs open, persistence can only be enabled in one tab.");
+                } else {
+                    console.error("Persistence error:", err);
+                }
+            });
+
         // ==================== GLOBAL VARIABLES ====================
         let allStudents = {};
         let studentDocMap = new Map();
@@ -283,14 +299,17 @@
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
         }
-        function calculateAge(dob) {
-            if (!dob) return 'N/A';
-            var b = new Date(dob);
-            var t = new Date();
-            var a = t.getFullYear() - b.getFullYear();
-            var m = t.getMonth() - b.getMonth();
-            if (m < 0 || (m === 0 && t.getDate() < b.getDate())) a--;
-            return a;
+        
+        // WhatsApp number validation
+        function getValidWhatsAppUrl(phone, message) {
+            let raw = phone.toString().replace(/\D/g, '');
+            if (raw.startsWith('0')) raw = raw.substring(1);
+            if (!raw.startsWith('232')) raw = '232' + raw;
+            if (raw.length < 10 || raw.length > 15) {
+                alert('Invalid phone number: ' + phone);
+                return null;
+            }
+            return 'https://wa.me/' + raw + '?text=' + encodeURIComponent(message);
         }
 
         // ========== AUTHENTICATION ==========
@@ -466,7 +485,8 @@
         function sendWhatsApp(student, status, remark, classname) {
             var statusText = status === 'present' ? 'PRESENT ✅' : (status === 'absent' ? 'ABSENT ❌' : 'LATE ⏰');
             var message = '🏫 Attendance Update - ' + classname + '\n\nStudent: ' + student.name + ' (' + student.id + ')\nStatus: ' + statusText + '\nRemark: ' + remark + '\nDate: ' + new Date().toLocaleDateString() + '\n\nThank you.';
-            window.open('https://wa.me/' + student.parentPhone + '?text=' + encodeURIComponent(message), '_blank');
+            let url = getValidWhatsAppUrl(student.parentPhone, message);
+            if (url) window.open(url, '_blank');
         }
         async function sendBatchWhatsApp() {
             if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert("Only admin/teacher can send reports."); return; }
@@ -489,7 +509,8 @@
                 (function(s, idx) {
                     setTimeout(function() {
                         var msg = 'Dear ' + s.parentName + ',\n\n' + summary + '\n\nThank you.';
-                        window.open('https://wa.me/' + s.parentPhone + '?text=' + encodeURIComponent(msg), '_blank');
+                        let url = getValidWhatsAppUrl(s.parentPhone, msg);
+                        if (url) window.open(url, '_blank');
                     }, idx * 500);
                 })(recipients[i], i);
             }
@@ -508,7 +529,8 @@
             for (var i = 0; i < students.length; i++) {
                 var s = students[i];
                 var att = attData[s.id] || { status: 'none', remark: '' };
-                var div = document.createElement('div'); div.className = 'student';
+                var div = document.createElement('div');
+                div.className = 'student';
                 var inner = '<div class="student-info">' +
                     '<span><strong>' + escapeHtml(s.name) + '</strong> (' + s.id + ')</span>' +
                     '<span>' + (att.status === 'present' ? '✅ Present' : (att.status === 'absent' ? '❌ Absent' : (att.status === 'late' ? '⏰ Late' : '⚪ Not marked'))) + '</span>' +
@@ -609,9 +631,9 @@
                     snap.forEach(function(d) {
                         var data = d.data();
                         var emoji = data.status === 'present' ? '✅ Present' : (data.status === 'absent' ? '❌ Absent' : '⏰ Late');
-                        html += '<tr><td class="date-cell">' + data.date + '</td><td class="status-cell">' + emoji + '</td><td class="remark-cell">' + escapeHtml(data.remark||'') + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                        html += '<tr><td class="date-cell">' + data.date + '</td><td class="status-cell">' + emoji + '</td><td class="remark-cell">' + escapeHtml(data.remark||'') + 'NonNullListCell-->';
                     });
-                    html += '</tbody></tr>';
+                    html += '</tbody></table>';
                     document.getElementById('historyContent').innerHTML = html;
                     openModal('historyModal');
                 };
@@ -631,9 +653,9 @@
                 var student = students[i];
                 var att = attMap[student.id] || { status: 'Not marked', remark: '' };
                 var emoji = att.status === 'present' ? '✅ Present' : (att.status === 'absent' ? '❌ Absent' : (att.status === 'late' ? '⏰ Late' : '⚪ Not marked'));
-                html += '<tr><td class="id-cell">' + student.id + '</td><td class="name-cell">' + escapeHtml(student.name) + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                html += '<tr><td class="id-cell">' + student.id + '</td><td class="name-cell">' + escapeHtml(student.name) + '</td><td class="status-cell">' + emoji + '</td><td class="remark-cell">' + escapeHtml(att.remark) + 'NonNullListCell-->';
             }
-            html += '</tbody><tr>';
+            html += '</tbody></table>';
             document.getElementById('historyContent').innerHTML = html;
             openModal('historyModal');
         }
@@ -694,7 +716,7 @@
         }
         async function refreshStudents() { await loadStudents(); await renderAttendance(); showMessage("Refreshed", 'success', 'importMessage'); }
 
-        // ========== STUDENT RECORDS (manual subjects) ==========
+        // ========== STUDENT RECORDS ==========
         async function searchStudent() {
             var queryText = document.getElementById('studentSearchInput').value.trim().toLowerCase();
             if (!queryText) { alert("Enter Student ID or Name"); return; }
@@ -756,7 +778,6 @@
             saveBtn._listener = handler;
         }
 
-        // Build subject inputs for manual entry
         function buildSubjectInputs(currentSubjects) {
             if (!currentSubjects || currentSubjects.length === 0) {
                 currentSubjects = [{ name: '', score: '' }];
@@ -865,9 +886,9 @@
                         '<table border="1"><thead><tr><th>Date</th><th>Amount (Le)</th><th>Type</th><th>Note</th></tr></thead><tbody>';
             for (var i = 0; i < (termData.transactions || []).length; i++) {
                 var t = termData.transactions[i];
-                html += '<tr><td class="date-cell">' + t.date + '</td><td class="amount-cell">' + t.amount.toLocaleString() + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                html += '<tr><td class="date-cell">' + t.date + '</td><td class="amount-cell">' + t.amount.toLocaleString() + '</td><td class="type-cell">' + t.type + '</td><td class="note-cell">' + escapeHtml(t.note || '') + 'NonNullListCell-->';
             }
-            html += '</tbody></td>';
+            html += '</tbody></table>';
             document.getElementById('feesContent').innerHTML = html;
         }
         async function recordPayment() {
@@ -937,14 +958,21 @@
             var html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Department</th><th>Actions</th></tr></thead><tbody>';
             for (var doc of snap.docs) {
                 var t = doc.data();
-                html += '<tr><td class="id-cell">' + escapeHtml(t.id) + '</td><td class="name-cell">' + escapeHtml(t.name) + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                html += '<tr>' +
+                    '<td class="id-cell">' + escapeHtml(t.id) + '</td>' +
+                    '<td class="name-cell">' + escapeHtml(t.name) + '</td>' +
+                    '<td class="dept-cell">' + escapeHtml(t.department || 'N/A') + '</td>' +
+                    '<td class="action-cell"><button class="delete-teacher" data-id="' + doc.id + '" style="background:#ffcdd2; color:#c62828;">Delete</button></td>' +
+                '</tr>';
             }
-            html += '</tbody></td>';
+            html += '</tbody></table>';
             listDiv.innerHTML = html;
             document.querySelectorAll('.delete-teacher').forEach(function(btn) {
                 btn.onclick = async function() {
-                    await db.collection('teachers').doc(btn.getAttribute('data-id')).delete();
-                    loadTeachers();
+                    if (confirm('Delete this teacher?')) {
+                        await db.collection('teachers').doc(btn.getAttribute('data-id')).delete();
+                        loadTeachers();
+                    }
                 };
             });
         }
@@ -1084,33 +1112,49 @@
             for (var doc of snap.docs) {
                 var a = doc.data();
                 var statusEmoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : '⏰ Late');
-                html += '<tr><td class="date-cell">' + a.date + '</td><td class="status-cell">' + statusEmoji + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                html += '<tr><td class="date-cell">' + a.date + '</td><td class="status-cell">' + statusEmoji + '</td><td class="remark-cell">' + escapeHtml(a.remark || '') + 'NonNullListCell-->';
             }
-            html += '</tbody></tr>';
+            html += '</tbody></table>';
             container.innerHTML = html;
         }
 
-        // ========== STAFF ATTENDANCE ==========
+        // ========== STAFF ATTENDANCE (FIXED) ==========
         async function loadStaffList() {
             if (currentUserRole !== 'admin') return;
             var snap = await db.collection('staff').get();
             var container = document.getElementById('staffAttendanceList');
             if (snap.empty) { container.innerHTML = '<p>No staff</p>'; return; }
-            var html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Check In</th><th>Check Out</th><th>Action</th><tr></thead><tbody>';
+            var html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Check In</th><th>Check Out</th><th>Action</th></tr></thead><tbody>';
             for (var doc of snap.docs) {
                 var s = doc.data();
                 var today = new Date().toISOString().split('T')[0];
                 var attDoc = await db.collection('staff_attendance').doc(today + '_' + s.id).get();
                 var att = attDoc.exists ? attDoc.data() : null;
-                html += '<tr><td class="id-cell">' + escapeHtml(s.id) + '</td><td class="name-cell">' + escapeHtml(s.name) + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                html += '<tr>' +
+                    '<td class="id-cell">' + escapeHtml(s.id) + '</td>' +
+                    '<td class="name-cell">' + escapeHtml(s.name) + '</td>' +
+                    '<td class="type-cell">' + escapeHtml(s.type) + '</td>' +
+                    '<td class="checkin-cell">' + (att?.checkInTime || 'Not checked in') + '</td>' +
+                    '<td class="checkout-cell">' + (att?.checkOutTime || 'Not checked out') + '</td>' +
+                    '<td class="action-cell">' +
+                        '<button class="checkin-staff" data-id="' + s.id + '">✅ Check In</button> ' +
+                        '<button class="checkout-staff" data-id="' + s.id + '">🚪 Check Out</button>' +
+                    '</td>' +
+                '</tr>';
             }
-            html += '</tbody><tr>';
+            html += '</tbody></table>';
             container.innerHTML = html;
+
             document.querySelectorAll('.checkin-staff').forEach(function(btn) {
                 btn.onclick = async function() {
                     var id = btn.getAttribute('data-id');
                     var today = new Date().toISOString().split('T')[0];
-                    await db.collection('staff_attendance').doc(today + '_' + id).set({ staffId: id, date: today, checkInTime: new Date().toLocaleString(), checkOutTime: null });
+                    await db.collection('staff_attendance').doc(today + '_' + id).set({
+                        staffId: id,
+                        date: today,
+                        checkInTime: new Date().toLocaleString(),
+                        checkOutTime: null
+                    });
                     loadStaffList();
                 };
             });
@@ -1118,7 +1162,9 @@
                 btn.onclick = async function() {
                     var id = btn.getAttribute('data-id');
                     var today = new Date().toISOString().split('T')[0];
-                    await db.collection('staff_attendance').doc(today + '_' + id).update({ checkOutTime: new Date().toLocaleString() });
+                    await db.collection('staff_attendance').doc(today + '_' + id).update({
+                        checkOutTime: new Date().toLocaleString()
+                    });
                     loadStaffList();
                 };
             });
@@ -1159,12 +1205,17 @@
             var snap = await db.collection('files').where('category', '==', category).orderBy('uploadDate', 'desc').get();
             var container = document.getElementById('filesList');
             if (snap.empty) { container.innerHTML = '<p>No files.</p>'; return; }
-            var html = '<table border="1"><thead></tr><th>Title</th><th>File</th><th>Size</th><th>Actions</th></tr></thead><tbody>';
+            var html = '<table border="1"><thead><tr><th>Title</th><th>File</th><th>Size</th><th>Actions</th></tr></thead><tbody>';
             for (var doc of snap.docs) {
                 var f = doc.data();
-                html += '<tr><td class="title-cell">' + escapeHtml(f.title) + '</td><td class="filename-cell">' + escapeHtml(f.fileName) + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                html += '<td>' +
+                    '<td class="title-cell">' + escapeHtml(f.title) + '</td>' +
+                    '<td class="filename-cell">' + escapeHtml(f.fileName) + '</td>' +
+                    '<td class="size-cell">' + Math.round(f.fileSize / 1024) + ' KB</td>' +
+                    '<td class="action-cell"><button class="delete-file" data-id="' + doc.id + '" data-url="' + f.downloadURL + '" style="background:#ffcdd2; color:#c62828;">Delete</button></td>' +
+                '</tr>';
             }
-            html += '</tbody></td>';
+            html += '</tbody></table>';
             container.innerHTML = html;
             document.querySelectorAll('.delete-file').forEach(function(btn) {
                 btn.onclick = async function() {
@@ -1177,7 +1228,7 @@
             });
         }
 
-        // ========== ASSETS, VISITORS, INVENTORY ==========
+        // ========== ASSETS ==========
         async function loadAssets() {
             if (currentUserRole !== 'admin') return;
             var snap = await db.collection('assets').get();
@@ -1186,9 +1237,14 @@
             var html = '<table border="1"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
             for (var doc of snap.docs) {
                 var a = doc.data();
-                html += '<tr><td class="name-cell">' + escapeHtml(a.name) + '</td><td class="location-cell">' + escapeHtml(a.location || 'N/A') + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                html += '<tr>' +
+                    '<td class="name-cell">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="location-cell">' + escapeHtml(a.location || 'N/A') + '</td>' +
+                    '<td class="status-cell">' + escapeHtml(a.status) + '</td>' +
+                    '<td class="action-cell"><button class="delete-asset" data-id="' + doc.id + '" style="background:#ffcdd2; color:#c62828;">Delete</button></td>' +
+                '</tr>';
             }
-            html += '</tbody></tr>';
+            html += '</tbody></table>';
             listDiv.innerHTML = html;
             document.querySelectorAll('.delete-asset').forEach(function(btn) {
                 btn.onclick = async function() {
@@ -1206,18 +1262,50 @@
             document.getElementById('assetName').value = '';
             loadAssets();
         }
+
+        // ========== VISITORS (with Check Out) ==========
         async function loadVisitors() {
             if (currentUserRole !== 'admin') return;
-            var snap = await db.collection('visitors').orderBy('checkInTime', 'desc').limit(30).get();
-            var listDiv = document.getElementById('visitorsList');
-            if (snap.empty) { listDiv.innerHTML = '<p>No visitors</p>'; return; }
-            var html = '<table border="1"><thead><tr><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>';
-            for (var doc of snap.docs) {
-                var v = doc.data();
-                html += '<tr><td class="name-cell">' + escapeHtml(v.name) + '</td><td class="purpose-cell">' + escapeHtml(v.purpose) + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+            const snap = await db.collection('visitors').orderBy('checkInTime', 'desc').limit(30).get();
+            const listDiv = document.getElementById('visitorsList');
+            if (snap.empty) {
+                listDiv.innerHTML = '<p>No visitors</p>';
+                return;
             }
-            html += '</tbody></td>';
+            let html = `<table border="1">
+                <thead>
+                    <tr><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th><th>Action</th></tr>
+                </thead>
+                <tbody>`;
+            for (const doc of snap.docs) {
+                const v = doc.data();
+                const checkedOut = v.checkOutTime ? true : false;
+                html += `
+                    <tr>
+                        <td>${escapeHtml(v.name)}</td>
+                        <td>${escapeHtml(v.purpose)}</td>
+                        <td>${escapeHtml(v.toSee || '')}</td>
+                        <td>${escapeHtml(v.checkInTime)}</td>
+                        <td>${checkedOut ? escapeHtml(v.checkOutTime) : 'Still inside'}</td>
+                        <td>
+                            ${!checkedOut ? `<button class="checkout-visitor" data-id="${doc.id}" style="background:#FF9800;">🚪 Check Out</button>` : '✅ Completed'}
+                        </td>
+                    </tr>
+                `;
+            }
+            html += `</tbody></table>`;
             listDiv.innerHTML = html;
+
+            document.querySelectorAll('.checkout-visitor').forEach(btn => {
+                btn.onclick = async () => {
+                    const id = btn.getAttribute('data-id');
+                    await db.collection('visitors').doc(id).update({
+                        checkOutTime: new Date().toLocaleString()
+                    });
+                    loadVisitors();
+                    showMessage("Visitor checked out", "success", "visitorMessage");
+                };
+            });
         }
         async function checkInVisitor() {
             if (currentUserRole !== 'admin') { alert("Only admin can check in visitors."); return; }
@@ -1231,6 +1319,18 @@
             document.getElementById('visitorToSee').value = '';
             loadVisitors();
         }
+        async function checkoutAllVisitors() {
+            const snap = await db.collection('visitors').where('checkOutTime', '==', null).get();
+            const batch = db.batch();
+            snap.forEach(doc => {
+                batch.update(doc.ref, { checkOutTime: new Date().toLocaleString() });
+            });
+            await batch.commit();
+            loadVisitors();
+            showMessage(`Checked out ${snap.size} visitor(s)`, "success", "visitorMessage");
+        }
+
+        // ========== INVENTORY ==========
         async function loadInventory() {
             if (currentUserRole !== 'admin') return;
             var snap = await db.collection('inventory').get();
@@ -1239,21 +1339,33 @@
             var html = '<table border="1"><thead><tr><th>Item</th><th>Quantity</th><th>Unit</th><th>Actions</th></tr></thead><tbody>';
             for (var doc of snap.docs) {
                 var i = doc.data();
-                html += '<tr><td class="name-cell">' + escapeHtml(i.name) + '</td><td class="qty-cell">' + i.quantity + 'NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->NonNullListCell-->';
+                html += '<tr>' +
+                    '<td class="name-cell">' + escapeHtml(i.name) + '</td>' +
+                    '<td class="qty-cell">' + i.quantity + '</td>' +
+                    '<td class="unit-cell">' + escapeHtml(i.unit || '') + '</td>' +
+                    '<td class="action-cell">' +
+                        '<button class="edit-inventory" data-id="' + doc.id + '" style="background:#2196F3;">✏️ Edit Qty</button> ' +
+                        '<button class="delete-inventory" data-id="' + doc.id + '" style="background:#ffcdd2; color:#c62828;">Delete</button>' +
+                    '</td>' +
+                '</tr>';
             }
-            html += '</tbody></tr>';
+            html += '</tbody></table>';
             listDiv.innerHTML = html;
             document.querySelectorAll('.edit-inventory').forEach(function(btn) {
                 btn.onclick = async function() {
                     var newQty = prompt("New quantity:");
-                    if (newQty) await db.collection('inventory').doc(btn.getAttribute('data-id')).update({ quantity: parseInt(newQty) });
-                    loadInventory();
+                    if (newQty !== null && !isNaN(parseInt(newQty))) {
+                        await db.collection('inventory').doc(btn.getAttribute('data-id')).update({ quantity: parseInt(newQty) });
+                        loadInventory();
+                    }
                 };
             });
             document.querySelectorAll('.delete-inventory').forEach(function(btn) {
                 btn.onclick = async function() {
-                    await db.collection('inventory').doc(btn.getAttribute('data-id')).delete();
-                    loadInventory();
+                    if (confirm("Delete item?")) {
+                        await db.collection('inventory').doc(btn.getAttribute('data-id')).delete();
+                        loadInventory();
+                    }
                 };
             });
         }
@@ -1341,6 +1453,15 @@
             });
         }
 
+        // ========== SERVICE WORKER REGISTRATION ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.error('SW registration failed', err));
+            });
+        }
+
         // ========== INITIALIZATION ==========
         window.onload = async function() {
             await updateOnlineStatus();
@@ -1392,6 +1513,7 @@
             document.getElementById('refreshFilesBtn').onclick = loadFiles;
             document.getElementById('addAssetBtn').onclick = addAsset;
             document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
+            document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
             document.getElementById('addInventoryBtn').onclick = addInventory;
             document.getElementById('searchTeacherRegisterBtn').onclick = loadTeacherRegister;
             document.querySelectorAll('.term-btn').forEach(function(btn) {
