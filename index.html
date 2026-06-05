@@ -955,25 +955,36 @@ async function loadTeachers() {
     var snap = await db.collection('teachers').get();
     var listDiv = document.getElementById('allTeachersList');
     if (snap.empty) { listDiv.innerHTML = '<p>No teachers</p>'; return; }
-    var html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Class</th><th>Department</th><th>Actions</th></tr></thead><tbody>';
+    var html = `<table border="1">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>DOB</th><th>Employment Date</th><th>Department</th><th>Subject</th><th>Class</th><th>Salary (Le)</th><th>Status</th><th>Actions</th>
+        </thead>
+        <tbody>`;
     for (var doc of snap.docs) {
         var t = doc.data();
-        html += '<tr>' +
-            '<td class="id-cell">' + escapeHtml(t.id) + '</td>' +
-            '<td class="name-cell">' + escapeHtml(t.name) + '</td>' +
-            '<td class="email-cell">' + escapeHtml(t.email || 'N/A') + '</td>' +
-            '<td class="class-cell">' + escapeHtml(t.class || 'N/A') + '</td>' +
-            '<td class="dept-cell">' + escapeHtml(t.department || 'N/A') + '</td>' +
-            '<td class="action-cell"><button class="delete-teacher" data-id="' + doc.id + '" style="background:#ffcdd2; color:#c62828;">Delete</button></td>' +
-        '</tr>';
+        html += `<tr>
+            <td class="id-cell">${escapeHtml(t.id)}</td>
+            <td class="name-cell">${escapeHtml(t.name)}</td>
+            <td class="email-cell">${escapeHtml(t.email || 'N/A')}</td>
+            <td class="phone-cell">${escapeHtml(t.phone || 'N/A')}</td>
+            <td class="dob-cell">${escapeHtml(t.dob || 'N/A')}</td>
+            <td class="employment-cell">${escapeHtml(t.employmentDate || 'N/A')}</td>
+            <td class="dept-cell">${escapeHtml(t.department || 'N/A')}</td>
+            <td class="subjects-cell">${escapeHtml(t.subjects || 'N/A')}</td>
+            <td class="class-cell">${escapeHtml(t.class || 'N/A')}</td>
+            <td class="salary-cell">${t.salary ? t.salary.toLocaleString() : '0'}</td>
+            <td class="status-cell">${t.status === 'active' ? '✅ Active' : '❌ Inactive'}</td>
+            <td class="action-cell"><button class="delete-teacher" data-id="${doc.id}" style="background:#ffcdd2; color:#c62828;">Delete</button></td>
+        </tr>`;
     }
-    html += '</tbody></table>';
+    html += `</tbody></table>`;
     listDiv.innerHTML = html;
-    document.querySelectorAll('.delete-teacher').forEach(function(btn) {
+    document.querySelectorAll('.delete-teacher').forEach(btn => {
         btn.onclick = async function() {
-            if (confirm('Delete this teacher?')) {
+            if (confirm('Delete this teacher? This will NOT delete their login account automatically.')) {
                 await db.collection('teachers').doc(btn.getAttribute('data-id')).delete();
                 loadTeachers();
+                showMessage('Teacher deleted', 'success', 'teacherMessage');
             }
         };
     });
@@ -987,34 +998,48 @@ async function addTeacher() {
     
     const id = document.getElementById('teacherId').value.trim();
     const name = document.getElementById('teacherName').value.trim();
-    const department = document.getElementById('teacherDepartment').value;
     const email = document.getElementById('teacherEmail').value.trim();
+    const phone = document.getElementById('teacherPhone').value.trim();
+    const dob = document.getElementById('teacherDob').value;
+    const employmentDate = document.getElementById('teacherEmploymentDate').value;
+    const department = document.getElementById('teacherDepartment').value;
+    const subjects = document.getElementById('teacherSubjects').value.trim();
     const assignedClass = document.getElementById('teacherClass').value;
-    const password = document.getElementById('teacherCredential').value;
+    const salary = parseFloat(document.getElementById('teacherSalary').value);
+    const status = document.getElementById('teacherStatus').value;
     
-    if (!id || !name || !email || !assignedClass || !password) {
-        showMessage("Please fill all fields (ID, Name, Email, Class, Password)", "error", "teacherMessage");
+    if (!id || !name || !email || !assignedClass) {
+        showMessage("Please fill required fields: ID, Name, Email, Class", "error", "teacherMessage");
         return;
     }
     
+    // Generate random 8-character password
+    const tempPassword = Math.random().toString(36).slice(-8);
+    
     try {
         // Create Firebase Auth user
-        const userCred = await auth.createUserWithEmailAndPassword(email, password);
+        const userCred = await auth.createUserWithEmailAndPassword(email, tempPassword);
         const uid = userCred.user.uid;
         
         // Store teacher document in Firestore
         await db.collection('teachers').doc(id).set({
             id: id,
             name: name,
-            department: department,
             email: email,
+            phone: phone,
+            dob: dob,
+            employmentDate: employmentDate,
+            department: department,
+            subjects: subjects,
             class: assignedClass,
+            salary: isNaN(salary) ? 0 : salary,
+            status: status,
             uid: uid,
-            status: 'active',
-            role: 'teacher'
+            role: 'teacher',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        // Also store in 'users' collection for role‑based access
+        // Store user role
         await db.collection('users').doc(uid).set({
             email: email,
             role: 'teacher',
@@ -1022,15 +1047,20 @@ async function addTeacher() {
             name: name
         });
         
-        showMessage(`Teacher ${name} added! Login: ${email}`, "success", "teacherMessage");
+        showMessage(`Teacher ${name} added! Temporary password: ${tempPassword} (share with teacher)`, "success", "teacherMessage");
         
         // Clear form
         document.getElementById('teacherId').value = '';
         document.getElementById('teacherName').value = '';
         document.getElementById('teacherEmail').value = '';
-        document.getElementById('teacherClass').value = '';
-        document.getElementById('teacherCredential').value = '';
+        document.getElementById('teacherPhone').value = '';
+        document.getElementById('teacherDob').value = '';
+        document.getElementById('teacherEmploymentDate').value = '';
         document.getElementById('teacherDepartment').value = '';
+        document.getElementById('teacherSubjects').value = '';
+        document.getElementById('teacherClass').value = '';
+        document.getElementById('teacherSalary').value = '';
+        document.getElementById('teacherStatus').value = 'active';
         
         loadTeachers();
         
@@ -1049,25 +1079,72 @@ async function importStaffExcel(file) {
         var sheet = workbook.Sheets[workbook.SheetNames[0]];
         var rows = XLSX.utils.sheet_to_json(sheet);
         var added = 0;
+        var errors = [];
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
-            var id = row.StaffID || row.staffId;
+            var id = row.TeacherID || row.id;
             var name = row.Name || row.name;
-            if (!id || !name) continue;
-            await db.collection('teachers').doc(id).set({ id: id, name: name, department: row.Department || '', status: 'active' });
-            added++;
+            var email = row.Email || row.email;
+            if (!id || !name || !email) {
+                errors.push(`Row ${i+1}: missing ID, Name, or Email`);
+                continue;
+            }
+            const tempPassword = Math.random().toString(36).slice(-8);
+            try {
+                const userCred = await auth.createUserWithEmailAndPassword(email, tempPassword);
+                const uid = userCred.user.uid;
+                await db.collection('teachers').doc(id).set({
+                    id: id,
+                    name: name,
+                    email: email,
+                    phone: row.Phone || '',
+                    dob: row.DOB || '',
+                    employmentDate: row.EmploymentDate || '',
+                    department: row.Department || '',
+                    subjects: row.Subjects || '',
+                    class: row.Class || '',
+                    salary: parseFloat(row.Salary) || 0,
+                    status: row.Status === 'inactive' ? 'inactive' : 'active',
+                    uid: uid,
+                    role: 'teacher',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                await db.collection('users').doc(uid).set({
+                    email: email,
+                    role: 'teacher',
+                    class: row.Class || '',
+                    name: name
+                });
+                added++;
+            } catch (err) {
+                errors.push(`Row ${i+1}: ${err.message}`);
+            }
         }
         loadTeachers();
-        showMessage('Imported ' + added + ' staff', 'success', 'staffImportMessage');
+        let msg = `Imported ${added} teachers.`;
+        if (errors.length) msg += ` Errors: ${errors.join('; ')}`;
+        showMessage(msg, 'success', 'staffImportMessage');
     };
     reader.readAsArrayBuffer(file);
 }
 
 function downloadStaffSample() {
-    var ws = XLSX.utils.json_to_sheet([{ StaffID: "TCH001", Name: "John Kamara", Department: "Mathematics" }]);
+    var ws = XLSX.utils.json_to_sheet([{
+        TeacherID: "TCH001",
+        Name: "John Kamara",
+        Email: "john.kamara@school.com",
+        Phone: "23276123456",
+        DOB: "1985-06-15",
+        EmploymentDate: "2020-09-01",
+        Department: "Mathematics",
+        Subjects: "Algebra, Geometry",
+        Class: "SSS2",
+        Salary: 2500000,
+        Status: "active"
+    }]);
     var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Staff");
-    XLSX.writeFile(wb, "staff_template.xlsx");
+    XLSX.utils.book_append_sheet(wb, ws, "Teachers");
+    XLSX.writeFile(wb, "teachers_template.xlsx");
 }
 
 async function searchTeacher() {
@@ -1084,7 +1161,14 @@ async function searchTeacher() {
     }
     var resultsDiv = document.getElementById('teacherSearchResults');
     if (!found) { resultsDiv.innerHTML = '<div class="error">Teacher not found.</div>'; return; }
-    resultsDiv.innerHTML = '<div class="success"><strong>' + escapeHtml(found.name) + ' (' + found.id + ')</strong><br>Department: ' + escapeHtml(found.department || 'N/A') + '</div>';
+    resultsDiv.innerHTML = `<div class="success">
+        <strong>${escapeHtml(found.name)} (${escapeHtml(found.id)})</strong><br>
+        Email: ${escapeHtml(found.email || 'N/A')}<br>
+        Phone: ${escapeHtml(found.phone || 'N/A')}<br>
+        Department: ${escapeHtml(found.department || 'N/A')}<br>
+        Class: ${escapeHtml(found.class || 'N/A')}<br>
+        Status: ${found.status === 'active' ? 'Active' : 'Inactive'}
+    </div>`;
 }
 
 // ========== TEACHER'S DAILY REGISTER ==========
@@ -1102,7 +1186,7 @@ async function loadTeacherRegister() {
     }
     if (!found) { showMessage("Teacher not found", "error", "teacherRegisterInfo"); return; }
     currentTeacherRegister = found;
-    document.getElementById('teacherRegisterInfo').innerHTML = '<div class="success">Teacher: ' + escapeHtml(found.name) + ' (' + found.id + ') - Department: ' + escapeHtml(found.department || 'N/A') + '</div>';
+    document.getElementById('teacherRegisterInfo').innerHTML = `<div class="success">Teacher: ${escapeHtml(found.name)} (${found.id}) - Department: ${escapeHtml(found.department || 'N/A')}</div>`;
     await renderTeacherRegisterAttendance();
     await renderTeacherRegisterHistory();
 }
@@ -1115,14 +1199,14 @@ async function renderTeacherRegisterAttendance() {
     var status = att?.status || 'none';
     var remark = att?.remark || '';
     var container = document.getElementById('teacherRegisterAttendance');
-    container.innerHTML = '<h4>Today\'s Attendance</h4>' +
-        '<div class="buttons">' +
-        '<button id="teacherPresentBtn" class="present" style="' + (status === 'present' ? 'opacity:0.6;' : '') + '">✅ Present</button>' +
-        '<button id="teacherAbsentBtn" class="absent" style="background:#ffcdd2; color:#c62828; ' + (status === 'absent' ? 'opacity:0.6;' : '') + '">❌ Absent</button>' +
-        '<button id="teacherLateBtn" class="late" style="' + (status === 'late' ? 'opacity:0.6;' : '') + '">⏰ Late</button>' +
-        '<input type="text" id="teacherRemarkInput" placeholder="Remark" value="' + escapeHtml(remark) + '" style="width:150px;">' +
-        '</div>';
-    document.getElementById('teacherPresentBtn').onclick = async function() {
+    container.innerHTML = `<h4>Today's Attendance</h4>
+        <div class="buttons">
+            <button id="teacherPresentBtn" class="present" style="${status === 'present' ? 'opacity:0.6;' : ''}">✅ Present</button>
+            <button id="teacherAbsentBtn" class="absent" style="background:#ffcdd2; color:#c62828; ${status === 'absent' ? 'opacity:0.6;' : ''}">❌ Absent</button>
+            <button id="teacherLateBtn" class="late" style="${status === 'late' ? 'opacity:0.6;' : ''}">⏰ Late</button>
+            <input type="text" id="teacherRemarkInput" placeholder="Remark" value="${escapeHtml(remark)}" style="width:150px;">
+        </div>`;
+    document.getElementById('teacherPresentBtn').onclick = async () => {
         await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
             teacherId: currentTeacherRegister.id,
             teacherName: currentTeacherRegister.name,
@@ -1134,7 +1218,7 @@ async function renderTeacherRegisterAttendance() {
         renderTeacherRegisterAttendance();
         renderTeacherRegisterHistory();
     };
-    document.getElementById('teacherAbsentBtn').onclick = async function() {
+    document.getElementById('teacherAbsentBtn').onclick = async () => {
         await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
             teacherId: currentTeacherRegister.id,
             teacherName: currentTeacherRegister.name,
@@ -1146,7 +1230,7 @@ async function renderTeacherRegisterAttendance() {
         renderTeacherRegisterAttendance();
         renderTeacherRegisterHistory();
     };
-    document.getElementById('teacherLateBtn').onclick = async function() {
+    document.getElementById('teacherLateBtn').onclick = async () => {
         await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
             teacherId: currentTeacherRegister.id,
             teacherName: currentTeacherRegister.name,
@@ -1169,7 +1253,7 @@ async function renderTeacherRegisterHistory() {
     for (var doc of snap.docs) {
         var a = doc.data();
         var statusEmoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : '⏰ Late');
-        html += '<tr><td class="date-cell">' + a.date + '</td><td class="status-cell">' + statusEmoji + '</td><td class="remark-cell">' + escapeHtml(a.remark || '') + 'NonNullListCell-->';
+        html += `<tr><td class="date-cell">${a.date}</td><td class="status-cell">${statusEmoji}</td><td class="remark-cell">${escapeHtml(a.remark || '')}</td></tr>`;
     }
     html += '</tbody></table>';
     container.innerHTML = html;
@@ -1238,52 +1322,126 @@ async function renderTeacherRegisterHistory() {
             loadStaffList();
         }
 
-        // ========== FILE STORAGE ==========
-        async function uploadFile() {
-            if (currentUserRole !== 'admin') { alert("Only admin can upload files."); return; }
-            var file = document.getElementById('uploadFile').files[0];
-            var category = document.getElementById('fileCategory').value;
-            var title = document.getElementById('fileTitle').value.trim() || file.name;
-            if (!file) { showMessage("Select a file","error","uploadMessage"); return; }
-            var storageRef = storage.ref('school_files/' + category + '/' + Date.now() + '_' + file.name);
-            var uploadTask = storageRef.put(file);
-            uploadTask.on('state_changed', null, function(error) { showMessage('Upload failed: ' + error.message, 'error', 'uploadMessage'); }, async function() {
-                var downloadURL = await storageRef.getDownloadURL();
-                await db.collection('files').add({ category: category, title: title, fileName: file.name, fileSize: file.size, downloadURL: downloadURL, uploadDate: firebase.firestore.FieldValue.serverTimestamp() });
-                showMessage('File uploaded!', 'success', 'uploadMessage');
-                document.getElementById('uploadFile').value = '';
-                document.getElementById('fileTitle').value = '';
-                loadFiles();
-            });
+       // ========== FILE STORAGE ==========
+async function uploadFile() {
+    if (currentUserRole !== 'admin') { 
+        alert("Only admin can upload files."); 
+        return; 
+    }
+    const file = document.getElementById('uploadFile').files[0];
+    const category = document.getElementById('fileCategory').value;
+    let title = document.getElementById('fileTitle').value.trim();
+    if (!file) {
+        showMessage("Select a file", "error", "uploadMessage");
+        return;
+    }
+    if (!title) title = file.name;
+    
+    // Create a unique file path
+    const fileName = `${Date.now()}_${file.name}`;
+    const storageRef = storage.ref(`school_files/${category}/${fileName}`);
+    
+    try {
+        // Upload file
+        const uploadTask = await storageRef.put(file);
+        const downloadURL = await storageRef.getDownloadURL();
+        
+        // Save metadata to Firestore
+        await db.collection('files').add({
+            category: category,
+            title: title,
+            fileName: file.name,
+            storedName: fileName,
+            fileSize: file.size,
+            fileType: file.type,
+            downloadURL: downloadURL,
+            uploadDate: firebase.firestore.FieldValue.serverTimestamp(),
+            uploadedBy: auth.currentUser?.email || 'admin'
+        });
+        
+        showMessage(`File "${title}" uploaded successfully!`, 'success', 'uploadMessage');
+        document.getElementById('uploadFile').value = '';
+        document.getElementById('fileTitle').value = '';
+        loadFiles(); // refresh the list
+        
+    } catch (error) {
+        console.error("Upload error:", error);
+        showMessage(`Upload failed: ${error.message}`, 'error', 'uploadMessage');
+    }
+}
+
+async function loadFiles() {
+    if (currentUserRole !== 'admin') return;
+    const category = document.getElementById('viewFileCategory').value;
+    try {
+        const snap = await db.collection('files')
+            .where('category', '==', category)
+            .orderBy('uploadDate', 'desc')
+            .get();
+        
+        const container = document.getElementById('filesList');
+        if (snap.empty) {
+            container.innerHTML = '<p>No files in this category.</p>';
+            return;
         }
-        async function loadFiles() {
-            if (currentUserRole !== 'admin') return;
-            var category = document.getElementById('viewFileCategory').value;
-            var snap = await db.collection('files').where('category', '==', category).orderBy('uploadDate', 'desc').get();
-            var container = document.getElementById('filesList');
-            if (snap.empty) { container.innerHTML = '<p>No files.</p>'; return; }
-            var html = '<table border="1"><thead><tr><th>Title</th><th>File</th><th>Size</th><th>Actions</th></tr></thead><tbody>';
-            for (var doc of snap.docs) {
-                var f = doc.data();
-                html += '<td>' +
-                    '<td class="title-cell">' + escapeHtml(f.title) + '</td>' +
-                    '<td class="filename-cell">' + escapeHtml(f.fileName) + '</td>' +
-                    '<td class="size-cell">' + Math.round(f.fileSize / 1024) + ' KB</td>' +
-                    '<td class="action-cell"><button class="delete-file" data-id="' + doc.id + '" data-url="' + f.downloadURL + '" style="background:#ffcdd2; color:#c62828;">Delete</button></td>' +
-                '</tr>';
-            }
-            html += '</tbody></table>';
-            container.innerHTML = html;
-            document.querySelectorAll('.delete-file').forEach(function(btn) {
-                btn.onclick = async function() {
-                    if (confirm("Delete file?")) {
+        
+        let html = `<table border="1">
+            <thead>
+                <tr><th>Title</th><th>File Name</th><th>Size</th><th>Upload Date</th><th>Actions</th>
+            </thead>
+            <tbody>`;
+        
+        for (const doc of snap.docs) {
+            const f = doc.data();
+            const fileSizeKB = Math.round(f.fileSize / 1024);
+            const fileExt = f.fileName.split('.').pop().toLowerCase();
+            let icon = '📄';
+            if (['jpg','jpeg','png','gif'].includes(fileExt)) icon = '🖼️';
+            else if (fileExt === 'pdf') icon = '📕';
+            else if (['doc','docx'].includes(fileExt)) icon = '📘';
+            else if (['xls','xlsx'].includes(fileExt)) icon = '📗';
+            else if (['mp4','mkv','avi'].includes(fileExt)) icon = '🎬';
+            else if (['mp3','wav'].includes(fileExt)) icon = '🎵';
+            
+            const uploadDate = f.uploadDate ? new Date(f.uploadDate.toDate()).toLocaleString() : 'Unknown';
+            
+            html += `<tr>
+                <td class="title-cell">${escapeHtml(f.title)}</td>
+                <td class="filename-cell">${icon} ${escapeHtml(f.fileName)}</td>
+                <td class="size-cell">${fileSizeKB} KB</td>
+                <td class="date-cell">${escapeHtml(uploadDate)}</td>
+                <td class="action-cell">
+                    <a href="${f.downloadURL}" target="_blank" class="refresh-btn" style="display:inline-block; text-decoration:none; margin-right:5px;">👁️ View/Download</a>
+                    <button class="delete-file" data-id="${doc.id}" data-url="${f.downloadURL}" style="background:#ffcdd2; color:#c62828;">🗑️ Delete</button>
+                </td>
+            </tr>`;
+        }
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+        
+        // Attach delete handlers
+        document.querySelectorAll('.delete-file').forEach(btn => {
+            btn.onclick = async function() {
+                if (confirm("Delete this file permanently?")) {
+                    try {
+                        // Delete from Storage
                         await firebase.storage().refFromURL(btn.getAttribute('data-url')).delete();
+                        // Delete from Firestore
                         await db.collection('files').doc(btn.getAttribute('data-id')).delete();
-                        loadFiles();
+                        showMessage("File deleted", "success", "uploadMessage");
+                        loadFiles(); // refresh
+                    } catch (err) {
+                        console.error("Delete error:", err);
+                        showMessage("Delete failed: " + err.message, "error", "uploadMessage");
                     }
-                };
-            });
-        }
+                }
+            };
+        });
+    } catch (error) {
+        console.error("Error loading files:", error);
+        document.getElementById('filesList').innerHTML = `<p class="error">Error loading files: ${error.message}</p>`;
+    }
+}
 
         // ========== ASSETS ==========
         async function loadAssets() {
