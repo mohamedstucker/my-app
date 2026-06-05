@@ -949,174 +949,231 @@
             saveBtn._listener = handler;
         }
 
-        // ========== TEACHER MANAGEMENT ==========
-        async function loadTeachers() {
-            if (currentUserRole !== 'admin') return;
-            var snap = await db.collection('teachers').get();
-            var listDiv = document.getElementById('allTeachersList');
-            if (snap.empty) { listDiv.innerHTML = '<p>No teachers</p>'; return; }
-            var html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Department</th><th>Actions</th></tr></thead><tbody>';
-            for (var doc of snap.docs) {
-                var t = doc.data();
-                html += '<tr>' +
-                    '<td class="id-cell">' + escapeHtml(t.id) + '</td>' +
-                    '<td class="name-cell">' + escapeHtml(t.name) + '</td>' +
-                    '<td class="dept-cell">' + escapeHtml(t.department || 'N/A') + '</td>' +
-                    '<td class="action-cell"><button class="delete-teacher" data-id="' + doc.id + '" style="background:#ffcdd2; color:#c62828;">Delete</button></td>' +
-                '</tr>';
-            }
-            html += '</tbody></table>';
-            listDiv.innerHTML = html;
-            document.querySelectorAll('.delete-teacher').forEach(function(btn) {
-                btn.onclick = async function() {
-                    if (confirm('Delete this teacher?')) {
-                        await db.collection('teachers').doc(btn.getAttribute('data-id')).delete();
-                        loadTeachers();
-                    }
-                };
-            });
-        }
-        async function addTeacher() {
-            if (currentUserRole !== 'admin') { alert("Only admin can add teachers."); return; }
-            var id = document.getElementById('teacherId').value.trim();
-            var name = document.getElementById('teacherName').value.trim();
-            if (!id || !name) { showMessage("ID and Name required","error","teacherMessage"); return; }
-            await db.collection('teachers').doc(id).set({ id: id, name: name, department: document.getElementById('teacherDepartment').value, status: 'active' });
-            showMessage('Teacher ' + name + ' added', 'success', 'teacherMessage');
-            document.getElementById('teacherId').value = '';
-            document.getElementById('teacherName').value = '';
-            loadTeachers();
-        }
-        async function importStaffExcel(file) {
-            if (currentUserRole !== 'admin') { alert("Only admin can import staff."); return; }
-            var reader = new FileReader();
-            reader.onload = async function(e) {
-                var data = new Uint8Array(e.target.result);
-                var workbook = XLSX.read(data, { type: 'array' });
-                var sheet = workbook.Sheets[workbook.SheetNames[0]];
-                var rows = XLSX.utils.sheet_to_json(sheet);
-                var added = 0;
-                for (var i = 0; i < rows.length; i++) {
-                    var row = rows[i];
-                    var id = row.StaffID || row.staffId;
-                    var name = row.Name || row.name;
-                    if (!id || !name) continue;
-                    await db.collection('teachers').doc(id).set({ id: id, name: name, department: row.Department || '', status: 'active' });
-                    added++;
-                }
+      // ========== TEACHER MANAGEMENT ==========
+async function loadTeachers() {
+    if (currentUserRole !== 'admin') return;
+    var snap = await db.collection('teachers').get();
+    var listDiv = document.getElementById('allTeachersList');
+    if (snap.empty) { listDiv.innerHTML = '<p>No teachers</p>'; return; }
+    var html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Class</th><th>Department</th><th>Actions</th></tr></thead><tbody>';
+    for (var doc of snap.docs) {
+        var t = doc.data();
+        html += '<tr>' +
+            '<td class="id-cell">' + escapeHtml(t.id) + '</td>' +
+            '<td class="name-cell">' + escapeHtml(t.name) + '</td>' +
+            '<td class="email-cell">' + escapeHtml(t.email || 'N/A') + '</td>' +
+            '<td class="class-cell">' + escapeHtml(t.class || 'N/A') + '</td>' +
+            '<td class="dept-cell">' + escapeHtml(t.department || 'N/A') + '</td>' +
+            '<td class="action-cell"><button class="delete-teacher" data-id="' + doc.id + '" style="background:#ffcdd2; color:#c62828;">Delete</button></td>' +
+        '</tr>';
+    }
+    html += '</tbody></table>';
+    listDiv.innerHTML = html;
+    document.querySelectorAll('.delete-teacher').forEach(function(btn) {
+        btn.onclick = async function() {
+            if (confirm('Delete this teacher?')) {
+                await db.collection('teachers').doc(btn.getAttribute('data-id')).delete();
                 loadTeachers();
-                showMessage('Imported ' + added + ' staff', 'success', 'staffImportMessage');
-            };
-            reader.readAsArrayBuffer(file);
-        }
-        function downloadStaffSample() {
-            var ws = XLSX.utils.json_to_sheet([{ StaffID: "TCH001", Name: "John Kamara", Department: "Mathematics" }]);
-            var wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Staff");
-            XLSX.writeFile(wb, "staff_template.xlsx");
-        }
-        async function searchTeacher() {
-            var query = document.getElementById('teacherSearchInput').value.trim().toLowerCase();
-            if (!query) { loadTeachers(); return; }
-            var snap = await db.collection('teachers').get();
-            var found = null;
-            for (var doc of snap.docs) {
-                var t = doc.data();
-                if (t.id.toLowerCase() === query || t.name.toLowerCase().includes(query)) {
-                    found = t;
-                    break;
-                }
             }
-            var resultsDiv = document.getElementById('teacherSearchResults');
-            if (!found) { resultsDiv.innerHTML = '<div class="error">Teacher not found.</div>'; return; }
-            resultsDiv.innerHTML = '<div class="success"><strong>' + escapeHtml(found.name) + ' (' + found.id + ')</strong><br>Department: ' + escapeHtml(found.department || 'N/A') + '</div>';
-        }
+        };
+    });
+}
 
-        // ========== TEACHER'S DAILY REGISTER ==========
-        async function loadTeacherRegister() {
-            var query = document.getElementById('teacherRegisterSearch').value.trim().toLowerCase();
-            if (!query) { alert("Enter Teacher ID or Name"); return; }
-            var snap = await db.collection('teachers').get();
-            var found = null;
-            for (var doc of snap.docs) {
-                var t = doc.data();
-                if (t.id.toLowerCase() === query || t.name.toLowerCase().includes(query)) {
-                    found = { docId: doc.id, ...t };
-                    break;
-                }
-            }
-            if (!found) { showMessage("Teacher not found", "error", "teacherRegisterInfo"); return; }
-            currentTeacherRegister = found;
-            document.getElementById('teacherRegisterInfo').innerHTML = '<div class="success">Teacher: ' + escapeHtml(found.name) + ' (' + found.id + ') - Department: ' + escapeHtml(found.department || 'N/A') + '</div>';
-            await renderTeacherRegisterAttendance();
-            await renderTeacherRegisterHistory();
+async function addTeacher() {
+    if (currentUserRole !== 'admin') { 
+        alert("Only admin can add teachers."); 
+        return; 
+    }
+    
+    const id = document.getElementById('teacherId').value.trim();
+    const name = document.getElementById('teacherName').value.trim();
+    const department = document.getElementById('teacherDepartment').value;
+    const email = document.getElementById('teacherEmail').value.trim();
+    const assignedClass = document.getElementById('teacherClass').value;
+    const password = document.getElementById('teacherCredential').value;
+    
+    if (!id || !name || !email || !assignedClass || !password) {
+        showMessage("Please fill all fields (ID, Name, Email, Class, Password)", "error", "teacherMessage");
+        return;
+    }
+    
+    try {
+        // Create Firebase Auth user
+        const userCred = await auth.createUserWithEmailAndPassword(email, password);
+        const uid = userCred.user.uid;
+        
+        // Store teacher document in Firestore
+        await db.collection('teachers').doc(id).set({
+            id: id,
+            name: name,
+            department: department,
+            email: email,
+            class: assignedClass,
+            uid: uid,
+            status: 'active',
+            role: 'teacher'
+        });
+        
+        // Also store in 'users' collection for role‑based access
+        await db.collection('users').doc(uid).set({
+            email: email,
+            role: 'teacher',
+            class: assignedClass,
+            name: name
+        });
+        
+        showMessage(`Teacher ${name} added! Login: ${email}`, "success", "teacherMessage");
+        
+        // Clear form
+        document.getElementById('teacherId').value = '';
+        document.getElementById('teacherName').value = '';
+        document.getElementById('teacherEmail').value = '';
+        document.getElementById('teacherClass').value = '';
+        document.getElementById('teacherCredential').value = '';
+        document.getElementById('teacherDepartment').value = '';
+        
+        loadTeachers();
+        
+    } catch (error) {
+        console.error("Error adding teacher:", error);
+        showMessage(error.message, "error", "teacherMessage");
+    }
+}
+
+async function importStaffExcel(file) {
+    if (currentUserRole !== 'admin') { alert("Only admin can import staff."); return; }
+    var reader = new FileReader();
+    reader.onload = async function(e) {
+        var data = new Uint8Array(e.target.result);
+        var workbook = XLSX.read(data, { type: 'array' });
+        var sheet = workbook.Sheets[workbook.SheetNames[0]];
+        var rows = XLSX.utils.sheet_to_json(sheet);
+        var added = 0;
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            var id = row.StaffID || row.staffId;
+            var name = row.Name || row.name;
+            if (!id || !name) continue;
+            await db.collection('teachers').doc(id).set({ id: id, name: name, department: row.Department || '', status: 'active' });
+            added++;
         }
-        async function renderTeacherRegisterAttendance() {
-            if (!currentTeacherRegister) return;
-            var today = new Date().toISOString().split('T')[0];
-            var attDoc = await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).get();
-            var att = attDoc.exists ? attDoc.data() : null;
-            var status = att?.status || 'none';
-            var remark = att?.remark || '';
-            var container = document.getElementById('teacherRegisterAttendance');
-            container.innerHTML = '<h4>Today\'s Attendance</h4>' +
-                '<div class="buttons">' +
-                '<button id="teacherPresentBtn" class="present" style="' + (status === 'present' ? 'opacity:0.6;' : '') + '">✅ Present</button>' +
-                '<button id="teacherAbsentBtn" class="absent" style="background:#ffcdd2; color:#c62828; ' + (status === 'absent' ? 'opacity:0.6;' : '') + '">❌ Absent</button>' +
-                '<button id="teacherLateBtn" class="late" style="' + (status === 'late' ? 'opacity:0.6;' : '') + '">⏰ Late</button>' +
-                '<input type="text" id="teacherRemarkInput" placeholder="Remark" value="' + escapeHtml(remark) + '" style="width:150px;">' +
-                '</div>';
-            document.getElementById('teacherPresentBtn').onclick = async function() {
-                await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
-                    teacherId: currentTeacherRegister.id,
-                    teacherName: currentTeacherRegister.name,
-                    date: today,
-                    status: 'present',
-                    remark: document.getElementById('teacherRemarkInput').value,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                renderTeacherRegisterAttendance();
-                renderTeacherRegisterHistory();
-            };
-            document.getElementById('teacherAbsentBtn').onclick = async function() {
-                await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
-                    teacherId: currentTeacherRegister.id,
-                    teacherName: currentTeacherRegister.name,
-                    date: today,
-                    status: 'absent',
-                    remark: document.getElementById('teacherRemarkInput').value,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                renderTeacherRegisterAttendance();
-                renderTeacherRegisterHistory();
-            };
-            document.getElementById('teacherLateBtn').onclick = async function() {
-                await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
-                    teacherId: currentTeacherRegister.id,
-                    teacherName: currentTeacherRegister.name,
-                    date: today,
-                    status: 'late',
-                    remark: document.getElementById('teacherRemarkInput').value,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                renderTeacherRegisterAttendance();
-                renderTeacherRegisterHistory();
-            };
+        loadTeachers();
+        showMessage('Imported ' + added + ' staff', 'success', 'staffImportMessage');
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function downloadStaffSample() {
+    var ws = XLSX.utils.json_to_sheet([{ StaffID: "TCH001", Name: "John Kamara", Department: "Mathematics" }]);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Staff");
+    XLSX.writeFile(wb, "staff_template.xlsx");
+}
+
+async function searchTeacher() {
+    var query = document.getElementById('teacherSearchInput').value.trim().toLowerCase();
+    if (!query) { loadTeachers(); return; }
+    var snap = await db.collection('teachers').get();
+    var found = null;
+    for (var doc of snap.docs) {
+        var t = doc.data();
+        if (t.id.toLowerCase() === query || t.name.toLowerCase().includes(query)) {
+            found = t;
+            break;
         }
-        async function renderTeacherRegisterHistory() {
-            if (!currentTeacherRegister) return;
-            var snap = await db.collection('teacher_daily_attendance').where('teacherId', '==', currentTeacherRegister.id).orderBy('date', 'desc').get();
-            var container = document.getElementById('teacherRegisterHistory');
-            if (snap.empty) { container.innerHTML = '<p>No attendance history.</p>'; return; }
-            var html = '<h4>Attendance History</h4><table class="teacher-register-table"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
-            for (var doc of snap.docs) {
-                var a = doc.data();
-                var statusEmoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : '⏰ Late');
-                html += '<tr><td class="date-cell">' + a.date + '</td><td class="status-cell">' + statusEmoji + '</td><td class="remark-cell">' + escapeHtml(a.remark || '') + 'NonNullListCell-->';
-            }
-            html += '</tbody></table>';
-            container.innerHTML = html;
+    }
+    var resultsDiv = document.getElementById('teacherSearchResults');
+    if (!found) { resultsDiv.innerHTML = '<div class="error">Teacher not found.</div>'; return; }
+    resultsDiv.innerHTML = '<div class="success"><strong>' + escapeHtml(found.name) + ' (' + found.id + ')</strong><br>Department: ' + escapeHtml(found.department || 'N/A') + '</div>';
+}
+
+// ========== TEACHER'S DAILY REGISTER ==========
+async function loadTeacherRegister() {
+    var query = document.getElementById('teacherRegisterSearch').value.trim().toLowerCase();
+    if (!query) { alert("Enter Teacher ID or Name"); return; }
+    var snap = await db.collection('teachers').get();
+    var found = null;
+    for (var doc of snap.docs) {
+        var t = doc.data();
+        if (t.id.toLowerCase() === query || t.name.toLowerCase().includes(query)) {
+            found = { docId: doc.id, ...t };
+            break;
         }
+    }
+    if (!found) { showMessage("Teacher not found", "error", "teacherRegisterInfo"); return; }
+    currentTeacherRegister = found;
+    document.getElementById('teacherRegisterInfo').innerHTML = '<div class="success">Teacher: ' + escapeHtml(found.name) + ' (' + found.id + ') - Department: ' + escapeHtml(found.department || 'N/A') + '</div>';
+    await renderTeacherRegisterAttendance();
+    await renderTeacherRegisterHistory();
+}
+
+async function renderTeacherRegisterAttendance() {
+    if (!currentTeacherRegister) return;
+    var today = new Date().toISOString().split('T')[0];
+    var attDoc = await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).get();
+    var att = attDoc.exists ? attDoc.data() : null;
+    var status = att?.status || 'none';
+    var remark = att?.remark || '';
+    var container = document.getElementById('teacherRegisterAttendance');
+    container.innerHTML = '<h4>Today\'s Attendance</h4>' +
+        '<div class="buttons">' +
+        '<button id="teacherPresentBtn" class="present" style="' + (status === 'present' ? 'opacity:0.6;' : '') + '">✅ Present</button>' +
+        '<button id="teacherAbsentBtn" class="absent" style="background:#ffcdd2; color:#c62828; ' + (status === 'absent' ? 'opacity:0.6;' : '') + '">❌ Absent</button>' +
+        '<button id="teacherLateBtn" class="late" style="' + (status === 'late' ? 'opacity:0.6;' : '') + '">⏰ Late</button>' +
+        '<input type="text" id="teacherRemarkInput" placeholder="Remark" value="' + escapeHtml(remark) + '" style="width:150px;">' +
+        '</div>';
+    document.getElementById('teacherPresentBtn').onclick = async function() {
+        await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
+            teacherId: currentTeacherRegister.id,
+            teacherName: currentTeacherRegister.name,
+            date: today,
+            status: 'present',
+            remark: document.getElementById('teacherRemarkInput').value,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        renderTeacherRegisterAttendance();
+        renderTeacherRegisterHistory();
+    };
+    document.getElementById('teacherAbsentBtn').onclick = async function() {
+        await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
+            teacherId: currentTeacherRegister.id,
+            teacherName: currentTeacherRegister.name,
+            date: today,
+            status: 'absent',
+            remark: document.getElementById('teacherRemarkInput').value,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        renderTeacherRegisterAttendance();
+        renderTeacherRegisterHistory();
+    };
+    document.getElementById('teacherLateBtn').onclick = async function() {
+        await db.collection('teacher_daily_attendance').doc(today + '_' + currentTeacherRegister.id).set({
+            teacherId: currentTeacherRegister.id,
+            teacherName: currentTeacherRegister.name,
+            date: today,
+            status: 'late',
+            remark: document.getElementById('teacherRemarkInput').value,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        renderTeacherRegisterAttendance();
+        renderTeacherRegisterHistory();
+    };
+}
+
+async function renderTeacherRegisterHistory() {
+    if (!currentTeacherRegister) return;
+    var snap = await db.collection('teacher_daily_attendance').where('teacherId', '==', currentTeacherRegister.id).orderBy('date', 'desc').get();
+    var container = document.getElementById('teacherRegisterHistory');
+    if (snap.empty) { container.innerHTML = '<p>No attendance history.</p>'; return; }
+    var html = '<h4>Attendance History</h4><table class="teacher-register-table"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
+    for (var doc of snap.docs) {
+        var a = doc.data();
+        var statusEmoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : '⏰ Late');
+        html += '<tr><td class="date-cell">' + a.date + '</td><td class="status-cell">' + statusEmoji + '</td><td class="remark-cell">' + escapeHtml(a.remark || '') + 'NonNullListCell-->';
+    }
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
 
         // ========== STAFF ATTENDANCE (FIXED) ==========
         async function loadStaffList() {
