@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>School Management System – Class History Fixed</title>
+    <title>School Management System – Exams & Fees Restored</title>
     <style>
         *{box-sizing:border-box}body{font-family:Arial;padding:20px;max-width:1400px;margin:auto;background:#f0f0f0}
         .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
@@ -106,7 +106,7 @@
         <div id="studentList"></div>
     </div>
 
-    <!-- STUDENT RECORDS MODULE (FULLY WORKING) -->
+    <!-- STUDENT RECORDS MODULE (FULLY RESTORED EXAMS & FEES) -->
     <div id="recordsModule" style="display:none;">
         <div class="card"><h3>🔍 Find Student</h3><div class="search-box"><input type="text" id="studentSearchInput" placeholder="Student ID or Name"><button id="searchStudentBtn" class="refresh-btn">Search</button><button id="clearSearchBtn" style="background:#ffcdd2; color:#c62828;">Clear</button></div><div id="searchResults"></div></div>
         <div id="studentRecordsPanel" style="display:none;">
@@ -117,7 +117,7 @@
         </div>
     </div>
 
-    <!-- TEACHERS MODULE (WITH ALL TEACHERS HISTORY) -->
+    <!-- TEACHERS MODULE (ALL TEACHERS HISTORY INTACT) -->
     <div id="teachersModule" style="display:none;">
         <div class="card"><h3>➕ Add New Teacher</h3>
             <div class="form-row"><input type="text" id="teacherId" placeholder="Teacher ID *"><input type="text" id="teacherName" placeholder="Full Name *"><input type="email" id="teacherEmail" placeholder="Email *"></div>
@@ -140,7 +140,7 @@
         </div>
     </div>
 
-    <!-- ADMIN MODULE (FULLY WORKING) -->
+    <!-- ADMIN MODULE (UNCHANGED) -->
     <div id="adminModule" style="display:none;">
         <div class="admin-tabs" id="adminTabs">
             <button class="admin-tab-btn active" data-tab="staff">👥 Staff Mgmt</button>
@@ -150,10 +150,7 @@
             <button class="admin-tab-btn" data-tab="noticeboard">📢 Notice Board</button>
             <button class="admin-tab-btn" data-tab="export">📎 Print/Export</button>
         </div>
-        <div id="staffTab" class="admin-tab active">
-            <div class="card"><h3>➕ Add Staff Member</h3><input type="text" id="staffId" placeholder="Staff ID"><input type="text" id="staffName" placeholder="Full Name"><select id="staffType"><option value="Teacher">Teacher</option><option value="Admin">Admin</option><option value="Cleaner">Cleaner</option><option value="Security">Security</option><option value="Driver">Driver</option><option value="Other">Other</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div></div>
-            <div class="card"><h3>📋 Staff List & Today's Attendance</h3><div id="staffListContainer"></div></div>
-        </div>
+        <div id="staffTab" class="admin-tab active"><div class="card"><h3>➕ Add Staff Member</h3><input type="text" id="staffId" placeholder="Staff ID"><input type="text" id="staffName" placeholder="Full Name"><select id="staffType"><option value="Teacher">Teacher</option><option value="Admin">Admin</option><option value="Cleaner">Cleaner</option><option value="Security">Security</option><option value="Driver">Driver</option><option value="Other">Other</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div></div><div class="card"><h3>📋 Staff List & Today's Attendance</h3><div id="staffListContainer"></div></div></div>
         <div id="assetsTab" class="admin-tab" style="display:none;"><div class="card"><h3>➕ Add Asset</h3><input type="text" id="assetName" placeholder="Asset Name"><input type="text" id="assetLocation" placeholder="Location"><select id="assetStatus"><option value="Good">Good</option><option value="Fair">Fair</option><option value="Poor">Poor</option></select><button id="addAssetBtn" class="refresh-btn">Add Asset</button><div id="assetMessage"></div></div><div class="card"><h3>📋 Assets List</h3><div id="assetsListContainer"></div></div></div>
         <div id="inventoryTab" class="admin-tab" style="display:none;"><div class="card"><h3>➕ Add Inventory Item</h3><input type="text" id="itemName" placeholder="Item Name"><input type="number" id="itemQuantity" placeholder="Quantity"><input type="text" id="itemUnit" placeholder="Unit (pcs, kg, etc)"><button id="addInventoryBtn" class="refresh-btn">Add Item</button><div id="inventoryMessage"></div></div><div class="card"><h3>📦 Inventory Items</h3><div id="inventoryListContainer"></div></div></div>
         <div id="visitorsTab" class="admin-tab" style="display:none;"><div class="card"><h3>📝 Check-In Visitor</h3><input type="text" id="visitorName" placeholder="Visitor Name"><input type="text" id="visitorPurpose" placeholder="Purpose"><input type="text" id="visitorToSee" placeholder="Person to See"><button id="checkInVisitorBtn" class="refresh-btn">Check In</button><button id="checkoutAllBtn" class="refresh-btn" style="background:#FF9800;">🚪 Check Out All</button><div id="visitorMessage"></div></div><div class="card"><h3>📋 Visitors Log</h3><div id="visitorsListContainer"></div></div></div>
@@ -223,186 +220,34 @@ async function loadStudents() {
         updateClassDropdown();
     } catch(e) { console.error(e); }
 }
-
-function updateClassDropdown() {
-    const select = document.getElementById('classSelect');
-    if(!select) return;
-    const classes = Object.keys(allStudents);
-    select.innerHTML = '<option value="">Select Class</option>' + classes.map(c => `<option value="${c}">${c} (${allStudents[c].length})</option>`).join('');
-}
-
-async function renderAttendance() {
-    const classVal = document.getElementById('classSelect').value;
-    if(!classVal || !allStudents[classVal]) {
-        document.getElementById('studentList').innerHTML = '<p>Select a class</p>';
-        return;
-    }
-    const students = allStudents[classVal];
-    const today = new Date().toISOString().split('T')[0];
-    let attMap = {};
-    const snap = await db.collection('attendance').where('class', '==', classVal).where('date', '==', today).get();
-    snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
-    
-    let html = '';
-    for(let s of students) {
-        let a = attMap[s.id] || { status: 'none', remark: '' };
-        let statusText = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : (a.status === 'late' ? '⏰ Late' : '⚪ Not marked'));
-        html += `<div class="student">
-            <div class="student-info">
-                <span><strong>${escapeHtml(s.name)}</strong> (${s.id})</span>
-                <span>${statusText}</span>
-                <div>
-                    <button class="history-student-btn" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-class="${classVal}">📜 History</button>
-                </div>
-            </div>
-            <div class="buttons">
-                <button class="present-btn" data-id="${s.id}">✅ Present</button>
-                <button class="absent-btn" data-id="${s.id}">❌ Absent</button>
-                <button class="late-btn" data-id="${s.id}">⏰ Late</button>
-                <input type="text" id="remark_${s.id}" class="remark-input" placeholder="Remark" value="${escapeHtml(a.remark)}">
-            </div>
-        </div>`;
-    }
-    document.getElementById('studentList').innerHTML = html;
-    
-    document.querySelectorAll('.present-btn').forEach(btn => {
-        btn.onclick = async () => { let sid = btn.getAttribute('data-id'); let remark = document.getElementById(`remark_${sid}`).value; await saveAttendance(classVal, sid, 'present', remark); renderAttendance(); };
-    });
-    document.querySelectorAll('.absent-btn').forEach(btn => {
-        btn.onclick = async () => { let sid = btn.getAttribute('data-id'); let remark = document.getElementById(`remark_${sid}`).value; await saveAttendance(classVal, sid, 'absent', remark); let student = students.find(s => s.id === sid); if(student && student.parentPhone && confirm(`Send WhatsApp absence notification?`)) sendWhatsApp(student, 'absent', remark, classVal); renderAttendance(); };
-    });
-    document.querySelectorAll('.late-btn').forEach(btn => {
-        btn.onclick = async () => { let sid = btn.getAttribute('data-id'); let remark = document.getElementById(`remark_${sid}`).value; await saveAttendance(classVal, sid, 'late', remark); renderAttendance(); };
-    });
-    document.querySelectorAll('.history-student-btn').forEach(btn => {
-        btn.onclick = async () => { let sid = btn.getAttribute('data-id'); let name = btn.getAttribute('data-name'); let cls = btn.getAttribute('data-class'); await viewStudentHistory(sid, name, cls); };
-    });
-}
-
-async function saveAttendance(cls, sid, status, remark) {
-    const today = new Date().toISOString().split('T')[0];
-    await db.collection('attendance').doc(`${today}_${cls}_${sid}`).set({
-        studentId: sid, class: cls, date: today, status, remark,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showMessage(`Marked ${status} for ${sid}`, 'success', 'importMessage');
-}
-
-function sendWhatsApp(student, status, remark, classname) {
-    let statusText = status === 'present' ? 'PRESENT ✅' : (status === 'absent' ? 'ABSENT ❌' : 'LATE ⏰');
-    let message = `🏫 Attendance Update - ${classname}\n\nStudent: ${student.name} (${student.id})\nStatus: ${statusText}\nRemark: ${remark}\nDate: ${new Date().toLocaleDateString()}\n\nThank you.`;
-    let url = getValidWhatsAppUrl(student.parentPhone, message);
-    if(url) window.open(url, '_blank');
-    else alert("Invalid phone number: " + student.parentPhone);
-}
-
-async function viewStudentHistory(sid, name, cls) {
-    try {
-        const snap = await db.collection('attendance').where('studentId', '==', sid).where('class', '==', cls).get();
-        let docs = []; snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-        docs.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-        if(docs.length === 0) { document.getElementById('historyContent').innerHTML = `<p>No attendance records for ${name} (${sid})</p>`; }
-        else {
-            let html = `<h3>Attendance History: ${name} (${sid})</h3><table border="1"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
-            for(let a of docs) {
-                let emoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : '⏰ Late');
-                html += `<tr><td class="date-cell">${a.date}</td><td class="status-cell">${emoji}</td><td class="remark-cell">${escapeHtml(a.remark || '')}</td></tr>`;
-            }
-            html += `</tbody></table>`;
-            document.getElementById('historyContent').innerHTML = html;
-        }
-        openModal('historyModal');
-    } catch(e) { console.error(e); document.getElementById('historyContent').innerHTML = `<p>Error: ${e.message}</p>`; openModal('historyModal'); }
-}
-
-// ***** FIXED: Class History for selected class and date *****
-async function viewClassHistory() {
-    const classVal = document.getElementById('classSelect').value;
-    if(!classVal || !allStudents[classVal]) {
-        alert("Please select a class first.");
-        return;
-    }
-    let date = prompt("Enter date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-    if(!date) return;
-    const snap = await db.collection('attendance').where('class', '==', classVal).where('date', '==', date).get();
-    let attMap = {};
-    snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
-    const students = allStudents[classVal];
-    let html = `<h3>${classVal} - Attendance for ${date}</h3><table border="1"><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
-    for(let s of students) {
-        let a = attMap[s.id] || { status: 'Not marked', remark: '' };
-        let emoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : (a.status === 'late' ? '⏰ Late' : '⚪ Not marked'));
-        html += `<tr><td class="id-cell">${escapeHtml(s.id)}</td><td class="name-cell">${escapeHtml(s.name)}</td><td class="status-cell">${emoji}</td><td class="remark-cell">${escapeHtml(a.remark)}</td></tr>`;
-    }
-    html += `</tbody></table>`;
-    document.getElementById('historyContent').innerHTML = html;
-    openModal('historyModal');
-}
-
-async function addManualStudent() {
-    const id = document.getElementById('newStudentId').value.trim();
-    const name = document.getElementById('newStudentName').value.trim();
-    const cls = document.getElementById('newClassLevel').value;
-    if(!id || !name || !cls) { showMessage('ID, Name and Class required', 'error', 'manualMessage'); return; }
-    const student = {
-        id, name, class: cls, dob: document.getElementById('newStudentDob').value,
-        department: document.getElementById('newDepartment').value, address: document.getElementById('newAddress').value,
-        parentPhone: document.getElementById('newParentPhone').value, parentName: document.getElementById('newParentName').value,
-        guardian: document.getElementById('newGuardian').value, status: document.getElementById('newStatus').value
-    };
-    await db.collection('students').doc(id).set(student);
-    await loadStudents();
-    showMessage('Student added', 'success', 'manualMessage');
-    renderAttendance();
-}
-
-function downloadSample() {
-    const ws = XLSX.utils.json_to_sheet([{ ID: 'STU001', Name: 'John Doe', Class: 'JSS1', ParentPhone: '23276123456' }]);
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
-    XLSX.writeFile(wb, 'student_sample.xlsx');
-}
-
+function updateClassDropdown() { const select = document.getElementById('classSelect'); if(!select) return; const classes = Object.keys(allStudents); select.innerHTML = '<option value="">Select Class</option>' + classes.map(c => `<option value="${c}">${c} (${allStudents[c].length})</option>`).join(''); }
+async function renderAttendance() { /* full original - kept for brevity but fully functional */ const classVal = document.getElementById('classSelect').value; if(!classVal || !allStudents[classVal]) { document.getElementById('studentList').innerHTML = '<p>Select a class</p>'; return; } const students = allStudents[classVal]; const today = new Date().toISOString().split('T')[0]; let attMap = {}; const snap = await db.collection('attendance').where('class', '==', classVal).where('date', '==', today).get(); snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' }); let html = ''; for(let s of students) { let a = attMap[s.id] || { status: 'none', remark: '' }; let statusText = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : (a.status === 'late' ? '⏰ Late' : '⚪ Not marked')); html += `<div class="student"><div class="student-info"><span><strong>${escapeHtml(s.name)}</strong> (${s.id})</span><span>${statusText}</span><div><button class="history-student-btn" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-class="${classVal}">📜 History</button></div></div><div class="buttons"><button class="present-btn" data-id="${s.id}">✅ Present</button><button class="absent-btn" data-id="${s.id}">❌ Absent</button><button class="late-btn" data-id="${s.id}">⏰ Late</button><input type="text" id="remark_${s.id}" class="remark-input" placeholder="Remark" value="${escapeHtml(a.remark)}"></div></div>`; } document.getElementById('studentList').innerHTML = html; document.querySelectorAll('.present-btn').forEach(btn => btn.onclick = async () => { let sid = btn.getAttribute('data-id'); let remark = document.getElementById(`remark_${sid}`).value; await saveAttendance(classVal, sid, 'present', remark); renderAttendance(); }); document.querySelectorAll('.absent-btn').forEach(btn => btn.onclick = async () => { let sid = btn.getAttribute('data-id'); let remark = document.getElementById(`remark_${sid}`).value; await saveAttendance(classVal, sid, 'absent', remark); let student = students.find(s => s.id === sid); if(student && student.parentPhone && confirm(`Send WhatsApp absence notification?`)) sendWhatsApp(student, 'absent', remark, classVal); renderAttendance(); }); document.querySelectorAll('.late-btn').forEach(btn => btn.onclick = async () => { let sid = btn.getAttribute('data-id'); let remark = document.getElementById(`remark_${sid}`).value; await saveAttendance(classVal, sid, 'late', remark); renderAttendance(); }); document.querySelectorAll('.history-student-btn').forEach(btn => btn.onclick = async () => { let sid = btn.getAttribute('data-id'); let name = btn.getAttribute('data-name'); let cls = btn.getAttribute('data-class'); await viewStudentHistory(sid, name, cls); }); }
+async function saveAttendance(cls, sid, status, remark) { const today = new Date().toISOString().split('T')[0]; await db.collection('attendance').doc(`${today}_${cls}_${sid}`).set({ studentId: sid, class: cls, date: today, status, remark, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); showMessage(`Marked ${status} for ${sid}`, 'success', 'importMessage'); }
+function sendWhatsApp(student, status, remark, classname) { let statusText = status === 'present' ? 'PRESENT ✅' : (status === 'absent' ? 'ABSENT ❌' : 'LATE ⏰'); let message = `🏫 Attendance Update - ${classname}\n\nStudent: ${student.name} (${student.id})\nStatus: ${statusText}\nRemark: ${remark}\nDate: ${new Date().toLocaleDateString()}\n\nThank you.`; let url = getValidWhatsAppUrl(student.parentPhone, message); if(url) window.open(url, '_blank'); else alert("Invalid phone number: " + student.parentPhone); }
+async function viewStudentHistory(sid, name, cls) { try { const snap = await db.collection('attendance').where('studentId', '==', sid).where('class', '==', cls).get(); let docs = []; snap.forEach(d => docs.push({ id: d.id, ...d.data() })); docs.sort((a,b) => (b.date || '').localeCompare(a.date || '')); if(docs.length === 0) { document.getElementById('historyContent').innerHTML = `<p>No attendance records for ${name} (${sid})</p>`; } else { let html = `<h3>Attendance History: ${name} (${sid})</h3><table border="1"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>`; for(let a of docs) { let emoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : '⏰ Late'); html += `<tr><td class="date-cell">${a.date}</td><td class="status-cell">${emoji}</td><td class="remark-cell">${escapeHtml(a.remark || '')}</td></tr>`; } html += `</tbody></table>`; document.getElementById('historyContent').innerHTML = html; } openModal('historyModal'); } catch(e) { console.error(e); document.getElementById('historyContent').innerHTML = `<p>Error: ${e.message}</p>`; openModal('historyModal'); } }
+async function viewClassHistory() { const classVal = document.getElementById('classSelect').value; if(!classVal || !allStudents[classVal]) { alert("Please select a class first."); return; } let date = prompt("Enter date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]); if(!date) return; const snap = await db.collection('attendance').where('class', '==', classVal).where('date', '==', date).get(); let attMap = {}; snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' }); const students = allStudents[classVal]; let html = `<h3>${classVal} - Attendance for ${date}</h3><table border="1"><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>`; for(let s of students) { let a = attMap[s.id] || { status: 'Not marked', remark: '' }; let emoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : (a.status === 'late' ? '⏰ Late' : '⚪ Not marked')); html += `<tr><td class="id-cell">${escapeHtml(s.id)}</td><td class="name-cell">${escapeHtml(s.name)}</td><td class="status-cell">${emoji}</td><td class="remark-cell">${escapeHtml(a.remark)}</td></tr>`; } html += `</tbody></table>`; document.getElementById('historyContent').innerHTML = html; openModal('historyModal'); }
+async function addManualStudent() { const id = document.getElementById('newStudentId').value.trim(); const name = document.getElementById('newStudentName').value.trim(); const cls = document.getElementById('newClassLevel').value; if(!id || !name || !cls) { showMessage('ID, Name and Class required', 'error', 'manualMessage'); return; } const student = { id, name, class: cls, dob: document.getElementById('newStudentDob').value, department: document.getElementById('newDepartment').value, address: document.getElementById('newAddress').value, parentPhone: document.getElementById('newParentPhone').value, parentName: document.getElementById('newParentName').value, guardian: document.getElementById('newGuardian').value, status: document.getElementById('newStatus').value }; await db.collection('students').doc(id).set(student); await loadStudents(); showMessage('Student added', 'success', 'manualMessage'); renderAttendance(); }
+function downloadSample() { const ws = XLSX.utils.json_to_sheet([{ ID: 'STU001', Name: 'John Doe', Class: 'JSS1', ParentPhone: '23276123456' }]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students'); XLSX.writeFile(wb, 'student_sample.xlsx'); }
 async function importExcel(file) { alert("Import Excel - full implementation would use SheetJS"); }
 async function sendBatchWhatsApp() { alert("Batch WhatsApp - implement with parent phones"); }
 async function refreshStudents() { await loadStudents(); renderAttendance(); }
 
-// ========== STUDENT RECORDS (fully restored) ==========
-async function searchStudent() {
-    const query = document.getElementById('studentSearchInput').value.trim();
-    if(!query) { alert("Enter Student ID or Name"); return; }
-    let found = null;
-    for(let [key, student] of globalStudentMap.entries()) {
-        if(key === query || key.toLowerCase() === query.toLowerCase() || student.id === query || student.name.toLowerCase().includes(query.toLowerCase())) {
-            found = student;
-            break;
-        }
-    }
-    if(!found) {
-        document.getElementById('searchResults').innerHTML = '<div class="error">Student not found.</div>';
-        document.getElementById('studentRecordsPanel').style.display = 'none';
-        return;
-    }
-    currentStudentDoc = found;
-    document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
-    document.getElementById('studentRecordsPanel').style.display = 'block';
-    displayProfile();
-    loadExamUI();
-    loadFeeUI();
-}
-function displayProfile() {
-    if(!currentStudentDoc) return;
-    let html = `<p><strong>ID:</strong> ${escapeHtml(currentStudentDoc.id)}</p><p><strong>Name:</strong> ${escapeHtml(currentStudentDoc.name)}</p><p><strong>DOB:</strong> ${escapeHtml(currentStudentDoc.dob || 'N/A')}</p><p><strong>Class:</strong> ${escapeHtml(currentStudentDoc.class)}</p><p><strong>Department:</strong> ${escapeHtml(currentStudentDoc.department || 'N/A')}</p><p><strong>Address:</strong> ${escapeHtml(currentStudentDoc.address || 'N/A')}</p><p><strong>Parent Name:</strong> ${escapeHtml(currentStudentDoc.parentName || 'N/A')}</p><p><strong>Parent Phone:</strong> ${escapeHtml(currentStudentDoc.parentPhone || 'N/A')}</p><p><strong>Guardian:</strong> ${escapeHtml(currentStudentDoc.guardian || 'N/A')}</p><p><strong>Status:</strong> ${currentStudentDoc.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`;
-    document.getElementById('profileContent').innerHTML = html;
-}
+// ========== STUDENT RECORDS (FULLY RESTORED EXAMS & FEES) ==========
+async function searchStudent() { const query = document.getElementById('studentSearchInput').value.trim(); if(!query) { alert("Enter Student ID or Name"); return; } let found = null; for(let [key, student] of globalStudentMap.entries()) { if(key === query || key.toLowerCase() === query.toLowerCase() || student.id === query || student.name.toLowerCase().includes(query.toLowerCase())) { found = student; break; } } if(!found) { document.getElementById('searchResults').innerHTML = '<div class="error">Student not found.</div>'; document.getElementById('studentRecordsPanel').style.display = 'none'; return; } currentStudentDoc = found; document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`; document.getElementById('studentRecordsPanel').style.display = 'block'; displayProfile(); loadExamUI(); loadFeeUI(); }
+function displayProfile() { if(!currentStudentDoc) return; let html = `<p><strong>ID:</strong> ${escapeHtml(currentStudentDoc.id)}</p><p><strong>Name:</strong> ${escapeHtml(currentStudentDoc.name)}</p><p><strong>DOB:</strong> ${escapeHtml(currentStudentDoc.dob || 'N/A')}</p><p><strong>Class:</strong> ${escapeHtml(currentStudentDoc.class)}</p><p><strong>Department:</strong> ${escapeHtml(currentStudentDoc.department || 'N/A')}</p><p><strong>Address:</strong> ${escapeHtml(currentStudentDoc.address || 'N/A')}</p><p><strong>Parent Name:</strong> ${escapeHtml(currentStudentDoc.parentName || 'N/A')}</p><p><strong>Parent Phone:</strong> ${escapeHtml(currentStudentDoc.parentPhone || 'N/A')}</p><p><strong>Guardian:</strong> ${escapeHtml(currentStudentDoc.guardian || 'N/A')}</p><p><strong>Status:</strong> ${currentStudentDoc.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`; document.getElementById('profileContent').innerHTML = html; }
 function editProfile() { if(!currentStudentDoc) return; document.getElementById('editProfileName').value = currentStudentDoc.name || ''; document.getElementById('editProfileDob').value = currentStudentDoc.dob || ''; document.getElementById('editProfileClass').value = currentStudentDoc.class || ''; document.getElementById('editProfileDepartment').value = currentStudentDoc.department || ''; document.getElementById('editProfileAddress').value = currentStudentDoc.address || ''; document.getElementById('editProfileParentPhone').value = currentStudentDoc.parentPhone || ''; document.getElementById('editProfileParentName').value = currentStudentDoc.parentName || ''; document.getElementById('editProfileGuardian').value = currentStudentDoc.guardian || ''; document.getElementById('editProfileStatus').value = currentStudentDoc.status || 'active'; openModal('editProfileModal'); }
 document.getElementById('saveProfileBtn').onclick = async () => { if(!currentStudentDoc) return; const updates = { name: document.getElementById('editProfileName').value.trim(), dob: document.getElementById('editProfileDob').value, class: document.getElementById('editProfileClass').value, department: document.getElementById('editProfileDepartment').value.trim(), address: document.getElementById('editProfileAddress').value.trim(), parentPhone: document.getElementById('editProfileParentPhone').value.trim(), parentName: document.getElementById('editProfileParentName').value.trim(), guardian: document.getElementById('editProfileGuardian').value.trim(), status: document.getElementById('editProfileStatus').value }; await db.collection('students').doc(currentStudentDoc.id).update(updates); closeModal('editProfileModal'); await loadStudents(); const refreshed = await db.collection('students').doc(currentStudentDoc.id).get(); currentStudentDoc = { docId: refreshed.id, ...refreshed.data() }; displayProfile(); showMessage('Profile updated', 'success', 'searchResults'); };
-async function loadExamUI() { /* original stub */ let termSelector = document.getElementById('termAssessmentSelector'); termSelector.innerHTML = `<div class="assessment-btns"><button class="assessment-btn ${currentAssessment === 'test1' ? 'active' : ''}" data-assessment="test1">Test 1</button><button class="assessment-btn ${currentAssessment === 'test2' ? 'active' : ''}" data-assessment="test2">Test 2</button><button class="assessment-btn ${currentAssessment === 'exam' ? 'active' : ''}" data-assessment="exam">Exam</button></div>`; document.getElementById('examRecordsContent').innerHTML = '<p>Exam records UI loaded.</p>'; }
-async function saveExamRecords() { alert("Exam records saved (stub)"); }
-async function loadFeeUI() { document.getElementById('feesContent').innerHTML = '<p>Fee management UI ready.</p>'; }
-function recordPayment() { openModal('paymentModal'); }
-function editTotalFees() { openModal('editFeesModal'); }
+async function loadExamUI() { if(!currentStudentDoc) return; let termSelector = document.getElementById('termAssessmentSelector'); termSelector.innerHTML = `<div class="assessment-btns"><button class="assessment-btn ${currentAssessment === 'test1' ? 'active' : ''}" data-assessment="test1">Test 1</button><button class="assessment-btn ${currentAssessment === 'test2' ? 'active' : ''}" data-assessment="test2">Test 2</button><button class="assessment-btn ${currentAssessment === 'exam' ? 'active' : ''}" data-assessment="exam">Exam</button></div>`; document.querySelectorAll('.assessment-btn').forEach(btn => { btn.onclick = () => { document.querySelectorAll('.assessment-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentAssessment = btn.getAttribute('data-assessment'); loadExamUI(); }; }); let examDoc = await db.collection('exam_records').doc(currentStudentDoc.id).get(); let records = examDoc.exists ? examDoc.data() : {}; let key = currentExamLevel + '_' + currentTerm + '_' + currentAssessment; let subjectsData = records[key] || []; document.getElementById('examRecordsContent').innerHTML = buildSubjectInputs(subjectsData); attachRemoveEvents(); }
+function buildSubjectInputs(currentSubjects) { if (!currentSubjects || currentSubjects.length === 0) currentSubjects = [{ name: '', score: '' }]; let html = '<div><button id="addSubjectBtn" class="refresh-btn" style="margin-bottom:10px;">+ Add Subject</button></div><div id="subjectsContainer">'; for (let i = 0; i < currentSubjects.length; i++) { html += `<div class="subject-row" data-index="${i}"><input type="text" class="subject-name" value="${escapeHtml(currentSubjects[i].name)}" placeholder="Subject name"><input type="number" class="subject-score" value="${currentSubjects[i].score}" placeholder="Score" step="0.01" style="width:80px;"><button class="remove-subject-btn" data-index="${i}" style="background:#ffcdd2; color:#c62828;">Remove</button></div>`; } html += '</div>'; return html; }
+function attachRemoveEvents() { document.querySelectorAll('.remove-subject-btn').forEach(btn => { btn.onclick = function () { let idx = parseInt(this.getAttribute('data-index')); let container = document.getElementById('subjectsContainer'); let rows = container.querySelectorAll('.subject-row'); if (rows.length > 1) { rows[idx].remove(); let allRows = container.querySelectorAll('.subject-row'); for (let r = 0; r < allRows.length; r++) { allRows[r].setAttribute('data-index', r); let remBtn = allRows[r].querySelector('.remove-subject-btn'); if (remBtn) remBtn.setAttribute('data-index', r); } } else { alert("At least one subject required."); } }; }); let addBtn = document.getElementById('addSubjectBtn'); if(addBtn) addBtn.onclick = () => { let container = document.getElementById('subjectsContainer'); let newIndex = container.children.length; let newDiv = document.createElement('div'); newDiv.className = 'subject-row'; newDiv.setAttribute('data-index', newIndex); newDiv.innerHTML = `<input type="text" class="subject-name" placeholder="Subject name"><input type="number" class="subject-score" placeholder="Score" step="0.01" style="width:80px;"><button class="remove-subject-btn" data-index="${newIndex}" style="background:#ffcdd2; color:#c62828;">Remove</button>`; container.appendChild(newDiv); attachRemoveEvents(); }; }
+async function saveExamRecords() { if(!currentStudentDoc) return; let subjects = []; let rows = document.querySelectorAll('#subjectsContainer .subject-row'); for (let row of rows) { let name = row.querySelector('.subject-name').value.trim(); let score = row.querySelector('.subject-score').value; if (name) subjects.push({ name, score: score ? parseFloat(score) : '' }); } if (subjects.length === 0) { alert("Add at least one subject"); return; } let key = currentExamLevel + '_' + currentTerm + '_' + currentAssessment; let examDoc = await db.collection('exam_records').doc(currentStudentDoc.id).get(); let records = examDoc.exists ? examDoc.data() : {}; records[key] = subjects; await db.collection('exam_records').doc(currentStudentDoc.id).set(records); alert("Exam records saved!"); }
+async function loadFeeUI() { if(!currentStudentDoc) return; let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get(); let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } }; let termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] }; let balance = termData.total - termData.paid; let statusClass = balance <= 0 ? 'fee-paid' : (termData.paid > 0 ? 'fee-partial' : 'fee-unpaid'); let termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' }; let html = `<div class="${statusClass}" style="padding:15px;border-radius:5px"><strong>${termNames[currentFeeTerm]} - Total Fees:</strong> ${termData.total.toLocaleString()} Le<br><strong>Paid:</strong> ${termData.paid.toLocaleString()} Le<br><strong>Balance:</strong> ${balance.toLocaleString()} Le<br><strong>Status:</strong> ${balance <= 0 ? '✅ Fully Paid' : (termData.paid > 0 ? '⚠️ Partial Payment' : '❌ Not Paid')}</div><h4>Payment History - ${termNames[currentFeeTerm]}</h4><table border="1"><thead><tr><th>Date</th><th>Amount (Le)</th><th>Type</th><th>Note</th></tr></thead><tbody>`; for (let t of (termData.transactions || [])) { html += `<tr><td class="date-cell">${t.date}</td><td class="amount-cell">${t.amount.toLocaleString()}</td><td class="type-cell">${t.type}</td><td class="note-cell">${escapeHtml(t.note || '')}</td></tr>`; } html += `</tbody></table>`; document.getElementById('feesContent').innerHTML = html; }
+function recordPayment() { if(!currentStudentDoc) return; let termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' }; document.getElementById('paymentTermLabel').innerText = termNames[currentFeeTerm]; openModal('paymentModal'); }
+document.getElementById('submitPaymentBtn').onclick = async () => { if(!currentStudentDoc) return; let amount = parseFloat(document.getElementById('paymentAmount').value); let type = document.getElementById('paymentType').value; let note = document.getElementById('paymentNote').value; if (isNaN(amount) || amount <= 0) { alert("Enter valid amount"); return; } let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get(); let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } }; let termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] }; let newPaid = termData.paid + amount; if (type === 'full') newPaid = termData.total; let transaction = { date: new Date().toLocaleDateString(), amount, type, note }; termData.paid = newPaid; termData.transactions = (termData.transactions || []).concat([transaction]); feeData[currentFeeTerm] = termData; await db.collection('fee_records').doc(currentStudentDoc.id).set(feeData); closeModal('paymentModal'); document.getElementById('paymentAmount').value = ''; document.getElementById('paymentNote').value = ''; loadFeeUI(); alert("Payment recorded!"); };
+function editTotalFees() { if(!currentStudentDoc) return; openModal('editFeesModal'); }
+document.getElementById('saveFeesBtn').onclick = async () => { if(!currentStudentDoc) return; let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get(); let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } }; feeData.term1 = { ...feeData.term1, total: parseFloat(document.getElementById('editTerm1Fees').value) || 500000 }; feeData.term2 = { ...feeData.term2, total: parseFloat(document.getElementById('editTerm2Fees').value) || 500000 }; feeData.term3 = { ...feeData.term3, total: parseFloat(document.getElementById('editTerm3Fees').value) || 500000 }; await db.collection('fee_records').doc(currentStudentDoc.id).set(feeData); closeModal('editFeesModal'); loadFeeUI(); alert("Fee amounts updated!"); };
 
-// ========== TEACHERS MODULE (with all teachers history) ==========
+// ========== TEACHERS MODULE (UNCHANGED, WITH ALL TEACHERS HISTORY) ==========
 async function loadTeachers() { const snap = await db.collection('teachers').get(); let html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Class</th><th>Status</th></tr></thead><tbody>'; snap.forEach(d => { const t = d.data(); html += `<tr><td>${escapeHtml(t.id)}</td><td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.email)}</td><td>${escapeHtml(t.phone || '')}</td><td>${escapeHtml(t.class)}</td><td>${t.status === 'active' ? 'Active' : 'Inactive'}</td></tr>`; }); html += '</tbody></table>'; document.getElementById('allTeachersList').innerHTML = html; }
 async function addTeacher() { alert("Teacher added (full implementation active)"); }
 async function importTeachersExcel(file) { alert("Import teachers - implement with SheetJS"); }
@@ -413,7 +258,7 @@ async function renderTeacherAttendance() { if(!currentTeacherRegister) return; c
 async function renderTeacherHistory() { if(!currentTeacherRegister) return; const snap = await db.collection('teacher_attendance').where('teacherId', '==', currentTeacherRegister.id).get(); const container = document.getElementById('teacherRegisterHistory'); if(snap.empty) { container.innerHTML = '<p>No attendance history.</p>'; return; } let docs = []; snap.forEach(d => docs.push({ id: d.id, ...d.data() })); docs.sort((a,b) => (b.date || '').localeCompare(a.date || '')); let html = '<h4>Attendance History</h4><table class="teacher-register-table"><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th><th>Duration</th></tr></thead><tbody>'; for(let a of docs) { let checkIn = a.checkInTime ? new Date(a.checkInTime.toDate()).toLocaleString() : '—'; let checkOut = a.checkOutTime ? new Date(a.checkOutTime.toDate()).toLocaleString() : 'Still inside'; let duration = '—'; if(a.checkInTime && a.checkOutTime) { let ms = a.checkOutTime.toDate() - a.checkInTime.toDate(); let hours = Math.floor(ms / 3600000); let minutes = Math.floor((ms % 3600000) / 60000); duration = `${hours}h ${minutes}m`; } html += `<tr><td>${a.date}</td><td>${checkIn}</td><td>${checkOut}</td><td class="att-duration">${duration}</td></tr>`; } html += `</tbody></table>`; container.innerHTML = html; }
 async function loadAllTeachersAttendanceHistory() { const container = document.getElementById('allTeachersHistoryContainer'); if (!container) return; container.innerHTML = '<p>⏳ Loading complete attendance log for all teachers...</p>'; try { const snapshot = await db.collection('teacher_attendance').get(); if (snapshot.empty) { container.innerHTML = '<p>📭 No teacher attendance records found. Use check-in/check-out to start tracking.</p>'; return; } let records = []; snapshot.forEach(doc => { const data = doc.data(); if (!data.teacherId) return; records.push({ teacherId: data.teacherId, teacherName: data.teacherName || 'Unknown', date: data.date || 'N/A', rawCheckIn: data.checkInTime, rawCheckOut: data.checkOutTime }); }); records.sort((a,b) => (b.date || '').localeCompare(a.date || '') || (a.teacherName.localeCompare(b.teacherName))); let html = `<div style="overflow-x:auto;"><table style="width:100%; min-width:600px;"><thead><tr><th>Teacher Name</th><th>Date</th><th>Check In Time</th><th>Check Out Time</th><th>Duration</th></tr></thead><tbody>`; for (const rec of records) { let checkInDisplay = '—', checkOutDisplay = '—', durationDisplay = '—'; if (rec.rawCheckIn) { try { checkInDisplay = new Date(rec.rawCheckIn.toDate()).toLocaleString(); } catch(e) { checkInDisplay = 'Invalid date'; } } if (rec.rawCheckOut) { try { checkOutDisplay = new Date(rec.rawCheckOut.toDate()).toLocaleString(); } catch(e) { checkOutDisplay = 'Invalid date'; } } if (rec.rawCheckIn && rec.rawCheckOut) { try { let ms = rec.rawCheckOut.toDate() - rec.rawCheckIn.toDate(); if (ms > 0) { let hours = Math.floor(ms / 3600000); let minutes = Math.floor((ms % 3600000) / 60000); durationDisplay = `${hours}h ${minutes}m`; } else { durationDisplay = '0h 0m'; } } catch(e) { durationDisplay = 'error'; } } else if (rec.rawCheckIn && !rec.rawCheckOut) { durationDisplay = '🟢 Still inside'; } html += `<tr><td>${escapeHtml(rec.teacherName)} (${escapeHtml(rec.teacherId)})</td><td>${escapeHtml(rec.date)}</td><td>${checkInDisplay}</td><td>${checkOutDisplay}</td><td class="att-duration">${durationDisplay}</td></tr>`; } html += `</tbody></table></div><p>✅ Total ${records.length} attendance records.</p>`; container.innerHTML = html; } catch(e) { container.innerHTML = `<div class="error">⚠️ Failed: ${e.message}</div>`; } }
 
-// ========== ADMIN MODULE (stubs) ==========
+// ========== ADMIN MODULE (STUBS) ==========
 async function loadStaffList() { document.getElementById('staffListContainer').innerHTML = '<p>Staff management ready.</p>'; }
 async function addStaff() { alert("Staff registered (stub)"); }
 async function loadAssetsList() { document.getElementById('assetsListContainer').innerHTML = '<p>Assets list ready.</p>'; }
@@ -442,6 +287,7 @@ function switchToAdmin() { document.getElementById('attendanceModule').style.dis
 function setActiveModuleBtn(activeId) { ['attendanceModuleBtn','recordsModuleBtn','teachersModuleBtn','adminModuleBtn'].forEach(id => { let btn = document.getElementById(id); if(btn) btn.classList.remove('active'); }); let activeBtn = document.getElementById(activeId); if(activeBtn) activeBtn.classList.add('active'); }
 function initAdminTabs() { document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => { btn.onclick = () => { const id = btn.getAttribute('data-tab'); document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('#adminModule .admin-tab').forEach(tab => tab.style.display = 'none'); document.getElementById(id + 'Tab').style.display = 'block'; if(id === 'staff') loadStaffList(); else if(id === 'assets') loadAssetsList(); else if(id === 'inventory') loadInventoryList(); else if(id === 'visitors') loadVisitorsList(); else if(id === 'noticeboard') loadNotices(); }; }); }
 
+// Login & Initialize
 document.getElementById('loginBtn').onclick = async () => { const email = document.getElementById('loginEmail').value.trim(); const pwd = document.getElementById('loginPassword').value; try { const cred = await auth.signInWithEmailAndPassword(email, pwd); const role = await checkUserRole(cred.user); if(!role) throw new Error("No role assigned."); document.getElementById('loginModal').style.display = 'none'; document.getElementById('userInfo').innerText = role.role.toUpperCase() + ': ' + cred.user.email; document.getElementById('logoutBtn').style.display = 'inline-block'; updateUIForRole(role); updateOnlineStatus(); } catch(e) { document.getElementById('loginMessage').innerHTML = '<div class="error">' + e.message + '</div>'; } };
 document.getElementById('logoutBtn').onclick = async () => { await auth.signOut(); location.reload(); };
 
@@ -462,7 +308,7 @@ window.onload = async () => {
     safe('loadBtn', renderAttendance);
     safe('refreshBtn', refreshStudents);
     safe('batchWhatsappBtn', sendBatchWhatsApp);
-    safe('classHistoryBtn', viewClassHistory);   // NOW FIXED
+    safe('classHistoryBtn', viewClassHistory);
     if(document.getElementById('classSelect')) document.getElementById('classSelect').onchange = renderAttendance;
     safe('searchStudentBtn', searchStudent);
     safe('clearSearchBtn', () => { document.getElementById('studentSearchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; document.getElementById('studentRecordsPanel').style.display = 'none'; });
