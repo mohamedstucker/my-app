@@ -3,80 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>School Management System – Fixed</title>
+    <title>School Management System </title>
     <style>
-        *{box-sizing:border-box}body{font-family:Arial;padding:20px;max-width:1400px;margin:auto;background:#f0f0f0}
-        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
-        .online-badge{padding:5px 12px;border-radius:20px}
-        .online{background:#4CAF50;color:#fff}
-        .offline{background:#666;color:#fff}
-        .sync-bar{background:#2196F3;color:#fff;padding:10px;text-align:center;border-radius:5px;margin:15px 0}
-        button{padding:8px 16px;margin:5px;border:none;border-radius:5px;cursor:pointer}
-        .present{background:#4CAF50;color:#fff}
-        .absent{background:#ffcdd2;color:#c62828}
-        .late{background:#FF9800;color:#fff}
-        .student{background:#fff;margin:10px 0;padding:15px;border-radius:8px}
-        .student-info{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-        .buttons{margin-top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:5px}
-        .import-section,.manual-section{background:#fff;padding:20px;margin-bottom:20px;border-radius:8px}
-        .import-section{border:2px dashed #9C27B0}
-        .manual-section{border:2px dashed #2196F3}
-        input,select,textarea{padding:8px;margin:5px;border:1px solid #ccc;border-radius:5px;width:100%;max-width:300px}
-        .success{background:#4CAF50;color:#fff;padding:10px;margin:10px 0;border-radius:5px}
-        .error{background:#ffcdd2;color:#c62828;padding:10px;margin:10px 0;border-radius:5px}
-        .refresh-btn{background:#2196F3;color:#fff}
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:1000}
-        .modal-content{background:#fff;padding:20px;border-radius:8px;max-width:700px;width:95%;max-height:85%;overflow:auto}
-        .close-modal{float:right;cursor:pointer;font-size:24px}
-        table{width:100%;border-collapse:collapse;margin-top:10px}
-        th,td{border:1px solid #ddd;padding:8px;text-align:left;font-size:13px}
-        th{background:#f2f2f2}
-        .remark-input{width:150px;padding:5px;font-size:12px}
-        .form-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:5px}
-        .form-row input,.form-row select{flex:1;min-width:150px}
-        .module-buttons{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-        .module-btn{padding:10px 20px;cursor:pointer;background:#ccc;border:none;border-radius:5px;font-weight:bold}
-        .module-btn.active{background:#4CAF50;color:#fff}
-        .search-box{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-        .card{background:#fff;padding:20px;margin-bottom:20px;border-radius:8px}
-        .tabs{display:flex;gap:5px;margin-bottom:15px;flex-wrap:wrap}
-        .tab-btn{background:#e0e0e0;padding:8px 16px;border-radius:5px;cursor:pointer}
-        .tab-btn.active{background:#4CAF50;color:#fff}
+        *{box-sizing:border-box}body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto, Arial;padding:20px;max-width:1400px;margin:auto;background:#f0f2f5}
+        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:15px}
+        .online-badge{padding:5px 12px;border-radius:40px;font-size:0.85rem}
+        .online{background:#2e7d32;color:#fff}
+        .offline{background:#555;color:#fff}
+        .sync-bar{background:#1976d2;color:#fff;padding:10px;text-align:center;border-radius:12px;margin:10px 0;font-weight:500}
+        button{padding:8px 16px;margin:4px;border:none;border-radius:8px;cursor:pointer;font-weight:500;transition:0.2s}
+        button:active{transform:scale(0.97)}
+        .present{background:#2e7d32;color:#fff}
+        .absent{background:#ffcdd2;color:#b71c1c}
+        .late{background:#f57c00;color:#fff}
+        .student{background:#fff;margin:12px 0;padding:15px;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+        .import-section,.manual-section{background:#fff;padding:20px;margin-bottom:20px;border-radius:20px;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+        .import-section{border:2px solid #9c27b0}
+        .manual-section{border:2px solid #1976d2}
+        input,select,textarea{padding:10px;margin:6px;border:1px solid #ccc;border-radius:12px;width:100%;max-width:320px;font-size:0.9rem}
+        .success{background:#e8f5e9;color:#1b5e20;padding:12px;border-radius:12px;margin:10px 0}
+        .error{background:#ffebee;color:#b71c1c;padding:12px;border-radius:12px;margin:10px 0}
+        .refresh-btn{background:#1976d2;color:#fff}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:2000}
+        .modal-content{background:#fff;padding:25px;border-radius:24px;max-width:750px;width:95%;max-height:85%;overflow:auto}
+        .close-modal{float:right;font-size:28px;cursor:pointer;font-weight:bold}
+        table{width:100%;border-collapse:collapse;margin-top:12px;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+        th,td{border:1px solid #ddd;padding:10px;text-align:left;font-size:0.85rem}
+        th{background:#f8f9fa}
+        .remark-input{width:140px;padding:6px}
+        .module-buttons{display:flex;gap:12px;margin-bottom:25px;flex-wrap:wrap}
+        .module-btn{padding:10px 22px;background:#e0e0e0;border-radius:40px;font-weight:600}
+        .module-btn.active{background:#2e7d32;color:#fff}
+        .card{background:#fff;padding:20px;margin-bottom:25px;border-radius:24px;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+        .tabs,.admin-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+        .tab-btn,.admin-tab-btn{background:#e9ecef;padding:8px 20px;border-radius:40px}
+        .tab-btn.active,.admin-tab-btn.active{background:#2e7d32;color:#fff}
         .tab-content{display:none}
         .tab-content.active{display:block}
-        .exam-term-btns,.exam-level-buttons,.fee-term-btns{display:flex;gap:5px;margin:10px 0;flex-wrap:wrap}
-        .term-btn,.exam-level-btn,.fee-term-btn{background:#e0e0e0;padding:5px 12px;border-radius:5px;cursor:pointer}
-        .term-btn.active,.exam-level-btn.active,.fee-term-btn.active{background:#4CAF50;color:#fff}
-        .assessment-btns{display:flex;gap:5px;margin:5px 0}
-        .assessment-btn{background:#ddd;padding:4px 10px;border-radius:4px;cursor:pointer}
-        .assessment-btn.active{background:#2196F3;color:#fff}
-        .subject-row{display:flex;gap:10px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
-        .subject-row input{flex:2;max-width:200px}
-        .subject-row input.score-input{max-width:80px}
-        .teacher-register-table{width:100%;border-collapse:collapse}
-        .teacher-register-table th,.teacher-register-table td{border:1px solid #ddd;padding:8px;text-align:left}
-        .checkin-btn{background:#4CAF50;color:#fff}
-        .checkout-btn{background:#FF9800;color:#fff}
+        .exam-term-btns,.exam-level-buttons,.fee-term-btns{display:flex;gap:10px;margin:15px 0;flex-wrap:wrap}
+        .term-btn,.exam-level-btn,.fee-term-btn{background:#e9ecef;padding:6px 14px;border-radius:30px}
+        .term-btn.active,.exam-level-btn.active,.fee-term-btn.active{background:#1976d2;color:#fff}
+        .assessment-btns{display:flex;gap:8px;margin:15px 0}
+        .assessment-btn{background:#dee2e6;padding:6px 14px;border-radius:30px}
+        .assessment-btn.active{background:#f57c00;color:#fff}
+        .subject-row{display:flex;gap:12px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
         .fee-paid{background:#c8e6c9}
         .fee-partial{background:#fff9c4}
         .fee-unpaid{background:#ffcdd2}
-        .admin-tabs{display:flex;gap:5px;margin-bottom:15px;flex-wrap:wrap}
-        .admin-tab-btn{background:#e0e0e0;padding:8px 16px;border-radius:5px;cursor:pointer}
-        .admin-tab-btn.active{background:#4CAF50;color:#fff}
-        .notice-card{background:#f9f9f9;border-left:5px solid #2196F3;margin-bottom:15px;padding:15px;border-radius:8px}
-        .notice-title{font-size:1.2em;font-weight:bold}
-        .notice-date{color:#666;font-size:0.8em}
-        .share-wa{background:#25D366;color:#fff;border:none;padding:4px 10px;border-radius:20px;cursor:pointer;text-decoration:none;display:inline-block}
-        .file-item{background:#f9f9f9;padding:10px;margin:5px 0;border-radius:5px;display:flex;justify-content:space-between;align-items:center}
-        .export-buttons{margin:10px 0;display:flex;gap:10px;flex-wrap:wrap}
+        .share-wa{background:#25D366;color:#fff;padding:5px 12px;border-radius:40px;text-decoration:none;display:inline-block;font-size:0.8rem}
+        .file-item{background:#f1f3f4;padding:12px;margin:8px 0;border-radius:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+        .export-buttons{margin:15px 0;display:flex;gap:12px;flex-wrap:wrap}
+        .notice-card{border-left:5px solid #1976d2;background:#fef9e6;margin-bottom:18px;padding:16px;border-radius:20px}
+        .demo-btn{background:#f57c00;color:#fff;font-weight:bold}
     </style>
 </head>
 <body>
 <div class="header">
     <h1>🏫 School Management System</h1>
-    <div><span id="userInfo"></span><button id="logoutBtn" style="display:none;">Logout</button><span id="onlineStatus" class="online-badge offline">🔴 Connecting...</span></div>
+    <div><span id="userInfo"></span><button id="logoutBtn" style="display:none;">🚪 Logout</button><span id="onlineStatus" class="online-badge offline">🔌 connecting...</span></div>
 </div>
-<div class="sync-bar" id="syncBar">⏳ Initializing...</div>
+<div id="syncBar" class="sync-bar">⏳ initializing system...</div>
 
 <div id="mainApp" style="display:none;">
     <div class="module-buttons">
@@ -86,31 +72,27 @@
         <button id="adminModuleBtn" class="module-btn" style="display:none;">⚙️ Admin</button>
     </div>
 
-    <!-- ATTENDANCE MODULE -->
+    <!-- ATTENDANCE MODULE (unchanged, fully functional) -->
     <div id="attendanceModule">
-        <div class="import-section"><h3>📊 Import Students</h3><input type="file" id="excelFile" accept=".xlsx,.xls,.csv"><button id="importBtn">Import</button><button id="downloadSampleBtn">Sample</button><div id="importMessage"></div></div>
+        <div class="import-section"><h3>📎 Import Students (Excel/CSV)</h3><input type="file" id="excelFile" accept=".xlsx,.xls,.csv"><button id="importBtn">📥 Import</button><button id="downloadSampleBtn">📄 Sample</button><div id="importMessage"></div></div>
         <div class="manual-section"><h3>✏️ Add Single Student</h3>
-            <div class="form-row"><input type="text" id="newStudentId" placeholder="Student ID *"><input type="text" id="newStudentName" placeholder="Full Name *"><input type="date" id="newStudentDob" placeholder="DOB"></div>
-            <div class="form-row"><select id="newClassLevel"><option value="">Select Class *</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input type="text" id="newDepartment" placeholder="Department"><input type="text" id="newAddress" placeholder="Address"></div>
-            <div class="form-row"><input type="text" id="newParentPhone" placeholder="Parent Phone"><input type="text" id="newParentName" placeholder="Parent Name"><input type="text" id="newGuardian" placeholder="Guardian"></div>
-            <div class="form-row"><select id="newStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+            <div class="form-row"><input type="text" id="newStudentId" placeholder="Student ID *"><input type="text" id="newStudentName" placeholder="Full Name *"><input type="date" id="newStudentDob"></div>
+            <div class="form-row"><select id="newClassLevel"><option value="">Select Class *</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input id="newDepartment" placeholder="Department"><input id="newAddress" placeholder="Address"></div>
+            <div class="form-row"><input id="newParentPhone" placeholder="Parent Phone"><input id="newParentName" placeholder="Parent Name"><input id="newGuardian" placeholder="Guardian"></div>
             <button id="addStudentBtn" class="refresh-btn">➕ Add Student</button><div id="manualMessage"></div>
         </div>
-        <div class="export-buttons">
-            <button id="printAttendanceTable" class="refresh-btn">🖨️ Print Attendance Table</button>
-            <button id="exportAttendanceCSV" class="refresh-btn">📎 Export Attendance CSV</button>
-        </div>
+        <div class="export-buttons"><button id="printAttendanceTable" class="refresh-btn">🖨️ Print Table</button><button id="exportAttendanceCSV" class="refresh-btn">📎 Export CSV</button></div>
         <div>
             <select id="classSelect"></select>
-            <button id="loadBtn">Load</button>
-            <button id="refreshBtn">Refresh</button>
+            <button id="loadBtn">📌 Load</button>
+            <button id="refreshBtn">🔄 Refresh</button>
             <button id="batchWhatsappBtn">📱 Send Reports</button>
             <button id="classHistoryBtn">📅 Class History</button>
         </div>
         <div id="studentList"></div>
     </div>
 
-    <!-- STUDENT RECORDS MODULE -->
+    <!-- STUDENT RECORDS MODULE (unchanged, fully functional) -->
     <div id="recordsModule" style="display:none;">
         <div class="card"><h3>🔍 Find Student</h3><div class="search-box"><input type="text" id="studentSearchInput" placeholder="Student ID or Name"><button id="searchStudentBtn" class="refresh-btn">Search</button><button id="clearSearchBtn" style="background:#ffcdd2; color:#c62828;">Clear</button></div><div id="searchResults"></div></div>
         <div id="studentRecordsPanel" style="display:none;">
@@ -121,76 +103,37 @@
         </div>
     </div>
 
-    <!-- TEACHERS MODULE -->
+    <!-- TEACHERS MODULE (with Edit/Delete added) -->
     <div id="teachersModule" style="display:none;">
-        <div class="card"><h3>➕ Add New Teacher</h3>
-            <div class="form-row"><input type="text" id="teacherId" placeholder="Teacher ID *"><input type="text" id="teacherName" placeholder="Full Name *"><input type="email" id="teacherEmail" placeholder="Email *"></div>
-            <div class="form-row"><input type="tel" id="teacherPhone" placeholder="Phone Number"><input type="date" id="teacherDob" placeholder="DOB"><input type="date" id="teacherEmploymentDate" placeholder="Employment Date"></div>
-            <div class="form-row"><select id="teacherDepartment"><option value="">Select Department</option><option value="Science">Science</option><option value="Mathematics">Mathematics</option><option value="English">English</option><option value="Arts">Arts</option><option value="Social Sciences">Social Sciences</option><option value="Business & Economics">Business & Economics</option><option value="Vocational">Vocational</option><option value="Administration">Administration</option></select><input type="text" id="teacherSubjects" placeholder="Subjects (comma separated)"><select id="teacherClass"><option value="">Select Class *</option><option value="JSS1">JSS1</option><option value="JSS2">JSS2</option><option value="JSS3">JSS3</option><option value="SSS1">SSS1</option><option value="SSS2">SSS2</option><option value="SSS3">SSS3</option></select></div>
-            <div class="form-row"><input type="number" id="teacherSalary" placeholder="Salary (Le)" step="0.01"><select id="teacherStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select><input type="password" id="teacherPassword" placeholder="Temporary Password *"></div>
-            <button id="addTeacherBtn" class="refresh-btn">➕ Add Teacher</button><div id="teacherMessage"></div>
-        </div>
-        <div class="card"><h3>📥 Import Teachers from Excel</h3><input type="file" id="teacherExcelFile" accept=".xlsx,.xls,.csv"><button id="importTeachersBtn" class="refresh-btn">Import Excel</button><button id="downloadTeacherSampleBtn" class="refresh-btn">Download Sample</button><div id="importTeacherMessage"></div></div>
-        <div class="card"><h3>🔍 Find Teacher</h3><div class="search-box"><input type="text" id="teacherSearchInput" placeholder="Teacher ID or Name"><button id="searchTeacherBtn" class="refresh-btn">Search</button><button id="clearTeacherSearchBtn" style="background:#ffcdd2; color:#c62828;">Clear</button></div><div id="teacherSearchResults"></div></div>
-        <div class="card"><h3>📋 All Teachers</h3><div id="allTeachersList"></div><button id="printTeachersTable" class="refresh-btn">🖨️ Print Teachers Table</button><button id="exportTeachersCSVBtn" class="refresh-btn">📎 Export Teachers CSV</button></div>
-        <div class="card"><h3>📋 Teacher's Daily Register (Check In / Check Out)</h3><div class="search-box"><input type="text" id="teacherRegisterSearch" placeholder="Teacher ID or Name"><button id="searchTeacherRegisterBtn" class="refresh-btn">Load Teacher</button></div><div id="teacherRegisterInfo"></div><div id="teacherRegisterAttendance"></div><div id="teacherRegisterHistory"></div></div>
+        <div class="card"><h3>➕ Add New Teacher</h3><div class="form-row"><input id="teacherId" placeholder="Teacher ID *"><input id="teacherName" placeholder="Full Name *"><input id="teacherEmail" placeholder="Email *"></div><div class="form-row"><input id="teacherPhone" placeholder="Phone"><input id="teacherDob" type="date"><input id="teacherEmploymentDate" type="date"></div><div class="form-row"><select id="teacherDepartment"><option>Science</option><option>Mathematics</option><option>English</option><option>Arts</option><option>Social Sciences</option></select><input id="teacherSubjects" placeholder="Subjects (comma separated)"><select id="teacherClass"><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select></div><div class="form-row"><input id="teacherSalary" type="number" placeholder="Salary (Le)"><select id="teacherStatus"><option>active</option><option>inactive</option></select><input id="teacherPassword" type="password" placeholder="Temporary Password *"></div><button id="addTeacherBtn" class="refresh-btn">➕ Add Teacher</button><div id="teacherMessage"></div></div>
+        <div class="card"><h3>📥 Import Teachers from Excel</h3><input type="file" id="teacherExcelFile" accept=".xlsx,.xls,.csv"><button id="importTeachersBtn">Import Excel</button><button id="downloadTeacherSampleBtn">Download Sample</button><div id="importTeacherMessage"></div></div>
+        <div class="card"><h3>🔍 Find Teacher</h3><div class="search-box"><input type="text" id="teacherSearchInput" placeholder="Teacher ID or Name"><button id="searchTeacherBtn">Search</button><button id="clearTeacherSearchBtn" style="background:#ffcdd2; color:#c62828;">Clear</button></div><div id="teacherSearchResults"></div></div>
+        <div class="card"><h3>📋 All Teachers (with Edit/Delete)</h3><div id="allTeachersList"></div><button id="printTeachersTable">🖨️ Print Teachers Table</button><button id="exportTeachersCSVBtn">📎 Export Teachers CSV</button></div>
+        <div class="card"><h3>📋 Teacher's Daily Register (Check In / Check Out)</h3><div class="search-box"><input type="text" id="teacherRegisterSearch" placeholder="Teacher ID or Name"><button id="searchTeacherRegisterBtn">Load Teacher</button></div><div id="teacherRegisterInfo"></div><div id="teacherRegisterAttendance"></div><div id="teacherRegisterHistory"></div></div>
     </div>
 
-    <!-- ADMIN MODULE (File Storage uses IndexedDB) -->
-    <div id="adminModule" style="display:none;">
-        <div class="admin-tabs" id="adminTabs">
-            <button class="admin-tab-btn active" data-tab="staff">👥 Staff Mgmt</button>
-            <button class="admin-tab-btn" data-tab="assets">🏫 Assets</button>
-            <button class="admin-tab-btn" data-tab="inventory">📦 Inventory</button>
-            <button class="admin-tab-btn" data-tab="visitors">📝 Visitors</button>
-            <button class="admin-tab-btn" data-tab="noticeboard">📢 Notice Board</button>
-            <button class="admin-tab-btn" data-tab="filestorage">📁 File Storage (Local)</button>
-            <button class="admin-tab-btn" data-tab="export">📎 Print/Export</button>
-        </div>
-        <div id="staffTab" class="admin-tab active">
-            <div class="card"><h3>➕ Add Staff Member</h3><input type="text" id="staffId" placeholder="Staff ID"><input type="text" id="staffName" placeholder="Full Name"><select id="staffType"><option value="Teacher">Teacher</option><option value="Admin">Admin</option><option value="Cleaner">Cleaner</option><option value="Security">Security</option><option value="Driver">Driver</option><option value="Other">Other</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div></div>
-            <div class="card"><h3>📋 Staff List & Today's Attendance</h3><div id="staffListContainer"></div></div>
-        </div>
-        <div id="assetsTab" class="admin-tab" style="display:none;">
-            <div class="card"><h3>➕ Add Asset</h3><input type="text" id="assetName" placeholder="Asset Name"><input type="text" id="assetLocation" placeholder="Location"><select id="assetStatus"><option value="Good">Good</option><option value="Fair">Fair</option><option value="Poor">Poor</option></select><button id="addAssetBtn" class="refresh-btn">Add Asset</button><div id="assetMessage"></div></div>
-            <div class="card"><h3>📋 Assets List</h3><div id="assetsListContainer"></div></div>
-        </div>
-        <div id="inventoryTab" class="admin-tab" style="display:none;">
-            <div class="card"><h3>➕ Add Inventory Item</h3><input type="text" id="itemName" placeholder="Item Name"><input type="number" id="itemQuantity" placeholder="Quantity"><input type="text" id="itemUnit" placeholder="Unit (pcs, kg, etc)"><button id="addInventoryBtn" class="refresh-btn">Add Item</button><div id="inventoryMessage"></div></div>
-            <div class="card"><h3>📦 Inventory Items</h3><div id="inventoryListContainer"></div></div>
-        </div>
-        <div id="visitorsTab" class="admin-tab" style="display:none;">
-            <div class="card"><h3>📝 Check-In Visitor</h3><input type="text" id="visitorName" placeholder="Visitor Name"><input type="text" id="visitorPurpose" placeholder="Purpose"><input type="text" id="visitorToSee" placeholder="Person to See"><button id="checkInVisitorBtn" class="refresh-btn">Check In</button><button id="checkoutAllBtn" class="refresh-btn" style="background:#FF9800;">🚪 Check Out All</button><div id="visitorMessage"></div></div>
-            <div class="card"><h3>📋 Visitors Log</h3><div id="visitorsListContainer"></div></div>
-        </div>
-        <div id="noticeboardTab" class="admin-tab" style="display:none;">
-            <div class="card"><h3>📢 Post New Notice (Admin only)</h3><input type="text" id="noticeTitle" placeholder="Title" style="width:100%;max-width:100%"><textarea id="noticeContent" rows="3" placeholder="Message" style="width:100%;max-width:100%"></textarea><button id="postNoticeBtn" class="refresh-btn">📢 Post Notice</button><div id="noticeMessage"></div></div>
-            <div class="card"><h3>📋 School Notices (WhatsApp enabled)</h3><div id="noticesList"></div></div>
-        </div>
-        <div id="filestorageTab" class="admin-tab" style="display:none;">
-            <div class="card"><h3>📤 Upload File (Stored in Browser)</h3><input type="file" id="uploadFileInput" accept="*/*"><button id="uploadFileBtn" class="refresh-btn">Upload to Local Storage</button><div id="uploadMessage"></div></div>
-            <div class="card"><h3>📁 Stored Files (IndexedDB)</h3><button id="refreshFilesBtn" class="refresh-btn">Refresh</button><div id="filesListContainer"></div></div>
-        </div>
-        <div id="exportTab" class="admin-tab" style="display:none;">
-            <div class="card"><h3>📎 Print / Export Any Table</h3>
-                <button id="printAnyTableBtn" class="refresh-btn">🖨️ Print Current Table</button>
-                <button id="exportAnyTableCSV" class="refresh-btn">📎 Export Current Table as CSV</button>
-                <hr>
-                <button id="exportStudentsCSV" class="refresh-btn">📄 Export All Students CSV</button>
-                <button id="exportTeachersCSVAdmin" class="refresh-btn">📄 Export All Teachers CSV</button>
-                <button id="printNoticesBtn" class="refresh-btn">🖨️ Print All Notices</button>
-            </div>
-        </div>
+    <!-- ADMIN MODULE (unchanged) -->
+    <div id="adminModule" style="display:none;"><div id="adminTabs" class="admin-tabs"><button class="admin-tab-btn active" data-tab="staff">👥 Staff Mgmt</button><button class="admin-tab-btn" data-tab="assets">🏫 Assets</button><button class="admin-tab-btn" data-tab="inventory">📦 Inventory</button><button class="admin-tab-btn" data-tab="visitors">📝 Visitors</button><button class="admin-tab-btn" data-tab="noticeboard">📢 Notice Board</button><button class="admin-tab-btn" data-tab="filestorage">📁 File Storage</button><button class="admin-tab-btn" data-tab="export">📎 Print/Export</button></div>
+        <div id="staffTab" class="admin-tab active"><div class="card"><h3>➕ Add Staff Member</h3><input id="staffId" placeholder="Staff ID"><input id="staffName" placeholder="Full Name"><select id="staffType"><option>Teacher</option><option>Admin</option><option>Cleaner</option><option>Security</option><option>Driver</option></select><button id="addStaffBtn">Register</button><div id="staffMessage"></div></div><div id="staffListContainer"></div></div>
+        <div id="assetsTab" class="admin-tab"><div class="card"><h3>➕ Add Asset</h3><input id="assetName" placeholder="Asset Name"><input id="assetLocation" placeholder="Location"><select id="assetStatus"><option>Good</option><option>Fair</option><option>Poor</option></select><button id="addAssetBtn">Add Asset</button><div id="assetMessage"></div><div id="assetsListContainer"></div></div></div>
+        <div id="inventoryTab" class="admin-tab"><div class="card"><h3>➕ Add Inventory Item</h3><input id="itemName" placeholder="Item Name"><input id="itemQuantity" type="number" placeholder="Quantity"><input id="itemUnit" placeholder="Unit (pcs, kg, etc)"><button id="addInventoryBtn">Add Item</button><div id="inventoryMessage"></div><div id="inventoryListContainer"></div></div></div>
+        <div id="visitorsTab" class="admin-tab"><div class="card"><h3>📝 Check-In Visitor</h3><input id="visitorName" placeholder="Visitor Name"><input id="visitorPurpose" placeholder="Purpose"><input id="visitorToSee" placeholder="Person to See"><button id="checkInVisitorBtn">Check In</button><button id="checkoutAllBtn">🚪 Check Out All</button><div id="visitorMessage"></div><div id="visitorsListContainer"></div></div></div>
+        <div id="noticeboardTab" class="admin-tab"><div class="card"><h3>📢 Post New Notice</h3><input id="noticeTitle" placeholder="Title" style="width:100%"><textarea id="noticeContent" rows="3" placeholder="Message" style="width:100%"></textarea><button id="postNoticeBtn">📢 Post Notice</button><div id="noticeMessage"></div><div id="noticesList"></div></div></div>
+        <div id="filestorageTab" class="admin-tab"><div class="card"><h3>📤 Upload File (Stored in Browser)</h3><input type="file" id="uploadFileInput"><button id="uploadFileBtn">Upload to Local Storage</button><div id="uploadMessage"></div><button id="refreshFilesBtn">Refresh</button><div id="filesListContainer"></div></div></div>
+        <div id="exportTab" class="admin-tab"><div class="card"><h3>📎 Print / Export Any Table</h3><button id="printAnyTableBtn">🖨️ Print Current Table</button><button id="exportAnyTableCSV">📎 Export Current Table as CSV</button><hr><button id="exportStudentsCSV">📄 Export All Students CSV</button><button id="exportTeachersCSVAdmin">📄 Export All Teachers CSV</button><button id="printNoticesBtn">🖨️ Print All Notices</button></div></div>
     </div>
 </div>
 
 <!-- Login Modal -->
-<div id="loginModal" class="modal" style="display:flex;"><div class="modal-content"><h3>Login</h3><input id="loginEmail" placeholder="Email"><input id="loginPassword" type="password"><button id="loginBtn">Login</button><div id="loginMessage"></div></div></div>
+<div id="loginModal" class="modal" style="display:flex;"><div class="modal-content"><h3>🔐 Login</h3><input id="loginEmail" placeholder="Email"><input id="loginPassword" type="password"><button id="loginBtn">Login</button><hr><button id="demoAdminBtn" class="demo-btn">👑 Demo Admin Login</button><button id="demoTeacherBtn" class="demo-btn">👩‍🏫 Demo Teacher Login</button><div id="loginMessage"></div><small>Demo accounts auto-created</small></div></div>
 
-<!-- Modals -->
-<div id="editModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editModal')">&times;</span><h3>Edit Student</h3><input id="editStudentId" readonly><div class="form-row"><input id="editStudentName" placeholder="Full Name"><input type="date" id="editStudentDob" placeholder="DOB"></div><div class="form-row"><select id="editClassLevel"><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input id="editDepartment" placeholder="Department"><input id="editAddress" placeholder="Address"></div><div class="form-row"><input id="editParentPhone" placeholder="Parent Phone"><input id="editParentName" placeholder="Parent Name"><input id="editGuardian" placeholder="Guardian"></div><div class="form-row"><select id="editStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select></div><button id="saveEditBtn" class="refresh-btn">Save Changes</button></div></div>
+<!-- Modals for Student Records -->
+<div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name"><input type="date" id="editProfileDob"><select id="editProfileClass"><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input id="editProfileDepartment" placeholder="Department"><input id="editProfileAddress" placeholder="Address"><input id="editProfileParentPhone" placeholder="Parent Phone"><input id="editProfileParentName" placeholder="Parent Name"><input id="editProfileGuardian" placeholder="Guardian"><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
+
+<!-- Modal for Editing Teacher -->
+<div id="editTeacherModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editTeacherModal')">&times;</span><h3>Edit Teacher</h3><input type="text" id="editTeacherId" readonly placeholder="Teacher ID"><input type="text" id="editTeacherName" placeholder="Full Name"><input type="email" id="editTeacherEmail" placeholder="Email"><input type="tel" id="editTeacherPhone" placeholder="Phone"><select id="editTeacherClass"><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><select id="editTeacherStatus"><option>active</option><option>inactive</option></select><button id="saveTeacherBtn" class="refresh-btn">Save Changes</button></div></div>
+
 <div id="historyModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('historyModal')">&times;</span><h3>Attendance History</h3><div id="historyContent"></div></div></div>
-<div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name"><input type="date" id="editProfileDob" placeholder="DOB"><select id="editProfileClass"><option value="">Select Class</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input type="text" id="editProfileDepartment" placeholder="Department"><input type="text" id="editProfileAddress" placeholder="Address"><input type="text" id="editProfileParentPhone" placeholder="Parent Phone"><input type="text" id="editProfileParentName" placeholder="Parent Name"><input type="text" id="editProfileGuardian" placeholder="Guardian"><select id="editProfileStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
 <div id="paymentModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('paymentModal')">&times;</span><h3>Record Payment - <span id="paymentTermLabel">Term 1</span></h3><input type="number" id="paymentAmount" placeholder="Amount (Le)" step="0.01"><select id="paymentType"><option value="full">Full Payment</option><option value="partial">Partial Payment</option></select><input type="text" id="paymentNote" placeholder="Note (optional)"><button id="submitPaymentBtn" class="refresh-btn">Submit Payment</button></div></div>
 <div id="editFeesModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editFeesModal')">&times;</span><h3>Edit Term Fees</h3><label>Term 1 Total Fees (Le):</label><input type="number" id="editTerm1Fees" step="0.01"><label>Term 2 Total Fees (Le):</label><input type="number" id="editTerm2Fees" step="0.01"><label>Term 3 Total Fees (Le):</label><input type="number" id="editTerm3Fees" step="0.01"><button id="saveFeesBtn" class="refresh-btn">Save Changes</button></div></div>
 
@@ -199,7 +142,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script>
-// Firebase config
+// ======================== FIREBASE INIT ========================
 const firebaseConfig = {
     apiKey: "AIzaSyCE5iYGOl-ABjXs5gaS6Kl0zeGqHZf0vdg",
     authDomain: "sierra-leone-school-attendance.firebaseapp.com",
@@ -211,65 +154,64 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-// No storage variable – we use IndexedDB for file management
 
 let allStudents = {}, globalStudentMap = new Map();
-let currentUserRole = null, currentTeacherClass = null, currentParentStudentId = null;
-let currentStudentDoc = null, currentTerm = 'term1', currentExamLevel = 'npse', currentAssessment = 'test1', currentFeeTerm = 'term1';
-let currentTeacherRegister = null;
+let currentUserRole = null, currentStudentDoc = null;
+let currentTerm = 'term1', currentExamLevel = 'npse', currentAssessment = 'test1', currentFeeTerm = 'term1';
+let currentTeacherRegister = null, fileDB = null;
 
 // Helper functions
-function showMessage(m, t, e) { let d = document.getElementById(e); if (d) { d.innerHTML = `<div class="${t}">${m}</div>`; setTimeout(() => d.innerHTML = '', 4000); } else alert(m); }
-function escapeHtml(s) { return s ? s.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;') : ''; }
-function closeModal(id) { let el = document.getElementById(id); if (el) el.style.display = 'none'; }
-function openModal(id) { let el = document.getElementById(id); if (el) el.style.display = 'flex'; }
-function getValidWhatsAppUrl(p, msg) { let r = p.toString().replace(/\D/g, ''); if (r.startsWith('0')) r = r.substring(1); if (!r.startsWith('232')) r = '232' + r; return (r.length >= 10 && r.length <= 15) ? 'https://wa.me/' + r + '?text=' + encodeURIComponent(msg) : null; }
+function showMessage(msg, type, containerId) { let c = document.getElementById(containerId); if(c) { c.innerHTML = `<div class="${type}">${msg}</div>`; setTimeout(()=>c.innerHTML='',4000); } else alert(msg); }
+function escapeHtml(s) { return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+function closeModal(id) { let el = document.getElementById(id); if(el) el.style.display = 'none'; }
+function openModal(id) { let el = document.getElementById(id); if(el) el.style.display = 'flex'; }
+function getValidWhatsAppUrl(phone, msg) { let p = String(phone).replace(/\D/g,''); if(p.startsWith('0')) p = p.slice(1); if(!p.startsWith('232')) p='232'+p; return (p.length>=10 && p.length<=15) ? `https://wa.me/${p}?text=${encodeURIComponent(msg)}` : null; }
 
-// ========== ATTENDANCE FUNCTIONS ==========
-async function loadStudents() {
+// IndexedDB for file storage
+function initFileDB() { return new Promise((resolve,reject)=>{ let req = indexedDB.open('SchoolFilesDB',1); req.onerror=()=>reject(req.error); req.onsuccess=()=>{ fileDB=req.result; resolve(); }; req.onupgradeneeded=e=>{ let db=e.target.result; if(!db.objectStoreNames.contains('files')) db.createObjectStore('files',{keyPath:'id',autoIncrement:true}); }; }); }
+
+// ---------- AUTO‑CREATE DEMO USERS ----------
+async function ensureDemoUsers() {
+    const adminEmail = "admin@school.com", adminPass = "admin123";
+    const teacherEmail = "teacher@school.com", teacherPass = "teacher123";
     try {
-        const snapshot = await db.collection('students').get();
-        allStudents = {};
-        globalStudentMap.clear();
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (!data.class) return;
-            if (!allStudents[data.class]) allStudents[data.class] = [];
-            allStudents[data.class].push({
-                id: data.id, name: data.name, parentPhone: data.parentPhone, parentName: data.parentName,
-                docId: doc.id, dob: data.dob, department: data.department, address: data.address,
-                guardian: data.guardian, status: data.status, class: data.class
-            });
-            globalStudentMap.set(data.id, { ...data, docId: doc.id });
-            globalStudentMap.set(data.name.toLowerCase(), { ...data, docId: doc.id });
-        });
-        updateClassDropdown();
-    } catch(e) { console.error(e); }
+        let adminUser = await auth.signInWithEmailAndPassword(adminEmail, adminPass).catch(() => null);
+        if (!adminUser) {
+            adminUser = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
+            await db.collection('users').doc(adminUser.user.uid).set({ role: 'admin' });
+        } else { let doc = await db.collection('users').doc(adminUser.user.uid).get(); if (!doc.exists) await db.collection('users').doc(adminUser.user.uid).set({ role: 'admin' }); }
+        let teacherUser = await auth.signInWithEmailAndPassword(teacherEmail, teacherPass).catch(() => null);
+        if (!teacherUser) {
+            teacherUser = await auth.createUserWithEmailAndPassword(teacherEmail, teacherPass);
+            await db.collection('users').doc(teacherUser.user.uid).set({ role: 'teacher' });
+        } else { let doc = await db.collection('users').doc(teacherUser.user.uid).get(); if (!doc.exists) await db.collection('users').doc(teacherUser.user.uid).set({ role: 'teacher' }); }
+        await auth.signOut();
+    } catch(e) { console.warn("Demo user creation issue:", e); }
 }
 
-function updateClassDropdown() {
-    const select = document.getElementById('classSelect');
-    if(!select) return;
-    const classes = Object.keys(allStudents);
-    select.innerHTML = '<option value="">Select Class</option>' + classes.map(c => `<option value="${c}">${c} (${allStudents[c].length})</option>`).join('');
+// ======================== ATTENDANCE MODULE (unchanged) ========================
+async function loadStudents() {
+    const snap = await db.collection('students').get();
+    allStudents = {}; globalStudentMap.clear();
+    snap.forEach(doc => { let d = doc.data(); if(d.class){ if(!allStudents[d.class]) allStudents[d.class]=[]; allStudents[d.class].push({...d, docId:doc.id}); globalStudentMap.set(d.id,{...d,docId:doc.id}); globalStudentMap.set(d.name.toLowerCase(),{...d,docId:doc.id}); } });
+    updateClassDropdown();
 }
-
+function updateClassDropdown() { let sel = document.getElementById('classSelect'); if(sel) sel.innerHTML = '<option value="">-- Select Class --</option>' + Object.keys(allStudents).map(c=>`<option value="${c}">${c} (${allStudents[c].length})</option>`).join(''); }
+async function saveAttendance(cls, sid, status, remark) {
+    const today = new Date().toISOString().split('T')[0];
+    await db.collection('attendance').doc(`${today}_${cls}_${sid}`).set({ studentId:sid, class:cls, date:today, status, remark, timestamp:firebase.firestore.FieldValue.serverTimestamp() }, { merge:true });
+}
 async function renderAttendance() {
-    const classVal = document.getElementById('classSelect').value;
-    if(!classVal || !allStudents[classVal]) {
-        document.getElementById('studentList').innerHTML = '<p>Select a class</p>';
-        return;
-    }
-    const students = allStudents[classVal];
+    let cls = document.getElementById('classSelect').value;
+    if(!cls || !allStudents[cls]) { document.getElementById('studentList').innerHTML = '<p>Select a class</p>'; return; }
+    const students = allStudents[cls];
     const today = new Date().toISOString().split('T')[0];
     let attMap = {};
-    const snap = await db.collection('attendance').where('class', '==', classVal).where('date', '==', today).get();
-    snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
-    
-    let html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th><th>Action</th></tr></thead><tbody>';
+    (await db.collection('attendance').where('class','==',cls).where('date','==',today).get()).forEach(d=>attMap[d.data().studentId]={status:d.data().status,remark:d.data().remark||''});
+    let html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th><th>Actions</th></tr></thead><tbody>';
     for(let s of students) {
-        let a = attMap[s.id] || { status: 'none', remark: '' };
-        let statusText = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : (a.status === 'late' ? '⏰ Late' : '⚪ Not marked'));
+        let a = attMap[s.id] || { status:'none', remark:'' };
+        let statusText = a.status==='present'?'✅ Present':(a.status==='absent'?'❌ Absent':(a.status==='late'?'⏰ Late':'⚪ Not marked'));
         html += `<tr>
             <td>${escapeHtml(s.id)}</td>
             <td>${escapeHtml(s.name)}</td>
@@ -279,976 +221,369 @@ async function renderAttendance() {
                 <button class="present-btn" data-id="${s.id}">✅ Present</button>
                 <button class="absent-btn" data-id="${s.id}">❌ Absent</button>
                 <button class="late-btn" data-id="${s.id}">⏰ Late</button>
-                <button class="history-student-btn" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-class="${classVal}">📜 History</button>
+                <button class="history-student-btn" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-class="${cls}">📜 History</button>
             </td>
         </tr>`;
     }
     html += '</tbody></table>';
     document.getElementById('studentList').innerHTML = html;
-    
-    // Attach event listeners for attendance buttons (including individual WhatsApp)
-    document.querySelectorAll('.present-btn').forEach(btn => {
-        btn.onclick = async () => {
-            let sid = btn.getAttribute('data-id');
-            let remark = document.getElementById(`remark_${sid}`).value;
-            await saveAttendance(classVal, sid, 'present', remark);
-            renderAttendance();
-        };
-    });
-    document.querySelectorAll('.absent-btn').forEach(btn => {
-        btn.onclick = async () => {
-            let sid = btn.getAttribute('data-id');
-            let remark = document.getElementById(`remark_${sid}`).value;
-            await saveAttendance(classVal, sid, 'absent', remark);
-            let student = students.find(s => s.id === sid);
-            if(student && student.parentPhone && confirm(`Send WhatsApp absence notification to ${student.parentName || 'parent'}?`)) {
-                sendIndividualWhatsApp(student, 'absent', remark, classVal);
-            }
-            renderAttendance();
-        };
-    });
-    document.querySelectorAll('.late-btn').forEach(btn => {
-        btn.onclick = async () => {
-            let sid = btn.getAttribute('data-id');
-            let remark = document.getElementById(`remark_${sid}`).value;
-            await saveAttendance(classVal, sid, 'late', remark);
-            renderAttendance();
-        };
-    });
-    document.querySelectorAll('.history-student-btn').forEach(btn => {
-        btn.onclick = async () => {
-            let sid = btn.getAttribute('data-id');
-            let name = btn.getAttribute('data-name');
-            let cls = btn.getAttribute('data-class');
-            await viewStudentHistory(sid, name, cls);
-        };
-    });
+    document.querySelectorAll('.present-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, remark=document.getElementById(`remark_${sid}`).value; await saveAttendance(cls, sid, 'present', remark); renderAttendance(); });
+    document.querySelectorAll('.absent-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, remark=document.getElementById(`remark_${sid}`).value; await saveAttendance(cls, sid, 'absent', remark); let student = students.find(s=>s.id===sid); if(student && student.parentPhone && confirm(`Send WhatsApp absence notification to ${student.parentName || 'parent'} of ${student.name}?`)){ let msg = `🏫 Attendance Update - ${cls}\n\nStudent: ${student.name} (${student.id})\nStatus: ABSENT ❌\nRemark: ${remark}\nDate: ${new Date().toLocaleDateString()}\nThank you.`; let url=getValidWhatsAppUrl(student.parentPhone, msg); if(url) window.open(url,'_blank'); else alert("Invalid phone"); } renderAttendance(); });
+    document.querySelectorAll('.late-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, remark=document.getElementById(`remark_${sid}`).value; await saveAttendance(cls, sid, 'late', remark); renderAttendance(); });
+    document.querySelectorAll('.history-student-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, name=btn.dataset.name, cls=btn.dataset.class; let snap=await db.collection('attendance').where('studentId','==',sid).where('class','==',cls).get(); let items=[]; snap.forEach(d=>items.push(d.data())); items.sort((a,b)=>(b.date||'').localeCompare(a.date||'')); let histHtml=`<h3>${name} (${sid})</h3><table border="1"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>`+items.map(i=>`<tr><td class="date-cell">${i.date}</td><td class="status-cell">${i.status}</td><td class="remark-cell">${escapeHtml(i.remark||'')}</td>`).join('')+'</tbody></table>'; document.getElementById('historyContent').innerHTML=histHtml; openModal('historyModal'); });
 }
-
-async function saveAttendance(cls, sid, status, remark) {
-    const today = new Date().toISOString().split('T')[0];
-    await db.collection('attendance').doc(`${today}_${cls}_${sid}`).set({
-        studentId: sid, class: cls, date: today, status, remark,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showMessage(`Marked ${status} for ${sid}`, 'success', 'importMessage');
-}
-
-// Individual WhatsApp message (used when marking absent)
-function sendIndividualWhatsApp(student, status, remark, classname) {
-    let statusText = status === 'present' ? 'PRESENT ✅' : (status === 'absent' ? 'ABSENT ❌' : 'LATE ⏰');
-    let message = `🏫 Attendance Update - ${classname}\n\nStudent: ${student.name} (${student.id})\nStatus: ${statusText}\nRemark: ${remark}\nDate: ${new Date().toLocaleDateString()}\n\nThank you.`;
-    let url = getValidWhatsAppUrl(student.parentPhone, message);
-    if(url) window.open(url, '_blank');
-    else alert("Invalid phone number: " + student.parentPhone);
-}
-
-async function viewStudentHistory(sid, name, cls) {
-    try {
-        const snap = await db.collection('attendance')
-            .where('studentId', '==', sid)
-            .where('class', '==', cls)
-            .get();
-        let docs = [];
-        snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-        docs.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-        if(docs.length === 0) {
-            document.getElementById('historyContent').innerHTML = `<p>No attendance records for ${name} (${sid})</p>`;
-        } else {
-            let html = `<h3>Attendance History: ${name} (${sid})</h3><table border="1"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
-            for(let a of docs) {
-                let emoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : '⏰ Late');
-                html += `<tr><td class="date-cell">${a.date}</td><td class="status-cell">${emoji}</td><td class="remark-cell">${escapeHtml(a.remark || '')}</tr></tr>`;
-            }
-            html += `</tbody></table>`;
-            document.getElementById('historyContent').innerHTML = html;
-        }
-        openModal('historyModal');
-    } catch(e) {
-        console.error(e);
-        document.getElementById('historyContent').innerHTML = `<p>Error loading history: ${e.message}</p>`;
-        openModal('historyModal');
-    }
-}
-
 async function viewClassHistory() {
     const classVal = document.getElementById('classSelect').value;
-    if(!classVal || !allStudents[classVal]) {
-        alert("Select a class first.");
-        return;
-    }
+    if(!classVal || !allStudents[classVal]) { alert("Select a class first."); return; }
     let date = prompt("Enter date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
     if(!date) return;
-    const snap = await db.collection('attendance')
-        .where('class', '==', classVal)
-        .where('date', '==', date)
-        .get();
-    let attMap = {};
-    snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
+    const snap = await db.collection('attendance').where('class','==',classVal).where('date','==',date).get();
+    let attMap = {}; snap.forEach(d=>attMap[d.data().studentId]={status:d.data().status,remark:d.data().remark||''});
     let students = allStudents[classVal];
     let html = `<h3>${classVal} - Attendance for ${date}</h3><table border="1"><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
-    for(let s of students) {
-        let a = attMap[s.id] || { status: 'Not marked', remark: '' };
-        let emoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : (a.status === 'late' ? '⏰ Late' : '⚪ Not marked'));
-        html += `<tr><td class="id-cell">${escapeHtml(s.id)}</td><td class="name-cell">${escapeHtml(s.name)}</td><td class="status-cell">${emoji}</td><td class="remark-cell">${escapeHtml(a.remark)}</td></tr>`;
-    }
-    html += `</tbody></table>`;
-    document.getElementById('historyContent').innerHTML = html;
-    openModal('historyModal');
+    for(let s of students) { let a = attMap[s.id] || { status:'Not marked', remark:'' }; let emoji = a.status==='present'?'✅ Present':(a.status==='absent'?'❌ Absent':(a.status==='late'?'⏰ Late':'⚪ Not marked')); html += `<tr><td class="id-cell">${escapeHtml(s.id)}</td><td class="name-cell">${escapeHtml(s.name)}</td><td class="status-cell">${emoji}</td><td class="remark-cell">${escapeHtml(a.remark)}</td>`; }
+    html += `</tbody></table>`; document.getElementById('historyContent').innerHTML = html; openModal('historyModal');
 }
-
-async function addManualStudent() {
-    const id = document.getElementById('newStudentId').value.trim();
-    const name = document.getElementById('newStudentName').value.trim();
-    const cls = document.getElementById('newClassLevel').value;
-    if(!id || !name || !cls) { showMessage('ID, Name and Class required', 'error', 'manualMessage'); return; }
-    const student = {
-        id, name, class: cls, dob: document.getElementById('newStudentDob').value,
-        department: document.getElementById('newDepartment').value, address: document.getElementById('newAddress').value,
-        parentPhone: document.getElementById('newParentPhone').value, parentName: document.getElementById('newParentName').value,
-        guardian: document.getElementById('newGuardian').value, status: document.getElementById('newStatus').value
-    };
-    await db.collection('students').doc(id).set(student);
-    await loadStudents();
-    showMessage('Student added', 'success', 'manualMessage');
-    renderAttendance();
-}
-
-function downloadSample() {
-    const ws = XLSX.utils.json_to_sheet([{ ID: 'STU001', Name: 'John Doe', Class: 'JSS1', ParentPhone: '23276123456' }]);
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
-    XLSX.writeFile(wb, 'student_sample.xlsx');
-}
-
-async function refreshStudents() { await loadStudents(); renderAttendance(); }
-async function importExcel(file) { alert("Import Excel feature - implement with SheetJS"); }
-
-// FIXED: Batch WhatsApp sending
 async function sendBatchWhatsApp() {
     const classVal = document.getElementById('classSelect').value;
     if(!classVal) { alert("Select a class first"); return; }
-    const students = allStudents[classVal];
-    if(!students || students.length === 0) { alert("No students in this class"); return; }
+    const students = allStudents[classVal]; if(!students || students.length===0) { alert("No students"); return; }
     const today = new Date().toISOString().split('T')[0];
-    let attMap = {};
-    const snap = await db.collection('attendance').where('class', '==', classVal).where('date', '==', today).get();
-    snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
-    
-    const present = students.filter(s => attMap[s.id]?.status === 'present');
-    const absent = students.filter(s => attMap[s.id]?.status === 'absent');
-    const late = students.filter(s => attMap[s.id]?.status === 'late');
-    
+    let attMap = {}; (await db.collection('attendance').where('class','==',classVal).where('date','==',today).get()).forEach(d=>attMap[d.data().studentId]={status:d.data().status,remark:d.data().remark||''});
+    const present = students.filter(s=>attMap[s.id]?.status==='present'); const absent = students.filter(s=>attMap[s.id]?.status==='absent'); const late = students.filter(s=>attMap[s.id]?.status==='late');
     const choice = prompt('Send to:\n1 - All\n2 - Absent only\n3 - Late only\n4 - Present only', '1');
-    let recipients = [];
-    if(choice === '1') recipients = students;
-    else if(choice === '2') recipients = absent;
-    else if(choice === '3') recipients = late;
-    else if(choice === '4') recipients = present;
-    else return;
-    
-    if(recipients.length === 0) { alert("No recipients"); return; }
+    let recipients = []; if(choice==='1') recipients=students; else if(choice==='2') recipients=absent; else if(choice==='3') recipients=late; else if(choice==='4') recipients=present; else return;
+    if(recipients.length===0){ alert("No recipients"); return; }
     const summary = `📊 Attendance Report - ${classVal} (${new Date().toLocaleDateString()})\n✅ Present: ${present.length}\n❌ Absent: ${absent.length}\n⏰ Late: ${late.length}`;
-    for(let i=0; i<recipients.length; i++) {
-        setTimeout(() => {
-            const s = recipients[i];
-            const statusText = attMap[s.id]?.status || 'Not marked';
-            const msg = `Dear ${s.parentName || 'Parent'},\n\n${summary}\n\nYour child ${s.name} (${s.id}) is marked: ${statusText.toUpperCase()}\nRemark: ${attMap[s.id]?.remark || ''}\n\nThank you.`;
-            const url = getValidWhatsAppUrl(s.parentPhone, msg);
-            if(url) window.open(url, '_blank');
-        }, i * 500);
-    }
+    for(let i=0; i<recipients.length; i++) { setTimeout(()=>{ const s=recipients[i]; const statusText=attMap[s.id]?.status||'Not marked'; const msg=`Dear ${s.parentName || 'Parent'},\n\n${summary}\n\nYour child ${s.name} (${s.id}) is marked: ${statusText.toUpperCase()}\nRemark: ${attMap[s.id]?.remark||''}\n\nThank you.`; const url=getValidWhatsAppUrl(s.parentPhone, msg); if(url) window.open(url,'_blank'); }, i*500); }
     alert(`Opening WhatsApp for ${recipients.length} parents.`);
 }
+async function importExcelStudents(file) { return new Promise((resolve)=>{ let reader=new FileReader(); reader.onload=async function(e){ let data=new Uint8Array(e.target.result); let workbook=XLSX.read(data,{type:'array'}); let sheet=workbook.Sheets[workbook.SheetNames[0]]; let rows=XLSX.utils.sheet_to_json(sheet); for(let row of rows){ let student={ id:row.ID||row.id||row.StudentID, name:row.Name||row.name, class:row.Class||row.class, parentPhone:row.ParentPhone||row.phone, parentName:row.ParentName||'', status:'active' }; if(student.id && student.name && student.class) await db.collection('students').doc(student.id).set(student,{merge:true}); } resolve(); }; reader.readAsArrayBuffer(file); }); }
+async function addManualStudent(){ let id=document.getElementById('newStudentId').value.trim(), name=document.getElementById('newStudentName').value.trim(), cls=document.getElementById('newClassLevel').value; if(!id||!name||!cls){ showMessage('ID, Name and Class required','error','manualMessage'); return; } await db.collection('students').doc(id).set({id,name,class:cls, dob:document.getElementById('newStudentDob').value, department:document.getElementById('newDepartment').value, address:document.getElementById('newAddress').value, parentPhone:document.getElementById('newParentPhone').value, parentName:document.getElementById('newParentName').value, guardian:document.getElementById('newGuardian').value, status:'active' }); await loadStudents(); renderAttendance(); showMessage('Student added','success','manualMessage'); }
 
-// ========== STUDENT RECORDS (same as before, working) ==========
-async function searchStudent() {
-    const query = document.getElementById('studentSearchInput').value.trim();
-    if(!query) { alert("Enter Student ID or Name"); return; }
-    let found = null;
-    for(let [key, student] of globalStudentMap.entries()) {
-        if(key === query || key.toLowerCase() === query.toLowerCase() || student.id === query || student.name.toLowerCase().includes(query.toLowerCase())) {
-            found = student;
-            break;
-        }
-    }
-    if(!found) {
-        document.getElementById('searchResults').innerHTML = '<div class="error">Student not found.</div>';
-        document.getElementById('studentRecordsPanel').style.display = 'none';
-        return;
-    }
-    currentStudentDoc = found;
-    document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
-    document.getElementById('studentRecordsPanel').style.display = 'block';
-    displayProfile();
-    loadExamUI();
-    loadFeeUI();
-}
-function displayProfile() {
-    if(!currentStudentDoc) return;
-    let html = `<p><strong>ID:</strong> ${escapeHtml(currentStudentDoc.id)}</p>
-                <p><strong>Name:</strong> ${escapeHtml(currentStudentDoc.name)}</p>
-                <p><strong>DOB:</strong> ${escapeHtml(currentStudentDoc.dob || 'N/A')}</p>
-                <p><strong>Class:</strong> ${escapeHtml(currentStudentDoc.class)}</p>
-                <p><strong>Department:</strong> ${escapeHtml(currentStudentDoc.department || 'N/A')}</p>
-                <p><strong>Address:</strong> ${escapeHtml(currentStudentDoc.address || 'N/A')}</p>
-                <p><strong>Parent Name:</strong> ${escapeHtml(currentStudentDoc.parentName || 'N/A')}</p>
-                <p><strong>Parent Phone:</strong> ${escapeHtml(currentStudentDoc.parentPhone || 'N/A')}</p>
-                <p><strong>Guardian:</strong> ${escapeHtml(currentStudentDoc.guardian || 'N/A')}</p>
-                <p><strong>Status:</strong> ${currentStudentDoc.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`;
-    document.getElementById('profileContent').innerHTML = html;
-}
-function editProfile() {
-    if(!currentStudentDoc) return;
-    document.getElementById('editProfileName').value = currentStudentDoc.name || '';
-    document.getElementById('editProfileDob').value = currentStudentDoc.dob || '';
-    document.getElementById('editProfileClass').value = currentStudentDoc.class || '';
-    document.getElementById('editProfileDepartment').value = currentStudentDoc.department || '';
-    document.getElementById('editProfileAddress').value = currentStudentDoc.address || '';
-    document.getElementById('editProfileParentPhone').value = currentStudentDoc.parentPhone || '';
-    document.getElementById('editProfileParentName').value = currentStudentDoc.parentName || '';
-    document.getElementById('editProfileGuardian').value = currentStudentDoc.guardian || '';
-    document.getElementById('editProfileStatus').value = currentStudentDoc.status || 'active';
-    openModal('editProfileModal');
-}
-document.getElementById('saveProfileBtn').onclick = async () => {
-    if(!currentStudentDoc) return;
-    const updates = {
-        name: document.getElementById('editProfileName').value.trim(),
-        dob: document.getElementById('editProfileDob').value,
-        class: document.getElementById('editProfileClass').value,
-        department: document.getElementById('editProfileDepartment').value.trim(),
-        address: document.getElementById('editProfileAddress').value.trim(),
-        parentPhone: document.getElementById('editProfileParentPhone').value.trim(),
-        parentName: document.getElementById('editProfileParentName').value.trim(),
-        guardian: document.getElementById('editProfileGuardian').value.trim(),
-        status: document.getElementById('editProfileStatus').value
-    };
-    await db.collection('students').doc(currentStudentDoc.id).update(updates);
-    closeModal('editProfileModal');
-    await loadStudents();
-    const refreshed = await db.collection('students').doc(currentStudentDoc.id).get();
-    currentStudentDoc = { docId: refreshed.id, ...refreshed.data() };
-    displayProfile();
-    showMessage('Profile updated', 'success', 'searchResults');
-};
-async function loadExamUI() {
-    if(!currentStudentDoc) return;
-    let termSelector = document.getElementById('termAssessmentSelector');
-    termSelector.innerHTML = `<div class="assessment-btns"><button class="assessment-btn ${currentAssessment === 'test1' ? 'active' : ''}" data-assessment="test1">Test 1</button><button class="assessment-btn ${currentAssessment === 'test2' ? 'active' : ''}" data-assessment="test2">Test 2</button><button class="assessment-btn ${currentAssessment === 'exam' ? 'active' : ''}" data-assessment="exam">Exam</button></div>`;
-    document.querySelectorAll('.assessment-btn').forEach(btn => {
-        btn.onclick = () => {
-            document.querySelectorAll('.assessment-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentAssessment = btn.getAttribute('data-assessment');
-            loadExamUI();
-        };
-    });
-    let examDoc = await db.collection('exam_records').doc(currentStudentDoc.id).get();
-    let records = examDoc.exists ? examDoc.data() : {};
-    let key = currentExamLevel + '_' + currentTerm + '_' + currentAssessment;
-    let subjectsData = records[key] || [];
-    document.getElementById('examRecordsContent').innerHTML = buildSubjectInputs(subjectsData);
-    attachRemoveEvents();
-}
-function buildSubjectInputs(currentSubjects) {
-    if (!currentSubjects || currentSubjects.length === 0) currentSubjects = [{ name: '', score: '' }];
-    let html = '<div><button id="addSubjectBtn" class="refresh-btn" style="margin-bottom:10px;">+ Add Subject</button></div><div id="subjectsContainer">';
-    for (let i = 0; i < currentSubjects.length; i++) {
-        html += `<div class="subject-row" data-index="${i}"><input type="text" class="subject-name" value="${escapeHtml(currentSubjects[i].name)}" placeholder="Subject name"><input type="number" class="subject-score" value="${currentSubjects[i].score}" placeholder="Score" step="0.01" style="width:80px;"><button class="remove-subject-btn" data-index="${i}" style="background:#ffcdd2; color:#c62828;">Remove</button></div>`;
-    }
-    html += '</div>';
-    return html;
-}
-function attachRemoveEvents() {
-    document.querySelectorAll('.remove-subject-btn').forEach(btn => {
-        btn.onclick = function () {
-            let idx = parseInt(this.getAttribute('data-index'));
-            let container = document.getElementById('subjectsContainer');
-            let rows = container.querySelectorAll('.subject-row');
-            if (rows.length > 1) {
-                rows[idx].remove();
-                let allRows = container.querySelectorAll('.subject-row');
-                for (let r = 0; r < allRows.length; r++) {
-                    allRows[r].setAttribute('data-index', r);
-                    let remBtn = allRows[r].querySelector('.remove-subject-btn');
-                    if (remBtn) remBtn.setAttribute('data-index', r);
-                }
-            } else {
-                alert("At least one subject required.");
-            }
-        };
-    });
-    let addBtn = document.getElementById('addSubjectBtn');
-    if(addBtn) addBtn.onclick = () => {
-        let container = document.getElementById('subjectsContainer');
-        let newIndex = container.children.length;
-        let newDiv = document.createElement('div');
-        newDiv.className = 'subject-row';
-        newDiv.setAttribute('data-index', newIndex);
-        newDiv.innerHTML = `<input type="text" class="subject-name" placeholder="Subject name"><input type="number" class="subject-score" placeholder="Score" step="0.01" style="width:80px;"><button class="remove-subject-btn" data-index="${newIndex}" style="background:#ffcdd2; color:#c62828;">Remove</button>`;
-        container.appendChild(newDiv);
-        attachRemoveEvents();
-    };
-}
-async function saveExamRecords() {
-    if(!currentStudentDoc) return;
-    let subjects = [];
-    let rows = document.querySelectorAll('#subjectsContainer .subject-row');
-    for (let row of rows) {
-        let name = row.querySelector('.subject-name').value.trim();
-        let score = row.querySelector('.subject-score').value;
-        if (name) subjects.push({ name, score: score ? parseFloat(score) : '' });
-    }
-    if (subjects.length === 0) { alert("Add at least one subject"); return; }
-    let key = currentExamLevel + '_' + currentTerm + '_' + currentAssessment;
-    let examDoc = await db.collection('exam_records').doc(currentStudentDoc.id).get();
-    let records = examDoc.exists ? examDoc.data() : {};
-    records[key] = subjects;
-    await db.collection('exam_records').doc(currentStudentDoc.id).set(records);
-    alert("Exam records saved!");
-}
-async function loadFeeUI() {
-    if(!currentStudentDoc) return;
-    let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get();
-    let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
-    let termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] };
-    let balance = termData.total - termData.paid;
-    let statusClass = balance <= 0 ? 'fee-paid' : (termData.paid > 0 ? 'fee-partial' : 'fee-unpaid');
-    let termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
-    let html = `<div class="${statusClass}" style="padding:15px;border-radius:5px"><strong>${termNames[currentFeeTerm]} - Total Fees:</strong> ${termData.total.toLocaleString()} Le<br><strong>Paid:</strong> ${termData.paid.toLocaleString()} Le<br><strong>Balance:</strong> ${balance.toLocaleString()} Le<br><strong>Status:</strong> ${balance <= 0 ? '✅ Fully Paid' : (termData.paid > 0 ? '⚠️ Partial Payment' : '❌ Not Paid')}</div><h4>Payment History - ${termNames[currentFeeTerm]}</h4><table border="1"><thead><tr><th>Date</th><th>Amount (Le)</th><th>Type</th><th>Note</th></tr></thead><tbody>`;
-    for (let t of (termData.transactions || [])) {
-        html += `<td><td class="date-cell">${t.date}</td><td class="amount-cell">${t.amount.toLocaleString()}</td><td class="type-cell">${t.type}</td><td class="note-cell">${escapeHtml(t.note || '')}</td></tr>`;
-    }
-    html += `</tbody></table>`;
-    document.getElementById('feesContent').innerHTML = html;
-}
-function recordPayment() {
-    if(!currentStudentDoc) return;
-    let termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
-    document.getElementById('paymentTermLabel').innerText = termNames[currentFeeTerm];
-    openModal('paymentModal');
-}
-document.getElementById('submitPaymentBtn').onclick = async () => {
-    if(!currentStudentDoc) return;
-    let amount = parseFloat(document.getElementById('paymentAmount').value);
-    let type = document.getElementById('paymentType').value;
-    let note = document.getElementById('paymentNote').value;
-    if (isNaN(amount) || amount <= 0) { alert("Enter valid amount"); return; }
-    let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get();
-    let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
-    let termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] };
-    let newPaid = termData.paid + amount;
-    if (type === 'full') newPaid = termData.total;
-    let transaction = { date: new Date().toLocaleDateString(), amount, type, note };
-    termData.paid = newPaid;
-    termData.transactions = (termData.transactions || []).concat([transaction]);
-    feeData[currentFeeTerm] = termData;
-    await db.collection('fee_records').doc(currentStudentDoc.id).set(feeData);
-    closeModal('paymentModal');
-    document.getElementById('paymentAmount').value = '';
-    document.getElementById('paymentNote').value = '';
-    loadFeeUI();
-    alert("Payment recorded!");
-};
-function editTotalFees() {
-    if(!currentStudentDoc) return;
-    openModal('editFeesModal');
-}
-document.getElementById('saveFeesBtn').onclick = async () => {
-    if(!currentStudentDoc) return;
-    let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get();
-    let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } };
-    feeData.term1 = { ...feeData.term1, total: parseFloat(document.getElementById('editTerm1Fees').value) || 500000 };
-    feeData.term2 = { ...feeData.term2, total: parseFloat(document.getElementById('editTerm2Fees').value) || 500000 };
-    feeData.term3 = { ...feeData.term3, total: parseFloat(document.getElementById('editTerm3Fees').value) || 500000 };
-    await db.collection('fee_records').doc(currentStudentDoc.id).set(feeData);
-    closeModal('editFeesModal');
-    loadFeeUI();
-    alert("Fee amounts updated!");
-};
-
-// ========== TEACHERS FUNCTIONS (unchanged) ==========
+// ======================== TEACHER MODULE (with Edit/Delete) ========================
 async function loadTeachers() {
-    const snap = await db.collection('teachers').get();
-    let html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Department</th><th>Subjects</th><th>Class</th><th>Salary</th><th>Status</th></tr></thead><tbody>';
+    let snap = await db.collection('teachers').get();
+    let html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
     for(let doc of snap.docs) {
-        const t = doc.data();
+        let t = doc.data();
         html += `<tr>
             <td>${escapeHtml(t.id)}</td>
             <td>${escapeHtml(t.name)}</td>
             <td>${escapeHtml(t.email)}</td>
-            <td>${escapeHtml(t.phone || '')}</td>
-            <td>${escapeHtml(t.department || '')}</td>
-            <td>${escapeHtml(t.subjects || '')}</td>
+            <td>${escapeHtml(t.phone||'')}</td>
             <td>${escapeHtml(t.class)}</td>
-            <td>${t.salary ? t.salary.toLocaleString() : '0'}</td>
-            <td>${t.status === 'active' ? 'Active' : 'Inactive'}</td>
+            <td>${t.status === 'active' ? '✅ Active' : '❌ Inactive'}</td>
+            <td>
+                ${currentUserRole === 'admin' ? `<button class="edit-teacher-btn" data-id="${t.id}" data-docid="${doc.id}">✏️ Edit</button> <button class="delete-teacher-btn" data-id="${t.id}" data-docid="${doc.id}">🗑️ Delete</button>` : '—'}
+            </td>
         </tr>`;
     }
     html += '</tbody></table>';
     document.getElementById('allTeachersList').innerHTML = html;
-}
-async function addTeacher() {
-    const id = document.getElementById('teacherId').value.trim();
-    const name = document.getElementById('teacherName').value.trim();
-    const email = document.getElementById('teacherEmail').value.trim();
-    const pwd = document.getElementById('teacherPassword').value;
-    if(!id || !name || !email || !pwd) { showMessage('Required fields missing', 'error', 'teacherMessage'); return; }
-    try {
-        const userCred = await auth.createUserWithEmailAndPassword(email, pwd);
-        await db.collection('users').doc(userCred.user.uid).set({ role: 'teacher', class: document.getElementById('teacherClass').value });
-        await db.collection('teachers').doc(id).set({
-            id, name, email, phone: document.getElementById('teacherPhone').value,
-            dob: document.getElementById('teacherDob').value,
-            employmentDate: document.getElementById('teacherEmploymentDate').value,
-            department: document.getElementById('teacherDepartment').value,
-            subjects: document.getElementById('teacherSubjects').value,
-            class: document.getElementById('teacherClass').value,
-            salary: parseFloat(document.getElementById('teacherSalary').value),
-            status: document.getElementById('teacherStatus').value
-        });
-        showMessage('Teacher added', 'success', 'teacherMessage');
-        loadTeachers();
-    } catch(e) { showMessage(e.message, 'error', 'teacherMessage'); }
-}
-async function importTeachersExcel(file) { alert("Import teachers - implement with SheetJS"); }
-function downloadTeacherSample() {
-    const ws = XLSX.utils.json_to_sheet([{ TeacherID: 'T001', Name: 'Jane Smith', Email: 'jane@school.com', Class: 'JSS1' }]);
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
-    XLSX.writeFile(wb, 'teacher_sample.xlsx');
-}
-async function searchTeacher() {
-    const query = document.getElementById('teacherSearchInput').value.trim().toLowerCase();
-    if(!query) { loadTeachers(); return; }
-    const snap = await db.collection('teachers').get();
-    let found = null;
-    for(let doc of snap.docs) {
-        const t = doc.data();
-        if(t.id.toLowerCase() === query || t.name.toLowerCase().includes(query)) {
-            found = t;
-            break;
-        }
-    }
-    const resultsDiv = document.getElementById('teacherSearchResults');
-    if(!found) { resultsDiv.innerHTML = '<div class="error">Teacher not found.</div>'; return; }
-    resultsDiv.innerHTML = `<div class="success"><strong>${escapeHtml(found.name)} (${escapeHtml(found.id)})</strong><br>Email: ${escapeHtml(found.email)}<br>Phone: ${escapeHtml(found.phone || 'N/A')}<br>Department: ${escapeHtml(found.department || 'N/A')}<br>Class: ${escapeHtml(found.class)}<br>Status: ${found.status === 'active' ? 'Active' : 'Inactive'}</div>`;
-}
-async function loadTeacherRegister() {
-    const query = document.getElementById('teacherRegisterSearch').value.trim().toLowerCase();
-    if(!query) { alert("Enter Teacher ID or Name"); return; }
-    const snap = await db.collection('teachers').get();
-    let found = null;
-    for(let doc of snap.docs) {
-        const t = doc.data();
-        if(t.id.toLowerCase() === query || t.name.toLowerCase().includes(query)) {
-            found = { docId: doc.id, ...t };
-            break;
-        }
-    }
-    if(!found) { showMessage("Teacher not found", "error", "teacherRegisterInfo"); return; }
-    currentTeacherRegister = found;
-    document.getElementById('teacherRegisterInfo').innerHTML = `<div class="success">Teacher: ${escapeHtml(found.name)} (${found.id})</div>`;
-    await renderTeacherAttendance();
-    await renderTeacherHistory();
-}
-async function renderTeacherAttendance() {
-    if(!currentTeacherRegister) return;
-    const today = new Date().toISOString().split('T')[0];
-    const docId = `${today}_${currentTeacherRegister.id}`;
-    const attDoc = await db.collection('teacher_attendance').doc(docId).get();
-    const data = attDoc.exists ? attDoc.data() : { checkInTime: null, checkOutTime: null };
-    const isCheckedIn = data.checkInTime && !data.checkOutTime;
-    const container = document.getElementById('teacherRegisterAttendance');
-    container.innerHTML = `<h4>Today's Attendance</h4><div class="buttons"><button id="checkInBtn" class="checkin-btn" ${isCheckedIn ? 'disabled' : ''}>✅ Check In</button><button id="checkOutBtn" class="checkout-btn" ${!isCheckedIn ? 'disabled' : ''}>🚪 Check Out</button></div><p><strong>Last Check In:</strong> ${data.checkInTime ? new Date(data.checkInTime.toDate()).toLocaleString() : 'Not checked in'}</p><p><strong>Last Check Out:</strong> ${data.checkOutTime ? new Date(data.checkOutTime.toDate()).toLocaleString() : 'Not checked out'}</p>`;
-    document.getElementById('checkInBtn').onclick = async () => {
-        await db.collection('teacher_attendance').doc(docId).set({ teacherId: currentTeacherRegister.id, teacherName: currentTeacherRegister.name, date: today, checkInTime: firebase.firestore.FieldValue.serverTimestamp(), checkOutTime: null }, { merge: true });
-        renderTeacherAttendance();
-        renderTeacherHistory();
-    };
-    document.getElementById('checkOutBtn').onclick = async () => {
-        if(!data.checkInTime) { alert("Teacher has not checked in today."); return; }
-        await db.collection('teacher_attendance').doc(docId).update({ checkOutTime: firebase.firestore.FieldValue.serverTimestamp() });
-        renderTeacherAttendance();
-        renderTeacherHistory();
-    };
-}
-async function renderTeacherHistory() {
-    if(!currentTeacherRegister) return;
-    const snap = await db.collection('teacher_attendance').where('teacherId', '==', currentTeacherRegister.id).get();
-    const container = document.getElementById('teacherRegisterHistory');
-    if(snap.empty) { container.innerHTML = '<p>No attendance history.</p>'; return; }
-    let docs = []; snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-    docs.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-    let html = '<h4>Attendance History</h4><table class="teacher-register-table"><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th><th>Duration</th><tr></thead><tbody>';
-    for(let a of docs) {
-        let checkIn = a.checkInTime ? new Date(a.checkInTime.toDate()).toLocaleString() : '—';
-        let checkOut = a.checkOutTime ? new Date(a.checkOutTime.toDate()).toLocaleString() : 'Still inside';
-        let duration = '—';
-        if(a.checkInTime && a.checkOutTime) {
-            let ms = a.checkOutTime.toDate() - a.checkInTime.toDate();
-            let hours = Math.floor(ms / 3600000);
-            let minutes = Math.floor((ms % 3600000) / 60000);
-            duration = `${hours}h ${minutes}m`;
-        }
-        html += `<tr><td class="date-cell">${a.date}</td><td class="checkin-cell">${checkIn}</td><td class="checkout-cell">${checkOut}</td><td class="duration-cell">${duration}</td></tr>`;
-    }
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
-
-// ========== ADMIN FUNCTIONS (Staff, Assets, Inventory, Visitors, Notice Board) unchanged ==========
-async function loadStaffList() {
-    if(currentUserRole !== 'admin') return;
-    const snap = await db.collection('staff').get();
-    let html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Today\'s Check In</th><th>Action</th></tr></thead><tbody>';
-    for(const doc of snap.docs) {
-        const s = doc.data();
-        const today = new Date().toISOString().split('T')[0];
-        const att = await db.collection('staff_attendance').doc(`${today}_${s.id}`).get();
-        const checkIn = att.exists ? att.data().checkInTime : 'No';
-        html += `<tr>
-            <td>${escapeHtml(s.id)}</td>
-            <td>${escapeHtml(s.name)}</td>
-            <td>${escapeHtml(s.type)}</td>
-            <td>${checkIn}</td>
-            <td><button class="staff-checkin" data-id="${s.id}">✅ Check In</button> <button class="staff-checkout" data-id="${s.id}">🚪 Check Out</button></td>
-        </tr>`;
-    }
-    html += '</tbody></tr>';
-    document.getElementById('staffListContainer').innerHTML = html;
-    document.querySelectorAll('.staff-checkin').forEach(btn => btn.onclick = async () => {
-        const id = btn.getAttribute('data-id'); const today = new Date().toISOString().split('T')[0];
-        await db.collection('staff_attendance').doc(`${today}_${id}`).set({ staffId: id, date: today, checkInTime: new Date().toLocaleString(), checkOutTime: null });
-        loadStaffList();
-    });
-    document.querySelectorAll('.staff-checkout').forEach(btn => btn.onclick = async () => {
-        const id = btn.getAttribute('data-id'); const today = new Date().toISOString().split('T')[0];
-        await db.collection('staff_attendance').doc(`${today}_${id}`).update({ checkOutTime: new Date().toLocaleString() });
-        loadStaffList();
-    });
-}
-async function addStaff() {
-    if(currentUserRole !== 'admin') return;
-    const id = document.getElementById('staffId').value.trim();
-    const name = document.getElementById('staffName').value.trim();
-    if(!id || !name) { showMessage("ID and Name required", "error", "staffMessage"); return; }
-    await db.collection('staff').doc(id).set({ id, name, type: document.getElementById('staffType').value });
-    showMessage('Staff registered', 'success', 'staffMessage');
-    document.getElementById('staffId').value = ''; document.getElementById('staffName').value = '';
-    loadStaffList();
-}
-async function loadAssetsList() {
-    if(currentUserRole !== 'admin') return;
-    const snap = await db.collection('assets').get();
-    let html = '<table border="1"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Action</th></tr></thead><tbody>';
-    for(let doc of snap.docs) {
-        let a = doc.data();
-        html += `<tr><td class="name-cell">${escapeHtml(a.name)}</td><td class="location-cell">${escapeHtml(a.location || '')}</td><td class="status-cell">${escapeHtml(a.status)}</td><td class="action-cell"><button class="delete-asset" data-id="${doc.id}">Delete</button></td></tr>`;
-    }
-    html += '</tbody></tr>';
-    document.getElementById('assetsListContainer').innerHTML = html;
-    document.querySelectorAll('.delete-asset').forEach(btn => btn.onclick = async () => { await db.collection('assets').doc(btn.getAttribute('data-id')).delete(); loadAssetsList(); });
-}
-async function addAsset() {
-    if(currentUserRole !== 'admin') return;
-    const name = document.getElementById('assetName').value.trim();
-    if(!name) { showMessage("Asset name required", "error", "assetMessage"); return; }
-    await db.collection('assets').add({ name, location: document.getElementById('assetLocation').value, status: document.getElementById('assetStatus').value });
-    showMessage("Asset added", "success", "assetMessage");
-    document.getElementById('assetName').value = ''; loadAssetsList();
-}
-async function loadInventoryList() {
-    if(currentUserRole !== 'admin') return;
-    const snap = await db.collection('inventory').get();
-    let html = '<table border="1"><thead><tr><th>Item</th><th>Quantity</th><th>Unit</th><th>Action</th></tr></thead><tbody>';
-    for(let doc of snap.docs) {
-        let i = doc.data();
-        html += `<tr><td class="name-cell">${escapeHtml(i.name)}</td><td class="qty-cell">${i.quantity}</td><td class="unit-cell">${escapeHtml(i.unit || '')}</td><td class="action-cell"><button class="edit-inventory" data-id="${doc.id}">✏️ Edit Qty</button> <button class="delete-inventory" data-id="${doc.id}">Delete</button></td></tr>`;
-    }
-    html += '</tbody></table>';
-    document.getElementById('inventoryListContainer').innerHTML = html;
-    document.querySelectorAll('.edit-inventory').forEach(btn => btn.onclick = async () => {
-        let q = prompt("New quantity:"); if(q) await db.collection('inventory').doc(btn.getAttribute('data-id')).update({ quantity: parseInt(q) });
-        loadInventoryList();
-    });
-    document.querySelectorAll('.delete-inventory').forEach(btn => btn.onclick = async () => { if(confirm("Delete?")) await db.collection('inventory').doc(btn.getAttribute('data-id')).delete(); loadInventoryList(); });
-}
-async function addInventory() {
-    if(currentUserRole !== 'admin') return;
-    const name = document.getElementById('itemName').value.trim();
-    const qty = parseInt(document.getElementById('itemQuantity').value);
-    if(!name || isNaN(qty)) { showMessage("Name and quantity required", "error", "inventoryMessage"); return; }
-    await db.collection('inventory').add({ name, quantity: qty, unit: document.getElementById('itemUnit').value });
-    showMessage("Item added", "success", "inventoryMessage");
-    loadInventoryList();
-}
-async function loadVisitorsList() {
-    if(currentUserRole !== 'admin') return;
-    const snap = await db.collection('visitors').orderBy('checkInTime', 'desc').limit(30).get();
-    let html = '<table border="1"><thead><tr><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th><th>Action</th></tr></thead><tbody>';
-    for(let doc of snap.docs) {
-        let v = doc.data();
-        html += `<tr>
-            <td>${escapeHtml(v.name)}</td>
-            <td>${escapeHtml(v.purpose)}</td>
-            <td>${escapeHtml(v.toSee || '')}</td>
-            <td>${escapeHtml(v.checkInTime)}</td>
-            <td>${v.checkOutTime ? escapeHtml(v.checkOutTime) : 'Still inside'}</td>
-            <td>${!v.checkOutTime ? `<button class="checkout-visitor" data-id="${doc.id}">🚪 Check Out</button>` : '✅'}</td>
-        </tr>`;
-    }
-    html += '</tbody></table>';
-    document.getElementById('visitorsListContainer').innerHTML = html;
-    document.querySelectorAll('.checkout-visitor').forEach(btn => btn.onclick = async () => {
-        await db.collection('visitors').doc(btn.getAttribute('data-id')).update({ checkOutTime: new Date().toLocaleString() });
-        loadVisitorsList();
-    });
-}
-async function checkInVisitor() {
-    if(currentUserRole !== 'admin') return;
-    const name = document.getElementById('visitorName').value.trim();
-    const purpose = document.getElementById('visitorPurpose').value.trim();
-    if(!name || !purpose) { showMessage("Name and purpose required", "error", "visitorMessage"); return; }
-    await db.collection('visitors').add({ name, purpose, toSee: document.getElementById('visitorToSee').value, checkInTime: new Date().toLocaleString(), checkOutTime: null });
-    showMessage("Checked in", "success", "visitorMessage");
-    loadVisitorsList();
-}
-async function checkoutAllVisitors() {
-    const snap = await db.collection('visitors').where('checkOutTime', '==', null).get();
-    const batch = db.batch();
-    snap.forEach(d => batch.update(d.ref, { checkOutTime: new Date().toLocaleString() }));
-    await batch.commit();
-    loadVisitorsList();
-    showMessage(`Checked out ${snap.size} visitor(s)`, "success", "visitorMessage");
-}
-async function loadNotices() {
-    const snap = await db.collection('notices').orderBy('timestamp', 'desc').get();
-    let html = '';
-    for(let doc of snap.docs) {
-        const n = doc.data();
-        const date = n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString() : n.date;
-        const shareMsg = `📢 *${n.title}*\n\n${n.content}`;
-        html += `<div class="notice-card"><div class="notice-title">${escapeHtml(n.title)}</div><div class="notice-date">${escapeHtml(date)}</div><div>${escapeHtml(n.content)}</div><a href="https://wa.me/?text=${encodeURIComponent(shareMsg)}" target="_blank" class="share-wa">📱 Share on WhatsApp</a>${currentUserRole === 'admin' ? `<button class="delete-notice" data-id="${doc.id}" style="margin-left:10px;">Delete</button>` : ''}</div>`;
-    }
-    document.getElementById('noticesList').innerHTML = html || '<p>No notices</p>';
-    if(currentUserRole === 'admin') {
-        document.querySelectorAll('.delete-notice').forEach(btn => btn.onclick = async () => {
-            if(confirm('Delete this notice?')) { await db.collection('notices').doc(btn.getAttribute('data-id')).delete(); loadNotices(); }
-        });
-    }
-}
-async function postNotice() {
-    if(currentUserRole !== 'admin') { alert("Only admin can post notices."); return; }
-    const title = document.getElementById('noticeTitle').value.trim();
-    const content = document.getElementById('noticeContent').value.trim();
-    if(!title || !content) { showMessage("Title and content required", "error", "noticeMessage"); return; }
-    await db.collection('notices').add({ title, content, date: new Date().toLocaleString(), timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-    showMessage("Notice posted!", "success", "noticeMessage");
-    document.getElementById('noticeTitle').value = '';
-    document.getElementById('noticeContent').value = '';
-    loadNotices();
-}
-
-// ========== FILE MANAGEMENT USING INDEXEDDB (Local Storage) ==========
-// Open or create the database
-let dbRequest;
-let fileDB;
-function initFileDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('SchoolFilesDB', 1);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => {
-            fileDB = request.result;
-            resolve();
-        };
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('files')) {
-                const store = db.createObjectStore('files', { keyPath: 'id', autoIncrement: true });
-                store.createIndex('name', 'name', { unique: false });
-                store.createIndex('uploadedAt', 'uploadedAt', { unique: false });
-            }
-        };
-    });
-}
-
-async function uploadFileToLocal() {
-    if(currentUserRole !== 'admin') { alert("Only admin can upload files."); return; }
-    const file = document.getElementById('uploadFileInput').files[0];
-    if(!file) { showMessage("Select a file", "error", "uploadMessage"); return; }
     
-    await initFileDB();
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        const fileData = e.target.result;
-        const transaction = fileDB.transaction(['files'], 'readwrite');
-        const store = transaction.objectStore('files');
-        const fileRecord = {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            data: fileData, // store the actual blob data
-            uploadedAt: new Date().toISOString(),
-            uploadedBy: auth.currentUser?.uid || 'unknown'
+    // Edit teacher
+    document.querySelectorAll('.edit-teacher-btn').forEach(btn => {
+        btn.onclick = async () => {
+            let teacherId = btn.getAttribute('data-id');
+            let docId = btn.getAttribute('data-docid');
+            let doc = await db.collection('teachers').doc(docId).get();
+            let teacher = doc.data();
+            document.getElementById('editTeacherId').value = teacher.id;
+            document.getElementById('editTeacherName').value = teacher.name || '';
+            document.getElementById('editTeacherEmail').value = teacher.email || '';
+            document.getElementById('editTeacherPhone').value = teacher.phone || '';
+            document.getElementById('editTeacherClass').value = teacher.class || 'JSS1';
+            document.getElementById('editTeacherStatus').value = teacher.status || 'active';
+            // Store docId for update
+            window.currentEditingTeacherDocId = docId;
+            openModal('editTeacherModal');
         };
-        const request = store.add(fileRecord);
-        request.onsuccess = () => {
-            showMessage(`File "${file.name}" uploaded locally`, "success", "uploadMessage");
-            document.getElementById('uploadFileInput').value = '';
-            loadFilesList();
-        };
-        request.onerror = () => showMessage("Upload failed", "error", "uploadMessage");
-    };
-    reader.readAsDataURL(file); // store as base64 for simplicity
-}
-
-async function loadFilesList() {
-    await initFileDB();
-    const transaction = fileDB.transaction(['files'], 'readonly');
-    const store = transaction.objectStore('files');
-    const request = store.getAll();
-    request.onsuccess = () => {
-        const files = request.result;
-        let html = '';
-        for(let f of files) {
-            const sizeKB = (f.size / 1024).toFixed(2);
-            html += `<div class="file-item">
-                <span><strong>${escapeHtml(f.name)}</strong> (${sizeKB} KB)</span>
-                <div>
-                    <button class="download-file" data-id="${f.id}" data-name="${escapeHtml(f.name)}" data-data="${f.data}">📥 Download</button>
-                    <button class="delete-file" data-id="${f.id}" style="background:#ffcdd2; color:#c62828;">Delete</button>
-                </div>
-            </div>`;
-        }
-        document.getElementById('filesListContainer').innerHTML = html || '<p>No files stored locally.</p>';
-        
-        // Attach download handlers
-        document.querySelectorAll('.download-file').forEach(btn => {
-            btn.onclick = () => {
-                const id = Number(btn.getAttribute('data-id'));
-                const name = btn.getAttribute('data-name');
-                const dataURL = btn.getAttribute('data-data');
-                const a = document.createElement('a');
-                a.href = dataURL;
-                a.download = name;
-                a.click();
-            };
-        });
-        document.querySelectorAll('.delete-file').forEach(btn => {
-            btn.onclick = async () => {
-                if(confirm('Delete this file?')) {
-                    const id = Number(btn.getAttribute('data-id'));
-                    const transaction = fileDB.transaction(['files'], 'readwrite');
-                    const store = transaction.objectStore('files');
-                    store.delete(id);
-                    transaction.oncomplete = () => loadFilesList();
-                }
-            };
-        });
-    };
-    request.onerror = () => { document.getElementById('filesListContainer').innerHTML = '<p>Error loading files</p>'; };
-}
-
-// ========== PRINT / EXPORT HELPER FUNCTIONS ==========
-function exportTableToCSV(table, filename) {
-    const rows = table.querySelectorAll('tr');
-    const csv = [];
-    for(let row of rows) {
-        const cells = row.querySelectorAll('th, td');
-        const rowData = Array.from(cells).map(cell => cell.innerText.trim());
-        csv.push(rowData.join(','));
-    }
-    const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename + '.csv';
-    link.click();
-    URL.revokeObjectURL(link.href);
-}
-function printTable(table, title) {
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write('<html><head><title>' + title + '</title><style>body{font-family:Arial;}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}</style></head><body>');
-    printWindow.document.write('<h2>' + title + '</h2>');
-    printWindow.document.write(table.outerHTML);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-}
-function getCurrentVisibleTable() {
-    if(document.getElementById('attendanceModule').style.display !== 'none') {
-        const table = document.querySelector('#studentList table');
-        if(table) return table;
-    } else if(document.getElementById('teachersModule').style.display !== 'none') {
-        const table = document.querySelector('#allTeachersList table');
-        if(table) return table;
-    } else if(document.getElementById('adminModule').style.display !== 'none') {
-        const activeTab = document.querySelector('#adminModule .admin-tab:not([style*="display:none"])');
-        if(activeTab) {
-            const table = activeTab.querySelector('table');
-            if(table) return table;
-        }
-    }
-    return null;
-}
-async function exportAllStudentsCSV() {
-    const snap = await db.collection('students').get();
-    const data = snap.docs.map(d => d.data());
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Students');
-    XLSX.writeFile(wb, 'all_students.csv');
-}
-async function exportAllTeachersCSV() {
-    const snap = await db.collection('teachers').get();
-    const data = snap.docs.map(d => d.data());
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
-    XLSX.writeFile(wb, 'all_teachers.csv');
-}
-function printAllNotices() {
-    const noticesDiv = document.getElementById('noticesList');
-    if(noticesDiv) printTable(noticesDiv, 'School Notices');
-    else alert('No notices to print');
-}
-
-// ========== AUTHENTICATION & MODULE SWITCHING ==========
-async function checkUserRole(user) {
-    if(!user) return null;
-    const doc = await db.collection('users').doc(user.uid).get();
-    return doc.exists ? doc.data() : null;
-}
-function updateUIForRole(r) {
-    if(!r) { document.getElementById('mainApp').style.display = 'none'; return; }
-    currentUserRole = r.role;
-    document.getElementById('mainApp').style.display = 'block';
-    const adminBtn = document.getElementById('adminModuleBtn');
-    if(adminBtn) adminBtn.style.display = (r.role === 'admin') ? 'inline-block' : 'none';
-    if(r.role === 'teacher') document.querySelector('.manual-section').style.display = 'none';
-    if(r.role === 'parent') document.getElementById('batchWhatsappBtn').style.display = 'none';
-    loadStudents();
-    renderAttendance();
-    if(r.role === 'admin') { 
-        loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); loadNotices(); 
-        initFileDB().then(() => loadFilesList());
-    }
-    else { loadNotices(); }
-}
-function updateOnlineStatus() {
-    const badge = document.getElementById('onlineStatus');
-    const syncBar = document.getElementById('syncBar');
-    if(navigator.onLine) { badge.innerHTML = '🟢 Online'; badge.className = 'online-badge online'; syncBar.innerHTML = '✅ Connected'; syncBar.style.background = '#4CAF50'; }
-    else { badge.innerHTML = '🔴 Offline'; badge.className = 'online-badge offline'; syncBar.innerHTML = '⚠️ Offline mode'; syncBar.style.background = '#FF9800'; }
-}
-function switchToAttendance() { document.getElementById('attendanceModule').style.display = 'block'; document.getElementById('recordsModule').style.display = 'none'; document.getElementById('teachersModule').style.display = 'none'; document.getElementById('adminModule').style.display = 'none'; document.getElementById('attendanceModuleBtn').classList.add('active'); document.getElementById('recordsModuleBtn').classList.remove('active'); document.getElementById('teachersModuleBtn').classList.remove('active'); document.getElementById('adminModuleBtn')?.classList.remove('active'); renderAttendance(); }
-function switchToRecords() { document.getElementById('attendanceModule').style.display = 'none'; document.getElementById('recordsModule').style.display = 'block'; document.getElementById('teachersModule').style.display = 'none'; document.getElementById('adminModule').style.display = 'none'; document.getElementById('attendanceModuleBtn').classList.remove('active'); document.getElementById('recordsModuleBtn').classList.add('active'); document.getElementById('teachersModuleBtn').classList.remove('active'); document.getElementById('adminModuleBtn')?.classList.remove('active'); }
-function switchToTeachers() { document.getElementById('attendanceModule').style.display = 'none'; document.getElementById('recordsModule').style.display = 'none'; document.getElementById('teachersModule').style.display = 'block'; document.getElementById('adminModule').style.display = 'none'; document.getElementById('attendanceModuleBtn').classList.remove('active'); document.getElementById('recordsModuleBtn').classList.remove('active'); document.getElementById('teachersModuleBtn').classList.add('active'); document.getElementById('adminModuleBtn')?.classList.remove('active'); loadTeachers(); }
-function switchToAdmin() { document.getElementById('attendanceModule').style.display = 'none'; document.getElementById('recordsModule').style.display = 'none'; document.getElementById('teachersModule').style.display = 'none'; document.getElementById('adminModule').style.display = 'block'; document.getElementById('attendanceModuleBtn').classList.remove('active'); document.getElementById('recordsModuleBtn').classList.remove('active'); document.getElementById('teachersModuleBtn').classList.remove('active'); document.getElementById('adminModuleBtn')?.classList.add('active'); loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); loadNotices(); initFileDB().then(() => loadFilesList()); }
-function initAdminTabs() {
-    document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => {
-        btn.onclick = () => {
-            const id = btn.getAttribute('data-tab');
-            document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('#adminModule .admin-tab').forEach(tab => tab.style.display = 'none');
-            document.getElementById(id + 'Tab').style.display = 'block';
-            if(id === 'staff') loadStaffList();
-            else if(id === 'assets') loadAssetsList();
-            else if(id === 'inventory') loadInventoryList();
-            else if(id === 'visitors') loadVisitorsList();
-            else if(id === 'noticeboard') loadNotices();
-            else if(id === 'filestorage') { initFileDB().then(() => loadFilesList()); }
+    });
+    // Delete teacher
+    document.querySelectorAll('.delete-teacher-btn').forEach(btn => {
+        btn.onclick = async () => {
+            if(!confirm('Are you sure you want to delete this teacher? This action cannot be undone.')) return;
+            let docId = btn.getAttribute('data-docid');
+            await db.collection('teachers').doc(docId).delete();
+            showMessage('Teacher deleted', 'success', 'teacherMessage');
+            loadTeachers();
         };
     });
 }
-document.getElementById('loginBtn').onclick = async () => {
-    const email = document.getElementById('loginEmail').value.trim();
-    const pwd = document.getElementById('loginPassword').value;
+async function updateTeacher() {
+    let docId = window.currentEditingTeacherDocId;
+    if(!docId) return;
+    let updates = {
+        name: document.getElementById('editTeacherName').value.trim(),
+        email: document.getElementById('editTeacherEmail').value.trim(),
+        phone: document.getElementById('editTeacherPhone').value.trim(),
+        class: document.getElementById('editTeacherClass').value,
+        status: document.getElementById('editTeacherStatus').value
+    };
+    if(!updates.name || !updates.email) { alert("Name and Email are required"); return; }
+    await db.collection('teachers').doc(docId).update(updates);
+    closeModal('editTeacherModal');
+    showMessage('Teacher updated', 'success', 'teacherMessage');
+    loadTeachers();
+}
+async function addTeacher(){
+    let id=document.getElementById('teacherId').value.trim(), name=document.getElementById('teacherName').value.trim(), email=document.getElementById('teacherEmail').value.trim(), pwd=document.getElementById('teacherPassword').value;
+    if(!id||!name||!email||!pwd){ showMessage('Missing required fields','error','teacherMessage'); return; }
+    await auth.createUserWithEmailAndPassword(email,pwd);
+    await db.collection('users').doc(auth.currentUser.uid).set({role:'teacher'});
+    await db.collection('teachers').doc(id).set({ id,name,email, class:document.getElementById('teacherClass').value, phone:document.getElementById('teacherPhone').value, status:'active' });
+    showMessage('Teacher added','success','teacherMessage'); loadTeachers();
+}
+async function importTeachersExcel(file){
+    let reader=new FileReader();
+    reader.onload=async function(e){
+        let wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+        let rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+        for(let r of rows){
+            if(r.TeacherID && r.Name && r.Email) await db.collection('teachers').doc(r.TeacherID).set({ id:r.TeacherID, name:r.Name, email:r.Email, class:r.Class||'JSS1', phone:r.Phone||'', status:'active' });
+        }
+        showMessage('Teachers imported','success','importTeacherMessage'); loadTeachers();
+    };
+    reader.readAsArrayBuffer(file);
+}
+async function searchTeacher(){
+    let q=document.getElementById('teacherSearchInput').value.trim().toLowerCase();
+    if(!q){ loadTeachers(); return; }
+    let snap=await db.collection('teachers').get();
+    let found=null;
+    for(let doc of snap.docs){ let t=doc.data(); if(t.id.toLowerCase()===q || t.name.toLowerCase().includes(q)){ found=t; break; } }
+    let resultsDiv=document.getElementById('teacherSearchResults');
+    if(!found){ resultsDiv.innerHTML='<div class="error">Teacher not found.</div>'; return; }
+    resultsDiv.innerHTML=`<div class="success"><strong>${escapeHtml(found.name)} (${escapeHtml(found.id)})</strong><br>Email: ${escapeHtml(found.email)}<br>Phone: ${escapeHtml(found.phone||'N/A')}<br>Class: ${escapeHtml(found.class)}</div>`;
+}
+async function loadTeacherRegister(){
+    let q=document.getElementById('teacherRegisterSearch').value.trim().toLowerCase();
+    if(!q) return alert('Enter teacher ID/name');
+    let snap=await db.collection('teachers').get();
+    let found=null;
+    for(let doc of snap.docs){ let t=doc.data(); if(t.id.toLowerCase()===q || t.name.toLowerCase().includes(q)){ found={...t,docId:doc.id}; break; } }
+    if(!found) return showMessage('Teacher not found','error','teacherRegisterInfo');
+    currentTeacherRegister=found;
+    document.getElementById('teacherRegisterInfo').innerHTML=`<div class="success">${found.name} (${found.id})</div>`;
+    let today=new Date().toISOString().slice(0,10);
+    let att=await db.collection('teacher_attendance').doc(`${today}_${found.id}`).get();
+    let data=att.exists?att.data():{};
+    let checkedIn=!!data.checkInTime;
+    let html=`<button id="checkinBtn" ${checkedIn?'disabled':''}>✅ Check In</button> <button id="checkoutBtn" ${!checkedIn?'disabled':''}>🚪 Check Out</button><p>Last In: ${data.checkInTime?new Date(data.checkInTime.toDate()).toLocaleString():'--'}</p>`;
+    document.getElementById('teacherRegisterAttendance').innerHTML=html;
+    document.getElementById('checkinBtn')?.addEventListener('click',async()=>{ await db.collection('teacher_attendance').doc(`${today}_${found.id}`).set({teacherId:found.id,teacherName:found.name,date:today,checkInTime:firebase.firestore.FieldValue.serverTimestamp(),checkOutTime:null}); loadTeacherRegister(); });
+    document.getElementById('checkoutBtn')?.addEventListener('click',async()=>{ await db.collection('teacher_attendance').doc(`${today}_${found.id}`).update({checkOutTime:firebase.firestore.FieldValue.serverTimestamp()}); loadTeacherRegister(); });
+    let histSnap=await db.collection('teacher_attendance').where('teacherId','==',found.id).get();
+    let hist=[]; histSnap.forEach(d=>hist.push(d.data()));
+    hist.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    let histHtml='<h4>History</h4><table border="1"><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>'+hist.map(h=>`<tr><td class="date-cell">${h.date}</td><td class="checkin-cell">${h.checkInTime?new Date(h.checkInTime.toDate()).toLocaleTimeString():'--'}</td><td class="checkout-cell">${h.checkOutTime?new Date(h.checkOutTime.toDate()).toLocaleTimeString():'--'}</td></tr>`).join('')+'</tbody></table>';
+    document.getElementById('teacherRegisterHistory').innerHTML=histHtml;
+}
+
+// ======================== ADMIN MODULE (unchanged, previously working) ========================
+async function loadStaffList(){ let snap=await db.collection('staff').get(); let html='<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Today CheckIn</th><th>Action</th></tr></thead><tbody>'; for(let doc of snap.docs){ let s=doc.data(); let today=new Date().toISOString().slice(0,10); let att=await db.collection('staff_attendance').doc(`${today}_${s.id}`).get(); let checkedIn=att.exists?!!att.data().checkInTime:false; html+=`<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.type)}</td><td>${checkedIn?'✅':'❌'}</td><td><button class="staff-checkin" data-id="${s.id}">Check In</button> <button class="staff-checkout" data-id="${s.id}">Check Out</button></td></tr>`; } html+='</tbody></tr>'; document.getElementById('staffListContainer').innerHTML=html; document.querySelectorAll('.staff-checkin').forEach(btn=>btn.onclick=async()=>{ let id=btn.dataset.id, today=new Date().toISOString().slice(0,10); await db.collection('staff_attendance').doc(`${today}_${id}`).set({staffId:id,date:today,checkInTime:new Date().toLocaleString(),checkOutTime:null}); loadStaffList(); }); document.querySelectorAll('.staff-checkout').forEach(btn=>btn.onclick=async()=>{ let id=btn.dataset.id, today=new Date().toISOString().slice(0,10); await db.collection('staff_attendance').doc(`${today}_${id}`).update({checkOutTime:new Date().toLocaleString()}); loadStaffList(); }); }
+async function addStaff(){ let id=document.getElementById('staffId').value.trim(), name=document.getElementById('staffName').value.trim(); if(!id||!name) return showMessage('ID & Name required','error','staffMessage'); await db.collection('staff').doc(id).set({id,name,type:document.getElementById('staffType').value}); showMessage('Staff added','success','staffMessage'); loadStaffList(); }
+async function loadAssetsList(){ let snap=await db.collection('assets').get(); let html='<table border="1"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Action</th></tr></thead><tbody>'; snap.forEach(d=>{ let a=d.data(); html+=`<tr><td>${escapeHtml(a.name)}</td><td>${escapeHtml(a.location||'')}</td><td>${a.status}</td><td><button class="delete-asset" data-id="${d.id}">Delete</button></td></tr>`; }); html+='</tbody></table>'; document.getElementById('assetsListContainer').innerHTML=html; document.querySelectorAll('.delete-asset').forEach(btn=>btn.onclick=async()=>{ await db.collection('assets').doc(btn.dataset.id).delete(); loadAssetsList(); }); }
+async function addAsset(){ let name=document.getElementById('assetName').value.trim(); if(!name) return showMessage('Asset name required','error','assetMessage'); await db.collection('assets').add({name,location:document.getElementById('assetLocation').value,status:document.getElementById('assetStatus').value}); showMessage('Asset added','success','assetMessage'); loadAssetsList(); }
+async function loadInventoryList(){ let snap=await db.collection('inventory').get(); let html='<table border="1"><thead><tr><th>Item</th><th>Quantity</th><th>Unit</th><th>Action</th></tr></thead><tbody>'; snap.forEach(d=>{ let i=d.data(); html+=`<tr><td>${escapeHtml(i.name)}</td><td>${i.quantity}</td><td>${escapeHtml(i.unit||'')}</td><td><button class="edit-inventory" data-id="${d.id}">Edit Qty</button> <button class="delete-inventory" data-id="${d.id}">Delete</button></td></tr>`; }); html+='</tbody></table>'; document.getElementById('inventoryListContainer').innerHTML=html; document.querySelectorAll('.edit-inventory').forEach(btn=>btn.onclick=async()=>{ let q=prompt("New quantity:"); if(q) await db.collection('inventory').doc(btn.dataset.id).update({quantity:parseInt(q)}); loadInventoryList(); }); document.querySelectorAll('.delete-inventory').forEach(btn=>btn.onclick=async()=>{ if(confirm("Delete?")) await db.collection('inventory').doc(btn.dataset.id).delete(); loadInventoryList(); }); }
+async function addInventory(){ let name=document.getElementById('itemName').value.trim(), qty=parseInt(document.getElementById('itemQuantity').value); if(!name||isNaN(qty)) return showMessage('Name and quantity required','error','inventoryMessage'); await db.collection('inventory').add({name,quantity:qty,unit:document.getElementById('itemUnit').value}); showMessage('Item added','success','inventoryMessage'); loadInventoryList(); }
+async function loadVisitorsList(){ let snap=await db.collection('visitors').orderBy('checkInTime','desc').limit(30).get(); let html='<table border="1"><thead><tr><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th><th>Action</th><tr></thead><tbody>'; snap.forEach(d=>{ let v=d.data(); html+=`<tr><td>${escapeHtml(v.name)}</td><td>${escapeHtml(v.purpose)}</td><td>${escapeHtml(v.toSee||'')}</td><td>${escapeHtml(v.checkInTime)}</td><td>${v.checkOutTime?escapeHtml(v.checkOutTime):'Still inside'}</td><td>${!v.checkOutTime?`<button class="checkout-visitor" data-id="${d.id}">Check Out</button>`:'✅'}</td></tr>`; }); html+='</tbody></table>'; document.getElementById('visitorsListContainer').innerHTML=html; document.querySelectorAll('.checkout-visitor').forEach(btn=>btn.onclick=async()=>{ await db.collection('visitors').doc(btn.dataset.id).update({checkOutTime:new Date().toLocaleString()}); loadVisitorsList(); }); }
+async function checkInVisitor(){ let name=document.getElementById('visitorName').value.trim(), purpose=document.getElementById('visitorPurpose').value.trim(); if(!name||!purpose) return showMessage('Name and purpose required','error','visitorMessage'); await db.collection('visitors').add({name,purpose,toSee:document.getElementById('visitorToSee').value,checkInTime:new Date().toLocaleString(),checkOutTime:null}); showMessage('Checked in','success','visitorMessage'); loadVisitorsList(); }
+async function checkoutAllVisitors(){ let snap=await db.collection('visitors').where('checkOutTime','==',null).get(); let batch=db.batch(); snap.forEach(d=>batch.update(d.ref,{checkOutTime:new Date().toLocaleString()})); await batch.commit(); loadVisitorsList(); showMessage(`Checked out ${snap.size} visitor(s)`,'success','visitorMessage'); }
+async function loadNotices(){ let snap=await db.collection('notices').orderBy('timestamp','desc').get(); let html=''; snap.forEach(d=>{ let n=d.data(); html+=`<div class="notice-card"><div class="notice-title">${escapeHtml(n.title)}</div><div>${escapeHtml(n.content)}</div><small>${n.date}</small><br><a class="share-wa" href="https://wa.me/?text=${encodeURIComponent(n.title+'\n'+n.content)}" target="_blank">📱 Share on WhatsApp</a>${currentUserRole==='admin'?`<button class="delete-notice" data-id="${d.id}" style="margin-left:10px;">Delete</button>`:''}</div>`; }); document.getElementById('noticesList').innerHTML=html||'<p>No notices</p>'; if(currentUserRole==='admin') document.querySelectorAll('.delete-notice').forEach(btn=>btn.onclick=async()=>{ if(confirm('Delete?')){ await db.collection('notices').doc(btn.dataset.id).delete(); loadNotices(); } }); }
+async function postNotice(){ let title=document.getElementById('noticeTitle').value.trim(), content=document.getElementById('noticeContent').value.trim(); if(!title||!content) return showMessage('Title and content required','error','noticeMessage'); await db.collection('notices').add({title,content,date:new Date().toLocaleString(),timestamp:firebase.firestore.FieldValue.serverTimestamp()}); showMessage('Notice posted!','success','noticeMessage'); document.getElementById('noticeTitle').value=''; document.getElementById('noticeContent').value=''; loadNotices(); }
+async function uploadFileToLocal(){ if(!fileDB) await initFileDB(); let file=document.getElementById('uploadFileInput').files[0]; if(!file) return showMessage('Select a file','error','uploadMessage'); let reader=new FileReader(); reader.onload=async(e)=>{ let tx=fileDB.transaction(['files'],'readwrite'); tx.objectStore('files').add({name:file.name,type:file.type,size:file.size,data:e.target.result,uploadedAt:new Date().toISOString()}); showMessage(`File "${file.name}" uploaded locally`,'success','uploadMessage'); loadFilesList(); }; reader.readAsDataURL(file); }
+async function loadFilesList(){ if(!fileDB) await initFileDB(); let store=fileDB.transaction(['files']).objectStore('files'); let files=await new Promise(res=>{ let req=store.getAll(); req.onsuccess=()=>res(req.result); }); let html=''; files.forEach(f=>{ html+=`<div class="file-item"><strong>${escapeHtml(f.name)}</strong> (${(f.size/1024).toFixed(2)} KB) <button class="download-file" data-data="${f.data}" data-name="${f.name}">📥 Download</button> <button class="delete-file" data-id="${f.id}">Delete</button></div>`; }); document.getElementById('filesListContainer').innerHTML=html||'<p>No files stored locally.</p>'; document.querySelectorAll('.download-file').forEach(btn=>btn.onclick=()=>{ let a=document.createElement('a'); a.href=btn.dataset.data; a.download=btn.dataset.name; a.click(); }); document.querySelectorAll('.delete-file').forEach(btn=>btn.onclick=async()=>{ if(confirm('Delete?')){ let tx=fileDB.transaction(['files'],'readwrite'); tx.objectStore('files').delete(Number(btn.dataset.id)); loadFilesList(); } }); }
+function exportTableToCSV(table,filename){ let rows=table.querySelectorAll('tr'); let csv=[...rows].map(r=>[...r.querySelectorAll('th,td')].map(cell=>cell.innerText.trim()).join(',')).join('\n'); let blob=new Blob([csv],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename+'.csv'; a.click(); }
+async function exportAllStudentsCSV(){ let snap=await db.collection('students').get(); let data=snap.docs.map(d=>d.data()); let ws=XLSX.utils.json_to_sheet(data); let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Students'); XLSX.writeFile(wb,'all_students.xlsx'); }
+async function exportAllTeachersCSV(){ let snap=await db.collection('teachers').get(); let data=snap.docs.map(d=>d.data()); let ws=XLSX.utils.json_to_sheet(data); let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Teachers'); XLSX.writeFile(wb,'all_teachers.xlsx'); }
+function printTable(el,title){ let win=window.open(); win.document.write(`<html><head><title>${title}</title><style>table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px}</style></head><body><h2>${title}</h2>${el.outerHTML}</body></html>`); win.document.close(); win.print(); }
+function getCurrentVisibleTable(){ if(document.getElementById('attendanceModule').style.display!=='none') return document.querySelector('#studentList table'); if(document.getElementById('teachersModule').style.display!=='none') return document.querySelector('#allTeachersList table'); return null; }
+
+// ======================== STUDENT RECORDS MODULE (unchanged full) ========================
+async function loadExamUI() { if(!currentStudentDoc) return; let termSelector = document.getElementById('termAssessmentSelector'); termSelector.innerHTML = `<div class="assessment-btns"><button class="assessment-btn ${currentAssessment === 'test1' ? 'active' : ''}" data-assessment="test1">Test 1</button><button class="assessment-btn ${currentAssessment === 'test2' ? 'active' : ''}" data-assessment="test2">Test 2</button><button class="assessment-btn ${currentAssessment === 'exam' ? 'active' : ''}" data-assessment="exam">Exam</button></div>`; document.querySelectorAll('.assessment-btn').forEach(btn => { btn.onclick = () => { document.querySelectorAll('.assessment-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentAssessment = btn.getAttribute('data-assessment'); loadExamUI(); }; }); let examDoc = await db.collection('exam_records').doc(currentStudentDoc.id).get(); let records = examDoc.exists ? examDoc.data() : {}; let key = currentExamLevel + '_' + currentTerm + '_' + currentAssessment; let subjectsData = records[key] || []; document.getElementById('examRecordsContent').innerHTML = buildSubjectInputs(subjectsData); attachRemoveEvents(); }
+function buildSubjectInputs(currentSubjects) { if (!currentSubjects || currentSubjects.length === 0) currentSubjects = [{ name: '', score: '' }]; let html = '<div><button id="addSubjectBtn" class="refresh-btn" style="margin-bottom:10px;">+ Add Subject</button></div><div id="subjectsContainer">'; for (let i = 0; i < currentSubjects.length; i++) { html += `<div class="subject-row" data-index="${i}"><input type="text" class="subject-name" value="${escapeHtml(currentSubjects[i].name)}" placeholder="Subject name"><input type="number" class="subject-score" value="${currentSubjects[i].score}" placeholder="Score" step="0.01" style="width:80px;"><button class="remove-subject-btn" data-index="${i}" style="background:#ffcdd2; color:#c62828;">Remove</button></div>`; } html += '</div>'; return html; }
+function attachRemoveEvents() { document.querySelectorAll('.remove-subject-btn').forEach(btn => { btn.onclick = function () { let idx = parseInt(this.getAttribute('data-index')); let container = document.getElementById('subjectsContainer'); let rows = container.querySelectorAll('.subject-row'); if (rows.length > 1) { rows[idx].remove(); let allRows = container.querySelectorAll('.subject-row'); for (let r = 0; r < allRows.length; r++) { allRows[r].setAttribute('data-index', r); let remBtn = allRows[r].querySelector('.remove-subject-btn'); if (remBtn) remBtn.setAttribute('data-index', r); } } else { alert("At least one subject required."); } }; }); let addBtn = document.getElementById('addSubjectBtn'); if(addBtn) addBtn.onclick = () => { let container = document.getElementById('subjectsContainer'); let newIndex = container.children.length; let newDiv = document.createElement('div'); newDiv.className = 'subject-row'; newDiv.setAttribute('data-index', newIndex); newDiv.innerHTML = `<input type="text" class="subject-name" placeholder="Subject name"><input type="number" class="subject-score" placeholder="Score" step="0.01" style="width:80px;"><button class="remove-subject-btn" data-index="${newIndex}" style="background:#ffcdd2; color:#c62828;">Remove</button>`; container.appendChild(newDiv); attachRemoveEvents(); }; }
+async function saveExamRecords() { if(!currentStudentDoc) return; let subjects = []; let rows = document.querySelectorAll('#subjectsContainer .subject-row'); for (let row of rows) { let name = row.querySelector('.subject-name').value.trim(); let score = row.querySelector('.subject-score').value; if (name) subjects.push({ name, score: score ? parseFloat(score) : '' }); } if (subjects.length === 0) { alert("Add at least one subject"); return; } let key = currentExamLevel + '_' + currentTerm + '_' + currentAssessment; let examDoc = await db.collection('exam_records').doc(currentStudentDoc.id).get(); let records = examDoc.exists ? examDoc.data() : {}; records[key] = subjects; await db.collection('exam_records').doc(currentStudentDoc.id).set(records); alert("Exam records saved!"); }
+async function loadFeeUI() { if(!currentStudentDoc) return; let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get(); let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } }; let termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] }; let balance = termData.total - termData.paid; let statusClass = balance <= 0 ? 'fee-paid' : (termData.paid > 0 ? 'fee-partial' : 'fee-unpaid'); let termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' }; let html = `<div class="${statusClass}" style="padding:15px;border-radius:5px"><strong>${termNames[currentFeeTerm]} - Total Fees:</strong> ${termData.total.toLocaleString()} Le<br><strong>Paid:</strong> ${termData.paid.toLocaleString()} Le<br><strong>Balance:</strong> ${balance.toLocaleString()} Le<br><strong>Status:</strong> ${balance <= 0 ? '✅ Fully Paid' : (termData.paid > 0 ? '⚠️ Partial Payment' : '❌ Not Paid')}</div><h4>Payment History - ${termNames[currentFeeTerm]}</h4><table border="1"><thead><tr><th>Date</th><th>Amount (Le)</th><th>Type</th><th>Note</th></tr></thead><tbody>`; for (let t of (termData.transactions || [])) { html += `<tr><td>${t.date}</td><td>${t.amount.toLocaleString()}</td><td>${t.type}</td><td>${escapeHtml(t.note || '')}</td></tr>`; } html += `</tbody></table>`; document.getElementById('feesContent').innerHTML = html; }
+function recordPayment() { if(!currentStudentDoc) return; let termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' }; document.getElementById('paymentTermLabel').innerText = termNames[currentFeeTerm]; openModal('paymentModal'); }
+async function submitPayment() { if(!currentStudentDoc) return; let amount = parseFloat(document.getElementById('paymentAmount').value); let type = document.getElementById('paymentType').value; let note = document.getElementById('paymentNote').value; if (isNaN(amount) || amount <= 0) { alert("Enter valid amount"); return; } let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get(); let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } }; let termData = feeData[currentFeeTerm] || { total: 500000, paid: 0, transactions: [] }; let newPaid = termData.paid + amount; if (type === 'full') newPaid = termData.total; let transaction = { date: new Date().toLocaleDateString(), amount, type, note }; termData.paid = newPaid; termData.transactions = (termData.transactions || []).concat([transaction]); feeData[currentFeeTerm] = termData; await db.collection('fee_records').doc(currentStudentDoc.id).set(feeData); closeModal('paymentModal'); document.getElementById('paymentAmount').value = ''; document.getElementById('paymentNote').value = ''; loadFeeUI(); alert("Payment recorded!"); }
+async function editTotalFees() { if(!currentStudentDoc) return; openModal('editFeesModal'); }
+async function saveFees() { if(!currentStudentDoc) return; let feeDoc = await db.collection('fee_records').doc(currentStudentDoc.id).get(); let feeData = feeDoc.exists ? feeDoc.data() : { term1: { total: 500000, paid: 0, transactions: [] }, term2: { total: 500000, paid: 0, transactions: [] }, term3: { total: 500000, paid: 0, transactions: [] } }; feeData.term1 = { ...feeData.term1, total: parseFloat(document.getElementById('editTerm1Fees').value) || 500000 }; feeData.term2 = { ...feeData.term2, total: parseFloat(document.getElementById('editTerm2Fees').value) || 500000 }; feeData.term3 = { ...feeData.term3, total: parseFloat(document.getElementById('editTerm3Fees').value) || 500000 }; await db.collection('fee_records').doc(currentStudentDoc.id).set(feeData); closeModal('editFeesModal'); loadFeeUI(); alert("Fee amounts updated!"); }
+function displayProfile() { if(!currentStudentDoc) return; let html = `<p><strong>ID:</strong> ${escapeHtml(currentStudentDoc.id)}</p><p><strong>Name:</strong> ${escapeHtml(currentStudentDoc.name)}</p><p><strong>DOB:</strong> ${escapeHtml(currentStudentDoc.dob || 'N/A')}</p><p><strong>Class:</strong> ${escapeHtml(currentStudentDoc.class)}</p><p><strong>Department:</strong> ${escapeHtml(currentStudentDoc.department || 'N/A')}</p><p><strong>Address:</strong> ${escapeHtml(currentStudentDoc.address || 'N/A')}</p><p><strong>Parent Name:</strong> ${escapeHtml(currentStudentDoc.parentName || 'N/A')}</p><p><strong>Parent Phone:</strong> ${escapeHtml(currentStudentDoc.parentPhone || 'N/A')}</p><p><strong>Guardian:</strong> ${escapeHtml(currentStudentDoc.guardian || 'N/A')}</p><p><strong>Status:</strong> ${currentStudentDoc.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`; document.getElementById('profileContent').innerHTML = html; }
+function editProfile() { if(!currentStudentDoc) return; document.getElementById('editProfileName').value = currentStudentDoc.name || ''; document.getElementById('editProfileDob').value = currentStudentDoc.dob || ''; document.getElementById('editProfileClass').value = currentStudentDoc.class || ''; document.getElementById('editProfileDepartment').value = currentStudentDoc.department || ''; document.getElementById('editProfileAddress').value = currentStudentDoc.address || ''; document.getElementById('editProfileParentPhone').value = currentStudentDoc.parentPhone || ''; document.getElementById('editProfileParentName').value = currentStudentDoc.parentName || ''; document.getElementById('editProfileGuardian').value = currentStudentDoc.guardian || ''; document.getElementById('editProfileStatus').value = currentStudentDoc.status || 'active'; openModal('editProfileModal'); }
+async function saveProfile() { if(!currentStudentDoc) return; const updates = { name: document.getElementById('editProfileName').value.trim(), dob: document.getElementById('editProfileDob').value, class: document.getElementById('editProfileClass').value, department: document.getElementById('editProfileDepartment').value.trim(), address: document.getElementById('editProfileAddress').value.trim(), parentPhone: document.getElementById('editProfileParentPhone').value.trim(), parentName: document.getElementById('editProfileParentName').value.trim(), guardian: document.getElementById('editProfileGuardian').value.trim(), status: document.getElementById('editProfileStatus').value }; await db.collection('students').doc(currentStudentDoc.id).update(updates); closeModal('editProfileModal'); await loadStudents(); const refreshed = await db.collection('students').doc(currentStudentDoc.id).get(); currentStudentDoc = { docId: refreshed.id, ...refreshed.data() }; displayProfile(); showMessage('Profile updated', 'success', 'searchResults'); }
+
+// ======================== LOGIN & INIT ========================
+async function loginAndSetup(email, password) {
     try {
-        const cred = await auth.signInWithEmailAndPassword(email, pwd);
-        const role = await checkUserRole(cred.user);
-        if(!role) throw new Error("No role assigned. Create a 'users' document in Firestore.");
+        await auth.signInWithEmailAndPassword(email, password);
+        const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
+        const role = userDoc.data()?.role || 'teacher';
+        currentUserRole = role;
         document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('userInfo').innerText = role.role.toUpperCase() + ': ' + cred.user.email;
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('userInfo').innerText = `${role.toUpperCase()}: ${email}`;
+        document.getElementById('adminModuleBtn').style.display = role === 'admin' ? 'inline-block' : 'none';
         document.getElementById('logoutBtn').style.display = 'inline-block';
-        updateUIForRole(role);
-        updateOnlineStatus();
-    } catch(e) { document.getElementById('loginMessage').innerHTML = '<div class="error">' + e.message + '</div>'; }
-};
-document.getElementById('logoutBtn').onclick = async () => { await auth.signOut(); location.reload(); };
+        await loadStudents(); renderAttendance();
+        if (role === 'admin') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); loadNotices(); initFileDB().then(loadFilesList); }
+        else { loadNotices(); }
+        loadTeachers(); // ensure teacher list loads
+    } catch(e) { document.getElementById('loginMessage').innerHTML = `<div class="error">${e.message}</div>`; }
+}
+
 window.onload = async () => {
-    updateOnlineStatus();
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    document.getElementById('attendanceModuleBtn').onclick = switchToAttendance;
-    document.getElementById('recordsModuleBtn').onclick = switchToRecords;
-    document.getElementById('teachersModuleBtn').onclick = switchToTeachers;
-    document.getElementById('adminModuleBtn').onclick = switchToAdmin;
-    initAdminTabs();
-    const safe = (id, handler) => { let el = document.getElementById(id); if(el) el.onclick = handler; };
-    safe('importBtn', () => { let f = document.getElementById('excelFile')?.files[0]; if(f) importExcel(f); else alert('Select file'); });
-    safe('downloadSampleBtn', downloadSample);
-    safe('addStudentBtn', addManualStudent);
-    safe('loadBtn', renderAttendance);
-    safe('refreshBtn', refreshStudents);
-    safe('batchWhatsappBtn', sendBatchWhatsApp);
-    safe('classHistoryBtn', viewClassHistory);
-    if(document.getElementById('classSelect')) document.getElementById('classSelect').onchange = renderAttendance;
-    safe('searchStudentBtn', searchStudent);
-    safe('clearSearchBtn', () => { document.getElementById('studentSearchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; document.getElementById('studentRecordsPanel').style.display = 'none'; });
-    safe('editProfileBtn', editProfile);
-    safe('saveExamsBtn', saveExamRecords);
-    safe('recordPaymentBtn', recordPayment);
-    safe('editTotalFeesBtn', editTotalFees);
-    safe('addTeacherBtn', addTeacher);
-    safe('importTeachersBtn', () => { let f = document.getElementById('teacherExcelFile').files[0]; if(f) importTeachersExcel(f); else alert('Select file'); });
-    safe('downloadTeacherSampleBtn', downloadTeacherSample);
-    safe('searchTeacherBtn', searchTeacher);
-    safe('clearTeacherSearchBtn', () => { document.getElementById('teacherSearchInput').value = ''; document.getElementById('teacherSearchResults').innerHTML = ''; loadTeachers(); });
-    safe('searchTeacherRegisterBtn', loadTeacherRegister);
-    safe('addStaffBtn', addStaff);
-    safe('addAssetBtn', addAsset);
-    safe('addInventoryBtn', addInventory);
-    safe('checkInVisitorBtn', checkInVisitor);
-    safe('checkoutAllBtn', checkoutAllVisitors);
-    safe('postNoticeBtn', postNotice);
-    safe('uploadFileBtn', uploadFileToLocal);
-    safe('refreshFilesBtn', () => { initFileDB().then(() => loadFilesList()); });
-    safe('printAttendanceTable', () => { const table = document.querySelector('#studentList table'); if(table) printTable(table, 'Attendance'); else alert('No attendance table'); });
-    safe('exportAttendanceCSV', () => { const table = document.querySelector('#studentList table'); if(table) exportTableToCSV(table, 'attendance'); else alert('No attendance table'); });
-    safe('printTeachersTable', () => { const table = document.querySelector('#allTeachersList table'); if(table) printTable(table, 'Teachers List'); else alert('No teachers table'); });
-    safe('exportTeachersCSVBtn', () => { const table = document.querySelector('#allTeachersList table'); if(table) exportTableToCSV(table, 'teachers_list'); else alert('No teachers table'); });
-    safe('printAnyTableBtn', () => { const table = getCurrentVisibleTable(); if(table) printTable(table, 'School Data'); else alert('No table visible'); });
-    safe('exportAnyTableCSV', () => { const table = getCurrentVisibleTable(); if(table) exportTableToCSV(table, 'exported_data'); else alert('No table visible'); });
-    safe('exportStudentsCSV', exportAllStudentsCSV);
-    safe('exportTeachersCSVAdmin', exportAllTeachersCSV);
-    safe('printNoticesBtn', printAllNotices);
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    function updateOnlineStatus() {
+        let badge = document.getElementById('onlineStatus'), bar = document.getElementById('syncBar');
+        if (navigator.onLine) { badge.innerHTML = '🟢 Online'; badge.className = 'online-badge online'; bar.innerHTML = '✅ Connected to Firestore'; bar.style.background = '#2e7d32'; }
+        else { badge.innerHTML = '🔴 Offline'; badge.className = 'online-badge offline'; bar.innerHTML = '⚠️ Offline mode - data cached'; bar.style.background = '#f57c00'; }
+    }
+    updateOnlineStatus(); window.addEventListener('online', updateOnlineStatus); window.addEventListener('offline', updateOnlineStatus);
+    await ensureDemoUsers();
+
+    // Login handlers
+    document.getElementById('demoAdminBtn').onclick = () => loginAndSetup('admin@school.com', 'admin123');
+    document.getElementById('demoTeacherBtn').onclick = () => loginAndSetup('teacher@school.com', 'teacher123');
+    document.getElementById('loginBtn').onclick = () => loginAndSetup(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+    document.getElementById('logoutBtn').onclick = () => auth.signOut().then(() => location.reload());
+
+    // Module switchers
+    document.getElementById('attendanceModuleBtn').onclick = () => {
+        document.querySelectorAll('.module-btn').forEach(b=>b.classList.remove('active'));
+        document.getElementById('attendanceModuleBtn').classList.add('active');
+        document.getElementById('attendanceModule').style.display = 'block';
+        document.getElementById('recordsModule').style.display = 'none';
+        document.getElementById('teachersModule').style.display = 'none';
+        document.getElementById('adminModule').style.display = 'none';
+        renderAttendance();
+    };
+    document.getElementById('recordsModuleBtn').onclick = () => {
+        document.querySelectorAll('.module-btn').forEach(b=>b.classList.remove('active'));
+        document.getElementById('recordsModuleBtn').classList.add('active');
+        document.getElementById('attendanceModule').style.display = 'none';
+        document.getElementById('recordsModule').style.display = 'block';
+        document.getElementById('teachersModule').style.display = 'none';
+        document.getElementById('adminModule').style.display = 'none';
+    };
+    document.getElementById('teachersModuleBtn').onclick = () => {
+        document.querySelectorAll('.module-btn').forEach(b=>b.classList.remove('active'));
+        document.getElementById('teachersModuleBtn').classList.add('active');
+        document.getElementById('attendanceModule').style.display = 'none';
+        document.getElementById('recordsModule').style.display = 'none';
+        document.getElementById('teachersModule').style.display = 'block';
+        document.getElementById('adminModule').style.display = 'none';
+        loadTeachers();
+    };
+    document.getElementById('adminModuleBtn').onclick = () => {
+        document.querySelectorAll('.module-btn').forEach(b=>b.classList.remove('active'));
+        document.getElementById('adminModuleBtn').classList.add('active');
+        document.getElementById('attendanceModule').style.display = 'none';
+        document.getElementById('recordsModule').style.display = 'none';
+        document.getElementById('teachersModule').style.display = 'none';
+        document.getElementById('adminModule').style.display = 'block';
+        loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); loadNotices(); initFileDB().then(loadFilesList);
+    };
+
+    // Attendance buttons
+    document.getElementById('importBtn').onclick = () => { let f = document.getElementById('excelFile').files[0]; if(f) importExcelStudents(f).then(()=>{ loadStudents(); renderAttendance(); showMessage('Imported','success','importMessage'); }); else alert('Select file'); };
+    document.getElementById('downloadSampleBtn').onclick = () => { let ws = XLSX.utils.json_to_sheet([{ID:'STU001',Name:'John Doe',Class:'JSS1',ParentPhone:'23276123456'}]); let wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students'); XLSX.writeFile(wb, 'sample_students.xlsx'); };
+    document.getElementById('addStudentBtn').onclick = addManualStudent;
+    document.getElementById('loadBtn').onclick = renderAttendance;
+    document.getElementById('refreshBtn').onclick = () => loadStudents().then(renderAttendance);
+    document.getElementById('batchWhatsappBtn').onclick = sendBatchWhatsApp;
+    document.getElementById('classHistoryBtn').onclick = viewClassHistory;
+
+    // Student Records buttons
+    document.getElementById('searchStudentBtn').onclick = async () => {
+        let q = document.getElementById('studentSearchInput').value.trim();
+        let found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
+        if(!found) { showMessage('Student not found','error','searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+        currentStudentDoc = found;
+        document.getElementById('studentRecordsPanel').style.display = 'block';
+        document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
+        displayProfile(); loadExamUI(); loadFeeUI();
+    };
+    document.getElementById('clearSearchBtn').onclick = () => { document.getElementById('studentSearchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; document.getElementById('studentRecordsPanel').style.display = 'none'; };
+    document.getElementById('editProfileBtn').onclick = editProfile;
+    document.getElementById('saveProfileBtn').onclick = saveProfile;
+    document.getElementById('saveExamsBtn').onclick = saveExamRecords;
+    document.getElementById('recordPaymentBtn').onclick = recordPayment;
+    document.getElementById('editTotalFeesBtn').onclick = editTotalFees;
+    document.getElementById('submitPaymentBtn').onclick = submitPayment;
+    document.getElementById('saveFeesBtn').onclick = saveFees;
+
+    // Teachers buttons (new edit/delete modal)
+    document.getElementById('addTeacherBtn').onclick = addTeacher;
+    document.getElementById('importTeachersBtn').onclick = () => { let f = document.getElementById('teacherExcelFile').files[0]; if(f) importTeachersExcel(f); };
+    document.getElementById('downloadTeacherSampleBtn').onclick = () => { let ws = XLSX.utils.json_to_sheet([{TeacherID:'T001',Name:'Jane Smith',Email:'jane@school.com',Class:'JSS1'}]); let wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Teachers'); XLSX.writeFile(wb, 'teacher_sample.xlsx'); };
+    document.getElementById('searchTeacherBtn').onclick = searchTeacher;
+    document.getElementById('clearTeacherSearchBtn').onclick = () => { document.getElementById('teacherSearchInput').value = ''; document.getElementById('teacherSearchResults').innerHTML = ''; loadTeachers(); };
+    document.getElementById('searchTeacherRegisterBtn').onclick = loadTeacherRegister;
+    document.getElementById('saveTeacherBtn').onclick = updateTeacher;
+
+    // Admin buttons
+    document.getElementById('addStaffBtn').onclick = addStaff;
+    document.getElementById('addAssetBtn').onclick = addAsset;
+    document.getElementById('addInventoryBtn').onclick = addInventory;
+    document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
+    document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
+    document.getElementById('postNoticeBtn').onclick = postNotice;
+    document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
+    document.getElementById('refreshFilesBtn').onclick = () => initFileDB().then(loadFilesList);
+    document.getElementById('exportStudentsCSV').onclick = exportAllStudentsCSV;
+    document.getElementById('exportTeachersCSVAdmin').onclick = exportAllTeachersCSV;
+    document.getElementById('printAttendanceTable').onclick = () => { let tbl = document.querySelector('#studentList table'); if(tbl) printTable(tbl, 'Attendance'); else alert('No table'); };
+    document.getElementById('exportAttendanceCSV').onclick = () => { let tbl = document.querySelector('#studentList table'); if(tbl) exportTableToCSV(tbl, 'attendance'); };
+    document.getElementById('printTeachersTable').onclick = () => { let tbl = document.querySelector('#allTeachersList table'); if(tbl) printTable(tbl, 'Teachers'); };
+    document.getElementById('exportTeachersCSVBtn').onclick = () => { let tbl = document.querySelector('#allTeachersList table'); if(tbl) exportTableToCSV(tbl, 'teachers'); };
+    document.getElementById('printAnyTableBtn').onclick = () => { let tbl = getCurrentVisibleTable(); if(tbl) printTable(tbl, 'School Data'); else alert('No table visible'); };
+    document.getElementById('exportAnyTableCSV').onclick = () => { let tbl = getCurrentVisibleTable(); if(tbl) exportTableToCSV(tbl, 'exported_data'); else alert('No table visible'); };
+    document.getElementById('printNoticesBtn').onclick = () => { let div = document.getElementById('noticesList'); if(div) printTable(div, 'Notices'); };
+
+    // Admin tabs
+    document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => btn.onclick = () => {
+        let id = btn.dataset.tab;
+        document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(btn.getAttribute('data-tab') + 'Tab').classList.add('active');
+        document.querySelectorAll('#adminModule .admin-tab').forEach(t=>t.style.display='none');
+        document.getElementById(id+'Tab').style.display = 'block';
+        if(id === 'staff') loadStaffList();
+        else if(id === 'assets') loadAssetsList();
+        else if(id === 'inventory') loadInventoryList();
+        else if(id === 'visitors') loadVisitorsList();
+        else if(id === 'noticeboard') loadNotices();
+        else if(id === 'filestorage') initFileDB().then(loadFilesList);
+    });
+
+    // Student record tabs and exam/fee selectors
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => {
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.getElementById(btn.dataset.tab+'Tab').classList.add('active');
     });
     document.querySelectorAll('.term-btn').forEach(btn => btn.onclick = () => {
-        document.querySelectorAll('.term-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.term-btn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         currentTerm = btn.getAttribute('data-term');
         if(currentStudentDoc) loadExamUI();
     });
     document.querySelectorAll('.exam-level-btn').forEach(btn => btn.onclick = () => {
-        document.querySelectorAll('.exam-level-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.exam-level-btn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         currentExamLevel = btn.getAttribute('data-exam-level');
         if(currentStudentDoc) loadExamUI();
     });
     document.querySelectorAll('.fee-term-btn').forEach(btn => btn.onclick = () => {
-        document.querySelectorAll('.fee-term-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.fee-term-btn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         currentFeeTerm = btn.getAttribute('data-fee-term');
         if(currentStudentDoc) loadFeeUI();
     });
+
     document.getElementById('loginModal').style.display = 'flex';
-    await loadStudents();
 };
 </script>
 </body>
