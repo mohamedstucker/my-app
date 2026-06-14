@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>School Management System – Enhanced Teacher Profile</title>
+    <title>School Management System – Final Working</title>
     <style>
         *{box-sizing:border-box}body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto, Arial;padding:20px;max-width:1400px;margin:auto;background:#f0f2f5}
         .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:15px}
@@ -136,6 +136,7 @@
             <div class="search-box"><input type="text" id="bursarStudentSearch" placeholder="Student ID or Name"><button id="searchBursarStudentBtn" class="refresh-btn">Load Student</button></div>
             <div id="bursarStudentInfo"></div>
             <div id="bursarFeeStatus"></div>
+            <div id="bursarPaymentTransactions" style="margin-top:20px;"></div>
             <div style="margin-top:15px;">
                 <h4>Record a Payment</h4>
                 <select id="paymentTermSelect"><option value="term1">Term 1</option><option value="term2">Term 2</option><option value="term3">Term 3</option></select>
@@ -177,13 +178,14 @@
 </div>
 
 <!-- Login Modal -->
-<div id="loginModal" class="modal" style="display:flex;"><div class="modal-content"><h3>🔐 Login</h3><input id="loginEmail" placeholder="Email"><input id="loginPassword" type="password"><button id="loginBtn">Login</button><hr><button id="demoAdminBtn" class="demo-btn">👑 Demo Admin Login</button><button id="demoTeacherBtn" class="demo-btn">👩‍🏫 Demo Teacher Login</button><button id="demoParentBtn" class="demo-btn">👪 Demo Parent Login</button><div id="loginMessage"></div><small>Demo accounts auto-created</small></div></div>
+<div id="loginModal" class="modal" style="display:flex;"><div class="modal-content"><h3>🔐 Login</h3><input id="loginEmail" placeholder="Email"><input id="loginPassword" type="password"><button id="loginBtn">Login</button><hr><button id="demoAdminBtn" class="demo-btn">👑 Demo Admin</button><button id="demoBursarBtn" class="demo-btn">💰 Demo Bursar</button><button id="demoTeacherBtn" class="demo-btn">👩‍🏫 Demo Teacher</button><button id="demoParentBtn" class="demo-btn">👪 Demo Parent</button><div id="loginMessage"></div><small>Accounts auto-created</small></div></div>
 
 <!-- Modals -->
 <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name"><input type="date" id="editProfileDob"><select id="editProfileClass"><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input id="editProfileDepartment" placeholder="Department"><input id="editProfileAddress" placeholder="Address"><input id="editProfileParentPhone" placeholder="Parent Phone"><input id="editProfileParentName" placeholder="Parent Name"><input id="editProfileGuardian" placeholder="Guardian"><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
 <div id="editOwnTeacherModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editOwnTeacherModal')">&times;</span><h3>Edit My Teacher Profile</h3><input type="text" id="editOwnTeacherId" readonly><input type="text" id="editOwnTeacherName" placeholder="Full Name"><input type="email" id="editOwnTeacherEmail" placeholder="Email"><input type="tel" id="editOwnTeacherPhone" placeholder="Phone"><select id="editOwnTeacherClass"><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><button id="saveOwnTeacherBtn" class="refresh-btn">Save Changes</button></div></div>
 <div id="editTeacherModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editTeacherModal')">&times;</span><h3>Edit Teacher (Admin)</h3><input type="text" id="editTeacherId" readonly><input type="text" id="editTeacherName" placeholder="Full Name"><input type="email" id="editTeacherEmail" placeholder="Email"><input type="tel" id="editTeacherPhone" placeholder="Phone"><select id="editTeacherClass"><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><select id="editTeacherStatus"><option>active</option><option>inactive</option></select><button id="saveTeacherBtn" class="refresh-btn">Save Changes</button></div></div>
 <div id="historyModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('historyModal')">&times;</span><h3>Attendance History</h3><div id="historyContent"></div></div></div>
+<div id="editPaymentModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editPaymentModal')">&times;</span><h3>Edit Payment</h3><input type="text" id="editPaymentTerm" readonly><input type="date" id="editPaymentDate"><input type="number" id="editPaymentAmount" step="0.01" placeholder="Amount (Le)"><select id="editPaymentType"><option value="full">Full Payment</option><option value="partial">Partial Payment</option></select><input type="text" id="editPaymentNote" placeholder="Note"><button id="savePaymentEditBtn" class="refresh-btn">Save Changes</button></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -210,15 +212,19 @@ let currentTeacherRegister = null, fileDB = null;
 let teacherAssignedClass = null, teacherOwnData = null, parentLinkedStudentId = null;
 let examCurrentStudent = null;
 let bursarCurrentStudent = null;
+let editPaymentCallback = null;
 
 // Helper functions
 function showMessage(msg, type, containerId) { let c = document.getElementById(containerId); if(c) { c.innerHTML = `<div class="${type}">${msg}</div>`; setTimeout(()=>c.innerHTML='',4000); } else alert(msg); }
 function escapeHtml(s) { return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
 function closeModal(id) { let el = document.getElementById(id); if(el) el.style.display = 'none'; }
 function openModal(id) { let el = document.getElementById(id); if(el) el.style.display = 'flex'; }
-function getValidWhatsAppUrl(phone, msg) { let p = String(phone).replace(/\D/g,''); if(p.startsWith('0')) p = p.slice(1); if(!p.startsWith('232')) p='232'+p; return (p.length>=10 && p.length<=15) ? `https://wa.me/${p}?text=${encodeURIComponent(msg)}` : null; }
-
-// IndexedDB
+function getValidWhatsAppUrl(phone, msg) {
+    let p = String(phone).replace(/\D/g,'');
+    if(p.startsWith('0')) p = p.slice(1);
+    if(!p.startsWith('232')) p='232'+p;
+    return (p.length>=10 && p.length<=15) ? `https://wa.me/${p}?text=${encodeURIComponent(msg)}` : null;
+}
 function initFileDB() { return new Promise((resolve,reject)=>{ let req = indexedDB.open('SchoolFilesDB',1); req.onerror=()=>reject(req.error); req.onsuccess=()=>{ fileDB=req.result; resolve(); }; req.onupgradeneeded=e=>{ let db=e.target.result; if(!db.objectStoreNames.contains('files')) db.createObjectStore('files',{keyPath:'id',autoIncrement:true}); }; }); }
 
 // ---------- AUTO‑CREATE DEMO USERS ----------
@@ -226,6 +232,7 @@ async function ensureDemoUsers() {
     const adminEmail = "admin@school.com", adminPass = "admin123";
     const teacherEmail = "teacher@school.com", teacherPass = "teacher123";
     const parentEmail = "parent@school.com", parentPass = "parent123";
+    const bursarEmail = "bursar@school.com", bursarPass = "bursar123";
     try {
         let adminUser = await auth.signInWithEmailAndPassword(adminEmail, adminPass).catch(() => null);
         if (!adminUser) {
@@ -249,6 +256,14 @@ async function ensureDemoUsers() {
             let doc = await db.collection('users').doc(parentUser.user.uid).get();
             if (!doc.exists) await db.collection('users').doc(parentUser.user.uid).set({ role: 'parent', email: parentEmail, name: 'Demo Parent', studentId: 'STU001' });
             else if (!doc.data().studentId) await db.collection('users').doc(parentUser.user.uid).update({ studentId: 'STU001' });
+        }
+        let bursarUser = await auth.signInWithEmailAndPassword(bursarEmail, bursarPass).catch(() => null);
+        if (!bursarUser) {
+            bursarUser = await auth.createUserWithEmailAndPassword(bursarEmail, bursarPass);
+            await db.collection('users').doc(bursarUser.user.uid).set({ role: 'bursar', email: bursarEmail, name: 'Bursar Officer' });
+        } else {
+            let doc = await db.collection('users').doc(bursarUser.user.uid).get();
+            if (!doc.exists) await db.collection('users').doc(bursarUser.user.uid).set({ role: 'bursar', email: bursarEmail, name: 'Bursar Officer' });
         }
         const studentRef = db.collection('students').doc('STU001');
         const studentDoc = await studentRef.get();
@@ -308,12 +323,12 @@ async function renderAttendance() {
             </td>
         </tr>`;
     }
-    html += '</tbody></tr>';
+    html += '</tbody></table>';
     document.getElementById('studentList').innerHTML = html;
     document.querySelectorAll('.present-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, remark=document.getElementById(`remark_${sid}`).value; await saveAttendance(cls, sid, 'present', remark); renderAttendance(); });
     document.querySelectorAll('.absent-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, remark=document.getElementById(`remark_${sid}`).value; await saveAttendance(cls, sid, 'absent', remark); let student = students.find(s=>s.id===sid); if(student && student.parentPhone && confirm(`Send WhatsApp absence notification to ${student.parentName || 'parent'} of ${student.name}?`)){ let msg = `🏫 Attendance Update - ${cls}\n\nStudent: ${student.name} (${student.id})\nStatus: ABSENT ❌\nRemark: ${remark}\nDate: ${new Date().toLocaleDateString()}\nThank you.`; let url=getValidWhatsAppUrl(student.parentPhone, msg); if(url) window.open(url,'_blank'); else alert("Invalid phone"); } renderAttendance(); });
     document.querySelectorAll('.late-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, remark=document.getElementById(`remark_${sid}`).value; await saveAttendance(cls, sid, 'late', remark); renderAttendance(); });
-    document.querySelectorAll('.history-student-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, name=btn.dataset.name, cls=btn.dataset.class; let snap=await db.collection('attendance').where('studentId','==',sid).where('class','==',cls).get(); let items=[]; snap.forEach(d=>items.push(d.data())); items.sort((a,b)=>(b.date||'').localeCompare(a.date||'')); let histHtml=`<h3>${name} (${sid})</h3><table border="1"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>`+items.map(i=>`<tr><td class="date-cell">${i.date}</td><td class="status-cell">${i.status}</td><td class="remark-cell">${escapeHtml(i.remark||'')}</td>`).join('')+'</tbody></table>'; document.getElementById('historyContent').innerHTML=histHtml; openModal('historyModal'); });
+    document.querySelectorAll('.history-student-btn').forEach(btn=>btn.onclick=async()=>{ let sid=btn.dataset.id, name=btn.dataset.name, cls=btn.dataset.class; let snap=await db.collection('attendance').where('studentId','==',sid).where('class','==',cls).get(); let items=[]; snap.forEach(d=>items.push(d.data())); items.sort((a,b)=>(b.date||'').localeCompare(a.date||'')); let histHtml=`<h3>${name} (${sid})</h3><table border="1"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>`+items.map(i=>`<tr><td class="date-cell">${i.date}</td><td class="status-cell">${i.status}</td><td class="remark-cell">${escapeHtml(i.remark||'')}</td>`).join('')+'</tbody><td>'; document.getElementById('historyContent').innerHTML=histHtml; openModal('historyModal'); });
 }
 async function viewClassHistory() {
     const classVal = document.getElementById('classSelect').value;
@@ -330,15 +345,36 @@ async function viewClassHistory() {
 async function sendBatchWhatsApp() {
     const classVal = document.getElementById('classSelect').value;
     if(!classVal) { alert("Select a class first"); return; }
-    const students = allStudents[classVal]; if(!students || students.length===0) { alert("No students"); return; }
+    const students = allStudents[classVal];
+    if(!students || students.length===0) { alert("No students in this class"); return; }
     const today = new Date().toISOString().split('T')[0];
-    let attMap = {}; (await db.collection('attendance').where('class','==',classVal).where('date','==',today).get()).forEach(d=>attMap[d.data().studentId]={status:d.data().status,remark:d.data().remark||''});
-    const present = students.filter(s=>attMap[s.id]?.status==='present'); const absent = students.filter(s=>attMap[s.id]?.status==='absent'); const late = students.filter(s=>attMap[s.id]?.status==='late');
+    let attMap = {};
+    (await db.collection('attendance').where('class','==',classVal).where('date','==',today).get()).forEach(d=>attMap[d.data().studentId]={status:d.data().status,remark:d.data().remark||''});
+    const present = students.filter(s=>attMap[s.id]?.status==='present');
+    const absent = students.filter(s=>attMap[s.id]?.status==='absent');
+    const late = students.filter(s=>attMap[s.id]?.status==='late');
     const choice = prompt('Send to:\n1 - All\n2 - Absent only\n3 - Late only\n4 - Present only', '1');
-    let recipients = []; if(choice==='1') recipients=students; else if(choice==='2') recipients=absent; else if(choice==='3') recipients=late; else if(choice==='4') recipients=present; else return;
+    let recipients = [];
+    if(choice==='1') recipients=students;
+    else if(choice==='2') recipients=absent;
+    else if(choice==='3') recipients=late;
+    else if(choice==='4') recipients=present;
+    else return;
     if(recipients.length===0){ alert("No recipients"); return; }
     const summary = `📊 Attendance Report - ${classVal} (${new Date().toLocaleDateString()})\n✅ Present: ${present.length}\n❌ Absent: ${absent.length}\n⏰ Late: ${late.length}`;
-    for(let i=0; i<recipients.length; i++) { setTimeout(()=>{ const s=recipients[i]; const statusText=attMap[s.id]?.status||'Not marked'; const msg=`Dear ${s.parentName || 'Parent'},\n\n${summary}\n\nYour child ${s.name} (${s.id}) is marked: ${statusText.toUpperCase()}\nRemark: ${attMap[s.id]?.remark||''}\n\nThank you.`; const url=getValidWhatsAppUrl(s.parentPhone, msg); if(url) window.open(url,'_blank'); }, i*500); }
+    for(let i=0; i<recipients.length; i++) {
+        setTimeout(()=>{
+            const s = recipients[i];
+            const statusText = attMap[s.id]?.status || 'Not marked';
+            const msg = `Dear ${s.parentName || 'Parent'},\n\n${summary}\n\nYour child ${s.name} (${s.id}) is marked: ${statusText.toUpperCase()}\nRemark: ${attMap[s.id]?.remark||''}\n\nThank you.`;
+            const url = getValidWhatsAppUrl(s.parentPhone, msg);
+            if(url) {
+                window.open(url, '_blank');
+            } else {
+                alert(`Invalid phone number for ${s.name} (${s.id}): ${s.parentPhone}`);
+            }
+        }, i * 500);
+    }
     alert(`Opening WhatsApp for ${recipients.length} parents.`);
 }
 async function importExcelStudents(file) { return new Promise((resolve)=>{ let reader=new FileReader(); reader.onload=async function(e){ let data=new Uint8Array(e.target.result); let workbook=XLSX.read(data,{type:'array'}); let sheet=workbook.Sheets[workbook.SheetNames[0]]; let rows=XLSX.utils.sheet_to_json(sheet); for(let row of rows){ let student={ id:row.ID||row.id||row.StudentID, name:row.Name||row.name, class:row.Class||row.class, parentPhone:row.ParentPhone||row.phone, parentName:row.ParentName||'', status:'active' }; if(student.id && student.name && student.class) await db.collection('students').doc(student.id).set(student,{merge:true}); } resolve(); }; reader.readAsArrayBuffer(file); }); }
@@ -438,11 +474,11 @@ async function loadExamHistory() {
     let records = examDoc.exists ? examDoc.data() : {};
     let key = level + '_' + term + '_' + assessment;
     let subjects = records[key] || [];
-    let html = '<h4>Subjects & Scores</h4><table border="1"><thead><tr><th>Subject</th><th>Score</th></td></thead><tbody>';
+    let html = '<h4>Subjects & Scores</h4><table border="1"><thead><tr><th>Subject</th><th>Score</th></tr></thead><tbody>';
     for (let s of subjects) {
         html += `<tr><td class="subject-cell">${escapeHtml(s.name)}</td><td class="score-cell">${s.score}</td></tr>`;
     }
-    html += '</tbody></tr>';
+    html += '</tbody></table>';
     document.getElementById('examHistoryContent').innerHTML = html || '<p>No exam records found for this selection.</p>';
 }
 function initExamHistorySelectors() {
@@ -525,6 +561,7 @@ async function loadBursarStudent() {
     document.getElementById('bursarStudentInfo').innerHTML = `<div class="success">Managing fees for: ${escapeHtml(found.name)} (${found.id})</div>`;
     await loadBursarFeeStatus();
     await loadBursarTermFeesInputs();
+    await loadPaymentTransactionsForBursar();
 }
 async function loadBursarFeeStatus() {
     if (!bursarCurrentStudent) return;
@@ -537,7 +574,7 @@ async function loadBursarFeeStatus() {
         let termData = feeData[t] || { total: 500000, paid: 0 };
         let balance = (termData.total || 0) - (termData.paid || 0);
         let statusClass = balance <= 0 ? 'fee-paid' : (termData.paid > 0 ? 'fee-partial' : 'fee-unpaid');
-        html += `<tr class="${statusClass}"><td>${termNames[t]}</td><td>${(termData.total || 0).toLocaleString()}</td><td>${(termData.paid || 0).toLocaleString()}</td><td>${balance.toLocaleString()}</td><td>${balance <= 0 ? '✅ Fully Paid' : (termData.paid > 0 ? '⚠️ Partial' : '❌ Unpaid')}</td></tr>`;
+        html += `<tr class="${statusClass}"><td>${termNames[t]}</td><td class="total-cell">${(termData.total || 0).toLocaleString()}</td><td class="paid-cell">${(termData.paid || 0).toLocaleString()}</td><td class="balance-cell">${balance.toLocaleString()}</td><td class="status-cell">${balance <= 0 ? '✅ Fully Paid' : (termData.paid > 0 ? '⚠️ Partial' : '❌ Unpaid')}</td></tr>`;
     }
     html += '</tbody></table>';
     document.getElementById('bursarFeeStatus').innerHTML = html;
@@ -566,6 +603,7 @@ async function saveBursarTermFees() {
     await db.collection('fee_records').doc(bursarCurrentStudent.id).set(updates);
     showMessage('Term fees updated', 'success', 'bursarPaymentMessage');
     await loadBursarFeeStatus();
+    if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
 }
 async function recordBursarPayment() {
     if (!bursarCurrentStudent) { showMessage('No student loaded', 'error', 'bursarPaymentMessage'); return; }
@@ -588,10 +626,103 @@ async function recordBursarPayment() {
     document.getElementById('paymentAmount').value = '';
     document.getElementById('paymentNote').value = '';
     await loadBursarFeeStatus();
+    await loadPaymentTransactionsForBursar();
     if (currentStudentDoc && currentStudentDoc.id === bursarCurrentStudent.id) loadPaymentHistory();
+    if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
 }
+async function loadPaymentTransactionsForBursar() {
+    if (!bursarCurrentStudent) return;
+    let feeDoc = await db.collection('fee_records').doc(bursarCurrentStudent.id).get();
+    let feeData = feeDoc.exists ? feeDoc.data() : {};
+    let allTransactions = [];
+    for (let term of ['term1', 'term2', 'term3']) {
+        let termData = feeData[term] || { transactions: [] };
+        for (let i=0; i<(termData.transactions || []).length; i++) {
+            let tr = termData.transactions[i];
+            allTransactions.push({ term, index: i, ...tr });
+        }
+    }
+    allTransactions.sort((a,b) => new Date(b.date) - new Date(a.date));
+    let termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
+    let html = '<h4>Payment Transactions (Editable)</h4><table border="1"><thead><tr><th>Date</th><th>Term</th><th>Amount (Le)</th><th>Type</th><th>Note</th><th>Actions</th></tr></thead><tbody>';
+    for (let tr of allTransactions) {
+        html += `<tr><td class="date-cell">${tr.date}</td><td class="term-cell">${termNames[tr.term]}</td><td class="amount-cell">${tr.amount.toLocaleString()}</td><td class="type-cell">${tr.type}</td><td class="note-cell">${escapeHtml(tr.note || '')}</td>
+        <td><button class="edit-payment-btn" data-term="${tr.term}" data-date="${tr.date}" data-amount="${tr.amount}" data-type="${tr.type}" data-note="${escapeHtml(tr.note||'')}" data-index="${tr.index}">✏️ Edit</button>
+        <button class="delete-payment-btn" data-term="${tr.term}" data-date="${tr.date}" data-amount="${tr.amount}" data-index="${tr.index}">🗑️ Delete</button></td>`;
+    }
+    html += '</tbody></table>';
+    if (allTransactions.length === 0) html = '<p>No payment records found.</p>';
+    document.getElementById('bursarPaymentTransactions').innerHTML = html;
+    // Edit handlers
+    document.querySelectorAll('.edit-payment-btn').forEach(btn => {
+        btn.onclick = () => {
+            const term = btn.dataset.term;
+            const date = btn.dataset.date;
+            const amount = btn.dataset.amount;
+            const type = btn.dataset.type;
+            const note = btn.dataset.note;
+            const idx = parseInt(btn.dataset.index);
+            document.getElementById('editPaymentTerm').value = termNames[term] || term;
+            document.getElementById('editPaymentDate').value = date;
+            document.getElementById('editPaymentAmount').value = amount;
+            document.getElementById('editPaymentType').value = type;
+            document.getElementById('editPaymentNote').value = note;
+            editPaymentCallback = async () => {
+                const newAmount = parseFloat(document.getElementById('editPaymentAmount').value);
+                const newDate = document.getElementById('editPaymentDate').value;
+                const newType = document.getElementById('editPaymentType').value;
+                const newNote = document.getElementById('editPaymentNote').value;
+                if (isNaN(newAmount) || newAmount <= 0) { alert("Invalid amount"); return; }
+                let feeDoc = await db.collection('fee_records').doc(bursarCurrentStudent.id).get();
+                let feeData = feeDoc.exists ? feeDoc.data() : {};
+                let termData = feeData[term] || { total: 500000, paid: 0, transactions: [] };
+                let transactions = termData.transactions || [];
+                if (idx >= transactions.length) { alert("Transaction not found"); return; }
+                const oldAmount = transactions[idx].amount;
+                termData.paid = termData.paid - oldAmount + newAmount;
+                transactions[idx] = { date: newDate, amount: newAmount, type: newType, note: newNote };
+                termData.transactions = transactions;
+                feeData[term] = termData;
+                await db.collection('fee_records').doc(bursarCurrentStudent.id).set(feeData);
+                closeModal('editPaymentModal');
+                await loadBursarFeeStatus();
+                await loadPaymentTransactionsForBursar();
+                if (currentStudentDoc && currentStudentDoc.id === bursarCurrentStudent.id) loadPaymentHistory();
+                if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
+                showMessage('Payment updated', 'success', 'bursarPaymentMessage');
+            };
+            openModal('editPaymentModal');
+        };
+    });
+    document.querySelectorAll('.delete-payment-btn').forEach(btn => {
+        btn.onclick = async () => {
+            if (!confirm('Delete this payment?')) return;
+            const term = btn.dataset.term;
+            const amount = parseFloat(btn.dataset.amount);
+            const idx = parseInt(btn.dataset.index);
+            let feeDoc = await db.collection('fee_records').doc(bursarCurrentStudent.id).get();
+            let feeData = feeDoc.exists ? feeDoc.data() : {};
+            let termData = feeData[term] || { total: 500000, paid: 0, transactions: [] };
+            let transactions = termData.transactions || [];
+            if (idx >= transactions.length) { alert("Transaction not found"); return; }
+            termData.paid = termData.paid - amount;
+            transactions.splice(idx, 1);
+            termData.transactions = transactions;
+            feeData[term] = termData;
+            await db.collection('fee_records').doc(bursarCurrentStudent.id).set(feeData);
+            await loadBursarFeeStatus();
+            await loadPaymentTransactionsForBursar();
+            if (currentStudentDoc && currentStudentDoc.id === bursarCurrentStudent.id) loadPaymentHistory();
+            if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
+            showMessage('Payment deleted', 'success', 'bursarPaymentMessage');
+        };
+    });
+}
+document.getElementById('savePaymentEditBtn').onclick = () => { if (editPaymentCallback) editPaymentCallback(); };
+
+// ======================== BURSAR SUMMARY ========================
 async function loadBursarSummary() {
-    if (currentUserRole !== 'admin') return;
+    if (currentUserRole !== 'bursar' && currentUserRole !== 'admin') return;
     const classFilter = document.getElementById('bursarClassFilter').value;
     const studentsSnap = await db.collection('students').get();
     let studentsList = [];
@@ -601,31 +732,50 @@ async function loadBursarSummary() {
     const feeSnap = await db.collection('fee_records').get();
     feeSnap.forEach(doc => { feeRecordsMap.set(doc.id, doc.data()); });
     let rowsHtml = '';
-    let term1TotalPaid = 0, term2TotalPaid = 0, term3TotalPaid = 0, term1TotalBalance = 0, term2TotalBalance = 0, term3TotalBalance = 0;
+    let term1TotalPaid = 0, term2TotalPaid = 0, term3TotalPaid = 0;
+    let term1TotalBalance = 0, term2TotalBalance = 0, term3TotalBalance = 0;
     for(let student of studentsList) {
         let feeData = feeRecordsMap.get(student.id) || { term1: { total: 0, paid: 0 }, term2: { total: 0, paid: 0 }, term3: { total: 0, paid: 0 } };
-        let t1 = feeData.term1 || { total: 0, paid: 0 }, t2 = feeData.term2 || { total: 0, paid: 0 }, t3 = feeData.term3 || { total: 0, paid: 0 };
+        let t1 = feeData.term1 || { total: 0, paid: 0 };
+        let t2 = feeData.term2 || { total: 0, paid: 0 };
+        let t3 = feeData.term3 || { total: 0, paid: 0 };
         let t1Paid = t1.paid || 0, t1Bal = (t1.total || 0) - t1Paid;
         let t2Paid = t2.paid || 0, t2Bal = (t2.total || 0) - t2Paid;
         let t3Paid = t3.paid || 0, t3Bal = (t3.total || 0) - t3Paid;
-        let totalPaid = t1Paid + t2Paid + t3Paid, totalBalance = t1Bal + t2Bal + t3Bal;
+        let totalPaid = t1Paid + t2Paid + t3Paid;
+        let totalBalance = t1Bal + t2Bal + t3Bal;
         term1TotalPaid += t1Paid; term1TotalBalance += t1Bal;
         term2TotalPaid += t2Paid; term2TotalBalance += t2Bal;
         term3TotalPaid += t3Paid; term3TotalBalance += t3Bal;
         rowsHtml += `<tr>
-            <td>${escapeHtml(student.id)}</td><td>${escapeHtml(student.name)}</td><td>${escapeHtml(student.class)}</td>
+            <td>${escapeHtml(student.id)}</td>
+            <td>${escapeHtml(student.name)}</td>
+            <td>${escapeHtml(student.class)}</td>
             <td>${t1Paid.toLocaleString()} / ${(t1.total || 0).toLocaleString()} (Bal: ${t1Bal.toLocaleString()})</td>
             <td>${t2Paid.toLocaleString()} / ${(t2.total || 0).toLocaleString()} (Bal: ${t2Bal.toLocaleString()})</td>
             <td>${t3Paid.toLocaleString()} / ${(t3.total || 0).toLocaleString()} (Bal: ${t3Bal.toLocaleString()})</td>
-            <td>${totalPaid.toLocaleString()}</td><td>${totalBalance.toLocaleString()}</td>
-        </tr>`;
+            <td>${totalPaid.toLocaleString()}</td>
+            <td>${totalBalance.toLocaleString()}</td>
+        <tr>`;
     }
-    let summaryHtml = `<table border="1" style="width:100%"><thead><tr><th>Student ID</th><th>Name</th><th>Class</th><th>Term 1 (Paid / Total) [Balance]</th><th>Term 2 (Paid / Total) [Balance]</th><th>Term 3 (Paid / Total) [Balance]</th><th>Total Paid</th><th>Overall Balance</th></tr></thead><tbody>${rowsHtml || '<tr><td colspan="8">No students found</td>'}</tbody><tfoot style="background:#e9ecef;font-weight:bold;"><tr><td colspan="3"><strong>Totals:</strong></td><td><strong>${term1TotalPaid.toLocaleString()} / Paid | Bal: ${term1TotalBalance.toLocaleString()}</strong></td><td><strong>${term2TotalPaid.toLocaleString()} / Paid | Bal: ${term2TotalBalance.toLocaleString()}</strong></td><td><strong>${term3TotalPaid.toLocaleString()} / Paid | Bal: ${term3TotalBalance.toLocaleString()}</strong></td><td><strong>${(term1TotalPaid+term2TotalPaid+term3TotalPaid).toLocaleString()}</strong></td><td><strong>${(term1TotalBalance+term2TotalBalance+term3TotalBalance).toLocaleString()}</strong></td></tr></tfoot></table>`;
+    let summaryHtml = `<table border="1" style="width:100%">
+        <thead><tr><th>Student ID</th><th>Name</th><th>Class</th><th>Term 1 (Paid / Total) [Balance]</th><th>Term 2 (Paid / Total) [Balance]</th><th>Term 3 (Paid / Total) [Balance]</th><th>Total Paid</th><th>Overall Balance</th></tr></thead>
+        <tbody>${rowsHtml || '<tr><td colspan="8">No students found<\/td><\/tr>'}</tbody>
+        <tfoot style="background:#e9ecef;font-weight:bold;">
+            <tr><td colspan="3"><strong>Totals:</strong></td>
+            <td><strong>${term1TotalPaid.toLocaleString()} / Paid | Bal: ${term1TotalBalance.toLocaleString()}</strong></td>
+            <td><strong>${term2TotalPaid.toLocaleString()} / Paid | Bal: ${term2TotalBalance.toLocaleString()}</strong></td>
+            <td><strong>${term3TotalPaid.toLocaleString()} / Paid | Bal: ${term3TotalBalance.toLocaleString()}</strong></td>
+            <td><strong>${(term1TotalPaid+term2TotalPaid+term3TotalPaid).toLocaleString()}</strong></td>
+            <td><strong>${(term1TotalBalance+term2TotalBalance+term3TotalBalance).toLocaleString()}</strong></td>
+            </tr>
+        </tfoot>
+    </table>`;
     document.getElementById('bursarSummaryContainer').innerHTML = summaryHtml;
 }
 function exportBursarToCSV() { let table = document.querySelector('#bursarSummaryContainer table'); if(table) exportTableToCSV(table, 'fee_summary'); }
 
-// ======================== TEACHER MODULE ========================
+// ======================== TEACHER MODULE (abbreviated but fully functional) ========================
 async function loadAllTeachersForAdmin() {
     if (currentUserRole !== 'admin') return;
     let snap = await db.collection('teachers').get();
@@ -633,7 +783,12 @@ async function loadAllTeachersForAdmin() {
     for(let doc of snap.docs) {
         let t = doc.data();
         html += `<tr>
-            <td>${escapeHtml(t.id)}</td><td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.email)}</td><td>${escapeHtml(t.phone||'')}</td><td>${escapeHtml(t.class)}</td><td>${t.status === 'active' ? '✅ Active' : '❌ Inactive'}</td>
+            <td>${escapeHtml(t.id)}</td>
+            <td>${escapeHtml(t.name)}</td>
+            <td>${escapeHtml(t.email)}</td>
+            <td>${escapeHtml(t.phone||'')}</td>
+            <td>${escapeHtml(t.class)}</td>
+            <td>${t.status === 'active' ? '✅ Active' : '❌ Inactive'}</td>
             <td><button class="edit-teacher-btn" data-id="${t.id}" data-docid="${doc.id}">✏️ Edit</button> <button class="delete-teacher-btn" data-id="${t.id}" data-docid="${doc.id}">🗑️ Delete</button></td>
         </tr>`;
     }
@@ -664,7 +819,6 @@ async function importTeachersExcel(file) {
     };
     reader.readAsArrayBuffer(file);
 }
-// ENHANCED searchTeacherAdmin - shows full profile
 async function searchTeacherAdmin() {
     if (currentUserRole !== 'admin') return;
     let q = document.getElementById('teacherSearchInput').value.trim().toLowerCase();
@@ -674,32 +828,13 @@ async function searchTeacherAdmin() {
     for(let doc of snap.docs){ let t = doc.data(); if(t.id.toLowerCase()===q || t.name.toLowerCase().includes(q)){ found = { ...t, docId: doc.id }; break; } }
     let resultsDiv = document.getElementById('teacherSearchResults');
     if(!found){ resultsDiv.innerHTML='<div class="error">Teacher not found.</div>'; return; }
-    let html = `<div class="success" style="text-align:left;">
-        <h4>📋 Teacher Profile</h4>
-        <p><strong>ID:</strong> ${escapeHtml(found.id)}</p>
-        <p><strong>Name:</strong> ${escapeHtml(found.name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(found.email)}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(found.phone || 'N/A')}</p>
-        <p><strong>Class:</strong> ${escapeHtml(found.class)}</p>
-        <p><strong>Department:</strong> ${escapeHtml(found.department || 'N/A')}</p>
-        <p><strong>Subjects:</strong> ${escapeHtml(found.subjects || 'N/A')}</p>
-        <p><strong>Salary (Le):</strong> ${found.salary ? found.salary.toLocaleString() : 'N/A'}</p>
-        <p><strong>Employment Date:</strong> ${escapeHtml(found.employmentDate || 'N/A')}</p>
-        <p><strong>Date of Birth:</strong> ${escapeHtml(found.dob || 'N/A')}</p>
-        <p><strong>Status:</strong> ${found.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>
-    </div>`;
+    let html = `<div class="success" style="text-align:left;"><h4>📋 Teacher Profile</h4><p><strong>ID:</strong> ${escapeHtml(found.id)}</p><p><strong>Name:</strong> ${escapeHtml(found.name)}</p><p><strong>Email:</strong> ${escapeHtml(found.email)}</p><p><strong>Phone:</strong> ${escapeHtml(found.phone || 'N/A')}</p><p><strong>Class:</strong> ${escapeHtml(found.class)}</p><p><strong>Department:</strong> ${escapeHtml(found.department || 'N/A')}</p><p><strong>Subjects:</strong> ${escapeHtml(found.subjects || 'N/A')}</p><p><strong>Salary (Le):</strong> ${found.salary ? found.salary.toLocaleString() : 'N/A'}</p><p><strong>Employment Date:</strong> ${escapeHtml(found.employmentDate || 'N/A')}</p><p><strong>Date of Birth:</strong> ${escapeHtml(found.dob || 'N/A')}</p><p><strong>Status:</strong> ${found.status === 'active' ? '✅ Active' : '❌ Inactive'}</p></div>`;
     resultsDiv.innerHTML = html;
 }
 async function updateTeacherAdmin() {
     let docId = window.currentEditingTeacherDocId;
     if(!docId) return;
-    let updates = {
-        name: document.getElementById('editTeacherName').value.trim(),
-        email: document.getElementById('editTeacherEmail').value.trim(),
-        phone: document.getElementById('editTeacherPhone').value.trim(),
-        class: document.getElementById('editTeacherClass').value,
-        status: document.getElementById('editTeacherStatus').value
-    };
+    let updates = { name: document.getElementById('editTeacherName').value.trim(), email: document.getElementById('editTeacherEmail').value.trim(), phone: document.getElementById('editTeacherPhone').value.trim(), class: document.getElementById('editTeacherClass').value, status: document.getElementById('editTeacherStatus').value };
     if(!updates.name || !updates.email) { alert("Name and Email required"); return; }
     await db.collection('teachers').doc(docId).update(updates);
     closeModal('editTeacherModal');
@@ -721,19 +856,12 @@ async function displayOwnTeacherProfile() {
             document.getElementById('editOwnTeacherClass').value = t.class || 'JSS1';
             openModal('editOwnTeacherModal');
         };
-    } else {
-        document.getElementById('editOwnTeacherBtn').style.display = 'none';
-    }
+    } else { document.getElementById('editOwnTeacherBtn').style.display = 'none'; }
 }
 async function saveOwnTeacherProfile() {
     if (!teacherOwnData) return;
     const docId = teacherOwnData.docId;
-    const updates = {
-        name: document.getElementById('editOwnTeacherName').value.trim(),
-        email: document.getElementById('editOwnTeacherEmail').value.trim(),
-        phone: document.getElementById('editOwnTeacherPhone').value.trim(),
-        class: document.getElementById('editOwnTeacherClass').value
-    };
+    const updates = { name: document.getElementById('editOwnTeacherName').value.trim(), email: document.getElementById('editOwnTeacherEmail').value.trim(), phone: document.getElementById('editOwnTeacherPhone').value.trim(), class: document.getElementById('editOwnTeacherClass').value };
     if (!updates.name || !updates.email) { alert("Name and Email required"); return; }
     await db.collection('teachers').doc(docId).update(updates);
     await auth.currentUser.updateProfile({ displayName: updates.name });
@@ -762,7 +890,7 @@ async function loadTeacherRegisterForId(teacherId) {
     let histSnap = await db.collection('teacher_attendance').where('teacherId','==',teacher.id).get();
     let hist = []; histSnap.forEach(d=>hist.push(d.data()));
     hist.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-    let histHtml = '<h4>History</h4><table border="1"><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>' + hist.map(h=>`<tr><td class="date-cell">${h.date}</td><td class="checkin-cell">${h.checkInTime?new Date(h.checkInTime.toDate()).toLocaleTimeString():'--'}</td><td class="checkout-cell">${h.checkOutTime?new Date(h.checkOutTime.toDate()).toLocaleTimeString():'--'}</td></tr>`).join('') + '</tbody></table>';
+    let histHtml = '<h4>History</h4><table border="1"><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>' + hist.map(h=>`<tr><td class="date-cell">${h.date}</td><td class="checkin-cell">${h.checkInTime?new Date(h.checkInTime.toDate()).toLocaleTimeString():'--'}</td><td class="checkout-cell">${h.checkOutTime?new Date(h.checkOutTime.toDate()).toLocaleTimeString():'--'}</td>`).join('') + '</tbody></table>';
     document.getElementById('teacherRegisterHistory').innerHTML = histHtml;
 }
 async function loadTeacherRegister() {
@@ -771,17 +899,23 @@ async function loadTeacherRegister() {
     await loadTeacherRegisterForId(q);
 }
 
-// ======================== ADMIN MODULE ========================
+// ======================== ADMIN MODULE (full) ========================
 async function loadStaffList() {
     if (currentUserRole !== 'admin') return;
     let snap = await db.collection('staff').get();
-    let html = '<table border="1"><thead><td><th>ID</th><th>Name</th><th>Type</th><th>Today CheckIn</th><th>Action</th></tr></thead><tbody>';
+    let html = '<table border="1"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Today CheckIn</th><th>Action</th></tr></thead><tbody>';
     for(let doc of snap.docs) {
         let s = doc.data();
         let today = new Date().toISOString().slice(0,10);
         let att = await db.collection('staff_attendance').doc(`${today}_${s.id}`).get();
         let checkedIn = att.exists ? !!att.data().checkInTime : false;
-        html += `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.type)}</td><td>${checkedIn?'✅':'❌'}</td><td><button class="staff-checkin" data-id="${s.id}">Check In</button> <button class="staff-checkout" data-id="${s.id}">Check Out</button></td></tr>`;
+        html += `<tr>
+            <td>${escapeHtml(s.id)}</td>
+            <td>${escapeHtml(s.name)}</td>
+            <td>${escapeHtml(s.type)}</td>
+            <td>${checkedIn?'✅':'❌'}</td>
+            <td><button class="staff-checkin" data-id="${s.id}">Check In</button> <button class="staff-checkout" data-id="${s.id}">Check Out</button></td>
+        </tr>`;
     }
     html += '</tbody></table>';
     document.getElementById('staffListContainer').innerHTML = html;
@@ -799,7 +933,7 @@ async function loadAssetsList() {
     if (currentUserRole !== 'admin') return;
     let snap = await db.collection('assets').get();
     let html = '<table border="1"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Action</th></tr></thead><tbody>';
-    snap.forEach(d=>{ let a=d.data(); html+=`<tr><td>${escapeHtml(a.name)}</td><td>${escapeHtml(a.location||'')}</td><td>${a.status}</td><td><button class="delete-asset" data-id="${d.id}">Delete</button></td></tr>`; });
+    snap.forEach(d=>{ let a=d.data(); html+=`<tr><td class="name-cell">${escapeHtml(a.name)}</td><td class="location-cell">${escapeHtml(a.location||'')}</td><td class="status-cell">${a.status}</td><td class="action-cell"><button class="delete-asset" data-id="${d.id}">Delete</button></td>`; });
     html += '</tbody></table>';
     document.getElementById('assetsListContainer').innerHTML = html;
     document.querySelectorAll('.delete-asset').forEach(btn=>btn.onclick=async()=>{ await db.collection('assets').doc(btn.dataset.id).delete(); loadAssetsList(); });
@@ -815,7 +949,7 @@ async function loadInventoryList() {
     if (currentUserRole !== 'admin') return;
     let snap = await db.collection('inventory').get();
     let html = '<table border="1"><thead><tr><th>Item</th><th>Quantity</th><th>Unit</th><th>Action</th></tr></thead><tbody>';
-    snap.forEach(d=>{ let i=d.data(); html+=`<tr><td>${escapeHtml(i.name)}</td><td>${i.quantity}</td><td>${escapeHtml(i.unit||'')}</td><td><button class="edit-inventory" data-id="${d.id}">Edit Qty</button> <button class="delete-inventory" data-id="${d.id}">Delete</button></td></tr>`; });
+    snap.forEach(d=>{ let i=d.data(); html+=`<tr><td class="name-cell">${escapeHtml(i.name)}</td><td class="qty-cell">${i.quantity}</td><td class="unit-cell">${escapeHtml(i.unit||'')}</td><td class="action-cell"><button class="edit-inventory" data-id="${d.id}">Edit Qty</button> <button class="delete-inventory" data-id="${d.id}">Delete</button></td>`; });
     html += '</tbody></table>';
     document.getElementById('inventoryListContainer').innerHTML = html;
     document.querySelectorAll('.edit-inventory').forEach(btn=>btn.onclick=async()=>{ let q=prompt("New quantity:"); if(q) await db.collection('inventory').doc(btn.dataset.id).update({quantity:parseInt(q)}); loadInventoryList(); });
@@ -831,8 +965,8 @@ async function addInventory() {
 async function loadVisitorsList() {
     if (currentUserRole !== 'admin') return;
     let snap = await db.collection('visitors').orderBy('checkInTime','desc').limit(30).get();
-    let html = '<table border="1"><thead><tr><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th><th>Action</th></tr></thead><tbody>';
-    snap.forEach(d=>{ let v=d.data(); html+=`<tr><td>${escapeHtml(v.name)}</td><td>${escapeHtml(v.purpose)}</td><td>${escapeHtml(v.toSee||'')}</td><td>${escapeHtml(v.checkInTime)}</td><td>${v.checkOutTime?escapeHtml(v.checkOutTime):'Still inside'}</td><td>${!v.checkOutTime?`<button class="checkout-visitor" data-id="${d.id}">Check Out</button>`:'✅'}</td></tr>`; });
+    let html = '<table border="1"><thead><tr><th>Name</th><th>Purpose</th><th>To See</th><th>Check In</th><th>Check Out</th><th>Action</th><tr></thead><tbody>';
+    snap.forEach(d=>{ let v=d.data(); html+=`<tr><td class="name-cell">${escapeHtml(v.name)}</td><td class="purpose-cell">${escapeHtml(v.purpose)}</td><td class="tosee-cell">${escapeHtml(v.toSee||'')}</td><td class="checkin-cell">${escapeHtml(v.checkInTime)}</td><td class="checkout-cell">${v.checkOutTime?escapeHtml(v.checkOutTime):'Still inside'}</td><td class="action-cell">${!v.checkOutTime?`<button class="checkout-visitor" data-id="${d.id}">Check Out</button>`:'✅'}</td>`; });
     html += '</tbody></table>';
     document.getElementById('visitorsListContainer').innerHTML = html;
     document.querySelectorAll('.checkout-visitor').forEach(btn=>btn.onclick=async()=>{ await db.collection('visitors').doc(btn.dataset.id).update({checkOutTime:new Date().toLocaleString()}); loadVisitorsList(); });
@@ -926,7 +1060,6 @@ function setupRoleUI(role, extra = {}) {
     document.getElementById('teachersModule').style.display = 'none';
     document.getElementById('bursarModule').style.display = 'none';
     document.getElementById('adminModule').style.display = 'none';
-
     const adminSearchHandler = async () => {
         let q = document.getElementById('studentSearchInput').value.trim();
         let found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
@@ -936,13 +1069,11 @@ function setupRoleUI(role, extra = {}) {
         document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
         loadStudentProfile(); loadPaymentHistory(); loadExamHistory();
     };
-
     if (role === 'admin') {
         const modules = [
             { id: 'attendanceModuleBtn', label: '📋 Attendance', moduleId: 'attendanceModule' },
             { id: 'recordsModuleBtn', label: '📚 Student Records', moduleId: 'recordsModule' },
             { id: 'teachersModuleBtn', label: '👩‍🏫 Teachers', moduleId: 'teachersModule' },
-            { id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' },
             { id: 'adminModuleBtn', label: '⚙️ Admin', moduleId: 'adminModule' }
         ];
         modules.forEach(m => {
@@ -957,7 +1088,6 @@ function setupRoleUI(role, extra = {}) {
                 document.getElementById(m.moduleId).style.display = 'block';
                 if (m.moduleId === 'attendanceModule') renderAttendance();
                 if (m.moduleId === 'teachersModule') { loadAllTeachersForAdmin(); displayOwnTeacherProfile(); }
-                if (m.moduleId === 'bursarModule') { loadBursarSummary(); }
                 if (m.moduleId === 'adminModule') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); loadNotices(); initFileDB().then(loadFilesList); }
             };
             moduleContainer.appendChild(btn);
@@ -970,8 +1100,28 @@ function setupRoleUI(role, extra = {}) {
         loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); loadNotices(); initFileDB().then(loadFilesList);
         loadAllTeachersForAdmin();
         displayOwnTeacherProfile();
-    } 
-    else if (role === 'teacher') {
+    } else if (role === 'bursar') {
+        const modules = [{ id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' }];
+        modules.forEach(m => {
+            const btn = document.createElement('button');
+            btn.id = m.id;
+            btn.className = 'module-btn';
+            btn.textContent = m.label;
+            btn.onclick = () => {
+                document.querySelectorAll('.module-btn').forEach(b=>b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('#mainApp > div[id$="Module"]').forEach(div=>div.style.display='none');
+                document.getElementById(m.moduleId).style.display = 'block';
+                loadBursarSummary();
+            };
+            moduleContainer.appendChild(btn);
+        });
+        document.getElementById('importSection').style.display = 'none';
+        document.getElementById('manualSection').style.display = 'none';
+        document.getElementById('adminTeacherSections').style.display = 'none';
+        document.getElementById('teacherOwnProfileCard').style.display = 'none';
+        loadBursarSummary();
+    } else if (role === 'teacher') {
         teacherAssignedClass = extra.class || 'JSS1';
         teacherOwnData = extra.teacherData || null;
         const modules = [
@@ -1028,8 +1178,7 @@ function setupRoleUI(role, extra = {}) {
             document.getElementById('teacherRegisterSearch').value = teacherOwnData.id;
             loadTeacherRegisterForId(teacherOwnData.id);
         }
-    } 
-    else if (role === 'parent') {
+    } else if (role === 'parent') {
         parentLinkedStudentId = extra.studentId || null;
         if (!parentLinkedStudentId) { alert('No student linked to this parent account.'); return; }
         const modules = [{ id: 'recordsModuleBtn', label: '📚 My Child\'s Records', moduleId: 'recordsModule' }];
@@ -1058,7 +1207,6 @@ function setupRoleUI(role, extra = {}) {
         loadParentStudent();
     }
 }
-
 async function loadParentStudent() {
     if (!parentLinkedStudentId) return;
     const found = globalStudentMap.get(parentLinkedStudentId);
@@ -1087,7 +1235,8 @@ async function loginAndSetup(email, password) {
             const teacherSnap = await db.collection('teachers').where('uid', '==', auth.currentUser.uid).get();
             if (!teacherSnap.empty) teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherSnap.docs[0].data() };
             setupRoleUI('admin');
-            loadBursarSummary();
+        } else if (role === 'bursar') {
+            setupRoleUI('bursar');
         } else if (role === 'teacher') {
             const teacherSnap = await db.collection('teachers').where('uid', '==', auth.currentUser.uid).get();
             if (teacherSnap.empty) throw new Error('Teacher record not found for this account');
@@ -1104,7 +1253,6 @@ async function loginAndSetup(email, password) {
         loadNotices();
         initExamHistorySelectors();
         initPaymentHistorySelectors();
-        // Set up term/level selectors for exam records in attendance module
         document.querySelectorAll('#attendanceModule .term-btn').forEach(btn => {
             btn.onclick = () => {
                 document.querySelectorAll('#attendanceModule .term-btn').forEach(b=>b.classList.remove('active'));
@@ -1137,6 +1285,7 @@ window.onload = async () => {
 
     // Login handlers
     document.getElementById('demoAdminBtn').onclick = () => loginAndSetup('admin@school.com', 'admin123');
+    document.getElementById('demoBursarBtn').onclick = () => loginAndSetup('bursar@school.com', 'bursar123');
     document.getElementById('demoTeacherBtn').onclick = () => loginAndSetup('teacher@school.com', 'teacher123');
     document.getElementById('demoParentBtn').onclick = () => loginAndSetup('parent@school.com', 'parent123');
     document.getElementById('loginBtn').onclick = () => loginAndSetup(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
@@ -1153,9 +1302,9 @@ window.onload = async () => {
     document.getElementById('clearSearchBtn').onclick = () => { document.getElementById('studentSearchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; document.getElementById('studentRecordsPanel').style.display = 'none'; };
     document.getElementById('editProfileBtn').onclick = editProfile;
     document.getElementById('saveProfileBtn').onclick = saveProfile;
-    document.getElementById('refreshBursarBtn').onclick = () => { if (currentUserRole === 'admin') loadBursarSummary(); };
-    document.getElementById('exportBursarCSV').onclick = () => { if (currentUserRole === 'admin') exportBursarToCSV(); };
-    document.getElementById('bursarClassFilter').onchange = () => { if (currentUserRole === 'admin') loadBursarSummary(); };
+    document.getElementById('refreshBursarBtn').onclick = () => { if (currentUserRole === 'bursar') loadBursarSummary(); };
+    document.getElementById('exportBursarCSV').onclick = () => { if (currentUserRole === 'bursar') exportBursarToCSV(); };
+    document.getElementById('bursarClassFilter').onchange = () => { if (currentUserRole === 'bursar') loadBursarSummary(); };
     document.getElementById('searchTeacherRegisterBtn').onclick = () => loadTeacherRegister();
     document.getElementById('saveOwnTeacherBtn').onclick = saveOwnTeacherProfile;
     document.getElementById('saveTeacherBtn').onclick = updateTeacherAdmin;
