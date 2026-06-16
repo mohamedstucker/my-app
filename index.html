@@ -1186,7 +1186,7 @@
         </div>
     </div>
 
-    <!-- ===== UPDATED EDIT OWN TEACHER MODAL (expanded fields) ===== -->
+    <!-- Expanded edit own teacher modal -->
     <div id="editOwnTeacherModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editOwnTeacherModal')">&times;</span>
@@ -1249,6 +1249,15 @@
             </select>
             <input type="text" id="editPaymentNote" placeholder="Note" />
             <button id="savePaymentEditBtn" class="refresh-btn">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- NEW: Staff Attendance History Modal -->
+    <div id="staffHistoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('staffHistoryModal')">&times;</span>
+            <h3>Staff Attendance History</h3>
+            <div id="staffHistoryContent"></div>
         </div>
     </div>
 
@@ -1338,7 +1347,7 @@
         }
 
         // ============================================================
-        //  AUTO‑CREATE DEMO USERS
+        //  AUTO‑CREATE DEMO USERS (expanded teacher fields)
         // ============================================================
         async function ensureDemoUsers() {
             const adminEmail = "admin@school.com",
@@ -1365,16 +1374,36 @@
                     teacherUser = await auth.createUserWithEmailAndPassword(teacherEmail, teacherPass);
                     await db.collection('users').doc(teacherUser.user.uid).set({ role: 'teacher', email: teacherEmail,
                         name: 'Demo Teacher' });
-                    await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher',
-                        email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active',
-                        uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry',
-                        salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01' });
+                    await db.collection('teachers').doc('T001').set({
+                        id: 'T001',
+                        name: 'Demo Teacher',
+                        email: teacherEmail,
+                        class: 'JSS1',
+                        phone: '23276123456',
+                        status: 'active',
+                        uid: teacherUser.user.uid,
+                        department: 'Science',
+                        subjects: 'Physics, Chemistry',
+                        salary: 5000,
+                        dob: '1990-01-01',
+                        employmentDate: '2020-01-01'
+                    });
                 } else {
                     let doc = await db.collection('teachers').where('uid', '==', teacherUser.user.uid).get();
-                    if (doc.empty) await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher',
-                        email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active',
-                        uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry',
-                        salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01' });
+                    if (doc.empty) await db.collection('teachers').doc('T001').set({
+                        id: 'T001',
+                        name: 'Demo Teacher',
+                        email: teacherEmail,
+                        class: 'JSS1',
+                        phone: '23276123456',
+                        status: 'active',
+                        uid: teacherUser.user.uid,
+                        department: 'Science',
+                        subjects: 'Physics, Chemistry',
+                        salary: 5000,
+                        dob: '1990-01-01',
+                        employmentDate: '2020-01-01'
+                    });
                 }
                 let parentUser = await auth.signInWithEmailAndPassword(parentEmail, parentPass).catch(() => null);
                 if (!parentUser) {
@@ -1409,7 +1438,7 @@
         }
 
         // ============================================================
-        //  ATTENDANCE
+        //  ATTENDANCE (unchanged)
         // ============================================================
         async function loadStudents() {
             const snap = await db.collection('students').get();
@@ -1635,7 +1664,7 @@
         }
 
         // ============================================================
-        //  EXAM RECORDS (attendance module)
+        //  EXAM RECORDS (unchanged)
         // ============================================================
         async function loadExamStudent() {
             let q = document.getElementById('examStudentSearch').value.trim();
@@ -1730,7 +1759,7 @@
         }
 
         // ============================================================
-        //  EXAM HISTORY (student records)
+        //  EXAM HISTORY (student records) – unchanged
         // ============================================================
         async function loadExamHistory() {
             if (!currentStudentDoc) return;
@@ -1779,7 +1808,7 @@
         }
 
         // ============================================================
-        //  PAYMENT HISTORY (student records)
+        //  PAYMENT HISTORY (student records) – unchanged
         // ============================================================
         async function loadPaymentHistory() {
             if (!currentStudentDoc) return;
@@ -1821,34 +1850,42 @@
         }
 
         // ============================================================
-        //  ATTENDANCE HISTORY (student records)
+        //  ATTENDANCE HISTORY (student records) – FIXED (no orderBy)
         // ============================================================
         async function loadAttendanceHistory() {
-            if (!currentStudentDoc) return;
-            const snap = await db.collection('attendance')
-                .where('studentId', '==', currentStudentDoc.id)
-                .orderBy('date', 'desc')
-                .get();
-            let items = [];
-            snap.forEach(d => items.push(d.data()));
-            if (items.length === 0) {
-                document.getElementById('attendanceHistoryContent').innerHTML = '<p>No attendance records found.</p>';
+            if (!currentStudentDoc) {
+                document.getElementById('attendanceHistoryContent').innerHTML = '<p>No student selected.</p>';
                 return;
             }
-            let html =
-                '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
-            for (let rec of items) {
-                let statusEmoji = rec.status === 'present' ? '✅ Present' : (rec.status === 'absent' ? '❌ Absent' : (rec
-                    .status === 'late' ? '⏰ Late' : rec.status));
-                html +=
-                    `<tr><td>${rec.date}</td><td>${statusEmoji}</td><td>${escapeHtml(rec.remark || '')}</td></tr>`;
+            try {
+                const snap = await db.collection('attendance')
+                    .where('studentId', '==', currentStudentDoc.id)
+                    .get();
+                let items = [];
+                snap.forEach(doc => items.push(doc.data()));
+                if (items.length === 0) {
+                    document.getElementById('attendanceHistoryContent').innerHTML = '<p>No attendance records found.</p>';
+                    return;
+                }
+                items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+                let html = '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
+                for (let rec of items) {
+                    let statusEmoji = rec.status === 'present' ? '✅ Present' :
+                        (rec.status === 'absent' ? '❌ Absent' :
+                            (rec.status === 'late' ? '⏰ Late' : rec.status));
+                    html += `<tr><td>${escapeHtml(rec.date)}</td><td>${statusEmoji}</td><td>${escapeHtml(rec.remark || '')}</td></tr>`;
+                }
+                html += '</tbody></table>';
+                document.getElementById('attendanceHistoryContent').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading attendance history:', error);
+                document.getElementById('attendanceHistoryContent').innerHTML =
+                    `<div class="error">Failed to load attendance history: ${error.message}</div>`;
             }
-            html += '</tbody></table>';
-            document.getElementById('attendanceHistoryContent').innerHTML = html;
         }
 
         // ============================================================
-        //  STUDENT RECORDS (profile)
+        //  STUDENT RECORDS (profile) – unchanged
         // ============================================================
         async function loadStudentProfile() {
             if (!currentStudentDoc) return;
@@ -1896,7 +1933,7 @@
         }
 
         // ============================================================
-        //  BURSAR MODULE
+        //  BURSAR MODULE (unchanged)
         // ============================================================
         async function loadBursarStudent() {
             let q = document.getElementById('bursarStudentSearch').value.trim();
@@ -2081,7 +2118,7 @@
         document.getElementById('savePaymentEditBtn').onclick = () => { if (editPaymentCallback) editPaymentCallback(); };
 
         // ============================================================
-        //  BURSAR SUMMARY
+        //  BURSAR SUMMARY (unchanged)
         // ============================================================
         async function loadBursarSummary() {
             if (currentUserRole !== 'bursar' && currentUserRole !== 'admin') return;
@@ -2156,7 +2193,7 @@
         }
 
         // ============================================================
-        //  TEACHER MODULE – expanded own profile
+        //  TEACHER MODULE – expanded own profile (unchanged)
         // ============================================================
         async function loadAllTeachersForAdmin() {
             if (currentUserRole !== 'admin') return;
@@ -2290,7 +2327,7 @@
             loadAllTeachersForAdmin();
         }
 
-        // ---- Expanded own profile display ----
+        // Expanded own profile display
         async function displayOwnTeacherProfile() {
             if (!teacherOwnData) return;
             const t = teacherOwnData;
@@ -2310,7 +2347,6 @@
             if (currentUserRole === 'teacher' || currentUserRole === 'admin') {
                 document.getElementById('editOwnTeacherBtn').style.display = 'inline-block';
                 document.getElementById('editOwnTeacherBtn').onclick = () => {
-                    // Populate expanded fields
                     document.getElementById('editOwnTeacherId').value = t.id;
                     document.getElementById('editOwnTeacherName').value = t.name || '';
                     document.getElementById('editOwnTeacherEmail').value = t.email || '';
@@ -2328,7 +2364,6 @@
             }
         }
 
-        // ---- Save own profile with expanded fields ----
         async function saveOwnTeacherProfile() {
             if (!teacherOwnData) return;
             const docId = teacherOwnData.docId;
@@ -2407,13 +2442,62 @@
         }
 
         // ============================================================
-        //  ADMIN MODULE – STAFF (with check‑in/out & duration)
+        //  ADMIN MODULE – STAFF (with check‑in/out & duration + HISTORY)
         // ============================================================
+        // New function to load staff attendance history
+        async function loadStaffAttendanceHistory(staffId) {
+            try {
+                const snap = await db.collection('staff_attendance')
+                    .where('staffId', '==', staffId)
+                    .get();
+                let items = [];
+                snap.forEach(doc => items.push(doc.data()));
+                if (items.length === 0) {
+                    document.getElementById('staffHistoryContent').innerHTML = '<p>No attendance records found for this staff member.</p>';
+                    openModal('staffHistoryModal');
+                    return;
+                }
+                // Sort by date descending
+                items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+                let html = '<table><thead><tr><th>Date</th><th>Check‑In</th><th>Check‑Out</th><th>Duration</th></tr></thead><tbody>';
+                for (let rec of items) {
+                    let checkIn = rec.checkInTime ? new Date(rec.checkInTime).toLocaleString() : '—';
+                    let checkOut = rec.checkOutTime ? new Date(rec.checkOutTime).toLocaleString() : '—';
+                    let duration = '—';
+                    if (rec.checkInTime && rec.checkOutTime) {
+                        try {
+                            const inTime = new Date(rec.checkInTime);
+                            const outTime = new Date(rec.checkOutTime);
+                            const diffMs = outTime - inTime;
+                            if (diffMs > 0) {
+                                const hours = Math.floor(diffMs / 3600000);
+                                const mins = Math.floor((diffMs % 3600000) / 60000);
+                                duration = `${hours}h ${mins}m`;
+                            } else {
+                                duration = 'Invalid';
+                            }
+                        } catch (e) { duration = 'Error'; }
+                    } else if (rec.checkInTime && !rec.checkOutTime) {
+                        duration = 'Still in';
+                    }
+                    html += `<tr><td>${escapeHtml(rec.date)}</td><td>${escapeHtml(checkIn)}</td><td>${escapeHtml(checkOut)}</td><td>${escapeHtml(duration)}</td></tr>`;
+                }
+                html += '</tbody></table>';
+                document.getElementById('staffHistoryContent').innerHTML = html;
+                openModal('staffHistoryModal');
+            } catch (error) {
+                console.error('Error loading staff history:', error);
+                document.getElementById('staffHistoryContent').innerHTML = `<div class="error">Failed to load history: ${error.message}</div>`;
+                openModal('staffHistoryModal');
+            }
+        }
+
+        // Modified loadStaffList to include History button
         async function loadStaffList() {
             if (currentUserRole !== 'admin') return;
             const snap = await db.collection('staff').get();
             let html =
-                '<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Check‑In</th><th>Check‑Out</th><th>Duration</th><th>Action</th></tr></thead><tbody>';
+                '<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Check‑In</th><th>Check‑Out</th><th>Duration</th><th>Actions</th></tr></thead><tbody>';
             for (const doc of snap.docs) {
                 const s = doc.data();
                 const today = new Date().toISOString().slice(0, 10);
@@ -2448,6 +2532,7 @@
                     <td>
                         <button class="staff-checkin" data-id="${s.id}" ${data.checkInTime?'disabled':''}>✅ In</button>
                         <button class="staff-checkout" data-id="${s.id}" ${!data.checkInTime?'disabled':''}>🚪 Out</button>
+                        <button class="staff-history-btn" data-id="${s.id}">📜 History</button>
                     </td>
                 </tr>`;
             }
@@ -2477,6 +2562,12 @@
                     if (!doc.exists) return alert('No check‑in record found.');
                     await ref.update({ checkOutTime: new Date().toISOString() });
                     loadStaffList();
+                };
+            });
+            document.querySelectorAll('.staff-history-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const id = btn.dataset.id;
+                    loadStaffAttendanceHistory(id);
                 };
             });
         }
