@@ -865,6 +865,7 @@
                     <button class="tab-btn active" data-tab="profile">📋 Profile</button>
                     <button class="tab-btn" data-tab="examhistory">📜 Exam History</button>
                     <button class="tab-btn" data-tab="paymenthistory">💰 Payment History</button>
+                    <button class="tab-btn" data-tab="attendancehistory">📅 Attendance History</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
                     <div class="card">
@@ -902,6 +903,12 @@
                             <button class="pay-term-btn" data-term="term3">Term 3</button>
                         </div>
                         <div id="paymentHistoryContent"></div>
+                    </div>
+                </div>
+                <div id="attendancehistoryTab" class="tab-content">
+                    <div class="card">
+                        <h3>📅 Attendance History (Read‑only)</h3>
+                        <div id="attendanceHistoryContent"></div>
                     </div>
                 </div>
             </div>
@@ -1179,6 +1186,7 @@
         </div>
     </div>
 
+    <!-- ===== UPDATED EDIT OWN TEACHER MODAL (expanded fields) ===== -->
     <div id="editOwnTeacherModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editOwnTeacherModal')">&times;</span>
@@ -1187,10 +1195,18 @@
             <input type="text" id="editOwnTeacherName" placeholder="Full Name" />
             <input type="email" id="editOwnTeacherEmail" placeholder="Email" />
             <input type="tel" id="editOwnTeacherPhone" placeholder="Phone" />
+            <input type="date" id="editOwnTeacherDob" placeholder="Date of Birth" />
+            <input type="date" id="editOwnTeacherEmploymentDate" placeholder="Employment Date" />
+            <select id="editOwnTeacherDepartment">
+                <option>Science</option><option>Mathematics</option>
+                <option>English</option><option>Arts</option><option>Social Sciences</option>
+            </select>
+            <input type="text" id="editOwnTeacherSubjects" placeholder="Subjects (comma separated)" />
             <select id="editOwnTeacherClass">
                 <option>JSS1</option><option>JSS2</option><option>JSS3</option>
                 <option>SSS1</option><option>SSS2</option><option>SSS3</option>
             </select>
+            <input type="number" id="editOwnTeacherSalary" placeholder="Salary (Le)" step="0.01" />
             <button id="saveOwnTeacherBtn" class="refresh-btn">Save Changes</button>
         </div>
     </div>
@@ -1351,12 +1367,14 @@
                         name: 'Demo Teacher' });
                     await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher',
                         email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active',
-                        uid: teacherUser.user.uid });
+                        uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry',
+                        salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01' });
                 } else {
                     let doc = await db.collection('teachers').where('uid', '==', teacherUser.user.uid).get();
                     if (doc.empty) await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher',
                         email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active',
-                        uid: teacherUser.user.uid });
+                        uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry',
+                        salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01' });
                 }
                 let parentUser = await auth.signInWithEmailAndPassword(parentEmail, parentPass).catch(() => null);
                 if (!parentUser) {
@@ -1803,6 +1821,33 @@
         }
 
         // ============================================================
+        //  ATTENDANCE HISTORY (student records)
+        // ============================================================
+        async function loadAttendanceHistory() {
+            if (!currentStudentDoc) return;
+            const snap = await db.collection('attendance')
+                .where('studentId', '==', currentStudentDoc.id)
+                .orderBy('date', 'desc')
+                .get();
+            let items = [];
+            snap.forEach(d => items.push(d.data()));
+            if (items.length === 0) {
+                document.getElementById('attendanceHistoryContent').innerHTML = '<p>No attendance records found.</p>';
+                return;
+            }
+            let html =
+                '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
+            for (let rec of items) {
+                let statusEmoji = rec.status === 'present' ? '✅ Present' : (rec.status === 'absent' ? '❌ Absent' : (rec
+                    .status === 'late' ? '⏰ Late' : rec.status));
+                html +=
+                    `<tr><td>${rec.date}</td><td>${statusEmoji}</td><td>${escapeHtml(rec.remark || '')}</td></tr>`;
+            }
+            html += '</tbody></table>';
+            document.getElementById('attendanceHistoryContent').innerHTML = html;
+        }
+
+        // ============================================================
         //  STUDENT RECORDS (profile)
         // ============================================================
         async function loadStudentProfile() {
@@ -2111,7 +2156,7 @@
         }
 
         // ============================================================
-        //  TEACHER MODULE
+        //  TEACHER MODULE – expanded own profile
         // ============================================================
         async function loadAllTeachersForAdmin() {
             if (currentUserRole !== 'admin') return;
@@ -2173,7 +2218,12 @@
                 email,
                 class: document.getElementById('teacherClass').value,
                 phone: document.getElementById('teacherPhone').value,
-                status: 'active'
+                department: document.getElementById('teacherDepartment').value,
+                subjects: document.getElementById('teacherSubjects').value,
+                salary: parseFloat(document.getElementById('teacherSalary').value) || 0,
+                dob: document.getElementById('teacherDob').value,
+                employmentDate: document.getElementById('teacherEmploymentDate').value,
+                status: document.getElementById('teacherStatus').value || 'active'
             });
             showMessage('Teacher added', 'success', 'teacherMessage');
             loadAllTeachersForAdmin();
@@ -2192,6 +2242,11 @@
                         email: r.Email,
                         class: r.Class || 'JSS1',
                         phone: r.Phone || '',
+                        department: r.Department || '',
+                        subjects: r.Subjects || '',
+                        salary: parseFloat(r.Salary) || 0,
+                        dob: r.DOB || '',
+                        employmentDate: r.EmploymentDate || '',
                         status: 'active'
                     });
                 }
@@ -2235,25 +2290,45 @@
             loadAllTeachersForAdmin();
         }
 
+        // ---- Expanded own profile display ----
         async function displayOwnTeacherProfile() {
             if (!teacherOwnData) return;
             const t = teacherOwnData;
             let html =
-                `<p><strong>ID:</strong> ${escapeHtml(t.id)}</p><p><strong>Name:</strong> ${escapeHtml(t.name)}</p><p><strong>Email:</strong> ${escapeHtml(t.email)}</p><p><strong>Phone:</strong> ${escapeHtml(t.phone || 'N/A')}</p><p><strong>Class:</strong> ${escapeHtml(t.class)}</p><p><strong>Status:</strong> ${t.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`;
+                `<p><strong>ID:</strong> ${escapeHtml(t.id)}</p>
+                 <p><strong>Name:</strong> ${escapeHtml(t.name)}</p>
+                 <p><strong>Email:</strong> ${escapeHtml(t.email)}</p>
+                 <p><strong>Phone:</strong> ${escapeHtml(t.phone || 'N/A')}</p>
+                 <p><strong>Class:</strong> ${escapeHtml(t.class)}</p>
+                 <p><strong>Department:</strong> ${escapeHtml(t.department || 'N/A')}</p>
+                 <p><strong>Subjects:</strong> ${escapeHtml(t.subjects || 'N/A')}</p>
+                 <p><strong>Salary (Le):</strong> ${t.salary ? t.salary.toLocaleString() : 'N/A'}</p>
+                 <p><strong>Date of Birth:</strong> ${escapeHtml(t.dob || 'N/A')}</p>
+                 <p><strong>Employment Date:</strong> ${escapeHtml(t.employmentDate || 'N/A')}</p>
+                 <p><strong>Status:</strong> ${t.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`;
             document.getElementById('ownTeacherProfile').innerHTML = html;
-            if (currentUserRole === 'teacher') {
+            if (currentUserRole === 'teacher' || currentUserRole === 'admin') {
                 document.getElementById('editOwnTeacherBtn').style.display = 'inline-block';
                 document.getElementById('editOwnTeacherBtn').onclick = () => {
+                    // Populate expanded fields
                     document.getElementById('editOwnTeacherId').value = t.id;
                     document.getElementById('editOwnTeacherName').value = t.name || '';
                     document.getElementById('editOwnTeacherEmail').value = t.email || '';
                     document.getElementById('editOwnTeacherPhone').value = t.phone || '';
+                    document.getElementById('editOwnTeacherDob').value = t.dob || '';
+                    document.getElementById('editOwnTeacherEmploymentDate').value = t.employmentDate || '';
+                    document.getElementById('editOwnTeacherDepartment').value = t.department || 'Science';
+                    document.getElementById('editOwnTeacherSubjects').value = t.subjects || '';
                     document.getElementById('editOwnTeacherClass').value = t.class || 'JSS1';
+                    document.getElementById('editOwnTeacherSalary').value = t.salary || '';
                     openModal('editOwnTeacherModal');
                 };
-            } else { document.getElementById('editOwnTeacherBtn').style.display = 'none'; }
+            } else {
+                document.getElementById('editOwnTeacherBtn').style.display = 'none';
+            }
         }
 
+        // ---- Save own profile with expanded fields ----
         async function saveOwnTeacherProfile() {
             if (!teacherOwnData) return;
             const docId = teacherOwnData.docId;
@@ -2261,7 +2336,12 @@
                 name: document.getElementById('editOwnTeacherName').value.trim(),
                 email: document.getElementById('editOwnTeacherEmail').value.trim(),
                 phone: document.getElementById('editOwnTeacherPhone').value.trim(),
-                class: document.getElementById('editOwnTeacherClass').value
+                class: document.getElementById('editOwnTeacherClass').value,
+                department: document.getElementById('editOwnTeacherDepartment').value,
+                subjects: document.getElementById('editOwnTeacherSubjects').value.trim(),
+                salary: parseFloat(document.getElementById('editOwnTeacherSalary').value) || 0,
+                dob: document.getElementById('editOwnTeacherDob').value,
+                employmentDate: document.getElementById('editOwnTeacherEmploymentDate').value
             };
             if (!updates.name || !updates.email) { alert("Name and Email required"); return; }
             await db.collection('teachers').doc(docId).update(updates);
@@ -2275,6 +2355,9 @@
             updateClassDropdown();
         }
 
+        // ============================================================
+        //  TEACHER REGISTER (unchanged)
+        // ============================================================
         async function loadTeacherRegisterForId(teacherId) {
             let found = await db.collection('teachers').doc(teacherId).get();
             if (!found.exists) { showMessage('Teacher not found', 'error', 'teacherRegisterInfo'); return; }
@@ -2324,44 +2407,81 @@
         }
 
         // ============================================================
-        //  ADMIN MODULE
+        //  ADMIN MODULE – STAFF (with check‑in/out & duration)
         // ============================================================
         async function loadStaffList() {
             if (currentUserRole !== 'admin') return;
-            let snap = await db.collection('staff').get();
+            const snap = await db.collection('staff').get();
             let html =
-                '<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Today CheckIn</th><th>Action</th></tr></thead><tbody>';
-            for (let doc of snap.docs) {
-                let s = doc.data();
-                let today = new Date().toISOString().slice(0, 10);
-                let att = await db.collection('staff_attendance').doc(`${today}_${s.id}`).get();
-                let checkedIn = att.exists ? !!att.data().checkInTime : false;
+                '<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Check‑In</th><th>Check‑Out</th><th>Duration</th><th>Action</th></tr></thead><tbody>';
+            for (const doc of snap.docs) {
+                const s = doc.data();
+                const today = new Date().toISOString().slice(0, 10);
+                const attDoc = await db.collection('staff_attendance').doc(`${today}_${s.id}`).get();
+                const data = attDoc.exists ? attDoc.data() : {};
+                const checkIn = data.checkInTime || '—';
+                const checkOut = data.checkOutTime || '—';
+                let duration = '—';
+                if (data.checkInTime && data.checkOutTime) {
+                    try {
+                        const inTime = new Date(data.checkInTime);
+                        const outTime = new Date(data.checkOutTime);
+                        const diffMs = outTime - inTime;
+                        if (diffMs > 0) {
+                            const hours = Math.floor(diffMs / 3600000);
+                            const mins = Math.floor((diffMs % 3600000) / 60000);
+                            duration = `${hours}h ${mins}m`;
+                        } else {
+                            duration = 'Invalid';
+                        }
+                    } catch (e) { duration = 'Error'; }
+                } else if (data.checkInTime && !data.checkOutTime) {
+                    duration = 'Still in';
+                }
                 html += `<tr>
                     <td>${escapeHtml(s.id)}</td>
                     <td>${escapeHtml(s.name)}</td>
                     <td>${escapeHtml(s.type)}</td>
-                    <td>${checkedIn?'✅':'❌'}</td>
-                    <td><button class="staff-checkin" data-id="${s.id}">Check In</button> <button class="staff-checkout" data-id="${s.id}">Check Out</button></td>
+                    <td>${escapeHtml(checkIn)}</td>
+                    <td>${escapeHtml(checkOut)}</td>
+                    <td>${escapeHtml(duration)}</td>
+                    <td>
+                        <button class="staff-checkin" data-id="${s.id}" ${data.checkInTime?'disabled':''}>✅ In</button>
+                        <button class="staff-checkout" data-id="${s.id}" ${!data.checkInTime?'disabled':''}>🚪 Out</button>
+                    </td>
                 </tr>`;
             }
             html += '</tbody></table>';
             document.getElementById('staffListContainer').innerHTML = html;
-            document.querySelectorAll('.staff-checkin').forEach(btn => btn.onclick = async () => {
-                let id = btn.dataset.id,
-                    today = new Date().toISOString().slice(0, 10);
-                await db.collection('staff_attendance').doc(`${today}_${id}`).set({ staffId: id, date: today,
-                    checkInTime: new Date().toLocaleString(), checkOutTime: null });
-                loadStaffList();
+
+            // Attach events
+            document.querySelectorAll('.staff-checkin').forEach(btn => {
+                btn.onclick = async () => {
+                    const id = btn.dataset.id;
+                    const today = new Date().toISOString().slice(0, 10);
+                    await db.collection('staff_attendance').doc(`${today}_${id}`).set({
+                        staffId: id,
+                        date: today,
+                        checkInTime: new Date().toISOString(),
+                        checkOutTime: null
+                    });
+                    loadStaffList();
+                };
             });
-            document.querySelectorAll('.staff-checkout').forEach(btn => btn.onclick = async () => {
-                let id = btn.dataset.id,
-                    today = new Date().toISOString().slice(0, 10);
-                await db.collection('staff_attendance').doc(`${today}_${id}`).update({ checkOutTime: new Date()
-                        .toLocaleString() });
-                loadStaffList();
+            document.querySelectorAll('.staff-checkout').forEach(btn => {
+                btn.onclick = async () => {
+                    const id = btn.dataset.id;
+                    const today = new Date().toISOString().slice(0, 10);
+                    const ref = db.collection('staff_attendance').doc(`${today}_${id}`);
+                    const doc = await ref.get();
+                    if (!doc.exists) return alert('No check‑in record found.');
+                    await ref.update({ checkOutTime: new Date().toISOString() });
+                    loadStaffList();
+                };
             });
         }
 
+        // ----- other admin functions (unchanged) -----
         async function addStaff() {
             if (currentUserRole !== 'admin') return;
             let id = document.getElementById('staffId').value.trim(),
@@ -2634,6 +2754,7 @@
                 loadStudentProfile();
                 loadPaymentHistory();
                 loadExamHistory();
+                loadAttendanceHistory();
             };
 
             if (role === 'admin') {
@@ -2747,6 +2868,7 @@
                     loadStudentProfile();
                     loadPaymentHistory();
                     loadExamHistory();
+                    loadAttendanceHistory();
                 };
                 document.getElementById('searchStudentBtn').onclick = teacherSearchHandler;
                 document.getElementById('importSection').style.display = 'none';
@@ -2809,6 +2931,7 @@
             loadStudentProfile();
             loadPaymentHistory();
             loadExamHistory();
+            loadAttendanceHistory();
         }
 
         // ============================================================
@@ -2960,7 +3083,8 @@
             };
             document.getElementById('downloadTeacherSampleBtn').onclick = () => {
                 let ws = XLSX.utils.json_to_sheet([{ TeacherID: 'T001', Name: 'Jane Smith', Email: 'jane@school.com',
-                    Class: 'JSS1' }]);
+                    Class: 'JSS1', Department: 'Science', Subjects: 'Physics, Chemistry', Salary: 5000,
+                    DOB: '1990-01-01', EmploymentDate: '2020-01-01' }]);
                 let wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
                 XLSX.writeFile(wb, 'teacher_sample.xlsx');
@@ -3046,6 +3170,7 @@
                 document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
                 if (btn.dataset.tab === 'examhistory' && currentStudentDoc) loadExamHistory();
                 if (btn.dataset.tab === 'paymenthistory' && currentStudentDoc) loadPaymentHistory();
+                if (btn.dataset.tab === 'attendancehistory' && currentStudentDoc) loadAttendanceHistory();
             });
 
             document.getElementById('loginModal').style.display = 'flex';
