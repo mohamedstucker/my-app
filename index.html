@@ -144,6 +144,53 @@
             backdrop-filter: blur(4px);
         }
 
+        /* ----- GLOBAL NOTICES ----- */
+        #globalNotices {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            padding: 18px 24px;
+            border-radius: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #globalNotices h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0b2b5c;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #globalNotices .notice-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 0.9rem;
+        }
+        #globalNotices .notice-item:last-child {
+            border-bottom: none;
+        }
+        #globalNotices .notice-item .notice-title {
+            font-weight: 600;
+            color: #1a4b8a;
+        }
+        #globalNotices .notice-item .notice-date {
+            font-size: 0.75rem;
+            color: #6c7a89;
+            margin-left: 12px;
+        }
+        #globalNotices .notice-item .notice-content {
+            color: #2c3e50;
+            margin-top: 2px;
+        }
+        #globalNotices .no-notices {
+            color: #6c7a89;
+            font-style: italic;
+        }
+
         /* ----- BUTTONS ----- */
         button {
             padding: 9px 22px;
@@ -478,7 +525,7 @@
             background: #f8d7da !important;
         }
 
-        /* ----- NOTICE CARDS ----- */
+        /* ----- NOTICE CARDS (used in admin tab) ----- */
         .notice-card {
             border-left: 6px solid #2a6bb0;
             background: #fefcf5;
@@ -715,6 +762,10 @@
             .search-box input {
                 max-width: 100%;
             }
+            #globalNotices {
+                padding: 14px 16px;
+                max-height: 150px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -747,6 +798,10 @@
                 font-size: 0.8rem;
                 padding: 12px 16px;
             }
+            #globalNotices {
+                padding: 12px 14px;
+                max-height: 120px;
+            }
         }
     </style>
 </head>
@@ -764,6 +819,12 @@
 
     <!-- ====== SYNC BAR ====== -->
     <div id="syncBar" class="sync-bar">⏳ initializing system…</div>
+
+    <!-- ====== GLOBAL NOTICES ====== -->
+    <div id="globalNotices">
+        <h3>📢 Latest Notices</h3>
+        <div id="globalNoticesList"><span class="no-notices">Loading notices…</span></div>
+    </div>
 
     <!-- ====== MAIN APP ====== -->
     <div id="mainApp" style="display:none;">
@@ -1252,7 +1313,7 @@
         </div>
     </div>
 
-    <!-- NEW: Staff Attendance History Modal -->
+    <!-- Staff History Modal -->
     <div id="staffHistoryModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('staffHistoryModal')">&times;</span>
@@ -1885,6 +1946,72 @@
         }
 
         // ============================================================
+        //  NOTICES – GLOBAL AND ADMIN
+        // ============================================================
+        // Render notices to a given container (by id). If no container, update both global and admin tab.
+        async function renderNotices(containerId) {
+            try {
+                const snap = await db.collection('notices').orderBy('timestamp', 'desc').limit(10).get();
+                let notices = [];
+                snap.forEach(d => notices.push({ id: d.id, ...d.data() }));
+
+                // Build HTML for global notices (simpler, compact)
+                let globalHtml = '';
+                if (notices.length === 0) {
+                    globalHtml = '<span class="no-notices">No notices available.</span>';
+                } else {
+                    notices.forEach(n => {
+                        globalHtml +=
+                            `<div class="notice-item"><span class="notice-title">${escapeHtml(n.title)}</span><span class="notice-date">${escapeHtml(n.date)}</span><div class="notice-content">${escapeHtml(n.content)}</div></div>`;
+                    });
+                }
+                document.getElementById('globalNoticesList').innerHTML = globalHtml;
+
+                // Also update the admin tab's notice board if it exists and is visible
+                if (currentUserRole === 'admin') {
+                    let adminHtml = '';
+                    notices.forEach(n => {
+                        adminHtml +=
+                            `<div class="notice-card"><div class="notice-title">${escapeHtml(n.title)}</div><div>${escapeHtml(n.content)}</div><small>${escapeHtml(n.date)}</small><br><a class="share-wa" href="https://wa.me/?text=${encodeURIComponent(n.title+'\n'+n.content)}" target="_blank">📱 Share on WhatsApp</a><button class="delete-notice" data-id="${n.id}" style="margin-left:10px; background:#fde8e8; color:#b71c1c;">Delete</button></div>`;
+                    });
+                    document.getElementById('noticesList').innerHTML = adminHtml || '<p>No notices</p>';
+
+                    // Attach delete events for admin
+                    document.querySelectorAll('.delete-notice').forEach(btn => {
+                        btn.onclick = async () => {
+                            if (confirm('Delete this notice?')) {
+                                await db.collection('notices').doc(btn.dataset.id).delete();
+                                renderNotices(); // refresh both
+                            }
+                        };
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading notices:', error);
+                document.getElementById('globalNoticesList').innerHTML =
+                    `<span class="error">Failed to load notices.</span>`;
+            }
+        }
+
+        // Function to post a new notice (admin only)
+        async function postNotice() {
+            if (currentUserRole !== 'admin') return;
+            let title = document.getElementById('noticeTitle').value.trim(),
+                content = document.getElementById('noticeContent').value.trim();
+            if (!title || !content) return showMessage('Title and content required', 'error', 'noticeMessage');
+            await db.collection('notices').add({
+                title,
+                content,
+                date: new Date().toLocaleString(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showMessage('Notice posted!', 'success', 'noticeMessage');
+            document.getElementById('noticeTitle').value = '';
+            document.getElementById('noticeContent').value = '';
+            renderNotices(); // refresh both
+        }
+
+        // ============================================================
         //  STUDENT RECORDS (profile) – unchanged
         // ============================================================
         async function loadStudentProfile() {
@@ -2444,7 +2571,6 @@
         // ============================================================
         //  ADMIN MODULE – STAFF (with check‑in/out & duration + HISTORY)
         // ============================================================
-        // New function to load staff attendance history
         async function loadStaffAttendanceHistory(staffId) {
             try {
                 const snap = await db.collection('staff_attendance')
@@ -2457,7 +2583,6 @@
                     openModal('staffHistoryModal');
                     return;
                 }
-                // Sort by date descending
                 items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
                 let html = '<table><thead><tr><th>Date</th><th>Check‑In</th><th>Check‑Out</th><th>Duration</th></tr></thead><tbody>';
                 for (let rec of items) {
@@ -2492,7 +2617,6 @@
             }
         }
 
-        // Modified loadStaffList to include History button
         async function loadStaffList() {
             if (currentUserRole !== 'admin') return;
             const snap = await db.collection('staff').get();
@@ -2539,7 +2663,6 @@
             html += '</tbody></table>';
             document.getElementById('staffListContainer').innerHTML = html;
 
-            // Attach events
             document.querySelectorAll('.staff-checkin').forEach(btn => {
                 btn.onclick = async () => {
                     const id = btn.dataset.id;
@@ -2692,38 +2815,8 @@
             showMessage(`Checked out ${snap.size} visitor(s)`, 'success', 'visitorMessage');
         }
 
-        async function loadNotices() {
-            let snap = await db.collection('notices').orderBy('timestamp', 'desc').get();
-            let html = '';
-            snap.forEach(d => {
-                let n = d.data();
-                html +=
-                    `<div class="notice-card"><div class="notice-title">${escapeHtml(n.title)}</div><div>${escapeHtml(n.content)}</div><small>${n.date}</small><br><a class="share-wa" href="https://wa.me/?text=${encodeURIComponent(n.title+'\n'+n.content)}" target="_blank">📱 Share on WhatsApp</a>${currentUserRole==='admin'?`<button class="delete-notice" data-id="${d.id}" style="margin-left:10px; background:#fde8e8; color:#b71c1c;">Delete</button>`:''}</div>`;
-            });
-            document.getElementById('noticesList').innerHTML = html || '<p>No notices</p>';
-            if (currentUserRole === 'admin') document.querySelectorAll('.delete-notice').forEach(btn => btn.onclick =
-                async () => {
-                    if (confirm('Delete?')) { await db.collection('notices').doc(btn.dataset.id).delete();
-                        loadNotices(); }
-                });
-        }
-
-        async function postNotice() {
-            if (currentUserRole !== 'admin') return;
-            let title = document.getElementById('noticeTitle').value.trim(),
-                content = document.getElementById('noticeContent').value.trim();
-            if (!title || !content) return showMessage('Title and content required', 'error', 'noticeMessage');
-            await db.collection('notices').add({
-                title,
-                content,
-                date: new Date().toLocaleString(),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showMessage('Notice posted!', 'success', 'noticeMessage');
-            document.getElementById('noticeTitle').value = '';
-            document.getElementById('noticeContent').value = '';
-            loadNotices();
-        }
+        // NOTICES are now handled globally – we no longer need the standalone loadNotices for admin tab; instead, renderNotices() does both.
+        // The postNotice function is defined above.
 
         async function uploadFileToLocal() {
             if (currentUserRole !== 'admin') return;
@@ -2873,7 +2966,7 @@
                             loadAssetsList();
                             loadInventoryList();
                             loadVisitorsList();
-                            loadNotices();
+                            renderNotices(); // refresh admin tab notices
                             initFileDB().then(loadFilesList); }
                     };
                     moduleContainer.appendChild(btn);
@@ -2887,7 +2980,7 @@
                 loadAssetsList();
                 loadInventoryList();
                 loadVisitorsList();
-                loadNotices();
+                renderNotices();
                 initFileDB().then(loadFilesList);
                 loadAllTeachersForAdmin();
                 displayOwnTeacherProfile();
@@ -3041,6 +3134,9 @@
                 document.getElementById('userInfo').innerText = `${role.toUpperCase()}: ${email}`;
                 document.getElementById('logoutBtn').style.display = 'inline-block';
                 await loadStudents();
+                // Load global notices for all roles
+                renderNotices();
+
                 if (role === 'admin') {
                     const teacherSnap = await db.collection('teachers').where('uid', '==', auth.currentUser.uid).get();
                     if (!teacherSnap.empty) teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherSnap.docs[0]
@@ -3061,7 +3157,6 @@
                 } else {
                     throw new Error('Invalid role');
                 }
-                loadNotices();
                 initExamHistorySelectors();
                 initPaymentHistorySelectors();
                 document.querySelectorAll('#attendanceModule .term-btn').forEach(btn => {
@@ -3219,8 +3314,10 @@
                 else alert('No table visible');
             };
             document.getElementById('printNoticesBtn').onclick = () => {
-                let div = document.getElementById('noticesList');
+                // Print global notices (or admin list)
+                let div = document.getElementById('globalNoticesList');
                 if (div) printTable(div, 'Notices');
+                else alert('No notices to print');
             };
             document.getElementById('exportStudentsCSV').onclick = exportAllStudentsCSV;
             document.getElementById('exportTeachersCSVAdmin').onclick = exportAllTeachersCSV;
@@ -3229,7 +3326,7 @@
             document.getElementById('addInventoryBtn').onclick = addInventory;
             document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
             document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
-            document.getElementById('postNoticeBtn').onclick = postNotice;
+            document.getElementById('postNoticeBtn').onclick = postNotice; // admin posts
             document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
             document.getElementById('refreshFilesBtn').onclick = () => initFileDB().then(loadFilesList);
             document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
@@ -3249,7 +3346,7 @@
                 else if (id === 'assets') loadAssetsList();
                 else if (id === 'inventory') loadInventoryList();
                 else if (id === 'visitors') loadVisitorsList();
-                else if (id === 'noticeboard') loadNotices();
+                else if (id === 'noticeboard') renderNotices(); // refresh admin notice tab
                 else if (id === 'filestorage') initFileDB().then(loadFilesList);
             });
 
