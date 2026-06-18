@@ -57,21 +57,26 @@
         }
 
         .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             font-size: 1.6rem;
             font-weight: 700;
             background: linear-gradient(135deg, #0b2b5c, #1a4b8a);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        .header h1::before {
-            content: "🏫";
+        /* Logo SVG – keep its own colors */
+        .header h1 svg {
+            height: 48px;
+            width: auto;
             -webkit-text-fill-color: initial;
-            font-size: 1.8rem;
+        }
+
+        .header h1 span {
+            -webkit-text-fill-color: transparent;
         }
 
         .header-right {
@@ -717,6 +722,9 @@
             .header h1 {
                 font-size: 1.3rem;
             }
+            .header h1 svg {
+                height: 38px;
+            }
             .header-right {
                 justify-content: center;
             }
@@ -772,8 +780,8 @@
             .header h1 {
                 font-size: 1.1rem;
             }
-            .header h1::before {
-                font-size: 1.4rem;
+            .header h1 svg {
+                height: 30px;
             }
             .module-btn {
                 padding: 8px 14px;
@@ -809,7 +817,19 @@
 
     <!-- ====== HEADER ====== -->
     <div class="header">
-        <h1>School Management System</h1>
+        <h1>
+            <!-- Embedded Edu SL Logo -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60">
+                <rect width="160" height="60" rx="12" fill="#1a4b8a" />
+                <text x="12" y="24" font-family="Arial, sans-serif" font-size="18" fill="white" font-weight="bold">Edu SL</text>
+                <text x="12" y="42" font-family="Arial, sans-serif" font-size="11" fill="#ffd700" font-weight="600">SCHOOL MANAGEMENT</text>
+                <text x="12" y="54" font-family="Arial, sans-serif" font-size="7" fill="white" opacity="0.85">Empowering Sierra Leone's Education</text>
+                <!-- Small decorative line -->
+                <line x1="120" y1="10" x2="150" y2="10" stroke="#ffd700" stroke-width="2" />
+                <line x1="120" y1="50" x2="150" y2="50" stroke="#ffd700" stroke-width="2" />
+            </svg>
+            <span>School Management System</span>
+        </h1>
         <div class="header-right">
             <span id="userInfo"></span>
             <button id="logoutBtn" style="display:none;">🚪 Logout</button>
@@ -1319,6 +1339,28 @@
             <span class="close-modal" onclick="closeModal('staffHistoryModal')">&times;</span>
             <h3>Staff Attendance History</h3>
             <div id="staffHistoryContent"></div>
+        </div>
+    </div>
+
+    <!-- Bursar History Modal -->
+    <div id="bursarHistoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('bursarHistoryModal')">&times;</span>
+            <h3>Payment History</h3>
+            <div id="bursarHistoryContent"></div>
+        </div>
+    </div>
+
+    <!-- Bursar Edit Fees Modal -->
+    <div id="bursarEditFeesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('bursarEditFeesModal')">&times;</span>
+            <h3>Edit Term Fees</h3>
+            <label>Term 1: <input type="number" id="bursarEditTerm1" step="0.01" /></label>
+            <label>Term 2: <input type="number" id="bursarEditTerm2" step="0.01" /></label>
+            <label>Term 3: <input type="number" id="bursarEditTerm3" step="0.01" /></label>
+            <button id="saveBursarEditFeesBtn" class="refresh-btn">Save Changes</button>
+            <div id="bursarEditFeesMessage"></div>
         </div>
     </div>
 
@@ -1948,14 +1990,12 @@
         // ============================================================
         //  NOTICES – GLOBAL AND ADMIN
         // ============================================================
-        // Render notices to a given container (by id). If no container, update both global and admin tab.
         async function renderNotices(containerId) {
             try {
                 const snap = await db.collection('notices').orderBy('timestamp', 'desc').limit(10).get();
                 let notices = [];
                 snap.forEach(d => notices.push({ id: d.id, ...d.data() }));
 
-                // Build HTML for global notices (simpler, compact)
                 let globalHtml = '';
                 if (notices.length === 0) {
                     globalHtml = '<span class="no-notices">No notices available.</span>';
@@ -1967,7 +2007,6 @@
                 }
                 document.getElementById('globalNoticesList').innerHTML = globalHtml;
 
-                // Also update the admin tab's notice board if it exists and is visible
                 if (currentUserRole === 'admin') {
                     let adminHtml = '';
                     notices.forEach(n => {
@@ -1976,12 +2015,11 @@
                     });
                     document.getElementById('noticesList').innerHTML = adminHtml || '<p>No notices</p>';
 
-                    // Attach delete events for admin
                     document.querySelectorAll('.delete-notice').forEach(btn => {
                         btn.onclick = async () => {
                             if (confirm('Delete this notice?')) {
                                 await db.collection('notices').doc(btn.dataset.id).delete();
-                                renderNotices(); // refresh both
+                                renderNotices();
                             }
                         };
                     });
@@ -1993,7 +2031,6 @@
             }
         }
 
-        // Function to post a new notice (admin only)
         async function postNotice() {
             if (currentUserRole !== 'admin') return;
             let title = document.getElementById('noticeTitle').value.trim(),
@@ -2008,7 +2045,7 @@
             showMessage('Notice posted!', 'success', 'noticeMessage');
             document.getElementById('noticeTitle').value = '';
             document.getElementById('noticeContent').value = '';
-            renderNotices(); // refresh both
+            renderNotices();
         }
 
         // ============================================================
@@ -2060,7 +2097,7 @@
         }
 
         // ============================================================
-        //  BURSAR MODULE (unchanged)
+        //  BURSAR MODULE (with new history & edit fees functions)
         // ============================================================
         async function loadBursarStudent() {
             let q = document.getElementById('bursarStudentSearch').value.trim();
@@ -2244,9 +2281,7 @@
         }
         document.getElementById('savePaymentEditBtn').onclick = () => { if (editPaymentCallback) editPaymentCallback(); };
 
-        // ============================================================
-        //  BURSAR SUMMARY (unchanged)
-        // ============================================================
+        // ---- Bursar summary with History & Edit Fees ----
         async function loadBursarSummary() {
             if (currentUserRole !== 'bursar' && currentUserRole !== 'admin') return;
             const classFilter = document.getElementById('bursarClassFilter').value;
@@ -2297,11 +2332,15 @@
                     <td>${t3Paid.toLocaleString()} / ${(t3.total || 0).toLocaleString()} (Bal: ${t3Bal.toLocaleString()})</td>
                     <td>${totalPaid.toLocaleString()}</td>
                     <td>${totalBalance.toLocaleString()}</td>
+                    <td>
+                        <button class="bursar-history-btn" data-id="${student.id}">📜 History</button>
+                        <button class="bursar-edit-fees-btn" data-id="${student.id}">✏️ Edit Fees</button>
+                    </td>
                 </tr>`;
             }
             let summaryHtml = `<table style="width:100%">
-                <thead><tr><th>Student ID</th><th>Name</th><th>Class</th><th>Term 1 (Paid / Total) [Balance]</th><th>Term 2 (Paid / Total) [Balance]</th><th>Term 3 (Paid / Total) [Balance]</th><th>Total Paid</th><th>Overall Balance</th></tr></thead>
-                <tbody>${rowsHtml || '<tr><td colspan="8">No students found</td></tr>'}</tbody>
+                <thead><tr><th>Student ID</th><th>Name</th><th>Class</th><th>Term 1 (Paid / Total) [Balance]</th><th>Term 2 (Paid / Total) [Balance]</th><th>Term 3 (Paid / Total) [Balance]</th><th>Total Paid</th><th>Overall Balance</th><th>Actions</th></tr></thead>
+                <tbody>${rowsHtml || '<tr><td colspan="9">No students found</td></tr>'}</tbody>
                 <tfoot style="background:#e9edf2;font-weight:700;">
                     <tr><td colspan="3"><strong>Totals:</strong></td>
                     <td><strong>${term1TotalPaid.toLocaleString()} / Paid | Bal: ${term1TotalBalance.toLocaleString()}</strong></td>
@@ -2309,15 +2348,97 @@
                     <td><strong>${term3TotalPaid.toLocaleString()} / Paid | Bal: ${term3TotalBalance.toLocaleString()}</strong></td>
                     <td><strong>${(term1TotalPaid+term2TotalPaid+term3TotalPaid).toLocaleString()}</strong></td>
                     <td><strong>${(term1TotalBalance+term2TotalBalance+term3TotalBalance).toLocaleString()}</strong></td>
+                    <td></td>
                 </tr></tfoot>
             </table>`;
             document.getElementById('bursarSummaryContainer').innerHTML = summaryHtml;
+
+            // Attach history button events
+            document.querySelectorAll('.bursar-history-btn').forEach(btn => {
+                btn.onclick = () => showBursarHistory(btn.dataset.id);
+            });
+            // Attach edit fees button events
+            document.querySelectorAll('.bursar-edit-fees-btn').forEach(btn => {
+                btn.onclick = () => showBursarEditFees(btn.dataset.id);
+            });
         }
 
         function exportBursarToCSV() {
             let table = document.querySelector('#bursarSummaryContainer table');
             if (table) exportTableToCSV(table, 'fee_summary');
         }
+
+        // ---- New functions for history and edit fees ----
+        async function showBursarHistory(studentId) {
+            try {
+                const feeDoc = await db.collection('fee_records').doc(studentId).get();
+                let feeData = feeDoc.exists ? feeDoc.data() : {};
+                let allTransactions = [];
+                for (let term of ['term1', 'term2', 'term3']) {
+                    let termData = feeData[term] || { transactions: [] };
+                    for (let tr of (termData.transactions || [])) {
+                        allTransactions.push({ term, ...tr });
+                    }
+                }
+                allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                let termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
+                let html = `<h4>Payment History for ${studentId}</h4>`;
+                if (allTransactions.length === 0) {
+                    html += '<p>No transactions found.</p>';
+                } else {
+                    html += '<table><thead><tr><th>Date</th><th>Term</th><th>Amount (Le)</th><th>Type</th><th>Note</th></tr></thead><tbody>';
+                    for (let tr of allTransactions) {
+                        html +=
+                            `<tr><td>${tr.date}</td><td>${termNames[tr.term]}</td><td>${tr.amount.toLocaleString()}</td><td>${tr.type}</td><td>${escapeHtml(tr.note || '')}</td></tr>`;
+                    }
+                    html += '</tbody></table>';
+                }
+                document.getElementById('bursarHistoryContent').innerHTML = html;
+                openModal('bursarHistoryModal');
+            } catch (error) {
+                alert('Error loading history: ' + error.message);
+            }
+        }
+
+        async function showBursarEditFees(studentId) {
+            try {
+                const feeDoc = await db.collection('fee_records').doc(studentId).get();
+                let feeData = feeDoc.exists ? feeDoc.data() : {};
+                document.getElementById('bursarEditTerm1').value = feeData.term1?.total || 500000;
+                document.getElementById('bursarEditTerm2').value = feeData.term2?.total || 500000;
+                document.getElementById('bursarEditTerm3').value = feeData.term3?.total || 500000;
+                document.getElementById('saveBursarEditFeesBtn').dataset.studentId = studentId;
+                openModal('bursarEditFeesModal');
+                document.getElementById('bursarEditFeesMessage').innerHTML = '';
+            } catch (error) {
+                alert('Error loading fees: ' + error.message);
+            }
+        }
+
+        document.getElementById('saveBursarEditFeesBtn').onclick = async function() {
+            const studentId = this.dataset.studentId;
+            if (!studentId) { alert('No student selected'); return; }
+            const term1 = parseFloat(document.getElementById('bursarEditTerm1').value) || 500000;
+            const term2 = parseFloat(document.getElementById('bursarEditTerm2').value) || 500000;
+            const term3 = parseFloat(document.getElementById('bursarEditTerm3').value) || 500000;
+            try {
+                const feeDoc = await db.collection('fee_records').doc(studentId).get();
+                let feeData = feeDoc.exists ? feeDoc.data() : {};
+                feeData.term1 = { ...feeData.term1, total: term1 };
+                feeData.term2 = { ...feeData.term2, total: term2 };
+                feeData.term3 = { ...feeData.term3, total: term3 };
+                await db.collection('fee_records').doc(studentId).set(feeData);
+                document.getElementById('bursarEditFeesMessage').innerHTML =
+                    `<div class="success">Fees updated successfully.</div>`;
+                setTimeout(() => {
+                    closeModal('bursarEditFeesModal');
+                    if (currentUserRole === 'bursar' || currentUserRole === 'admin') loadBursarSummary();
+                }, 1000);
+            } catch (error) {
+                document.getElementById('bursarEditFeesMessage').innerHTML =
+                    `<div class="error">Error: ${error.message}</div>`;
+            }
+        };
 
         // ============================================================
         //  TEACHER MODULE – expanded own profile (unchanged)
@@ -2454,7 +2575,6 @@
             loadAllTeachersForAdmin();
         }
 
-        // Expanded own profile display
         async function displayOwnTeacherProfile() {
             if (!teacherOwnData) return;
             const t = teacherOwnData;
@@ -2815,9 +2935,6 @@
             showMessage(`Checked out ${snap.size} visitor(s)`, 'success', 'visitorMessage');
         }
 
-        // NOTICES are now handled globally – we no longer need the standalone loadNotices for admin tab; instead, renderNotices() does both.
-        // The postNotice function is defined above.
-
         async function uploadFileToLocal() {
             if (currentUserRole !== 'admin') return;
             if (!fileDB) await initFileDB();
@@ -2966,7 +3083,7 @@
                             loadAssetsList();
                             loadInventoryList();
                             loadVisitorsList();
-                            renderNotices(); // refresh admin tab notices
+                            renderNotices();
                             initFileDB().then(loadFilesList); }
                     };
                     moduleContainer.appendChild(btn);
@@ -3134,7 +3251,6 @@
                 document.getElementById('userInfo').innerText = `${role.toUpperCase()}: ${email}`;
                 document.getElementById('logoutBtn').style.display = 'inline-block';
                 await loadStudents();
-                // Load global notices for all roles
                 renderNotices();
 
                 if (role === 'admin') {
@@ -3206,7 +3322,6 @@
             window.addEventListener('offline', updateOnlineStatus);
             await ensureDemoUsers();
 
-            // ---- Login handlers ----
             document.getElementById('demoAdminBtn').onclick = () => loginAndSetup('admin@school.com', 'admin123');
             document.getElementById('demoBursarBtn').onclick = () => loginAndSetup('bursar@school.com', 'bursar123');
             document.getElementById('demoTeacherBtn').onclick = () => loginAndSetup('teacher@school.com', 'teacher123');
@@ -3215,7 +3330,6 @@
                 document.getElementById('loginPassword').value);
             document.getElementById('logoutBtn').onclick = () => auth.signOut().then(() => location.reload());
 
-            // ---- Common button handlers ----
             document.getElementById('importBtn').onclick = () => {
                 if (currentUserRole !== 'admin') return;
                 let f = document.getElementById('excelFile').files[0];
@@ -3314,7 +3428,6 @@
                 else alert('No table visible');
             };
             document.getElementById('printNoticesBtn').onclick = () => {
-                // Print global notices (or admin list)
                 let div = document.getElementById('globalNoticesList');
                 if (div) printTable(div, 'Notices');
                 else alert('No notices to print');
@@ -3326,7 +3439,7 @@
             document.getElementById('addInventoryBtn').onclick = addInventory;
             document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
             document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
-            document.getElementById('postNoticeBtn').onclick = postNotice; // admin posts
+            document.getElementById('postNoticeBtn').onclick = postNotice;
             document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
             document.getElementById('refreshFilesBtn').onclick = () => initFileDB().then(loadFilesList);
             document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
@@ -3335,7 +3448,6 @@
             document.getElementById('saveBursarFeesBtn').onclick = saveBursarTermFees;
             document.getElementById('submitBursarPaymentBtn').onclick = recordBursarPayment;
 
-            // ---- Admin tabs ----
             document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => btn.onclick = () => {
                 let id = btn.dataset.tab;
                 document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
@@ -3346,11 +3458,10 @@
                 else if (id === 'assets') loadAssetsList();
                 else if (id === 'inventory') loadInventoryList();
                 else if (id === 'visitors') loadVisitorsList();
-                else if (id === 'noticeboard') renderNotices(); // refresh admin notice tab
+                else if (id === 'noticeboard') renderNotices();
                 else if (id === 'filestorage') initFileDB().then(loadFilesList);
             });
 
-            // ---- Student record tabs ----
             document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
