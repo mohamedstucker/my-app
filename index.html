@@ -70,7 +70,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* Logo SVG – keep its own colors */
         .header h1 svg {
             height: 48px;
             width: auto;
@@ -711,7 +710,35 @@
             border-top: 2px dashed #e6edf4;
         }
 
-        /* ----- RESPONSIVE ----- */
+        /* ----- FLOATING SUGGESTION BUTTON ----- */
+        .suggestion-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #1a4b8a, #2a6bb0);
+            color: #fff;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 0 8px 30px rgba(26, 75, 138, 0.4);
+            cursor: pointer;
+            z-index: 1000;
+            transition: 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .suggestion-fab:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(26, 75, 138, 0.5);
+        }
+        .suggestion-fab:active {
+            transform: scale(0.95);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             body {
                 padding: 12px;
@@ -776,6 +803,12 @@
                 padding: 14px 16px;
                 max-height: 150px;
             }
+            .suggestion-fab {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -812,6 +845,12 @@
                 padding: 12px 14px;
                 max-height: 120px;
             }
+            .suggestion-fab {
+                bottom: 16px;
+                right: 16px;
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -826,7 +865,6 @@
                 <text x="12" y="24" font-family="Arial, sans-serif" font-size="18" fill="white" font-weight="bold">Edu SL</text>
                 <text x="12" y="42" font-family="Arial, sans-serif" font-size="11" fill="#ffd700" font-weight="600">SCHOOL MANAGEMENT</text>
                 <text x="12" y="54" font-family="Arial, sans-serif" font-size="7" fill="white" opacity="0.85">Empowering Sierra Leone's Education</text>
-                <!-- Small decorative line -->
                 <line x1="120" y1="10" x2="150" y2="10" stroke="#ffd700" stroke-width="2" />
                 <line x1="120" y1="50" x2="150" y2="50" stroke="#ffd700" stroke-width="2" />
             </svg>
@@ -1139,6 +1177,8 @@
                 <button class="admin-tab-btn" data-tab="noticeboard">📢 Notice Board</button>
                 <button class="admin-tab-btn" data-tab="filestorage">📁 File Storage</button>
                 <button class="admin-tab-btn" data-tab="export">📎 Print / Export</button>
+                <!-- NEW Suggestions tab (admin only) -->
+                <button class="admin-tab-btn" data-tab="suggestions">📋 Suggestions</button>
             </div>
 
             <div id="staffTab" class="admin-tab active">
@@ -1226,6 +1266,15 @@
                     <button id="printNoticesBtn" class="refresh-btn">🖨️ Print All Notices</button>
                 </div>
             </div>
+
+            <!-- NEW Suggestions Tab (admin only) -->
+            <div id="suggestionsTab" class="admin-tab">
+                <div class="card">
+                    <h3>📋 All Suggestions</h3>
+                    <button id="refreshSuggestionsBtn" class="refresh-btn">🔄 Refresh</button>
+                    <div id="suggestionsList"><p>Loading suggestions…</p></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1248,7 +1297,23 @@
         </div>
     </div>
 
-    <!-- ===== MODALS ===== -->
+    <!-- ===== SUGGESTION MODALS ===== -->
+    <!-- Submit Suggestion Modal -->
+    <div id="suggestionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('suggestionModal')">&times;</span>
+            <h3>💬 Submit Your Suggestion</h3>
+            <p>Your suggestion helps us improve the system. You may remain anonymous if you prefer.</p>
+            <textarea id="suggestionText" rows="5" placeholder="Write your suggestion here…" style="width:100%; max-width:100%;"></textarea>
+            <button id="submitSuggestionBtn" class="refresh-btn">📨 Submit</button>
+            <div id="suggestionMessage"></div>
+        </div>
+    </div>
+
+    <!-- ===== FLOATING SUGGESTION BUTTON ===== -->
+    <button id="suggestionFab" class="suggestion-fab">💬 Suggestion</button>
+
+    <!-- ===== OTHER MODALS (unchanged) ===== -->
     <div id="editProfileModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span>
@@ -1269,7 +1334,6 @@
         </div>
     </div>
 
-    <!-- Expanded edit own teacher modal -->
     <div id="editOwnTeacherModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editOwnTeacherModal')">&times;</span>
@@ -1335,7 +1399,6 @@
         </div>
     </div>
 
-    <!-- Staff History Modal -->
     <div id="staffHistoryModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('staffHistoryModal')">&times;</span>
@@ -1344,7 +1407,6 @@
         </div>
     </div>
 
-    <!-- Bursar History Modal -->
     <div id="bursarHistoryModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('bursarHistoryModal')">&times;</span>
@@ -1353,7 +1415,6 @@
         </div>
     </div>
 
-    <!-- Bursar Edit Fees Modal -->
     <div id="bursarEditFeesModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('bursarEditFeesModal')">&times;</span>
@@ -2099,7 +2160,7 @@
         }
 
         // ============================================================
-        //  BURSAR MODULE (with new history & edit fees functions)
+        //  BURSAR MODULE (with new history & edit fees functions) – unchanged
         // ============================================================
         async function loadBursarStudent() {
             let q = document.getElementById('bursarStudentSearch').value.trim();
@@ -2355,11 +2416,9 @@
             </table>`;
             document.getElementById('bursarSummaryContainer').innerHTML = summaryHtml;
 
-            // Attach history button events
             document.querySelectorAll('.bursar-history-btn').forEach(btn => {
                 btn.onclick = () => showBursarHistory(btn.dataset.id);
             });
-            // Attach edit fees button events
             document.querySelectorAll('.bursar-edit-fees-btn').forEach(btn => {
                 btn.onclick = () => showBursarEditFees(btn.dataset.id);
             });
@@ -2370,7 +2429,6 @@
             if (table) exportTableToCSV(table, 'fee_summary');
         }
 
-        // ---- New functions for history and edit fees ----
         async function showBursarHistory(studentId) {
             try {
                 const feeDoc = await db.collection('fee_records').doc(studentId).get();
@@ -3034,7 +3092,105 @@
         }
 
         // ============================================================
-        //  ROLE‑BASED UI
+        //  SUGGESTION BOX FEATURE
+        // ============================================================
+
+        // ---- Submit a suggestion ----
+        document.getElementById('submitSuggestionBtn').onclick = async function() {
+            const text = document.getElementById('suggestionText').value.trim();
+            if (!text) {
+                showMessage('Please write your suggestion.', 'error', 'suggestionMessage');
+                return;
+            }
+            try {
+                const user = auth.currentUser;
+                const suggestionData = {
+                    text: text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending',
+                    userEmail: user ? user.email : null,
+                    userName: user ? user.displayName || user.email : 'Anonymous',
+                };
+                await db.collection('suggestions').add(suggestionData);
+                document.getElementById('suggestionText').value = '';
+                showMessage('Thank you! Your suggestion has been submitted.', 'success', 'suggestionMessage');
+                setTimeout(() => {
+                    closeModal('suggestionModal');
+                }, 1500);
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error', 'suggestionMessage');
+            }
+        };
+
+        // ---- Load suggestions (admin only) ----
+        async function loadSuggestions() {
+            if (currentUserRole !== 'admin') return;
+            try {
+                const snap = await db.collection('suggestions')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                if (snap.empty) {
+                    document.getElementById('suggestionsList').innerHTML = '<p>No suggestions yet.</p>';
+                    return;
+                }
+                let html = '<table><thead><tr><th>Date</th><th>User</th><th>Suggestion</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
+                    const status = data.status || 'pending';
+                    const statusBadge = status === 'resolved' ?
+                        '<span style="color:#27ae60;">✅ Resolved</span>' :
+                        '<span style="color:#f39c12;">⏳ Pending</span>';
+                    html += `<tr>
+                        <td>${escapeHtml(date)}</td>
+                        <td>${escapeHtml(data.userName || 'Anonymous')}</td>
+                        <td>${escapeHtml(data.text)}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            ${status === 'pending' ? `<button class="resolve-suggestion-btn" data-id="${doc.id}">✅ Resolve</button>` : ''}
+                            <button class="delete-suggestion-btn" data-id="${doc.id}" style="background:#fde8e8; color:#b71c1c;">🗑️ Delete</button>
+                        </td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                document.getElementById('suggestionsList').innerHTML = html;
+
+                // Attach resolve event
+                document.querySelectorAll('.resolve-suggestion-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Mark this suggestion as resolved?')) {
+                            await db.collection('suggestions').doc(this.dataset.id).update({ status: 'resolved' });
+                            loadSuggestions();
+                        }
+                    };
+                });
+                // Attach delete event
+                document.querySelectorAll('.delete-suggestion-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Delete this suggestion?')) {
+                            await db.collection('suggestions').doc(this.dataset.id).delete();
+                            loadSuggestions();
+                        }
+                    };
+                });
+            } catch (error) {
+                document.getElementById('suggestionsList').innerHTML = `<div class="error">Failed to load suggestions: ${error.message}</div>`;
+            }
+        }
+
+        // ---- Floating button ----
+        document.getElementById('suggestionFab').onclick = function() {
+            // Only show if user is logged in, or we can allow anyone. We'll allow anyone.
+            document.getElementById('suggestionText').value = '';
+            document.getElementById('suggestionMessage').innerHTML = '';
+            openModal('suggestionModal');
+        };
+
+        // ---- Refresh suggestions ----
+        document.getElementById('refreshSuggestionsBtn').onclick = loadSuggestions;
+
+        // ============================================================
+        //  ROLE‑BASED UI (modified to include admin suggestions tab)
         // ============================================================
         function setupRoleUI(role, extra = {}) {
             const moduleContainer = document.getElementById('moduleButtons');
@@ -3044,6 +3200,9 @@
             document.getElementById('teachersModule').style.display = 'none';
             document.getElementById('bursarModule').style.display = 'none';
             document.getElementById('adminModule').style.display = 'none';
+
+            // Show suggestion button for everyone (even if not logged in)
+            document.getElementById('suggestionFab').style.display = 'flex';
 
             const adminSearchHandler = async () => {
                 let q = document.getElementById('studentSearchInput').value.trim();
@@ -3086,7 +3245,9 @@
                             loadInventoryList();
                             loadVisitorsList();
                             renderNotices();
-                            initFileDB().then(loadFilesList); }
+                            initFileDB().then(loadFilesList);
+                            // Default to staff tab, but suggestions will be loaded when clicked
+                        }
                     };
                     moduleContainer.appendChild(btn);
                 });
@@ -3103,6 +3264,7 @@
                 initFileDB().then(loadFilesList);
                 loadAllTeachersForAdmin();
                 displayOwnTeacherProfile();
+                // Admin suggestion tab is already in HTML; load suggestions when tab is clicked
             } else if (role === 'bursar') {
                 const modules = [
                     { id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' }
@@ -3450,20 +3612,26 @@
             document.getElementById('saveBursarFeesBtn').onclick = saveBursarTermFees;
             document.getElementById('submitBursarPaymentBtn').onclick = recordBursarPayment;
 
-            document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => btn.onclick = () => {
-                let id = btn.dataset.tab;
-                document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display = 'none');
-                document.getElementById(id + 'Tab').style.display = 'block';
-                if (id === 'staff') loadStaffList();
-                else if (id === 'assets') loadAssetsList();
-                else if (id === 'inventory') loadInventoryList();
-                else if (id === 'visitors') loadVisitorsList();
-                else if (id === 'noticeboard') renderNotices();
-                else if (id === 'filestorage') initFileDB().then(loadFilesList);
+            // ---- Admin tabs (including suggestions) ----
+            document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const id = btn.dataset.tab;
+                    document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove(
+                    'active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display = 'none');
+                    document.getElementById(id + 'Tab').style.display = 'block';
+                    if (id === 'staff') loadStaffList();
+                    else if (id === 'assets') loadAssetsList();
+                    else if (id === 'inventory') loadInventoryList();
+                    else if (id === 'visitors') loadVisitorsList();
+                    else if (id === 'noticeboard') renderNotices();
+                    else if (id === 'filestorage') initFileDB().then(loadFilesList);
+                    else if (id === 'suggestions') loadSuggestions();
+                };
             });
 
+            // ---- Student record tabs ----
             document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
@@ -3477,6 +3645,5 @@
             document.getElementById('loginModal').style.display = 'flex';
         };
     </script>
-
 </body>
 </html>
