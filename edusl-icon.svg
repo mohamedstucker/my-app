@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E7A45"/>
+      <stop offset="100%" style="stop-color:#0C3520"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F4CC4A"/>
+      <stop offset="100%" style="stop-color:#C8900A"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#00000035"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded square background (app icon base) -->
+  <rect x="10" y="10" width="180" height="180" rx="38" fill="url(#shieldGrad)" filter="url(#shadow)"/>
+
+  <!-- Inner shield outline -->
+  <path d="M100 28 L158 28 L158 118 Q100 160 100 160 Q100 160 42 118 L42 28 Z"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.5" opacity="0.45"/>
+
+  <!-- Open Book -->
+  <!-- Left page -->
+  <path d="M50 90 Q72 82 97 87 L97 138 Q72 132 50 138 Z"
+        fill="white" opacity="0.97"/>
+  <!-- Right page -->
+  <path d="M103 87 Q128 82 150 90 L150 138 Q128 132 103 138 Z"
+        fill="white" opacity="0.87"/>
+  <!-- Spine -->
+  <line x1="100" y1="87" x2="100" y2="138"
+        stroke="url(#goldGrad)" stroke-width="3"/>
+  <!-- Bottom curve -->
+  <path d="M50 138 Q100 150 150 138"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.5"/>
+
+  <!-- Text lines left page -->
+  <line x1="60" y1="100" x2="90" y2="98" stroke="#1B4332" stroke-width="2" opacity="0.45" stroke-linecap="round"/>
+  <line x1="60" y1="110" x2="90" y2="108" stroke="#1B4332" stroke-width="2" opacity="0.45" stroke-linecap="round"/>
+  <line x1="60" y1="120" x2="85" y2="118" stroke="#1B4332" stroke-width="2" opacity="0.45" stroke-linecap="round"/>
+
+  <!-- Text lines right page -->
+  <line x1="110" y1="98" x2="140" y2="100" stroke="#1B4332" stroke-width="2" opacity="0.38" stroke-linecap="round"/>
+  <line x1="110" y1="108" x2="140" y2="110" stroke="#1B4332" stroke-width="2" opacity="0.38" stroke-linecap="round"/>
+  <line x1="110" y1="118" x2="135" y2="120" stroke="#1B4332" stroke-width="2" opacity="0.38" stroke-linecap="round"/>
+
+  <!-- Mortarboard cap -->
+  <!-- Board -->
+  <rect x="70" y="62" width="60" height="9" rx="3" fill="url(#goldGrad)" filter="url(#glow)"/>
+  <!-- Stem -->
+  <rect x="97" y="70" width="6" height="18" fill="url(#goldGrad)"/>
+  <!-- Tassel cord -->
+  <line x1="130" y1="66" x2="143" y2="76" stroke="url(#goldGrad)" stroke-width="2.5"/>
+  <circle cx="143" cy="76" r="3.5" fill="#F4CC4A"/>
+  <line x1="143" y1="79.5" x2="140" y2="90" stroke="#F4CC4A" stroke-width="2"/>
+  <line x1="143" y1="79.5" x2="145" y2="90" stroke="#F4CC4A" stroke-width="2"/>
+
+  <!-- "E" letter watermark bottom left -->
+  <text x="52" y="172" font-size="13" font-weight="700" letter-spacing="2"
+        fill="white" opacity="0.55">EduSL</text>
+
+  <!-- Decorative gold dot accent top right -->
+  <circle cx="158" cy="42" r="5" fill="#F4CC4A" opacity="0.6"/>
+  <circle cx="158" cy="42" r="2.5" fill="#F4CC4A"/>
+</svg>
