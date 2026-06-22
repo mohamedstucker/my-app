@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>School Management System – Final Working</title>
-    <!-- Favicon: place edusl-icon.svg in the same folder as this file -->
     <link rel="icon" type="image/svg+xml" href="edusl-icon.svg" />
     <style>
         /* ----- RESET & BASE ----- */
@@ -738,6 +737,89 @@
             transform: scale(0.95);
         }
 
+        /* ----- DASHBOARD CHARTS ----- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .dash-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            border: 1px solid #e6edf4;
+        }
+        .dash-card h4 {
+            font-size: 1.1rem;
+            color: #0b2b5c;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .chart-bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chart-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-bar-label {
+            min-width: 70px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1a3a5c;
+        }
+        .chart-bar-bg {
+            flex: 1;
+            height: 24px;
+            background: #eef2f7;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .chart-bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.6s ease;
+            background: linear-gradient(90deg, #2a6bb0, #1a4b8a);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            min-width: 20px;
+        }
+        .chart-bar-fill.male {
+            background: linear-gradient(90deg, #2980b9, #3498db);
+        }
+        .chart-bar-fill.female {
+            background: linear-gradient(90deg, #e84393, #fd79a8);
+        }
+        .gender-ratio {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+        .gender-ratio span {
+            background: #f0f5fa;
+            padding: 4px 16px;
+            border-radius: 30px;
+        }
+        .total-count {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a4b8a;
+            margin: 8px 0;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             body {
@@ -809,6 +891,9 @@
                 padding: 12px 20px;
                 font-size: 0.9rem;
             }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -859,7 +944,6 @@
     <!-- ====== HEADER ====== -->
     <div class="header">
         <h1>
-            <!-- Embedded Edu SL Logo -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60">
                 <rect width="160" height="60" rx="12" fill="#1a4b8a" />
                 <text x="12" y="24" font-family="Arial, sans-serif" font-size="18" fill="white" font-weight="bold">Edu SL</text>
@@ -892,6 +976,17 @@
         <!-- Module Buttons -->
         <div class="module-buttons" id="moduleButtons"></div>
 
+        <!-- ===== DASHBOARD MODULE (NEW) ===== -->
+        <div id="dashboardModule" style="display:none;">
+            <div class="card">
+                <h3>📊 Student Statistics Dashboard</h3>
+                <div id="dashboardContent">
+                    <p>Loading dashboard data…</p>
+                </div>
+                <button id="refreshDashboardBtn" class="refresh-btn" style="margin-top:16px;">🔄 Refresh</button>
+            </div>
+        </div>
+
         <!-- ===== ATTENDANCE MODULE ===== -->
         <div id="attendanceModule">
             <div class="import-section" id="importSection">
@@ -912,6 +1007,9 @@
                 <div class="form-row">
                     <select id="newClassLevel">
                         <option value="">Select Class *</option>
+                        <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                        <option>Class1</option><option>Class2</option><option>Class3</option>
+                        <option>Class4</option><option>Class5</option><option>Class6</option>
                         <option>JSS1</option><option>JSS2</option><option>JSS3</option>
                         <option>SSS1</option><option>SSS2</option><option>SSS3</option>
                     </select>
@@ -922,6 +1020,16 @@
                     <input id="newParentPhone" placeholder="Parent Phone" />
                     <input id="newParentName" placeholder="Parent Name" />
                     <input id="newGuardian" placeholder="Guardian" />
+                </div>
+                <div class="form-row">
+                    <input id="newParentEmail" type="email" placeholder="Parent Email" />
+                    <select id="newGender">
+                        <option value="">Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input id="newTempPassword" type="password" placeholder="Temporary Password" />
                 </div>
                 <button id="addStudentBtn" class="refresh-btn">➕ Add Student</button>
                 <div id="manualMessage"></div>
@@ -1057,6 +1165,9 @@
                         </select>
                         <input id="teacherSubjects" placeholder="Subjects (comma separated)" />
                         <select id="teacherClass">
+                            <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                            <option>Class1</option><option>Class2</option><option>Class3</option>
+                            <option>Class4</option><option>Class5</option><option>Class6</option>
                             <option>JSS1</option><option>JSS2</option><option>JSS3</option>
                             <option>SSS1</option><option>SSS2</option><option>SSS3</option>
                         </select>
@@ -1157,6 +1268,9 @@
                 <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
                     <select id="bursarClassFilter">
                         <option value="">All Classes</option>
+                        <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                        <option>Class1</option><option>Class2</option><option>Class3</option>
+                        <option>Class4</option><option>Class5</option><option>Class6</option>
                         <option>JSS1</option><option>JSS2</option><option>JSS3</option>
                         <option>SSS1</option><option>SSS2</option><option>SSS3</option>
                     </select>
@@ -1177,7 +1291,6 @@
                 <button class="admin-tab-btn" data-tab="noticeboard">📢 Notice Board</button>
                 <button class="admin-tab-btn" data-tab="filestorage">📁 File Storage</button>
                 <button class="admin-tab-btn" data-tab="export">📎 Print / Export</button>
-                <!-- NEW Suggestions tab (admin only) -->
                 <button class="admin-tab-btn" data-tab="suggestions">📋 Suggestions</button>
             </div>
 
@@ -1267,7 +1380,6 @@
                 </div>
             </div>
 
-            <!-- NEW Suggestions Tab (admin only) -->
             <div id="suggestionsTab" class="admin-tab">
                 <div class="card">
                     <h3>📋 All Suggestions</h3>
@@ -1298,7 +1410,6 @@
     </div>
 
     <!-- ===== SUGGESTION MODALS ===== -->
-    <!-- Submit Suggestion Modal -->
     <div id="suggestionModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('suggestionModal')">&times;</span>
@@ -1313,7 +1424,7 @@
     <!-- ===== FLOATING SUGGESTION BUTTON ===== -->
     <button id="suggestionFab" class="suggestion-fab">💬 Suggestion</button>
 
-    <!-- ===== OTHER MODALS (unchanged) ===== -->
+    <!-- ===== OTHER MODALS ===== -->
     <div id="editProfileModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span>
@@ -1321,6 +1432,9 @@
             <input type="text" id="editProfileName" placeholder="Full Name" />
             <input type="date" id="editProfileDob" />
             <select id="editProfileClass">
+                <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                <option>Class1</option><option>Class2</option><option>Class3</option>
+                <option>Class4</option><option>Class5</option><option>Class6</option>
                 <option>JSS1</option><option>JSS2</option><option>JSS3</option>
                 <option>SSS1</option><option>SSS2</option><option>SSS3</option>
             </select>
@@ -1329,6 +1443,14 @@
             <input id="editProfileParentPhone" placeholder="Parent Phone" />
             <input id="editProfileParentName" placeholder="Parent Name" />
             <input id="editProfileGuardian" placeholder="Guardian" />
+            <input id="editProfileParentEmail" type="email" placeholder="Parent Email" />
+            <select id="editProfileGender">
+                <option value="">Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <input id="editProfileTempPassword" type="password" placeholder="Temporary Password" />
             <select id="editProfileStatus"><option>active</option><option>inactive</option></select>
             <button id="saveProfileBtn" class="refresh-btn">Save Changes</button>
         </div>
@@ -1350,6 +1472,9 @@
             </select>
             <input type="text" id="editOwnTeacherSubjects" placeholder="Subjects (comma separated)" />
             <select id="editOwnTeacherClass">
+                <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                <option>Class1</option><option>Class2</option><option>Class3</option>
+                <option>Class4</option><option>Class5</option><option>Class6</option>
                 <option>JSS1</option><option>JSS2</option><option>JSS3</option>
                 <option>SSS1</option><option>SSS2</option><option>SSS3</option>
             </select>
@@ -1367,6 +1492,9 @@
             <input type="email" id="editTeacherEmail" placeholder="Email" />
             <input type="tel" id="editTeacherPhone" placeholder="Phone" />
             <select id="editTeacherClass">
+                <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                <option>Class1</option><option>Class2</option><option>Class3</option>
+                <option>Class4</option><option>Class5</option><option>Class6</option>
                 <option>JSS1</option><option>JSS2</option><option>JSS3</option>
                 <option>SSS1</option><option>SSS2</option><option>SSS3</option>
             </select>
@@ -1453,6 +1581,14 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // ----- list of all class levels (used in dropdowns & dynamic population) -----
+        const ALL_CLASSES = [
+            'Nursery1', 'Nursery2', 'Nursery3',
+            'Class1', 'Class2', 'Class3', 'Class4', 'Class5', 'Class6',
+            'JSS1', 'JSS2', 'JSS3',
+            'SSS1', 'SSS2', 'SSS3'
+        ];
+
         let allStudents = {},
             globalStudentMap = new Map();
         let currentUserRole = null,
@@ -1513,7 +1649,124 @@
         }
 
         // ============================================================
-        //  AUTO‑CREATE DEMO USERS (expanded teacher fields)
+        //  DASHBOARD – NEW
+        // ============================================================
+        function categorizeClass(cls) {
+            // Returns 'nursery', 'primary', 'jss', 'sss' based on class string
+            const lower = cls.toLowerCase();
+            if (lower.startsWith('nursery')) return 'nursery';
+            if (lower.startsWith('class')) return 'primary'; // Class1..Class6
+            if (lower.startsWith('jss')) return 'jss';
+            if (lower.startsWith('sss')) return 'sss';
+            return 'other';
+        }
+
+        async function loadDashboard() {
+            const snap = await db.collection('students').get();
+            const students = [];
+            snap.forEach(doc => students.push(doc.data()));
+
+            // Initialize categories
+            const categories = {
+                nursery: { label: 'Nursery', classes: ['Nursery1', 'Nursery2', 'Nursery3'], boys: 0, girls: 0, other: 0,
+                    total: 0 },
+                primary: { label: 'Primary (Class 1-6)', classes: ['Class1', 'Class2', 'Class3', 'Class4', 'Class5',
+                        'Class6'
+                    ], boys: 0, girls: 0, other: 0, total: 0 },
+                jss: { label: 'JSS', classes: ['JSS1', 'JSS2', 'JSS3'], boys: 0, girls: 0, other: 0, total: 0 },
+                sss: { label: 'SSS', classes: ['SSS1', 'SSS2', 'SSS3'], boys: 0, girls: 0, other: 0, total: 0 }
+            };
+
+            // Count
+            students.forEach(s => {
+                const cat = categorizeClass(s.class);
+                if (cat === 'other') return;
+                const gender = s.gender || 'Other';
+                categories[cat].total++;
+                if (gender.toLowerCase() === 'male') categories[cat].boys++;
+                else if (gender.toLowerCase() === 'female') categories[cat].girls++;
+                else categories[cat].other++;
+            });
+
+            // Build HTML
+            let html = `<div class="dashboard-grid">`;
+            for (let key of ['nursery', 'primary', 'jss', 'sss']) {
+                const data = categories[key];
+                const maxTotal = Math.max(
+                    categories.nursery.total,
+                    categories.primary.total,
+                    categories.jss.total,
+                    categories.sss.total,
+                    1
+                );
+                const boysPct = data.total > 0 ? (data.boys / data.total * 100) : 0;
+                const girlsPct = data.total > 0 ? (data.girls / data.total * 100) : 0;
+                const otherPct = data.total > 0 ? (data.other / data.total * 100) : 0;
+                html += `
+                    <div class="dash-card">
+                        <h4>${data.label}</h4>
+                        <div class="total-count">${data.total}</div>
+                        <div class="chart-bar-container">
+                            <div class="chart-bar-item">
+                                <span class="chart-bar-label">Boys</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar-fill male" style="width: ${data.total > 0 ? (data.boys/data.total)*100 : 0}%;">
+                                        ${data.boys}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-bar-item">
+                                <span class="chart-bar-label">Girls</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar-fill female" style="width: ${data.total > 0 ? (data.girls/data.total)*100 : 0}%;">
+                                        ${data.girls}
+                                    </div>
+                                </div>
+                            </div>
+                            ${data.other > 0 ? `
+                            <div class="chart-bar-item">
+                                <span class="chart-bar-label">Other</span>
+                                <div class="chart-bar-bg">
+                                    <div class="chart-bar-fill" style="width: ${(data.other/data.total)*100}%; background: #95a5a6;">
+                                        ${data.other}
+                                    </div>
+                                </div>
+                            </div>` : ''}
+                        </div>
+                        <div class="gender-ratio">
+                            <span>👦 ${data.boys} (${boysPct.toFixed(1)}%)</span>
+                            <span>👧 ${data.girls} (${girlsPct.toFixed(1)}%)</span>
+                            ${data.other > 0 ? `<span>👤 ${data.other} (${otherPct.toFixed(1)}%)</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            html += `</div>`;
+
+            // Add totals row
+            const totalBoys = categories.nursery.boys + categories.primary.boys + categories.jss.boys + categories.sss.boys;
+            const totalGirls = categories.nursery.girls + categories.primary.girls + categories.jss.girls + categories.sss
+                .girls;
+            const totalOther = categories.nursery.other + categories.primary.other + categories.jss.other + categories.sss
+                .other;
+            const grandTotal = totalBoys + totalGirls + totalOther;
+            html += `
+                <div class="card" style="margin-top:20px; background:#f0f5fa;">
+                    <h4 style="text-align:center;">📊 Overall Summary</h4>
+                    <div style="display:flex; justify-content:space-around; flex-wrap:wrap; font-size:1.1rem; gap:20px;">
+                        <span><strong>Total Students:</strong> ${grandTotal}</span>
+                        <span><strong>Boys:</strong> ${totalBoys} (${grandTotal > 0 ? (totalBoys/grandTotal*100).toFixed(1) : 0}%)</span>
+                        <span><strong>Girls:</strong> ${totalGirls} (${grandTotal > 0 ? (totalGirls/grandTotal*100).toFixed(1) : 0}%)</span>
+                        ${totalOther > 0 ? `<span><strong>Other:</strong> ${totalOther} (${(totalOther/grandTotal*100).toFixed(1)}%)</span>` : ''}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('dashboardContent').innerHTML = html;
+        }
+
+        // ============================================================
+        //  AUTO‑CREATE DEMO USERS
         // ============================================================
         async function ensureDemoUsers() {
             const adminEmail = "admin@school.com",
@@ -1604,7 +1857,7 @@
         }
 
         // ============================================================
-        //  ATTENDANCE (unchanged)
+        //  ATTENDANCE
         // ============================================================
         async function loadStudents() {
             const snap = await db.collection('students').get();
@@ -1625,18 +1878,20 @@
         function updateClassDropdown() {
             let sel = document.getElementById('classSelect');
             if (!sel) return;
-            let classOptions = Object.keys(allStudents);
+
             if (currentUserRole === 'teacher' && teacherAssignedClass) {
-                if (classOptions.includes(teacherAssignedClass)) {
-                    sel.innerHTML =
-                        `<option value="${teacherAssignedClass}">${teacherAssignedClass} (${allStudents[teacherAssignedClass].length})</option>`;
-                } else {
-                    sel.innerHTML = '<option value="">No students in your class</option>';
-                }
-            } else {
-                sel.innerHTML = '<option value="">-- Select Class --</option>' + classOptions.map(c =>
-                    `<option value="${c}">${c} (${allStudents[c].length})</option>`).join('');
+                const count = (allStudents[teacherAssignedClass] || []).length;
+                sel.innerHTML =
+                    `<option value="${teacherAssignedClass}">${teacherAssignedClass} (${count})</option>`;
+                return;
             }
+
+            let optionsHtml = '<option value="">-- Select Class --</option>';
+            for (let cls of ALL_CLASSES) {
+                const count = (allStudents[cls] || []).length;
+                optionsHtml += `<option value="${cls}">${cls} (${count})</option>`;
+            }
+            sel.innerHTML = optionsHtml;
         }
 
         async function saveAttendance(cls, sid, status, remark) {
@@ -1807,30 +2062,87 @@
             });
         }
 
+        // ============================================================
+        //  ADD SINGLE STUDENT – UPDATED with three new fields
+        // ============================================================
         async function addManualStudent() {
             let id = document.getElementById('newStudentId').value.trim(),
                 name = document.getElementById('newStudentName').value.trim(),
                 cls = document.getElementById('newClassLevel').value;
             if (!id || !name || !cls) { showMessage('ID, Name and Class required', 'error', 'manualMessage'); return; }
-            await db.collection('students').doc(id).set({
+
+            let dob = document.getElementById('newStudentDob').value;
+            let department = document.getElementById('newDepartment').value;
+            let address = document.getElementById('newAddress').value;
+            let parentPhone = document.getElementById('newParentPhone').value;
+            let parentName = document.getElementById('newParentName').value;
+            let guardian = document.getElementById('newGuardian').value;
+            let parentEmail = document.getElementById('newParentEmail').value.trim();
+            let gender = document.getElementById('newGender').value;
+            let tempPassword = document.getElementById('newTempPassword').value;
+
+            let studentData = {
                 id,
                 name,
                 class: cls,
-                dob: document.getElementById('newStudentDob').value,
-                department: document.getElementById('newDepartment').value,
-                address: document.getElementById('newAddress').value,
-                parentPhone: document.getElementById('newParentPhone').value,
-                parentName: document.getElementById('newParentName').value,
-                guardian: document.getElementById('newGuardian').value,
+                dob,
+                department,
+                address,
+                parentPhone,
+                parentName,
+                guardian,
+                parentEmail,
+                gender,
+                tempPassword,
                 status: 'active'
-            });
+            };
+
+            await db.collection('students').doc(id).set(studentData);
+
+            if (parentEmail && tempPassword) {
+                try {
+                    let existingUser = await auth.fetchSignInMethodsForEmail(parentEmail);
+                    if (existingUser.length === 0) {
+                        let userCred = await auth.createUserWithEmailAndPassword(parentEmail, tempPassword);
+                        await db.collection('users').doc(userCred.user.uid).set({
+                            role: 'parent',
+                            email: parentEmail,
+                            name: parentName || 'Parent',
+                            studentId: id
+                        });
+                        showMessage(`Student added. Parent account created for ${parentEmail}`, 'success', 'manualMessage');
+                    } else {
+                        showMessage(`Student added. Parent email ${parentEmail} already has an account.`, 'success',
+                            'manualMessage');
+                    }
+                } catch (e) {
+                    console.warn('Parent account creation error:', e);
+                    showMessage(`Student added, but parent account creation failed: ${e.message}`, 'warning',
+                        'manualMessage');
+                }
+            } else {
+                showMessage('Student added successfully!', 'success', 'manualMessage');
+            }
+
+            document.getElementById('newStudentId').value = '';
+            document.getElementById('newStudentName').value = '';
+            document.getElementById('newStudentDob').value = '';
+            document.getElementById('newClassLevel').value = '';
+            document.getElementById('newDepartment').value = '';
+            document.getElementById('newAddress').value = '';
+            document.getElementById('newParentPhone').value = '';
+            document.getElementById('newParentName').value = '';
+            document.getElementById('newGuardian').value = '';
+            document.getElementById('newParentEmail').value = '';
+            document.getElementById('newGender').value = '';
+            document.getElementById('newTempPassword').value = '';
+
             await loadStudents();
             renderAttendance();
-            showMessage('Student added', 'success', 'manualMessage');
         }
 
         // ============================================================
-        //  EXAM RECORDS (unchanged)
+        //  EXAM RECORDS
         // ============================================================
         async function loadExamStudent() {
             let q = document.getElementById('examStudentSearch').value.trim();
@@ -1925,7 +2237,7 @@
         }
 
         // ============================================================
-        //  EXAM HISTORY (student records) – unchanged
+        //  EXAM HISTORY (student records)
         // ============================================================
         async function loadExamHistory() {
             if (!currentStudentDoc) return;
@@ -1974,7 +2286,7 @@
         }
 
         // ============================================================
-        //  PAYMENT HISTORY (student records) – unchanged
+        //  PAYMENT HISTORY (student records)
         // ============================================================
         async function loadPaymentHistory() {
             if (!currentStudentDoc) return;
@@ -2016,7 +2328,7 @@
         }
 
         // ============================================================
-        //  ATTENDANCE HISTORY (student records) – FIXED (no orderBy)
+        //  ATTENDANCE HISTORY (student records)
         // ============================================================
         async function loadAttendanceHistory() {
             if (!currentStudentDoc) {
@@ -2112,12 +2424,23 @@
         }
 
         // ============================================================
-        //  STUDENT RECORDS (profile) – unchanged
+        //  STUDENT RECORDS (profile) – UPDATED with three new fields
         // ============================================================
         async function loadStudentProfile() {
             if (!currentStudentDoc) return;
             let html =
-                `<p><strong>ID:</strong> ${escapeHtml(currentStudentDoc.id)}</p><p><strong>Name:</strong> ${escapeHtml(currentStudentDoc.name)}</p><p><strong>DOB:</strong> ${escapeHtml(currentStudentDoc.dob || 'N/A')}</p><p><strong>Class:</strong> ${escapeHtml(currentStudentDoc.class)}</p><p><strong>Department:</strong> ${escapeHtml(currentStudentDoc.department || 'N/A')}</p><p><strong>Address:</strong> ${escapeHtml(currentStudentDoc.address || 'N/A')}</p><p><strong>Parent Name:</strong> ${escapeHtml(currentStudentDoc.parentName || 'N/A')}</p><p><strong>Parent Phone:</strong> ${escapeHtml(currentStudentDoc.parentPhone || 'N/A')}</p><p><strong>Guardian:</strong> ${escapeHtml(currentStudentDoc.guardian || 'N/A')}</p><p><strong>Status:</strong> ${currentStudentDoc.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`;
+                `<p><strong>ID:</strong> ${escapeHtml(currentStudentDoc.id)}</p>
+                 <p><strong>Name:</strong> ${escapeHtml(currentStudentDoc.name)}</p>
+                 <p><strong>DOB:</strong> ${escapeHtml(currentStudentDoc.dob || 'N/A')}</p>
+                 <p><strong>Class:</strong> ${escapeHtml(currentStudentDoc.class)}</p>
+                 <p><strong>Department:</strong> ${escapeHtml(currentStudentDoc.department || 'N/A')}</p>
+                 <p><strong>Address:</strong> ${escapeHtml(currentStudentDoc.address || 'N/A')}</p>
+                 <p><strong>Parent Name:</strong> ${escapeHtml(currentStudentDoc.parentName || 'N/A')}</p>
+                 <p><strong>Parent Phone:</strong> ${escapeHtml(currentStudentDoc.parentPhone || 'N/A')}</p>
+                 <p><strong>Parent Email:</strong> ${escapeHtml(currentStudentDoc.parentEmail || 'N/A')}</p>
+                 <p><strong>Gender:</strong> ${escapeHtml(currentStudentDoc.gender || 'N/A')}</p>
+                 <p><strong>Guardian:</strong> ${escapeHtml(currentStudentDoc.guardian || 'N/A')}</p>
+                 <p><strong>Status:</strong> ${currentStudentDoc.status === 'active' ? '✅ Active' : '❌ Inactive'}</p>`;
             document.getElementById('profileContent').innerHTML = html;
         }
 
@@ -2132,6 +2455,9 @@
             document.getElementById('editProfileParentPhone').value = currentStudentDoc.parentPhone || '';
             document.getElementById('editProfileParentName').value = currentStudentDoc.parentName || '';
             document.getElementById('editProfileGuardian').value = currentStudentDoc.guardian || '';
+            document.getElementById('editProfileParentEmail').value = currentStudentDoc.parentEmail || '';
+            document.getElementById('editProfileGender').value = currentStudentDoc.gender || '';
+            document.getElementById('editProfileTempPassword').value = currentStudentDoc.tempPassword || '';
             document.getElementById('editProfileStatus').value = currentStudentDoc.status || 'active';
             openModal('editProfileModal');
         }
@@ -2148,6 +2474,9 @@
                 parentPhone: document.getElementById('editProfileParentPhone').value.trim(),
                 parentName: document.getElementById('editProfileParentName').value.trim(),
                 guardian: document.getElementById('editProfileGuardian').value.trim(),
+                parentEmail: document.getElementById('editProfileParentEmail').value.trim(),
+                gender: document.getElementById('editProfileGender').value,
+                tempPassword: document.getElementById('editProfileTempPassword').value,
                 status: document.getElementById('editProfileStatus').value
             };
             await db.collection('students').doc(currentStudentDoc.id).update(updates);
@@ -2160,7 +2489,7 @@
         }
 
         // ============================================================
-        //  BURSAR MODULE (with new history & edit fees functions) – unchanged
+        //  BURSAR MODULE
         // ============================================================
         async function loadBursarStudent() {
             let q = document.getElementById('bursarStudentSearch').value.trim();
@@ -2344,7 +2673,7 @@
         }
         document.getElementById('savePaymentEditBtn').onclick = () => { if (editPaymentCallback) editPaymentCallback(); };
 
-        // ---- Bursar summary with History & Edit Fees ----
+        // ---- Bursar summary ----
         async function loadBursarSummary() {
             if (currentUserRole !== 'bursar' && currentUserRole !== 'admin') return;
             const classFilter = document.getElementById('bursarClassFilter').value;
@@ -2501,7 +2830,7 @@
         };
 
         // ============================================================
-        //  TEACHER MODULE – expanded own profile (unchanged)
+        //  TEACHER MODULE
         // ============================================================
         async function loadAllTeachersForAdmin() {
             if (currentUserRole !== 'admin') return;
@@ -2698,7 +3027,7 @@
         }
 
         // ============================================================
-        //  TEACHER REGISTER (unchanged)
+        //  TEACHER REGISTER
         // ============================================================
         async function loadTeacherRegisterForId(teacherId) {
             let found = await db.collection('teachers').doc(teacherId).get();
@@ -2749,7 +3078,7 @@
         }
 
         // ============================================================
-        //  ADMIN MODULE – STAFF (with check‑in/out & duration + HISTORY)
+        //  ADMIN MODULE – STAFF
         // ============================================================
         async function loadStaffAttendanceHistory(staffId) {
             try {
@@ -2875,7 +3204,7 @@
             });
         }
 
-        // ----- other admin functions (unchanged) -----
+        // ----- other admin functions -----
         async function addStaff() {
             if (currentUserRole !== 'admin') return;
             let id = document.getElementById('staffId').value.trim(),
@@ -3094,8 +3423,6 @@
         // ============================================================
         //  SUGGESTION BOX FEATURE
         // ============================================================
-
-        // ---- Submit a suggestion ----
         document.getElementById('submitSuggestionBtn').onclick = async function() {
             const text = document.getElementById('suggestionText').value.trim();
             if (!text) {
@@ -3122,7 +3449,6 @@
             }
         };
 
-        // ---- Load suggestions (admin only) ----
         async function loadSuggestions() {
             if (currentUserRole !== 'admin') return;
             try {
@@ -3155,7 +3481,6 @@
                 html += '</tbody></table>';
                 document.getElementById('suggestionsList').innerHTML = html;
 
-                // Attach resolve event
                 document.querySelectorAll('.resolve-suggestion-btn').forEach(btn => {
                     btn.onclick = async function() {
                         if (confirm('Mark this suggestion as resolved?')) {
@@ -3164,7 +3489,6 @@
                         }
                     };
                 });
-                // Attach delete event
                 document.querySelectorAll('.delete-suggestion-btn').forEach(btn => {
                     btn.onclick = async function() {
                         if (confirm('Delete this suggestion?')) {
@@ -3178,30 +3502,27 @@
             }
         }
 
-        // ---- Floating button ----
         document.getElementById('suggestionFab').onclick = function() {
-            // Only show if user is logged in, or we can allow anyone. We'll allow anyone.
             document.getElementById('suggestionText').value = '';
             document.getElementById('suggestionMessage').innerHTML = '';
             openModal('suggestionModal');
         };
 
-        // ---- Refresh suggestions ----
         document.getElementById('refreshSuggestionsBtn').onclick = loadSuggestions;
 
         // ============================================================
-        //  ROLE‑BASED UI (modified to include admin suggestions tab)
+        //  ROLE‑BASED UI – updated to include Dashboard
         // ============================================================
         function setupRoleUI(role, extra = {}) {
             const moduleContainer = document.getElementById('moduleButtons');
             moduleContainer.innerHTML = '';
+            document.getElementById('dashboardModule').style.display = 'none';
             document.getElementById('attendanceModule').style.display = 'none';
             document.getElementById('recordsModule').style.display = 'none';
             document.getElementById('teachersModule').style.display = 'none';
             document.getElementById('bursarModule').style.display = 'none';
             document.getElementById('adminModule').style.display = 'none';
 
-            // Show suggestion button for everyone (even if not logged in)
             document.getElementById('suggestionFab').style.display = 'flex';
 
             const adminSearchHandler = async () => {
@@ -3219,38 +3540,68 @@
                 loadAttendanceHistory();
             };
 
+            // Define modules based on role
+            let modules = [];
             if (role === 'admin') {
-                const modules = [
+                modules = [
+                    { id: 'dashboardModuleBtn', label: '📊 Dashboard', moduleId: 'dashboardModule' },
                     { id: 'attendanceModuleBtn', label: '📋 Attendance', moduleId: 'attendanceModule' },
                     { id: 'recordsModuleBtn', label: '📚 Student Records', moduleId: 'recordsModule' },
                     { id: 'teachersModuleBtn', label: '👩‍🏫 Teachers', moduleId: 'teachersModule' },
+                    { id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' },
                     { id: 'adminModuleBtn', label: '⚙️ Admin', moduleId: 'adminModule' }
                 ];
-                modules.forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.id = m.id;
-                    btn.className = 'module-btn';
-                    btn.textContent = m.label;
-                    btn.onclick = () => {
-                        document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        document.querySelectorAll('#mainApp > div[id$="Module"]').forEach(div => div.style
-                            .display = 'none');
-                        document.getElementById(m.moduleId).style.display = 'block';
-                        if (m.moduleId === 'attendanceModule') renderAttendance();
-                        if (m.moduleId === 'teachersModule') { loadAllTeachersForAdmin();
-                            displayOwnTeacherProfile(); }
-                        if (m.moduleId === 'adminModule') { loadStaffList();
-                            loadAssetsList();
-                            loadInventoryList();
-                            loadVisitorsList();
-                            renderNotices();
-                            initFileDB().then(loadFilesList);
-                            // Default to staff tab, but suggestions will be loaded when clicked
-                        }
-                    };
-                    moduleContainer.appendChild(btn);
-                });
+            } else if (role === 'bursar') {
+                modules = [
+                    { id: 'dashboardModuleBtn', label: '📊 Dashboard', moduleId: 'dashboardModule' },
+                    { id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' }
+                ];
+            } else if (role === 'teacher') {
+                modules = [
+                    { id: 'dashboardModuleBtn', label: '📊 Dashboard', moduleId: 'dashboardModule' },
+                    { id: 'attendanceModuleBtn', label: '📋 Attendance', moduleId: 'attendanceModule' },
+                    { id: 'recordsModuleBtn', label: '📚 Student Records', moduleId: 'recordsModule' },
+                    { id: 'teachersModuleBtn', label: '👩‍🏫 My Profile', moduleId: 'teachersModule' }
+                ];
+            } else if (role === 'parent') {
+                modules = [
+                    { id: 'dashboardModuleBtn', label: '📊 Dashboard', moduleId: 'dashboardModule' },
+                    { id: 'recordsModuleBtn', label: '📚 My Child\'s Records', moduleId: 'recordsModule' }
+                ];
+            }
+
+            modules.forEach(m => {
+                const btn = document.createElement('button');
+                btn.id = m.id;
+                btn.className = 'module-btn';
+                btn.textContent = m.label;
+                btn.onclick = () => {
+                    document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll('#mainApp > div[id$="Module"]').forEach(div => div.style
+                        .display = 'none');
+                    document.getElementById(m.moduleId).style.display = 'block';
+                    if (m.moduleId === 'dashboardModule') loadDashboard();
+                    if (m.moduleId === 'attendanceModule') renderAttendance();
+                    if (m.moduleId === 'teachersModule') { 
+                        if (role === 'admin') loadAllTeachersForAdmin();
+                        displayOwnTeacherProfile(); 
+                    }
+                    if (m.moduleId === 'bursarModule') loadBursarSummary();
+                    if (m.moduleId === 'adminModule') { 
+                        loadStaffList();
+                        loadAssetsList();
+                        loadInventoryList();
+                        loadVisitorsList();
+                        renderNotices();
+                        initFileDB().then(loadFilesList);
+                    }
+                };
+                moduleContainer.appendChild(btn);
+            });
+
+            // Specific adjustments per role
+            if (role === 'admin') {
                 document.getElementById('searchStudentBtn').onclick = adminSearchHandler;
                 document.getElementById('importSection').style.display = 'block';
                 document.getElementById('manualSection').style.display = 'block';
@@ -3264,57 +3615,22 @@
                 initFileDB().then(loadFilesList);
                 loadAllTeachersForAdmin();
                 displayOwnTeacherProfile();
-                // Admin suggestion tab is already in HTML; load suggestions when tab is clicked
             } else if (role === 'bursar') {
-                const modules = [
-                    { id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' }
-                ];
-                modules.forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.id = m.id;
-                    btn.className = 'module-btn';
-                    btn.textContent = m.label;
-                    btn.onclick = () => {
-                        document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        document.querySelectorAll('#mainApp > div[id$="Module"]').forEach(div => div.style
-                            .display = 'none');
-                        document.getElementById(m.moduleId).style.display = 'block';
-                        loadBursarSummary();
-                    };
-                    moduleContainer.appendChild(btn);
-                });
                 document.getElementById('importSection').style.display = 'none';
                 document.getElementById('manualSection').style.display = 'none';
                 document.getElementById('adminTeacherSections').style.display = 'none';
                 document.getElementById('teacherOwnProfileCard').style.display = 'none';
-                loadBursarSummary();
+                // loadBursarSummary will be called when module is clicked
             } else if (role === 'teacher') {
                 teacherAssignedClass = extra.class || 'JSS1';
                 teacherOwnData = extra.teacherData || null;
-                const modules = [
-                    { id: 'attendanceModuleBtn', label: '📋 Attendance', moduleId: 'attendanceModule' },
-                    { id: 'recordsModuleBtn', label: '📚 Student Records', moduleId: 'recordsModule' },
-                    { id: 'teachersModuleBtn', label: '👩‍🏫 My Profile', moduleId: 'teachersModule' }
-                ];
-                modules.forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.id = m.id;
-                    btn.className = 'module-btn';
-                    btn.textContent = m.label;
-                    btn.onclick = () => {
-                        document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        document.getElementById('attendanceModule').style.display = 'none';
-                        document.getElementById('recordsModule').style.display = 'none';
-                        document.getElementById('teachersModule').style.display = 'none';
-                        document.getElementById(m.moduleId).style.display = 'block';
-                        if (m.moduleId === 'attendanceModule') renderAttendance();
-                        if (m.moduleId === 'teachersModule') { displayOwnTeacherProfile(); }
-                    };
-                    moduleContainer.appendChild(btn);
-                });
-                const teacherSearchHandler = async () => {
+                document.getElementById('importSection').style.display = 'none';
+                document.getElementById('manualSection').style.display = 'none';
+                document.getElementById('adminTeacherSections').style.display = 'none';
+                document.getElementById('teacherOwnProfileCard').style.display = 'block';
+                document.getElementById('editOwnTeacherBtn').style.display = 'inline-block';
+                // Set teacher's search handler for records
+                document.getElementById('searchStudentBtn').onclick = async () => {
                     let q = document.getElementById('studentSearchInput').value.trim();
                     let found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
                     if (!found) { showMessage('Student not found in your class', 'error', 'searchResults');
@@ -3335,12 +3651,6 @@
                     loadExamHistory();
                     loadAttendanceHistory();
                 };
-                document.getElementById('searchStudentBtn').onclick = teacherSearchHandler;
-                document.getElementById('importSection').style.display = 'none';
-                document.getElementById('manualSection').style.display = 'none';
-                document.getElementById('adminTeacherSections').style.display = 'none';
-                document.getElementById('teacherOwnProfileCard').style.display = 'block';
-                document.getElementById('editOwnTeacherBtn').style.display = 'inline-block';
                 setTimeout(() => {
                     const classSelect = document.getElementById('classSelect');
                     if (classSelect && classSelect.querySelector(`option[value="${teacherAssignedClass}"]`)) {
@@ -3356,47 +3666,41 @@
             } else if (role === 'parent') {
                 parentLinkedStudentId = extra.studentId || null;
                 if (!parentLinkedStudentId) { alert('No student linked to this parent account.'); return; }
-                const modules = [
-                    { id: 'recordsModuleBtn', label: '📚 My Child\'s Records', moduleId: 'recordsModule' }
-                ];
-                modules.forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.id = m.id;
-                    btn.className = 'module-btn';
-                    btn.textContent = m.label;
-                    btn.onclick = () => {
-                        document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        document.getElementById('recordsModule').style.display = 'block';
-                        document.getElementById('attendanceModule').style.display = 'none';
-                        document.getElementById('teachersModule').style.display = 'none';
-                        document.getElementById('bursarModule').style.display = 'none';
-                        document.getElementById('adminModule').style.display = 'none';
-                        loadParentStudent();
-                    };
-                    moduleContainer.appendChild(btn);
-                });
                 document.getElementById('importSection').style.display = 'none';
                 document.getElementById('manualSection').style.display = 'none';
+                document.getElementById('editProfileBtn').style.display = 'none';
                 const searchBox = document.querySelector('#recordsModule .search-box');
                 if (searchBox) searchBox.style.display = 'none';
-                document.getElementById('editProfileBtn').style.display = 'none';
-                loadParentStudent();
+                // load parent student automatically when records module clicked
+                // we'll handle in the onclick of records module
+                // For now, we'll define a function
+                window.loadParentStudent = async function() {
+                    if (!parentLinkedStudentId) return;
+                    const found = globalStudentMap.get(parentLinkedStudentId);
+                    if (!found) { showMessage(`Student with ID ${parentLinkedStudentId} not found.`, 'error',
+                        'searchResults'); return; }
+                    currentStudentDoc = found;
+                    document.getElementById('studentRecordsPanel').style.display = 'block';
+                    document.getElementById('searchResults').innerHTML =
+                        `<div class="success">Viewing record for: ${escapeHtml(found.name)} (${found.id})</div>`;
+                    loadStudentProfile();
+                    loadPaymentHistory();
+                    loadExamHistory();
+                    loadAttendanceHistory();
+                };
+                // Override the records module click to load parent student
+                const recordsBtn = document.getElementById('recordsModuleBtn');
+                if (recordsBtn) {
+                    recordsBtn.onclick = () => {
+                        document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
+                        recordsBtn.classList.add('active');
+                        document.querySelectorAll('#mainApp > div[id$="Module"]').forEach(div => div.style
+                            .display = 'none');
+                        document.getElementById('recordsModule').style.display = 'block';
+                        window.loadParentStudent();
+                    };
+                }
             }
-        }
-
-        async function loadParentStudent() {
-            if (!parentLinkedStudentId) return;
-            const found = globalStudentMap.get(parentLinkedStudentId);
-            if (!found) { showMessage(`Student with ID ${parentLinkedStudentId} not found.`, 'error', 'searchResults'); return; }
-            currentStudentDoc = found;
-            document.getElementById('studentRecordsPanel').style.display = 'block';
-            document.getElementById('searchResults').innerHTML =
-                `<div class="success">Viewing record for: ${escapeHtml(found.name)} (${found.id})</div>`;
-            loadStudentProfile();
-            loadPaymentHistory();
-            loadExamHistory();
-            loadAttendanceHistory();
         }
 
         // ============================================================
@@ -3457,6 +3761,16 @@
                         if (examCurrentStudent) loadExamUIForStudent();
                     };
                 });
+                // Also ensure dashboard shows if default module is dashboard? We'll let user click.
+                // Auto-show dashboard for all roles after login?
+                // Let's set dashboard as the first visible module after login.
+                const firstModuleBtn = document.querySelector('.module-btn');
+                if (firstModuleBtn) firstModuleBtn.click();
+                else {
+                    // fallback: show dashboard
+                    document.getElementById('dashboardModule').style.display = 'block';
+                    loadDashboard();
+                }
             } catch (e) {
                 document.getElementById('loginMessage').innerHTML = `<div class="error">${e.message}</div>`;
             }
@@ -3611,8 +3925,8 @@
             document.getElementById('searchBursarStudentBtn').onclick = loadBursarStudent;
             document.getElementById('saveBursarFeesBtn').onclick = saveBursarTermFees;
             document.getElementById('submitBursarPaymentBtn').onclick = recordBursarPayment;
+            document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
 
-            // ---- Admin tabs (including suggestions) ----
             document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => {
                 btn.onclick = () => {
                     const id = btn.dataset.tab;
@@ -3631,7 +3945,6 @@
                 };
             });
 
-            // ---- Student record tabs ----
             document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
