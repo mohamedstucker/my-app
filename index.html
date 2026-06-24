@@ -24,6 +24,7 @@
             color: #1a2634;
         }
 
+        /* ----- SCROLLBAR ----- */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -56,19 +57,19 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* FIXED: added standard background-clip for linting */
-        .header h1 {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #0b2b5c, #1a4b8a);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
+    .header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a4b8a; /* fallback solid color for browsers that don't support background-clip: text */
+    background: linear-gradient(135deg, #0b2b5c, #1a4b8a);
+    -webkit-background-clip: text;
+    background-clip: text;      /* standard property (still requires -webkit- in many browsers) */
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
 
         .header h1 svg {
             height: 48px;
@@ -749,7 +750,7 @@
             background: #fff;
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
             border: 1px solid #e6edf4;
         }
         .dash-card h4 {
@@ -1059,13 +1060,20 @@
                     <button id="searchExamStudentBtn" class="refresh-btn">Load Student</button>
                 </div>
                 <div id="examStudentInfo"></div>
-                <div class="exam-term-btns">
+                <!-- Year selector -->
+                <div class="form-row">
+                    <label style="font-weight:600;">Year:</label>
+                    <input type="number" id="examYearInput" placeholder="e.g. 2025" value="2025" style="max-width:120px;" />
+                </div>
+                <div class="exam-term-btns" id="examTermButtons">
                     <button class="term-btn active" data-term="term1">Term 1</button>
                     <button class="term-btn" data-term="term2">Term 2</button>
                     <button class="term-btn" data-term="term3">Term 3</button>
                 </div>
-                <div class="exam-level-buttons">
-                    <button class="exam-level-btn active" data-exam-level="npse">NPSE</button>
+                <div class="exam-level-buttons" id="examLevelButtons">
+                    <button class="exam-level-btn active" data-exam-level="nursery">Nursery</button>
+                    <button class="exam-level-btn" data-exam-level="primary">Primary</button>
+                    <button class="exam-level-btn" data-exam-level="npse">NPSE</button>
                     <button class="exam-level-btn" data-exam-level="bece">BECE</button>
                     <button class="exam-level-btn" data-exam-level="wasce">WASSCE</button>
                     <button class="exam-level-btn" data-exam-level="jss">JSS</button>
@@ -1113,7 +1121,9 @@
                             <button class="term-btn2" data-term="term3">Term 3</button>
                         </div>
                         <div class="exam-level-buttons">
-                            <button class="exam-level-btn2 active" data-exam-level="npse">NPSE</button>
+                            <button class="exam-level-btn2 active" data-exam-level="nursery">Nursery</button>
+                            <button class="exam-level-btn2" data-exam-level="primary">Primary</button>
+                            <button class="exam-level-btn2" data-exam-level="npse">NPSE</button>
                             <button class="exam-level-btn2" data-exam-level="bece">BECE</button>
                             <button class="exam-level-btn2" data-exam-level="wasce">WASSCE</button>
                             <button class="exam-level-btn2" data-exam-level="jss">JSS</button>
@@ -1296,6 +1306,7 @@
                 <button class="admin-tab-btn" data-tab="noticeboard">📢 Notice Board</button>
                 <button class="admin-tab-btn" data-tab="filestorage">📁 File Storage</button>
                 <button class="admin-tab-btn" data-tab="export">📎 Print / Export</button>
+                <button class="admin-tab-btn" data-tab="examhistoryall">📅 Exam History (All Years)</button>
                 <button class="admin-tab-btn" data-tab="suggestions">📋 Suggestions</button>
             </div>
 
@@ -1382,6 +1393,22 @@
                     <button id="exportStudentsCSV" class="refresh-btn">📄 Export All Students CSV</button>
                     <button id="exportTeachersCSVAdmin" class="refresh-btn">📄 Export All Teachers CSV</button>
                     <button id="printNoticesBtn" class="refresh-btn">🖨️ Print All Notices</button>
+                </div>
+            </div>
+
+            <!-- NEW TAB: Exam History (All Years) -->
+            <div id="examhistoryallTab" class="admin-tab">
+                <div class="card">
+                    <h3>📅 Exam History (All Years)</h3>
+                    <div class="search-box">
+                        <input type="text" id="examHistoryAllStudentId" placeholder="Student ID" />
+                        <button id="loadExamHistoryAllBtn" class="refresh-btn">Load Student</button>
+                        <select id="examHistoryAllYear" style="max-width:120px;">
+                            <option value="">Select Year</option>
+                        </select>
+                        <button id="refreshExamHistoryAllBtn" class="refresh-btn">Refresh</button>
+                    </div>
+                    <div id="examHistoryAllContent"><p>Enter a student ID and select a year to view exam history.</p></div>
                 </div>
             </div>
 
@@ -1635,221 +1662,30 @@
             if (el) el.style.display = 'flex';
         }
 
-        // ============================================================
-        //  FIXED: WhatsApp URL generator – more permissive & robust
-        // ============================================================
         function getValidWhatsAppUrl(phone, msg) {
             if (!phone) return null;
-            let p = String(phone).replace(/\s/g, '').replace(/[^0-9+]/g, '');
+            let p = String(phone).replace(/\D/g, '');
             if (!p) return null;
-
-            // If it has a '+', keep it but normalize
-            let hasPlus = p.startsWith('+');
-            p = p.replace(/[^0-9]/g, '');
-
-            // Sierra Leone: remove leading zero, ensure country code 232
             if (p.startsWith('0')) p = p.slice(1);
             if (!p.startsWith('232')) p = '232' + p;
-
-            // Accept any length >= 10 (after normalization)
-            if (p.length >= 10) {
+            if (p.length >= 11 && p.length <= 15) {
                 return `https://wa.me/${p}?text=${encodeURIComponent(msg)}`;
             }
             return null;
         }
 
-        // ============================================================
-        //  FIXED: Send Batch WhatsApp Reports – with popup handling
-        // ============================================================
-        async function sendBatchWhatsApp() {
-            const classVal = document.getElementById('classSelect').value;
-            if (!classVal) {
-                alert("Please select a class first.");
-                return;
-            }
-            const students = allStudents[classVal];
-            if (!students || students.length === 0) {
-                alert(`No students found in class "${classVal}".`);
-                return;
-            }
-
-            const today = new Date().toISOString().split('T')[0];
-            let attMap = {};
-            try {
-                const attSnap = await db.collection('attendance')
-                    .where('class', '==', classVal)
-                    .where('date', '==', today)
-                    .get();
-                attSnap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
-            } catch (e) {
-                alert(`Error loading attendance data: ${e.message}`);
-                return;
-            }
-
-            const present = students.filter(s => attMap[s.id]?.status === 'present');
-            const absent = students.filter(s => attMap[s.id]?.status === 'absent');
-            const late = students.filter(s => attMap[s.id]?.status === 'late');
-
-            const choice = prompt(
-                `📊 Select recipients for ${classVal} (${new Date().toLocaleDateString()}):\n\n1 – All (${students.length})\n2 – Absent only (${absent.length})\n3 – Late only (${late.length})\n4 – Present only (${present.length})`,
-                '1'
-            );
-            if (!choice) return;
-
-            let recipients = [];
-            if (choice === '1') recipients = students;
-            else if (choice === '2') recipients = absent;
-            else if (choice === '3') recipients = late;
-            else if (choice === '4') recipients = present;
-            else {
-                alert("Invalid selection. Operation cancelled.");
-                return;
-            }
-
-            if (recipients.length === 0) {
-                alert("No recipients selected.");
-                return;
-            }
-
-            const summary =
-                `📊 Attendance Report - ${classVal} (${new Date().toLocaleDateString()})\n✅ Present: ${present.length}\n❌ Absent: ${absent.length}\n⏰ Late: ${late.length}`;
-
-            let validRecipients = [];
-            let invalidRecipients = [];
-
-            for (let s of recipients) {
-                let phone = s.parentPhone || s.phone || '';
-                if (phone) {
-                    let formatted = String(phone).replace(/\D/g, '');
-                    if (formatted && formatted.length >= 8) {
-                        validRecipients.push({ student: s, phone: formatted });
-                    } else {
-                        invalidRecipients.push(s);
-                    }
-                } else {
-                    invalidRecipients.push(s);
-                }
-            }
-
-            if (validRecipients.length === 0) {
-                alert(`No valid phone numbers found among ${recipients.length} recipient(s). Please check parent phone numbers.`);
-                return;
-            }
-
-            if (invalidRecipients.length > 0) {
-                let names = invalidRecipients.slice(0, 5).map(s => s.name).join(', ');
-                let more = invalidRecipients.length > 5 ? ` and ${invalidRecipients.length - 5} more` : '';
-                if (!confirm(
-                        `${invalidRecipients.length} student(s) have no valid phone number:\n${names}${more}\n\nContinue with ${validRecipients.length} valid recipient(s)?`
-                    )) {
-                    return;
-                }
-            }
-
-            // Open WhatsApp with a staggered delay and inform user about popups
-            let opened = 0;
-            let failCount = 0;
-            for (let i = 0; i < validRecipients.length; i++) {
-                const { student, phone } = validRecipients[i];
-                const statusText = attMap[student.id]?.status || 'Not marked';
-                const msg =
-                    `Dear ${student.parentName || 'Parent'},\n\n${summary}\n\nYour child ${student.name} (${student.id}) is marked: ${statusText.toUpperCase()}\nRemark: ${attMap[student.id]?.remark||''}\n\nThank you.`;
-
-                const url = getValidWhatsAppUrl(phone, msg);
-                if (url) {
-                    setTimeout(() => {
-                        try {
-                            const win = window.open(url, '_blank');
-                            if (win) opened++;
-                            else failCount++;
-                        } catch (e) {
-                            failCount++;
-                            console.warn('Popup blocked for', student.name);
-                        }
-                    }, i * 800);
-                } else {
-                    failCount++;
-                    console.warn(`Invalid phone for ${student.name}: ${phone}`);
-                }
-            }
-
-            setTimeout(() => {
-                let msg = `✅ Opening WhatsApp for ${opened} parent(s).`;
-                if (failCount > 0) msg += `\n⚠️ ${failCount} failed (invalid numbers or popup blocked).`;
-                msg += `\n\nIf you don't see WhatsApp opening, please allow popups for this site.`;
-                alert(msg);
-            }, validRecipients.length * 800 + 500);
-        }
-
-        // ============================================================
-        //  FIXED: Class History – robust with clear empty-state
-        // ============================================================
-        async function viewClassHistory() {
-            const classVal = document.getElementById('classSelect').value;
-            if (!classVal) {
-                alert("Please select a class first.");
-                return;
-            }
-            if (!allStudents[classVal] || allStudents[classVal].length === 0) {
-                alert(`No students found in class "${classVal}".`);
-                return;
-            }
-
-            let date = prompt("Enter date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-            if (!date) return;
-
-            try {
-                const snap = await db.collection('attendance')
-                    .where('class', '==', classVal)
-                    .where('date', '==', date)
-                    .get();
-
-                let attMap = {};
-                snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
-
-                let students = allStudents[classVal];
-                let html =
-                    `<h3>${classVal} – Attendance for ${date}</h3>
-                     <p><strong>Total Students:</strong> ${students.length}</p>
-                     <table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
-
-                let presentCount = 0,
-                    absentCount = 0,
-                    lateCount = 0,
-                    notMarkedCount = 0;
-
-                for (let s of students) {
-                    let a = attMap[s.id] || { status: 'none', remark: '' };
-                    let emoji = a.status === 'present' ? '✅ Present' :
-                        (a.status === 'absent' ? '❌ Absent' :
-                            (a.status === 'late' ? '⏰ Late' : '⚪ Not marked'));
-                    if (a.status === 'present') presentCount++;
-                    else if (a.status === 'absent') absentCount++;
-                    else if (a.status === 'late') lateCount++;
-                    else notMarkedCount++;
-                    html +=
-                        `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${emoji}</td><td>${escapeHtml(a.remark)}</td></tr>`;
-                }
-                html += `</tbody></table>`;
-
-                // Summary
-                html += `
-                    <div style="margin-top:16px; padding:12px; background:#f0f5fa; border-radius:12px;">
-                        <strong>Summary:</strong> ✅ Present: ${presentCount} | ❌ Absent: ${absentCount} | ⏰ Late: ${lateCount} | ⚪ Not marked: ${notMarkedCount}
-                    </div>
-                `;
-
-                if (snap.size === 0) {
-                    html += `<div class="warning" style="margin-top:16px; padding:12px; background:#fff3cd; border-radius:12px; border-left:5px solid #f39c12;">
-                        ⚠️ No attendance records found for this date. All students are shown as "Not marked".
-                    </div>`;
-                }
-
-                document.getElementById('historyContent').innerHTML = html;
-                openModal('historyModal');
-            } catch (error) {
-                alert(`Error loading class history: ${error.message}`);
-            }
+        function initFileDB() {
+            return new Promise((resolve, reject) => {
+                let req = indexedDB.open('SchoolFilesDB', 1);
+                req.onerror = () => reject(req.error);
+                req.onsuccess = () => { fileDB = req.result;
+                    resolve(); };
+                req.onupgradeneeded = e => {
+                    let db = e.target.result;
+                    if (!db.objectStoreNames.contains('files')) db.createObjectStore('files', { keyPath: 'id',
+                        autoIncrement: true });
+                };
+            });
         }
 
         // ============================================================
@@ -2137,7 +1973,7 @@
                 renderAttendance();
             });
 
-            // --- FIXED: Absent button with robust WhatsApp ---
+            // --- Absent button with WhatsApp alert ---
             document.querySelectorAll('.absent-btn').forEach(btn => btn.onclick = async () => {
                 let sid = btn.dataset.id,
                     remark = document.getElementById(`remark_${sid}`).value;
@@ -2145,6 +1981,7 @@
 
                 let student = students.find(s => s.id === sid);
                 if (!student) {
+                    alert('Student not found in the list.');
                     renderAttendance();
                     return;
                 }
@@ -2161,11 +1998,7 @@
                         `🏫 Attendance Update - ${cls}\n\nStudent: ${student.name} (${student.id})\nStatus: ABSENT ❌\nRemark: ${remark}\nDate: ${new Date().toLocaleDateString()}\nThank you.`;
                     let url = getValidWhatsAppUrl(phone, msg);
                     if (url) {
-                        const win = window.open(url, '_blank');
-                        if (!win) {
-                            alert(
-                                '⚠️ Popup blocked! Please allow popups for this site or click the WhatsApp icon manually.');
-                        }
+                        window.open(url, '_blank');
                     } else {
                         alert(`Invalid phone number for ${student.name}: ${phone}. Please check the number format.`);
                     }
@@ -2173,7 +2006,6 @@
                 renderAttendance();
             });
 
-            // --- Late button ---
             document.querySelectorAll('.late-btn').forEach(btn => btn.onclick = async () => {
                 let sid = btn.dataset.id,
                     remark = document.getElementById(`remark_${sid}`).value;
@@ -2181,7 +2013,6 @@
                 renderAttendance();
             });
 
-            // --- Individual student history ---
             document.querySelectorAll('.history-student-btn').forEach(btn => btn.onclick = async () => {
                 let sid = btn.dataset.id,
                     name = btn.dataset.name,
@@ -2202,6 +2033,148 @@
                 document.getElementById('historyContent').innerHTML = histHtml;
                 openModal('historyModal');
             });
+        }
+
+        // ============================================================
+        //  CLASS HISTORY
+        // ============================================================
+        async function viewClassHistory() {
+            const classVal = document.getElementById('classSelect').value;
+            if (!classVal) {
+                alert("Please select a class first.");
+                return;
+            }
+            if (!allStudents[classVal] || allStudents[classVal].length === 0) {
+                alert(`No students found in class "${classVal}".`);
+                return;
+            }
+
+            let date = prompt("Enter date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+            if (!date) return;
+
+            try {
+                const snap = await db.collection('attendance').where('class', '==', classVal).where('date', '==', date).get();
+                let attMap = {};
+                snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
+
+                let students = allStudents[classVal];
+                let html =
+                    `<h3>${classVal} – Attendance for ${date}</h3><table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
+                for (let s of students) {
+                    let a = attMap[s.id] || { status: 'Not marked', remark: '' };
+                    let emoji = a.status === 'present' ? '✅ Present' : (a.status === 'absent' ? '❌ Absent' : (a.status ===
+                        'late' ? '⏰ Late' : '⚪ Not marked'));
+                    html +=
+                        `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${emoji}</td><td>${escapeHtml(a.remark)}</td></tr>`;
+                }
+                html += `</tbody></table>`;
+                document.getElementById('historyContent').innerHTML = html;
+                openModal('historyModal');
+            } catch (error) {
+                alert(`Error loading class history: ${error.message}`);
+            }
+        }
+
+        // ============================================================
+        //  SEND BATCH WHATSAPP REPORT
+        // ============================================================
+        async function sendBatchWhatsApp() {
+            const classVal = document.getElementById('classSelect').value;
+            if (!classVal) {
+                alert("Please select a class first.");
+                return;
+            }
+            const students = allStudents[classVal];
+            if (!students || students.length === 0) {
+                alert(`No students found in class "${classVal}".`);
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            let attMap = {};
+            try {
+                (await db.collection('attendance').where('class', '==', classVal).where('date', '==', today).get()).forEach(d =>
+                    attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
+            } catch (e) {
+                alert(`Error loading attendance data: ${e.message}`);
+                return;
+            }
+
+            const present = students.filter(s => attMap[s.id]?.status === 'present');
+            const absent = students.filter(s => attMap[s.id]?.status === 'absent');
+            const late = students.filter(s => attMap[s.id]?.status === 'late');
+
+            const choice = prompt(
+                `📊 Select recipients for ${classVal} (${new Date().toLocaleDateString()}):\n\n1 – All (${students.length})\n2 – Absent only (${absent.length})\n3 – Late only (${late.length})\n4 – Present only (${present.length})`,
+                '1'
+            );
+
+            let recipients = [];
+            if (choice === '1') recipients = students;
+            else if (choice === '2') recipients = absent;
+            else if (choice === '3') recipients = late;
+            else if (choice === '4') recipients = present;
+            else {
+                alert("Invalid selection. Operation cancelled.");
+                return;
+            }
+
+            if (recipients.length === 0) {
+                alert("No recipients selected.");
+                return;
+            }
+
+            const summary =
+                `📊 Attendance Report - ${classVal} (${new Date().toLocaleDateString()})\n✅ Present: ${present.length}\n❌ Absent: ${absent.length}\n⏰ Late: ${late.length}`;
+
+            let validRecipients = [];
+            let invalidRecipients = [];
+
+            for (let s of recipients) {
+                let phone = s.parentPhone || s.phone || '';
+                if (phone) {
+                    let formatted = String(phone).replace(/\D/g, '');
+                    if (formatted && formatted.length >= 8) {
+                        validRecipients.push({ student: s, phone: formatted });
+                    } else {
+                        invalidRecipients.push(s);
+                    }
+                } else {
+                    invalidRecipients.push(s);
+                }
+            }
+
+            if (validRecipients.length === 0) {
+                alert(`No valid phone numbers found among ${recipients.length} recipient(s). Please check parent phone numbers.`);
+                return;
+            }
+
+            if (invalidRecipients.length > 0) {
+                let names = invalidRecipients.map(s => s.name).join(', ');
+                if (!confirm(
+                        `${invalidRecipients.length} student(s) have no valid phone number:\n${names}\n\nContinue with ${validRecipients.length} valid recipient(s)?`
+                        )) {
+                    return;
+                }
+            }
+
+            for (let i = 0; i < validRecipients.length; i++) {
+                const { student, phone } = validRecipients[i];
+                const statusText = attMap[student.id]?.status || 'Not marked';
+                const msg =
+                    `Dear ${student.parentName || 'Parent'},\n\n${summary}\n\nYour child ${student.name} (${student.id}) is marked: ${statusText.toUpperCase()}\nRemark: ${attMap[student.id]?.remark||''}\n\nThank you.`;
+
+                let p = phone;
+                if (p.startsWith('0')) p = p.slice(1);
+                if (!p.startsWith('232')) p = '232' + p;
+                const url = `https://wa.me/${p}?text=${encodeURIComponent(msg)}`;
+
+                setTimeout(() => {
+                    window.open(url, '_blank');
+                }, i * 700);
+            }
+
+            alert(`✅ Opening WhatsApp for ${validRecipients.length} parent(s).\n\n⚠️ If your browser blocks popups, please allow them for this site.`);
         }
 
         // ============================================================
@@ -2313,7 +2286,7 @@
         }
 
         // ============================================================
-        //  EXAM RECORDS
+        //  EXAM RECORDS (UPDATED WITH YEAR)
         // ============================================================
         async function loadExamStudent() {
             let q = document.getElementById('examStudentSearch').value.trim();
@@ -2322,28 +2295,88 @@
             examCurrentStudent = found;
             document.getElementById('examStudentInfo').innerHTML =
                 `<div class="success">Editing exam for: ${escapeHtml(found.name)} (${found.id})</div>`;
+            // Set year input default to current year if not set
+            if (!document.getElementById('examYearInput').value) {
+                document.getElementById('examYearInput').value = new Date().getFullYear();
+            }
+            // Reset to term1 if no active term button
+            if (!document.querySelector('#examTermButtons .term-btn.active')) {
+                document.querySelector('#examTermButtons .term-btn[data-term="term1"]')?.classList.add('active');
+                currentTerm = 'term1';
+            }
+            if (!document.querySelector('#examLevelButtons .exam-level-btn.active')) {
+                document.querySelector('#examLevelButtons .exam-level-btn[data-exam-level="npse"]')?.classList.add('active');
+                currentExamLevel = 'npse';
+            }
             await loadExamUIForStudent();
         }
 
         async function loadExamUIForStudent() {
             if (!examCurrentStudent) return;
+            const year = document.getElementById('examYearInput').value.trim() || new Date().getFullYear();
+
+            // Get active term and level
+            const activeTermBtn = document.querySelector('#examTermButtons .term-btn.active');
+            const activeLevelBtn = document.querySelector('#examLevelButtons .exam-level-btn.active');
+            if (activeTermBtn) currentTerm = activeTermBtn.dataset.term;
+            if (activeLevelBtn) currentExamLevel = activeLevelBtn.dataset.examLevel;
+
+            // Build assessment buttons
             let termSelector = document.getElementById('examTermAssessmentSelector');
             termSelector.innerHTML =
                 `<div class="assessment-btns"><button class="assessment-btn ${currentAssessment === 'test1' ? 'active' : ''}" data-assessment="test1">Test 1</button><button class="assessment-btn ${currentAssessment === 'test2' ? 'active' : ''}" data-assessment="test2">Test 2</button><button class="assessment-btn ${currentAssessment === 'exam' ? 'active' : ''}" data-assessment="exam">Exam</button></div>`;
-            document.querySelectorAll('.assessment-btn').forEach(btn => {
-                btn.onclick = () => {
-                    document.querySelectorAll('.assessment-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentAssessment = btn.getAttribute('data-assessment');
+
+            // Assessment button click handlers
+            document.querySelectorAll('#examTermAssessmentSelector .assessment-btn').forEach(btn => {
+                btn.onclick = function() {
+                    document.querySelectorAll('#examTermAssessmentSelector .assessment-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentAssessment = this.dataset.assessment;
                     loadExamUIForStudent();
                 };
             });
+
+            // Load data for current selection
             let examDoc = await db.collection('exam_records').doc(examCurrentStudent.id).get();
             let records = examDoc.exists ? examDoc.data() : {};
-            let key = currentExamLevel + '_' + currentTerm + '_' + currentAssessment;
-            let subjectsData = records[key] || [];
+            let years = records.years || {};
+            let yearData = years[year] || {};
+            let levelData = yearData[currentExamLevel] || {};
+            let termData = levelData[currentTerm] || {};
+            let subjectsData = termData[currentAssessment] || [];
             document.getElementById('examRecordsContent').innerHTML = buildSubjectInputs(subjectsData);
             attachExamRemoveEvents();
+        }
+
+        // --- Setup event delegation for exam controls ---
+        function setupExamControls() {
+            // Term buttons
+            document.getElementById('examTermButtons')?.addEventListener('click', function(e) {
+                const btn = e.target.closest('.term-btn');
+                if (!btn) return;
+                document.querySelectorAll('#examTermButtons .term-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTerm = btn.dataset.term;
+                if (examCurrentStudent) loadExamUIForStudent();
+            });
+
+            // Exam level buttons
+            document.getElementById('examLevelButtons')?.addEventListener('click', function(e) {
+                const btn = e.target.closest('.exam-level-btn');
+                if (!btn) return;
+                document.querySelectorAll('#examLevelButtons .exam-level-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentExamLevel = btn.dataset.examLevel;
+                if (examCurrentStudent) loadExamUIForStudent();
+            });
+
+            // Year input change
+            document.getElementById('examYearInput')?.addEventListener('change', function() {
+                if (examCurrentStudent) loadExamUIForStudent();
+            });
+            document.getElementById('examYearInput')?.addEventListener('input', function() {
+                if (examCurrentStudent) loadExamUIForStudent();
+            });
         }
 
         function buildSubjectInputs(currentSubjects) {
@@ -2391,6 +2424,9 @@
 
         async function saveExamRecords() {
             if (!examCurrentStudent) { showMessage('No student loaded', 'error', 'examMessage'); return; }
+            let year = document.getElementById('examYearInput').value.trim();
+            if (!year) { alert('Please enter a valid year.'); return; }
+
             let subjects = [];
             let rows = document.querySelectorAll('#examSubjectsContainer .subject-row');
             for (let row of rows) {
@@ -2399,61 +2435,152 @@
                 if (name) subjects.push({ name, score: score ? parseFloat(score) : '' });
             }
             if (subjects.length === 0) { alert("Add at least one subject"); return; }
-            let key = currentExamLevel + '_' + currentTerm + '_' + currentAssessment;
-            let examDoc = await db.collection('exam_records').doc(examCurrentStudent.id).get();
-            let records = examDoc.exists ? examDoc.data() : {};
-            records[key] = subjects;
-            await db.collection('exam_records').doc(examCurrentStudent.id).set(records);
-            showMessage('Exam records saved!', 'success', 'examMessage');
+
+            // Build the nested structure
+            const examDocRef = db.collection('exam_records').doc(examCurrentStudent.id);
+            const doc = await examDocRef.get();
+            let data = doc.exists ? doc.data() : {};
+            if (!data.years) data.years = {};
+            if (!data.years[year]) data.years[year] = {};
+            if (!data.years[year][currentExamLevel]) data.years[year][currentExamLevel] = {};
+            if (!data.years[year][currentExamLevel][currentTerm]) data.years[year][currentExamLevel][currentTerm] = {};
+            data.years[year][currentExamLevel][currentTerm][currentAssessment] = subjects;
+
+            await examDocRef.set(data);
+            showMessage(`Exam records saved for ${currentTerm}!`, 'success', 'examMessage');
         }
 
         // ============================================================
-        //  EXAM HISTORY (student records)
+        //  EXAM HISTORY (student records – read‑only, now uses years)
         // ============================================================
         async function loadExamHistory() {
-            if (!currentStudentDoc) return;
-            let term = document.querySelector('.term-btn2.active')?.getAttribute('data-term') || 'term1';
-            let level = document.querySelector('.exam-level-btn2.active')?.getAttribute('data-exam-level') || 'npse';
-            let assessment = document.querySelector('#examHistoryAssessmentSelector .assessment-btn.active')?.getAttribute(
-                'data-assessment') || 'test1';
-            let examDoc = await db.collection('exam_records').doc(currentStudentDoc.id).get();
-            let records = examDoc.exists ? examDoc.data() : {};
-            let key = level + '_' + term + '_' + assessment;
-            let subjects = records[key] || [];
-            let html = '<h4>Subjects & Scores</h4><table><thead><tr><th>Subject</th><th>Score</th></tr></thead><tbody>';
-            for (let s of subjects) {
-                html += `<tr><td>${escapeHtml(s.name)}</td><td>${s.score}</td></tr>`;
+            if (!currentStudentDoc) {
+                document.getElementById('examHistoryContent').innerHTML = '<p>No student selected.</p>';
+                return;
             }
-            html += '</tbody></table>';
-            document.getElementById('examHistoryContent').innerHTML = html || '<p>No exam records found for this selection.</p>';
+            const examDoc = await db.collection('exam_records').doc(currentStudentDoc.id).get();
+            const records = examDoc.exists ? examDoc.data() : {};
+            const years = records.years || {};
+            const yearKeys = Object.keys(years).sort((a, b) => b - a);
+            if (yearKeys.length === 0) {
+                document.getElementById('examHistoryContent').innerHTML = '<p>No exam records found.</p>';
+                return;
+            }
+            const latestYear = yearKeys[0];
+            const yearData = years[latestYear];
+            let html = `<h4>Exam Records for ${latestYear}</h4>`;
+            for (const level of Object.keys(yearData)) {
+                html += `<h5>${level.toUpperCase()}</h5>`;
+                const levelData = yearData[level];
+                for (const term of Object.keys(levelData)) {
+                    const termData = levelData[term];
+                    for (const assessment of Object.keys(termData)) {
+                        const subjects = termData[assessment];
+                        html += `<p><strong>${term} - ${assessment}</strong></p><ul>`;
+                        subjects.forEach(s => {
+                            html += `<li>${escapeHtml(s.name)}: ${s.score}</li>`;
+                        });
+                        html += `</ul>`;
+                    }
+                }
+            }
+            document.getElementById('examHistoryContent').innerHTML = html;
         }
 
-        function initExamHistorySelectors() {
-            document.querySelectorAll('.term-btn2').forEach(btn => {
-                btn.onclick = () => {
-                    document.querySelectorAll('.term-btn2').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    loadExamHistory();
-                };
+        // ============================================================
+        //  ADMIN: EXAM HISTORY (ALL YEARS)
+        // ============================================================
+        async function loadExamHistoryAll() {
+            const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
+            if (!studentId) {
+                document.getElementById('examHistoryAllContent').innerHTML = '<p>Please enter a Student ID.</p>';
+                return;
+            }
+            const found = globalStudentMap.get(studentId) || globalStudentMap.get(studentId.toLowerCase());
+            if (!found) {
+                document.getElementById('examHistoryAllContent').innerHTML = `<p class="error">Student not found.</p>`;
+                return;
+            }
+            const yearSelect = document.getElementById('examHistoryAllYear');
+            const examDoc = await db.collection('exam_records').doc(found.id).get();
+            const records = examDoc.exists ? examDoc.data() : {};
+            const years = records.years || {};
+            const yearKeys = Object.keys(years).sort((a, b) => b - a);
+            const currentYear = yearSelect.value;
+            yearSelect.innerHTML = '<option value="">Select Year</option>';
+            yearKeys.forEach(y => {
+                const selected = (y === currentYear) ? 'selected' : '';
+                yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`;
             });
-            document.querySelectorAll('.exam-level-btn2').forEach(btn => {
-                btn.onclick = () => {
-                    document.querySelectorAll('.exam-level-btn2').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    loadExamHistory();
-                };
+            if (yearKeys.length === 0) {
+                document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found for this student.</p>';
+                return;
+            }
+            if (!yearSelect.value) {
+                yearSelect.value = yearKeys[0];
+            }
+            displayExamHistoryAll(found.id, yearSelect.value);
+        }
+
+        function displayExamHistoryAll(studentId, year) {
+            db.collection('exam_records').doc(studentId).get().then(doc => {
+                if (!doc.exists) {
+                    document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found.</p>';
+                    return;
+                }
+                const data = doc.data();
+                const years = data.years || {};
+                const yearData = years[year];
+                if (!yearData) {
+                    document.getElementById('examHistoryAllContent').innerHTML = `<p>No records for year ${year}.</p>`;
+                    return;
+                }
+                let html = `<h4>Exam Records for ${escapeHtml(studentId)} - ${year}</h4>`;
+                for (const level of Object.keys(yearData)) {
+                    html += `<h5>${level.toUpperCase()}</h5>`;
+                    const levelData = yearData[level];
+                    for (const term of Object.keys(levelData)) {
+                        const termData = levelData[term];
+                        for (const assessment of Object.keys(termData)) {
+                            const subjects = termData[assessment];
+                            html += `<p><strong>${term} - ${assessment}</strong></p><ul>`;
+                            subjects.forEach(s => {
+                                html += `<li>${escapeHtml(s.name)}: ${s.score}</li>`;
+                            });
+                            html += `</ul>`;
+                        }
+                    }
+                }
+                html += `<br><button class="refresh-btn" onclick="editExamHistoryAll('${studentId}','${year}')">✏️ Edit Records</button>`;
+                html += `<button class="refresh-btn" style="background:#fde8e8; color:#b71c1c;" onclick="deleteExamHistoryAll('${studentId}','${year}')">🗑️ Delete Year</button>`;
+                document.getElementById('examHistoryAllContent').innerHTML = html;
+            }).catch(err => {
+                document.getElementById('examHistoryAllContent').innerHTML = `<p class="error">Error loading records: ${err.message}</p>`;
             });
-            let container = document.getElementById('examHistoryAssessmentSelector');
-            container.innerHTML =
-                `<div class="assessment-btns"><button class="assessment-btn active" data-assessment="test1">Test 1</button><button class="assessment-btn" data-assessment="test2">Test 2</button><button class="assessment-btn" data-assessment="exam">Exam</button></div>`;
-            document.querySelectorAll('#examHistoryAssessmentSelector .assessment-btn').forEach(btn => {
-                btn.onclick = () => {
-                    document.querySelectorAll('#examHistoryAssessmentSelector .assessment-btn').forEach(b => b
-                        .classList.remove('active'));
-                    btn.classList.add('active');
-                    loadExamHistory();
-                };
-            });
+        }
+
+        function editExamHistoryAll(studentId, year) {
+            const found = globalStudentMap.get(studentId);
+            if (!found) { alert('Student not found in memory. Please refresh.'); return; }
+            const attendanceBtn = document.getElementById('attendanceModuleBtn');
+            if (attendanceBtn) attendanceBtn.click();
+            document.getElementById('examStudentSearch').value = studentId;
+            document.getElementById('examYearInput').value = year;
+            document.getElementById('searchExamStudentBtn').click();
+        }
+
+        async function deleteExamHistoryAll(studentId, year) {
+            if (!confirm(`Are you sure you want to delete all exam records for ${studentId} in ${year}?`)) return;
+            const docRef = db.collection('exam_records').doc(studentId);
+            const doc = await docRef.get();
+            if (!doc.exists) return;
+            const data = doc.data();
+            if (data.years && data.years[year]) {
+                delete data.years[year];
+                await docRef.set(data);
+                alert('Year deleted successfully.');
+                loadExamHistoryAll();
+            }
         }
 
         // ============================================================
@@ -3001,7 +3128,7 @@
         };
 
         // ============================================================
-        //  TEACHER MODULE
+        //  TEACHER MODULE (updated with qualification and NIN)
         // ============================================================
         async function loadAllTeachersForAdmin() {
             if (currentUserRole !== 'admin') return;
@@ -3933,26 +4060,26 @@
                 } else {
                     throw new Error('Invalid role');
                 }
+                
+                // Setup exam controls using event delegation
+                setupExamControls();
+                
+                // Initialize exam history selectors
                 initExamHistorySelectors();
                 initPaymentHistorySelectors();
-                document.querySelectorAll('#attendanceModule .term-btn').forEach(btn => {
-                    btn.onclick = () => {
-                        document.querySelectorAll('#attendanceModule .term-btn').forEach(b => b.classList.remove(
-                            'active'));
-                        btn.classList.add('active');
-                        currentTerm = btn.getAttribute('data-term');
-                        if (examCurrentStudent) loadExamUIForStudent();
-                    };
-                });
-                document.querySelectorAll('#attendanceModule .exam-level-btn').forEach(btn => {
-                    btn.onclick = () => {
-                        document.querySelectorAll('#attendanceModule .exam-level-btn').forEach(b => b.classList
-                            .remove('active'));
-                        btn.classList.add('active');
-                        currentExamLevel = btn.getAttribute('data-exam-level');
-                        if (examCurrentStudent) loadExamUIForStudent();
-                    };
-                });
+
+                // --- Re-initialize term and level button states ---
+                // Ensure default active states are set
+                if (!document.querySelector('#examTermButtons .term-btn.active')) {
+                    const defaultTerm = document.querySelector('#examTermButtons .term-btn');
+                    if (defaultTerm) defaultTerm.classList.add('active');
+                    currentTerm = defaultTerm ? defaultTerm.dataset.term : 'term1';
+                }
+                if (!document.querySelector('#examLevelButtons .exam-level-btn.active')) {
+                    const defaultLevel = document.querySelector('#examLevelButtons .exam-level-btn');
+                    if (defaultLevel) defaultLevel.classList.add('active');
+                    currentExamLevel = defaultLevel ? defaultLevel.dataset.examLevel : 'npse';
+                }
 
                 const firstModuleBtn = document.querySelector('.module-btn');
                 if (firstModuleBtn) firstModuleBtn.click();
@@ -4024,7 +4151,6 @@
                     'teacher') return;
                 loadStudents().then(renderAttendance); };
             
-            // --- FIXED: Send Reports button ---
             document.getElementById('batchWhatsappBtn').onclick = () => { 
                 if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') {
                     alert('You do not have permission to send reports.');
@@ -4033,7 +4159,6 @@
                 sendBatchWhatsApp(); 
             };
             
-            // --- FIXED: Class History button ---
             document.getElementById('classHistoryBtn').onclick = () => { 
                 if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') {
                     alert('You do not have permission to view class history.');
@@ -4131,6 +4256,16 @@
             document.getElementById('submitBursarPaymentBtn').onclick = recordBursarPayment;
             document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
 
+            // Admin tab: Exam History (All Years)
+            document.getElementById('loadExamHistoryAllBtn').onclick = loadExamHistoryAll;
+            document.getElementById('examHistoryAllYear').onchange = function() {
+                const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
+                if (studentId && this.value) {
+                    displayExamHistoryAll(studentId, this.value);
+                }
+            };
+            document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
+
             document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => {
                 btn.onclick = () => {
                     const id = btn.dataset.tab;
@@ -4145,6 +4280,7 @@
                     else if (id === 'visitors') loadVisitorsList();
                     else if (id === 'noticeboard') renderNotices();
                     else if (id === 'filestorage') initFileDB().then(loadFilesList);
+                    else if (id === 'examhistoryall') { /* handled on load */ }
                     else if (id === 'suggestions') loadSuggestions();
                 };
             });
