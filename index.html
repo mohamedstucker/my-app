@@ -24,7 +24,6 @@
             color: #1a2634;
         }
 
-        /* ----- SCROLLBAR ----- */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -57,19 +56,19 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-    .header h1 {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #1a4b8a; /* fallback solid color for browsers that don't support background-clip: text */
-    background: linear-gradient(135deg, #0b2b5c, #1a4b8a);
-    -webkit-background-clip: text;
-    background-clip: text;      /* standard property (still requires -webkit- in many browsers) */
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.5px;
-}
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a4b8a;
+            background: linear-gradient(135deg, #0b2b5c, #1a4b8a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
 
         .header h1 svg {
             height: 48px;
@@ -135,7 +134,6 @@
             transform: scale(1.02);
         }
 
-        /* ----- SYNC BAR ----- */
         .sync-bar {
             background: linear-gradient(135deg, #1a4b8a, #0b2b5c);
             color: #fff;
@@ -151,7 +149,6 @@
             backdrop-filter: blur(4px);
         }
 
-        /* ----- GLOBAL NOTICES ----- */
         #globalNotices {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(8px);
@@ -311,7 +308,6 @@
             gap: 10px;
         }
 
-        /* ----- FORM ELEMENTS ----- */
         input,
         select,
         textarea {
@@ -532,7 +528,7 @@
             background: #f8d7da !important;
         }
 
-        /* ----- NOTICE CARDS (used in admin tab) ----- */
+        /* ----- NOTICE CARDS ----- */
         .notice-card {
             border-left: 6px solid #2a6bb0;
             background: #fefcf5;
@@ -578,7 +574,6 @@
             flex-wrap: wrap;
         }
 
-        /* ----- SHARE WHATSAPP ----- */
         .share-wa {
             background: #25D366;
             color: #fff;
@@ -595,7 +590,6 @@
             transform: scale(1.03);
         }
 
-        /* ----- SUBJECT ROW ----- */
         .subject-row {
             display: flex;
             gap: 12px;
@@ -673,7 +667,6 @@
             transform: rotate(90deg);
         }
 
-        /* ----- SUCCESS / ERROR ----- */
         .success {
             background: #d4edda;
             color: #0b5e2e;
@@ -693,7 +686,6 @@
             font-weight: 500;
         }
 
-        /* ----- LOGIN MODAL ----- */
         #loginModal .modal-content {
             max-width: 440px;
             text-align: center;
@@ -711,7 +703,6 @@
             border-top: 2px dashed #e6edf4;
         }
 
-        /* ----- FLOATING SUGGESTION BUTTON ----- */
         .suggestion-fab {
             position: fixed;
             bottom: 30px;
@@ -739,7 +730,6 @@
             transform: scale(0.95);
         }
 
-        /* ----- DASHBOARD CHARTS ----- */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -821,8 +811,21 @@
             color: #1a4b8a;
             margin: 8px 0;
         }
+        .filter-badge {
+            display: inline-block;
+            background: #eef2f7;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1a3a5c;
+            margin-left: 12px;
+        }
+        .filter-badge.active {
+            background: #1a4b8a;
+            color: #fff;
+        }
 
-        /* Responsive */
         @media (max-width: 768px) {
             body {
                 padding: 12px;
@@ -981,11 +984,26 @@
         <!-- ===== DASHBOARD MODULE (ADMIN ONLY) ===== -->
         <div id="dashboardModule" style="display:none;">
             <div class="card">
-                <h3>📊 Student Statistics Dashboard</h3>
+                <h3>📊 Student Statistics Dashboard
+                    <span id="dashboardFilterBadge" class="filter-badge">All Years | All</span>
+                </h3>
+                <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:16px;">
+                    <label style="font-weight:600;">Year:</label>
+                    <select id="dashboardYearFilter" style="max-width:150px;">
+                        <option value="all">All Years</option>
+                    </select>
+                    <label style="font-weight:600; margin-left:4px;">Status:</label>
+                    <select id="dashboardStatusFilter" style="max-width:130px;">
+                        <option value="all">All</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <button id="applyDashboardFiltersBtn" class="refresh-btn">Apply Filters</button>
+                    <button id="refreshDashboardBtn" class="refresh-btn">🔄 Refresh</button>
+                </div>
                 <div id="dashboardContent">
                     <p>Loading dashboard data…</p>
                 </div>
-                <button id="refreshDashboardBtn" class="refresh-btn" style="margin-top:16px;">🔄 Refresh</button>
             </div>
         </div>
 
@@ -1052,7 +1070,6 @@
 
             <div id="studentList"></div>
 
-            <!-- Exam Records (inside attendance module) -->
             <div class="card" id="examRecordsSection">
                 <h3>📝 Exam Records (by Student)</h3>
                 <div class="search-box">
@@ -1060,7 +1077,6 @@
                     <button id="searchExamStudentBtn" class="refresh-btn">Load Student</button>
                 </div>
                 <div id="examStudentInfo"></div>
-                <!-- Year selector -->
                 <div class="form-row">
                     <label style="font-weight:600;">Year:</label>
                     <input type="number" id="examYearInput" placeholder="e.g. 2025" value="2025" style="max-width:120px;" />
@@ -1240,7 +1256,7 @@
             </div>
         </div>
 
-        <!-- ===== BURSAR MODULE (BURSAR ONLY) ===== -->
+        <!-- ===== BURSAR MODULE ===== -->
         <div id="bursarModule" style="display:none;">
             <div class="card">
                 <h3>💰 Record Payment / Manage Fees</h3>
@@ -1396,7 +1412,6 @@
                 </div>
             </div>
 
-            <!-- NEW TAB: Exam History (All Years) -->
             <div id="examhistoryallTab" class="admin-tab">
                 <div class="card">
                     <h3>📅 Exam History (All Years)</h3>
@@ -1689,8 +1704,11 @@
         }
 
         // ============================================================
-        //  DASHBOARD
+        //  DASHBOARD WITH YEAR AND STATUS FILTERS
         // ============================================================
+        let dashboardStudentRecords = [];
+        let dashboardExamYearsMap = {};
+
         function categorizeClass(cls) {
             const lower = cls.toLowerCase();
             if (lower.startsWith('nursery')) return 'nursery';
@@ -1701,10 +1719,93 @@
         }
 
         async function loadDashboard() {
-            const snap = await db.collection('students').get();
-            const students = [];
-            snap.forEach(doc => students.push(doc.data()));
+            const selectedYear = document.getElementById('dashboardYearFilter').value;
+            const selectedStatus = document.getElementById('dashboardStatusFilter').value;
 
+            // Load all students
+            const studentsSnap = await db.collection('students').get();
+            const allStudentsData = [];
+            studentsSnap.forEach(doc => allStudentsData.push(doc.data()));
+            dashboardStudentRecords = allStudentsData;
+
+            // Load all exam records to build year map
+            const examSnap = await db.collection('exam_records').get();
+            dashboardExamYearsMap = {};
+            const allYearsSet = new Set();
+
+            examSnap.forEach(doc => {
+                const data = doc.data();
+                const studentId = doc.id;
+                const years = data.years || {};
+                const yearKeys = Object.keys(years);
+                if (yearKeys.length > 0) {
+                    dashboardExamYearsMap[studentId] = new Set(yearKeys);
+                    yearKeys.forEach(y => allYearsSet.add(y));
+                }
+            });
+
+            // Populate year dropdown
+            const yearSelect = document.getElementById('dashboardYearFilter');
+            const currentYearValue = yearSelect.value;
+            yearSelect.innerHTML = '<option value="all">All Years</option>';
+            const sortedYears = Array.from(allYearsSet).sort((a, b) => b - a);
+            sortedYears.forEach(y => {
+                const selected = (y === currentYearValue) ? 'selected' : '';
+                yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`;
+            });
+
+            // If no years found, show message but still allow status filter
+            if (sortedYears.length === 0) {
+                document.getElementById('dashboardContent').innerHTML = `
+                    <div class="success" style="text-align:center; padding:40px;">
+                        <h4>📊 No Exam Records Found</h4>
+                        <p>Start by adding exam records for students, then the dashboard will show year-based statistics.</p>
+                        <p style="margin-top:10px; font-size:0.9rem; color:#6c7a89;">Showing all students (no year filter available).</p>
+                    </div>
+                `;
+                // Still show all students with status filter applied
+                renderDashboardStats(allStudentsData, 'All Years', selectedStatus);
+                return;
+            }
+
+            // Ensure valid selection
+            if (!yearSelect.value || !yearSelect.querySelector(`option[value="${yearSelect.value}"]`)) {
+                yearSelect.value = 'all';
+            }
+
+            // Apply filters
+            let filteredStudents = allStudentsData;
+            let yearLabel = 'All Years';
+
+            // Year filter
+            if (selectedYear && selectedYear !== 'all') {
+                filteredStudents = filteredStudents.filter(s => {
+                    const studentYears = dashboardExamYearsMap[s.id] || new Set();
+                    return studentYears.has(selectedYear);
+                });
+                yearLabel = `Year ${selectedYear}`;
+            }
+
+            // Status filter
+            let statusLabel = 'All';
+            if (selectedStatus && selectedStatus !== 'all') {
+                filteredStudents = filteredStudents.filter(s => {
+                    const status = s.status || 'active';
+                    return status === selectedStatus;
+                });
+                statusLabel = selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1);
+            }
+
+            // Update filter badge
+            const badge = document.getElementById('dashboardFilterBadge');
+            badge.textContent = `${yearLabel} | ${statusLabel}`;
+            badge.className = 'filter-badge active';
+
+            renderDashboardStats(filteredStudents, yearLabel, statusLabel);
+        }
+
+        function renderDashboardStats(students, yearLabel, statusLabel) {
+            // Initialize categories
             const categories = {
                 nursery: { label: 'Nursery', classes: ['Nursery1', 'Nursery2', 'Nursery3'], boys: 0, girls: 0, other: 0,
                     total: 0 },
@@ -1715,6 +1816,7 @@
                 sss: { label: 'SSS', classes: ['SSS1', 'SSS2', 'SSS3'], boys: 0, girls: 0, other: 0, total: 0 }
             };
 
+            // Count students
             students.forEach(s => {
                 const cat = categorizeClass(s.class);
                 if (cat === 'other') return;
@@ -1725,7 +1827,22 @@
                 else categories[cat].other++;
             });
 
-            let html = `<div class="dashboard-grid">`;
+            // Build HTML
+            let html = `<div style="margin-bottom:12px; font-size:0.95rem; color:#1a3a5c; background:#f0f5fa; padding:10px 16px; border-radius:12px;">
+                <strong>Year:</strong> ${yearLabel} &nbsp;|&nbsp; <strong>Status:</strong> ${statusLabel} &nbsp;|&nbsp; <strong>Students:</strong> ${students.length}
+                ${students.length > 0 ? `&nbsp;|&nbsp; <span style="color:#27ae60;">✅ ${students.length} total</span>` : ''}
+            </div>`;
+
+            if (students.length === 0) {
+                html += `<div class="error" style="text-align:center; padding:30px;">
+                    <h4>No students found for ${yearLabel} | ${statusLabel}</h4>
+                    <p>Try adjusting the filters or add exam records for students.</p>
+                </div>`;
+                document.getElementById('dashboardContent').innerHTML = html;
+                return;
+            }
+
+            html += `<div class="dashboard-grid">`;
             for (let key of ['nursery', 'primary', 'jss', 'sss']) {
                 const data = categories[key];
                 const boysPct = data.total > 0 ? (data.boys / data.total * 100) : 0;
@@ -1772,12 +1889,14 @@
             }
             html += `</div>`;
 
+            // Overall summary
             const totalBoys = categories.nursery.boys + categories.primary.boys + categories.jss.boys + categories.sss.boys;
             const totalGirls = categories.nursery.girls + categories.primary.girls + categories.jss.girls + categories.sss
                 .girls;
             const totalOther = categories.nursery.other + categories.primary.other + categories.jss.other + categories.sss
                 .other;
             const grandTotal = totalBoys + totalGirls + totalOther;
+
             html += `
                 <div class="card" style="margin-top:20px; background:#f0f5fa;">
                     <h4 style="text-align:center;">📊 Overall Summary</h4>
@@ -1965,7 +2084,6 @@
             html += '</tbody></table>';
             document.getElementById('studentList').innerHTML = html;
 
-            // --- Present button ---
             document.querySelectorAll('.present-btn').forEach(btn => btn.onclick = async () => {
                 let sid = btn.dataset.id,
                     remark = document.getElementById(`remark_${sid}`).value;
@@ -1973,7 +2091,6 @@
                 renderAttendance();
             });
 
-            // --- Absent button with WhatsApp alert ---
             document.querySelectorAll('.absent-btn').forEach(btn => btn.onclick = async () => {
                 let sid = btn.dataset.id,
                     remark = document.getElementById(`remark_${sid}`).value;
@@ -2035,9 +2152,6 @@
             });
         }
 
-        // ============================================================
-        //  CLASS HISTORY
-        // ============================================================
         async function viewClassHistory() {
             const classVal = document.getElementById('classSelect').value;
             if (!classVal) {
@@ -2075,9 +2189,6 @@
             }
         }
 
-        // ============================================================
-        //  SEND BATCH WHATSAPP REPORT
-        // ============================================================
         async function sendBatchWhatsApp() {
             const classVal = document.getElementById('classSelect').value;
             if (!classVal) {
@@ -2177,9 +2288,6 @@
             alert(`✅ Opening WhatsApp for ${validRecipients.length} parent(s).\n\n⚠️ If your browser blocks popups, please allow them for this site.`);
         }
 
-        // ============================================================
-        //  IMPORT EXCEL STUDENTS
-        // ============================================================
         async function importExcelStudents(file) {
             return new Promise((resolve) => {
                 let reader = new FileReader();
@@ -2206,9 +2314,6 @@
             });
         }
 
-        // ============================================================
-        //  ADD SINGLE STUDENT
-        // ============================================================
         async function addManualStudent() {
             let id = document.getElementById('newStudentId').value.trim(),
                 name = document.getElementById('newStudentName').value.trim(),
@@ -2286,7 +2391,7 @@
         }
 
         // ============================================================
-        //  EXAM RECORDS (UPDATED WITH YEAR)
+        //  EXAM RECORDS
         // ============================================================
         async function loadExamStudent() {
             let q = document.getElementById('examStudentSearch').value.trim();
@@ -2295,11 +2400,9 @@
             examCurrentStudent = found;
             document.getElementById('examStudentInfo').innerHTML =
                 `<div class="success">Editing exam for: ${escapeHtml(found.name)} (${found.id})</div>`;
-            // Set year input default to current year if not set
             if (!document.getElementById('examYearInput').value) {
                 document.getElementById('examYearInput').value = new Date().getFullYear();
             }
-            // Reset to term1 if no active term button
             if (!document.querySelector('#examTermButtons .term-btn.active')) {
                 document.querySelector('#examTermButtons .term-btn[data-term="term1"]')?.classList.add('active');
                 currentTerm = 'term1';
@@ -2315,28 +2418,25 @@
             if (!examCurrentStudent) return;
             const year = document.getElementById('examYearInput').value.trim() || new Date().getFullYear();
 
-            // Get active term and level
             const activeTermBtn = document.querySelector('#examTermButtons .term-btn.active');
             const activeLevelBtn = document.querySelector('#examLevelButtons .exam-level-btn.active');
             if (activeTermBtn) currentTerm = activeTermBtn.dataset.term;
             if (activeLevelBtn) currentExamLevel = activeLevelBtn.dataset.examLevel;
 
-            // Build assessment buttons
             let termSelector = document.getElementById('examTermAssessmentSelector');
             termSelector.innerHTML =
                 `<div class="assessment-btns"><button class="assessment-btn ${currentAssessment === 'test1' ? 'active' : ''}" data-assessment="test1">Test 1</button><button class="assessment-btn ${currentAssessment === 'test2' ? 'active' : ''}" data-assessment="test2">Test 2</button><button class="assessment-btn ${currentAssessment === 'exam' ? 'active' : ''}" data-assessment="exam">Exam</button></div>`;
 
-            // Assessment button click handlers
             document.querySelectorAll('#examTermAssessmentSelector .assessment-btn').forEach(btn => {
                 btn.onclick = function() {
-                    document.querySelectorAll('#examTermAssessmentSelector .assessment-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#examTermAssessmentSelector .assessment-btn').forEach(b => b.classList
+                        .remove('active'));
                     this.classList.add('active');
                     currentAssessment = this.dataset.assessment;
                     loadExamUIForStudent();
                 };
             });
 
-            // Load data for current selection
             let examDoc = await db.collection('exam_records').doc(examCurrentStudent.id).get();
             let records = examDoc.exists ? examDoc.data() : {};
             let years = records.years || {};
@@ -2348,9 +2448,7 @@
             attachExamRemoveEvents();
         }
 
-        // --- Setup event delegation for exam controls ---
         function setupExamControls() {
-            // Term buttons
             document.getElementById('examTermButtons')?.addEventListener('click', function(e) {
                 const btn = e.target.closest('.term-btn');
                 if (!btn) return;
@@ -2360,7 +2458,6 @@
                 if (examCurrentStudent) loadExamUIForStudent();
             });
 
-            // Exam level buttons
             document.getElementById('examLevelButtons')?.addEventListener('click', function(e) {
                 const btn = e.target.closest('.exam-level-btn');
                 if (!btn) return;
@@ -2370,7 +2467,6 @@
                 if (examCurrentStudent) loadExamUIForStudent();
             });
 
-            // Year input change
             document.getElementById('examYearInput')?.addEventListener('change', function() {
                 if (examCurrentStudent) loadExamUIForStudent();
             });
@@ -2436,7 +2532,6 @@
             }
             if (subjects.length === 0) { alert("Add at least one subject"); return; }
 
-            // Build the nested structure
             const examDocRef = db.collection('exam_records').doc(examCurrentStudent.id);
             const doc = await examDocRef.get();
             let data = doc.exists ? doc.data() : {};
@@ -2448,10 +2543,13 @@
 
             await examDocRef.set(data);
             showMessage(`Exam records saved for ${currentTerm}!`, 'success', 'examMessage');
+            if (document.getElementById('dashboardModule').style.display !== 'none') {
+                loadDashboard();
+            }
         }
 
         // ============================================================
-        //  EXAM HISTORY (student records – read‑only, now uses years)
+        //  EXAM HISTORY (student records)
         // ============================================================
         async function loadExamHistory() {
             if (!currentStudentDoc) {
@@ -2485,6 +2583,34 @@
                 }
             }
             document.getElementById('examHistoryContent').innerHTML = html;
+        }
+
+        function initExamHistorySelectors() {
+            document.querySelectorAll('.term-btn2').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.term-btn2').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    loadExamHistory();
+                };
+            });
+            document.querySelectorAll('.exam-level-btn2').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.exam-level-btn2').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    loadExamHistory();
+                };
+            });
+            let container = document.getElementById('examHistoryAssessmentSelector');
+            container.innerHTML =
+                `<div class="assessment-btns"><button class="assessment-btn active" data-assessment="test1">Test 1</button><button class="assessment-btn" data-assessment="test2">Test 2</button><button class="assessment-btn" data-assessment="exam">Exam</button></div>`;
+            document.querySelectorAll('#examHistoryAssessmentSelector .assessment-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('#examHistoryAssessmentSelector .assessment-btn').forEach(b => b
+                        .classList.remove('active'));
+                    btn.classList.add('active');
+                    loadExamHistory();
+                };
+            });
         }
 
         // ============================================================
@@ -2580,6 +2706,9 @@
                 await docRef.set(data);
                 alert('Year deleted successfully.');
                 loadExamHistoryAll();
+                if (document.getElementById('dashboardModule').style.display !== 'none') {
+                    loadDashboard();
+                }
             }
         }
 
@@ -2971,7 +3100,6 @@
         }
         document.getElementById('savePaymentEditBtn').onclick = () => { if (editPaymentCallback) editPaymentCallback(); };
 
-        // ---- Bursar summary ----
         async function loadBursarSummary() {
             if (currentUserRole !== 'bursar' && currentUserRole !== 'admin') return;
             const classFilter = document.getElementById('bursarClassFilter').value;
@@ -3128,7 +3256,7 @@
         };
 
         // ============================================================
-        //  TEACHER MODULE (updated with qualification and NIN)
+        //  TEACHER MODULE
         // ============================================================
         async function loadAllTeachersForAdmin() {
             if (currentUserRole !== 'admin') return;
@@ -3357,9 +3485,6 @@
             updateClassDropdown();
         }
 
-        // ============================================================
-        //  TEACHER REGISTER
-        // ============================================================
         async function loadTeacherRegisterForId(teacherId) {
             let found = await db.collection('teachers').doc(teacherId).get();
             if (!found.exists) { showMessage('Teacher not found', 'error', 'teacherRegisterInfo'); return; }
@@ -3535,7 +3660,6 @@
             });
         }
 
-        // ----- other admin functions -----
         async function addStaff() {
             if (currentUserRole !== 'admin') return;
             let id = document.getElementById('staffId').value.trim(),
@@ -3909,12 +4033,12 @@
                     document.getElementById(m.moduleId).style.display = 'block';
                     if (m.moduleId === 'dashboardModule') loadDashboard();
                     if (m.moduleId === 'attendanceModule') renderAttendance();
-                    if (m.moduleId === 'teachersModule') { 
+                    if (m.moduleId === 'teachersModule') {
                         if (role === 'admin') loadAllTeachersForAdmin();
-                        displayOwnTeacherProfile(); 
+                        displayOwnTeacherProfile();
                     }
                     if (m.moduleId === 'bursarModule') loadBursarSummary();
-                    if (m.moduleId === 'adminModule') { 
+                    if (m.moduleId === 'adminModule') {
                         loadStaffList();
                         loadAssetsList();
                         loadInventoryList();
@@ -4060,16 +4184,11 @@
                 } else {
                     throw new Error('Invalid role');
                 }
-                
-                // Setup exam controls using event delegation
+
                 setupExamControls();
-                
-                // Initialize exam history selectors
                 initExamHistorySelectors();
                 initPaymentHistorySelectors();
 
-                // --- Re-initialize term and level button states ---
-                // Ensure default active states are set
                 if (!document.querySelector('#examTermButtons .term-btn.active')) {
                     const defaultTerm = document.querySelector('#examTermButtons .term-btn');
                     if (defaultTerm) defaultTerm.classList.add('active');
@@ -4080,6 +4199,11 @@
                     if (defaultLevel) defaultLevel.classList.add('active');
                     currentExamLevel = defaultLevel ? defaultLevel.dataset.examLevel : 'npse';
                 }
+
+                // Dashboard filter listeners
+                document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
+                document.getElementById('dashboardYearFilter').onchange = loadDashboard;
+                document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
 
                 const firstModuleBtn = document.querySelector('.module-btn');
                 if (firstModuleBtn) firstModuleBtn.click();
@@ -4150,21 +4274,21 @@
             document.getElementById('refreshBtn').onclick = () => { if (currentUserRole !== 'admin' && currentUserRole !==
                     'teacher') return;
                 loadStudents().then(renderAttendance); };
-            
-            document.getElementById('batchWhatsappBtn').onclick = () => { 
+
+            document.getElementById('batchWhatsappBtn').onclick = () => {
                 if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') {
                     alert('You do not have permission to send reports.');
                     return;
                 }
-                sendBatchWhatsApp(); 
+                sendBatchWhatsApp();
             };
-            
-            document.getElementById('classHistoryBtn').onclick = () => { 
+
+            document.getElementById('classHistoryBtn').onclick = () => {
                 if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') {
                     alert('You do not have permission to view class history.');
                     return;
                 }
-                viewClassHistory(); 
+                viewClassHistory();
             };
 
             document.getElementById('clearSearchBtn').onclick = () => {
@@ -4174,12 +4298,12 @@
             };
             document.getElementById('editProfileBtn').onclick = editProfile;
             document.getElementById('saveProfileBtn').onclick = saveProfile;
-            document.getElementById('refreshBursarBtn').onclick = () => { if (currentUserRole === 'bursar' || currentUserRole === 'admin')
-                    loadBursarSummary(); };
-            document.getElementById('exportBursarCSV').onclick = () => { if (currentUserRole === 'bursar' || currentUserRole === 'admin')
-                    exportBursarToCSV(); };
-            document.getElementById('bursarClassFilter').onchange = () => { if (currentUserRole === 'bursar' || currentUserRole === 'admin')
-                    loadBursarSummary(); };
+            document.getElementById('refreshBursarBtn').onclick = () => { if (currentUserRole === 'bursar' || currentUserRole ===
+                    'admin') loadBursarSummary(); };
+            document.getElementById('exportBursarCSV').onclick = () => { if (currentUserRole === 'bursar' || currentUserRole ===
+                    'admin') exportBursarToCSV(); };
+            document.getElementById('bursarClassFilter').onchange = () => { if (currentUserRole === 'bursar' || currentUserRole ===
+                    'admin') loadBursarSummary(); };
             document.getElementById('searchTeacherRegisterBtn').onclick = () => loadTeacherRegister();
             document.getElementById('saveOwnTeacherBtn').onclick = saveOwnTeacherProfile;
             document.getElementById('saveTeacherBtn').onclick = updateTeacherAdmin;
@@ -4270,7 +4394,7 @@
                 btn.onclick = () => {
                     const id = btn.dataset.tab;
                     document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove(
-                    'active'));
+                        'active'));
                     btn.classList.add('active');
                     document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display = 'none');
                     document.getElementById(id + 'Tab').style.display = 'block';
