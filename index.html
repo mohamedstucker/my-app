@@ -1482,6 +1482,7 @@
                 <input type="email" id="signupEmail" placeholder="Admin Email *" />
                 <input type="password" id="signupPassword" placeholder="Password *" />
                 <input type="password" id="signupConfirm" placeholder="Confirm Password *" />
+                <input type="text" id="signupKey" placeholder="Registration Key *" />
                 <button id="signupBtn" class="refresh-btn" style="width:100%;">🏫 Create School Account</button>
                 <div id="signupMessage"></div>
                 <span class="signup-toggle" id="signupBack">← Back to login</span>
@@ -1694,6 +1695,9 @@
         // ----- TENANT STATE -----
         let _tenantId = 'default_tenant';
 
+        // ----- CACHED REGISTRATION KEY -----
+        let cachedRegistrationKey = null;
+
         // ============================================================
         //  TENANT HELPER
         // ============================================================
@@ -1766,7 +1770,24 @@
         }
 
         // ============================================================
-        //  SIGNUP (self-service tenant creation)
+        //  GET REGISTRATION KEY FROM FIRESTORE (with fallback)
+        // ============================================================
+        async function getRegistrationKey() {
+            if (cachedRegistrationKey !== null) return cachedRegistrationKey;
+            try {
+                const doc = await db.collection('settings').doc('registration').get();
+                if (doc.exists && doc.data().key) {
+                    cachedRegistrationKey = doc.data().key;
+                    return cachedRegistrationKey;
+                }
+            } catch (_) { /* ignore */ }
+            // Fallback hardcoded key
+            cachedRegistrationKey = 'EduSL2025';
+            return cachedRegistrationKey;
+        }
+
+        // ============================================================
+        //  SIGNUP (self-service tenant creation with key validation)
         // ============================================================
         async function signUpAndCreateTenant() {
             const schoolName = document.getElementById('signupSchoolName').value.trim();
@@ -1774,9 +1795,10 @@
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
             const confirm = document.getElementById('signupConfirm').value;
+            const providedKey = document.getElementById('signupKey').value.trim();
 
             // Validation
-            if (!schoolName || !adminName || !email || !password || !confirm) {
+            if (!schoolName || !adminName || !email || !password || !confirm || !providedKey) {
                 showMessage('Please fill in all fields.', 'error', 'signupMessage');
                 return;
             }
@@ -1786,6 +1808,14 @@
             }
             if (password.length < 6) {
                 showMessage('Password must be at least 6 characters.', 'error', 'signupMessage');
+                return;
+            }
+
+            // Validate registration key
+            const validKey = await getRegistrationKey();
+            if (providedKey !== validKey) {
+                showMessage('Invalid registration key. Please contact the system administrator.', 'error',
+                    'signupMessage');
                 return;
             }
 
@@ -1814,15 +1844,12 @@
                 }
 
                 // 5. Sign in (already signed in)
-                // 6. Proceed to app
                 showMessage('School created! Logging you in…', 'success', 'signupMessage');
 
                 // Call login flow after short delay
                 setTimeout(() => {
                     document.getElementById('signupMessage').innerHTML = '';
-                    // The user is already signed in, but we need to set up the app
-                    // Re-use login logic
-                    loginAndSetup(email, password, true); // skip login attempt
+                    loginAndSetup(email, password, true);
                 }, 800);
 
             } catch (error) {
