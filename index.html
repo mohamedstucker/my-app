@@ -6,6 +6,7 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
+        /* ----- RESET & BASE ----- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -597,7 +598,7 @@
             </div>
         </div>
 
-        <!-- BURSAR -->
+        <!-- BURSAR (only visible to bursar role) -->
         <div id="bursarModule" style="display:none;">
             <div class="card">
                 <h3>💰 Record Payment / Manage Fees</h3>
@@ -784,6 +785,17 @@
         </div>
     </div>
 
+    <div id="replySuggestionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('replySuggestionModal')">&times;</span>
+            <h3>✉️ Reply to Suggestion</h3>
+            <textarea id="replySuggestionText" rows="4" style="width:100%; max-width:100%;" placeholder="Write your reply here…"></textarea>
+            <input type="hidden" id="replySuggestionId" />
+            <button id="submitReplyBtn" class="refresh-btn">📤 Send Reply</button>
+            <div id="replySuggestionMessage"></div>
+        </div>
+    </div>
+
     <button id="suggestionFab" class="suggestion-fab">💬 Suggestion</button>
 
     <!-- ===== OTHER MODALS ===== -->
@@ -931,6 +943,67 @@
             } catch (error) {
                 showMessage('Signup failed: ' + error.message, 'error', 'signupMessage');
             }
+        }
+
+        // ============================================================
+        //  DEMO USERS
+        // ============================================================
+        async function ensureDemoUsers() {
+            const adminEmail = 'admin@school.com', adminPass = 'admin123';
+            const teacherEmail = 'teacher@school.com', teacherPass = 'teacher123';
+            const parentEmail = 'parent@school.com', parentPass = 'parent123';
+            const bursarEmail = 'bursar@school.com', bursarPass = 'bursar123';
+            const defaultTenant = 'default_tenant';
+
+            try {
+                let adminUser = await auth.signInWithEmailAndPassword(adminEmail, adminPass).catch(() => null);
+                if (!adminUser) {
+                    adminUser = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
+                    await db.collection('users').doc(adminUser.user.uid).set({ role: 'admin', email: adminEmail, name: 'System Admin', tenantId: defaultTenant });
+                } else {
+                    const doc = await db.collection('users').doc(adminUser.user.uid).get();
+                    if (!doc.exists) await db.collection('users').doc(adminUser.user.uid).set({ role: 'admin', email: adminEmail, name: 'System Admin', tenantId: defaultTenant });
+                    else if (!doc.data().tenantId) await db.collection('users').doc(adminUser.user.uid).update({ tenantId: defaultTenant });
+                }
+
+                let teacherUser = await auth.signInWithEmailAndPassword(teacherEmail, teacherPass).catch(() => null);
+                if (!teacherUser) {
+                    teacherUser = await auth.createUserWithEmailAndPassword(teacherEmail, teacherPass);
+                    await db.collection('users').doc(teacherUser.user.uid).set({ role: 'teacher', email: teacherEmail, name: 'Demo Teacher', tenantId: defaultTenant });
+                    await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher', email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active', uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry', salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01', qualification: 'B.Ed', nin: 'SL123456789', tenantId: defaultTenant });
+                } else {
+                    const snap = await db.collection('teachers').where('uid', '==', teacherUser.user.uid).get();
+                    if (snap.empty) await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher', email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active', uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry', salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01', qualification: 'B.Ed', nin: 'SL123456789', tenantId: defaultTenant });
+                    else if (!snap.docs[0].data().tenantId) await db.collection('teachers').doc(snap.docs[0].id).update({ tenantId: defaultTenant });
+                }
+
+                let parentUser = await auth.signInWithEmailAndPassword(parentEmail, parentPass).catch(() => null);
+                if (!parentUser) {
+                    parentUser = await auth.createUserWithEmailAndPassword(parentEmail, parentPass);
+                    await db.collection('users').doc(parentUser.user.uid).set({ role: 'parent', email: parentEmail, name: 'Demo Parent', studentId: 'STU001', tenantId: defaultTenant });
+                } else {
+                    const doc = await db.collection('users').doc(parentUser.user.uid).get();
+                    if (!doc.exists) await db.collection('users').doc(parentUser.user.uid).set({ role: 'parent', email: parentEmail, name: 'Demo Parent', studentId: 'STU001', tenantId: defaultTenant });
+                    else if (!doc.data().tenantId) await db.collection('users').doc(parentUser.user.uid).update({ tenantId: defaultTenant });
+                }
+
+                let bursarUser = await auth.signInWithEmailAndPassword(bursarEmail, bursarPass).catch(() => null);
+                if (!bursarUser) {
+                    bursarUser = await auth.createUserWithEmailAndPassword(bursarEmail, bursarPass);
+                    await db.collection('users').doc(bursarUser.user.uid).set({ role: 'bursar', email: bursarEmail, name: 'Bursar Officer', tenantId: defaultTenant });
+                } else {
+                    const doc = await db.collection('users').doc(bursarUser.user.uid).get();
+                    if (!doc.exists) await db.collection('users').doc(bursarUser.user.uid).set({ role: 'bursar', email: bursarEmail, name: 'Bursar Officer', tenantId: defaultTenant });
+                    else if (!doc.data().tenantId) await db.collection('users').doc(bursarUser.user.uid).update({ tenantId: defaultTenant });
+                }
+
+                const studentRef = db.collection('students').doc('STU001');
+                const studentDoc = await studentRef.get();
+                if (!studentDoc.exists) await studentRef.set({ id: 'STU001', name: 'John Doe', class: 'JSS1', parentPhone: '23276123456', parentName: 'Parent Name', status: 'active', tenantId: defaultTenant });
+                else if (!studentDoc.data().tenantId) await studentRef.update({ tenantId: defaultTenant });
+
+                await auth.signOut();
+            } catch (e) { console.warn('Demo user creation issue:', e); }
         }
 
         // ============================================================
@@ -1085,67 +1158,6 @@
                 </div>
             </div>`;
             document.getElementById('dashboardContent').innerHTML = html;
-        }
-
-        // ============================================================
-        //  DEMO USERS
-        // ============================================================
-        async function ensureDemoUsers() {
-            const adminEmail = 'admin@school.com', adminPass = 'admin123';
-            const teacherEmail = 'teacher@school.com', teacherPass = 'teacher123';
-            const parentEmail = 'parent@school.com', parentPass = 'parent123';
-            const bursarEmail = 'bursar@school.com', bursarPass = 'bursar123';
-            const defaultTenant = 'default_tenant';
-
-            try {
-                let adminUser = await auth.signInWithEmailAndPassword(adminEmail, adminPass).catch(() => null);
-                if (!adminUser) {
-                    adminUser = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
-                    await db.collection('users').doc(adminUser.user.uid).set({ role: 'admin', email: adminEmail, name: 'System Admin', tenantId: defaultTenant });
-                } else {
-                    const doc = await db.collection('users').doc(adminUser.user.uid).get();
-                    if (!doc.exists) await db.collection('users').doc(adminUser.user.uid).set({ role: 'admin', email: adminEmail, name: 'System Admin', tenantId: defaultTenant });
-                    else if (!doc.data().tenantId) await db.collection('users').doc(adminUser.user.uid).update({ tenantId: defaultTenant });
-                }
-
-                let teacherUser = await auth.signInWithEmailAndPassword(teacherEmail, teacherPass).catch(() => null);
-                if (!teacherUser) {
-                    teacherUser = await auth.createUserWithEmailAndPassword(teacherEmail, teacherPass);
-                    await db.collection('users').doc(teacherUser.user.uid).set({ role: 'teacher', email: teacherEmail, name: 'Demo Teacher', tenantId: defaultTenant });
-                    await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher', email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active', uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry', salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01', qualification: 'B.Ed', nin: 'SL123456789', tenantId: defaultTenant });
-                } else {
-                    const snap = await db.collection('teachers').where('uid', '==', teacherUser.user.uid).get();
-                    if (snap.empty) await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher', email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active', uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry', salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01', qualification: 'B.Ed', nin: 'SL123456789', tenantId: defaultTenant });
-                    else if (!snap.docs[0].data().tenantId) await db.collection('teachers').doc(snap.docs[0].id).update({ tenantId: defaultTenant });
-                }
-
-                let parentUser = await auth.signInWithEmailAndPassword(parentEmail, parentPass).catch(() => null);
-                if (!parentUser) {
-                    parentUser = await auth.createUserWithEmailAndPassword(parentEmail, parentPass);
-                    await db.collection('users').doc(parentUser.user.uid).set({ role: 'parent', email: parentEmail, name: 'Demo Parent', studentId: 'STU001', tenantId: defaultTenant });
-                } else {
-                    const doc = await db.collection('users').doc(parentUser.user.uid).get();
-                    if (!doc.exists) await db.collection('users').doc(parentUser.user.uid).set({ role: 'parent', email: parentEmail, name: 'Demo Parent', studentId: 'STU001', tenantId: defaultTenant });
-                    else if (!doc.data().tenantId) await db.collection('users').doc(parentUser.user.uid).update({ tenantId: defaultTenant });
-                }
-
-                let bursarUser = await auth.signInWithEmailAndPassword(bursarEmail, bursarPass).catch(() => null);
-                if (!bursarUser) {
-                    bursarUser = await auth.createUserWithEmailAndPassword(bursarEmail, bursarPass);
-                    await db.collection('users').doc(bursarUser.user.uid).set({ role: 'bursar', email: bursarEmail, name: 'Bursar Officer', tenantId: defaultTenant });
-                } else {
-                    const doc = await db.collection('users').doc(bursarUser.user.uid).get();
-                    if (!doc.exists) await db.collection('users').doc(bursarUser.user.uid).set({ role: 'bursar', email: bursarEmail, name: 'Bursar Officer', tenantId: defaultTenant });
-                    else if (!doc.data().tenantId) await db.collection('users').doc(bursarUser.user.uid).update({ tenantId: defaultTenant });
-                }
-
-                const studentRef = db.collection('students').doc('STU001');
-                const studentDoc = await studentRef.get();
-                if (!studentDoc.exists) await studentRef.set({ id: 'STU001', name: 'John Doe', class: 'JSS1', parentPhone: '23276123456', parentName: 'Parent Name', status: 'active', tenantId: defaultTenant });
-                else if (!studentDoc.data().tenantId) await studentRef.update({ tenantId: defaultTenant });
-
-                await auth.signOut();
-            } catch (e) { console.warn('Demo user creation issue:', e); }
         }
 
         // ============================================================
@@ -1947,9 +1959,13 @@
         }
 
         // ============================================================
-        //  BURSAR MODULE
+        //  BURSAR MODULE (only accessible to bursar role)
         // ============================================================
         async function loadBursarStudent() {
+            if (currentUserRole !== 'bursar') {
+                showMessage('Access denied. Only bursar can access this.', 'error', 'bursarPaymentMessage');
+                return;
+            }
             try {
                 const tenantId = getCurrentTenantId();
                 const q = document.getElementById('bursarStudentSearch').value.trim();
@@ -2005,6 +2021,7 @@
         }
 
         async function saveBursarTermFees() {
+            if (currentUserRole !== 'bursar') { showMessage('Access denied.', 'error', 'bursarPaymentMessage'); return; }
             if (!bursarCurrentStudent) { showMessage('No student loaded', 'error', 'bursarPaymentMessage'); return; }
             try {
                 const tenantId = getCurrentTenantId();
@@ -2041,7 +2058,7 @@
                 await db.collection('fee_records').doc(bursarCurrentStudent.id).set(finalData);
                 showMessage('Term fees updated', 'success', 'bursarPaymentMessage');
                 await loadBursarFeeStatus();
-                if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
+                if (currentUserRole === 'bursar') loadBursarSummary();
 
                 await loadFeeStats();
                 await populateFeeStatsYears();
@@ -2051,6 +2068,7 @@
         }
 
         async function recordBursarPayment() {
+            if (currentUserRole !== 'bursar') { showMessage('Access denied.', 'error', 'bursarPaymentMessage'); return; }
             if (!bursarCurrentStudent) { showMessage('No student loaded', 'error', 'bursarPaymentMessage'); return; }
             try {
                 const tenantId = getCurrentTenantId();
@@ -2087,7 +2105,7 @@
                 await loadBursarFeeStatus();
                 await loadPaymentTransactionsForBursar();
                 if (currentStudentDoc && currentStudentDoc.id === bursarCurrentStudent.id) loadPaymentHistory();
-                if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
+                if (currentUserRole === 'bursar') loadBursarSummary();
 
                 await loadFeeStats();
                 await populateFeeStatsYears();
@@ -2169,7 +2187,7 @@
                                 await loadBursarFeeStatus();
                                 await loadPaymentTransactionsForBursar();
                                 if (currentStudentDoc && currentStudentDoc.id === bursarCurrentStudent.id) loadPaymentHistory();
-                                if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
+                                if (currentUserRole === 'bursar') loadBursarSummary();
                                 showMessage('Payment updated', 'success', 'bursarPaymentMessage');
                             } catch (error) {
                                 showMessage('Error updating payment: ' + error.message, 'error', 'bursarPaymentMessage');
@@ -2204,7 +2222,7 @@
                             await loadBursarFeeStatus();
                             await loadPaymentTransactionsForBursar();
                             if (currentStudentDoc && currentStudentDoc.id === bursarCurrentStudent.id) loadPaymentHistory();
-                            if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
+                            if (currentUserRole === 'bursar') loadBursarSummary();
                             showMessage('Payment deleted', 'success', 'bursarPaymentMessage');
                         } catch (error) {
                             showMessage('Error deleting payment: ' + error.message, 'error', 'bursarPaymentMessage');
@@ -2219,7 +2237,7 @@
         document.getElementById('savePaymentEditBtn').onclick = function() { if (editPaymentCallback) editPaymentCallback(); };
 
         async function loadBursarSummary() {
-            if (currentUserRole !== 'bursar' && currentUserRole !== 'admin') return;
+            if (currentUserRole !== 'bursar') return;
             try {
                 const tenantId = getCurrentTenantId();
                 const classFilter = document.getElementById('bursarClassFilter').value;
@@ -2289,6 +2307,7 @@
         }
 
         function exportBursarToCSV() {
+            if (currentUserRole !== 'bursar') return;
             const table = document.querySelector('#bursarSummaryContainer table');
             if (table) exportTableToCSV(table, 'fee_summary');
         }
@@ -2340,6 +2359,7 @@
         }
 
         document.getElementById('saveBursarEditFeesBtn').onclick = async function() {
+            if (currentUserRole !== 'bursar') return;
             try {
                 const tenantId = getCurrentTenantId();
                 const studentId = this.dataset.studentId;
@@ -2366,7 +2386,7 @@
                 document.getElementById('bursarEditFeesMessage').innerHTML = '<div class="success">Fees updated successfully.</div>';
                 setTimeout(() => {
                     closeModal('bursarEditFeesModal');
-                    if (currentUserRole === 'bursar' || currentUserRole === 'admin') loadBursarSummary();
+                    if (currentUserRole === 'bursar') loadBursarSummary();
                 }, 1000);
             } catch (error) {
                 document.getElementById('bursarEditFeesMessage').innerHTML = '<div class="error">Error: ' + escapeHtml(error.message) + '</div>';
@@ -2377,6 +2397,7 @@
         //  FEE STATISTICS (backward compatible)
         // ============================================================
         async function loadFeeStats() {
+            if (currentUserRole !== 'bursar') return;
             try {
                 const tenantId = getCurrentTenantId();
                 const selectedYear = document.getElementById('feeStatsYear').value;
@@ -3219,37 +3240,32 @@
         // ============================================================
         //  SUGGESTIONS (FIXED – with containerId parameter)
         // ============================================================
-    async function loadSuggestions(containerId = 'suggestionsList') {
-    if (!auth.currentUser) return;
-    const tenantId = getCurrentTenantId();
-    const user = auth.currentUser;
-    try {
-        let query = db.collection('suggestions').where('tenantId', '==', tenantId);
-        if (currentUserRole !== 'admin') {
-            query = query.where('uid', '==', user.uid);
-        }
-        // REMOVE this line:
-        // query = query.orderBy('timestamp', 'desc');
-        const snap = await query.get();
-        
-        // Sort manually after fetching:
-        const items = [];
-        snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
-        items.sort((a, b) => {
-            const ta = a.timestamp?.toMillis?.() || 0;
-            const tb = b.timestamp?.toMillis?.() || 0;
-            return tb - ta;
-        });
-        
-        const container = document.getElementById(containerId);
-        // ... rest of the code using 'items' instead of 'snap'
-                if (snap.empty) {
+        async function loadSuggestions(containerId = 'suggestionsList') {
+            if (!auth.currentUser) return;
+            const tenantId = getCurrentTenantId();
+            const user = auth.currentUser;
+            try {
+                let query = db.collection('suggestions').where('tenantId', '==', tenantId);
+                if (currentUserRole !== 'admin') {
+                    query = query.where('uid', '==', user.uid);
+                }
+                // No orderBy to avoid index requirement
+                const snap = await query.get();
+                const items = [];
+                snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                items.sort((a, b) => {
+                    const ta = a.timestamp?.toMillis?.() || 0;
+                    const tb = b.timestamp?.toMillis?.() || 0;
+                    return tb - ta;
+                });
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                if (items.length === 0) {
                     container.innerHTML = '<p>No suggestions found.</p>';
                     return;
                 }
-                let html = '<table><thead><tr><th>Date</th><th>User</th><th>Suggestion</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-                snap.forEach(doc => {
-                    const data = doc.data();
+                let html = '<table><thead><tr><th>Date</th><th>User</th><th>Suggestion</th><th>Reply</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                items.forEach(data => {
                     const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
                     const status = data.status || 'pending';
                     const statusBadge = status === 'resolved' ? '<span style="color:#27ae60;">✅ Resolved</span>' : '<span style="color:#f39c12;">⏳ Pending</span>';
@@ -3257,15 +3273,18 @@
                     const isAdmin = currentUserRole === 'admin';
                     const canEdit = isAdmin || isOwn;
                     const canDelete = isAdmin || isOwn;
+                    const replyHtml = data.reply ? `<div style="background:#e8f0fe; padding:6px 10px; border-radius:6px; margin-top:4px; font-size:0.85rem;"><strong>Admin reply:</strong> ${escapeHtml(data.reply)}</div>` : '';
+
                     html += `<tr>
                         <td>${escapeHtml(date)}</td>
                         <td>${escapeHtml(data.userName || 'Anonymous')}</td>
-                        <td>${escapeHtml(data.text)}</td>
+                        <td>${escapeHtml(data.text)}${replyHtml}</td>
+                        <td>${isAdmin ? `<button class="reply-suggestion-btn" data-id="${data.id}">💬 Reply</button>` : (data.reply ? '✅ Replied' : '—')}</td>
                         <td>${statusBadge}</td>
                         <td>
-                            ${canEdit ? `<button class="edit-suggestion-btn" data-id="${doc.id}" data-text="${escapeHtml(data.text)}">✏️ Edit</button>` : ''}
-                            ${canDelete ? `<button class="delete-suggestion-btn" data-id="${doc.id}" style="background:#fde8e8; color:#b71c1c;">🗑️ Delete</button>` : ''}
-                            ${isAdmin && status === 'pending' ? `<button class="resolve-suggestion-btn" data-id="${doc.id}">✅ Resolve</button>` : ''}
+                            ${canEdit ? `<button class="edit-suggestion-btn" data-id="${data.id}" data-text="${escapeHtml(data.text)}">✏️ Edit</button>` : ''}
+                            ${canDelete ? `<button class="delete-suggestion-btn" data-id="${data.id}" style="background:#fde8e8; color:#b71c1c;">🗑️ Delete</button>` : ''}
+                            ${isAdmin && status === 'pending' ? `<button class="resolve-suggestion-btn" data-id="${data.id}">✅ Resolve</button>` : ''}
                         </td>
                     </tr>`;
                 });
@@ -3289,7 +3308,6 @@
                         if (!confirm('Delete this suggestion?')) return;
                         try {
                             await db.collection('suggestions').doc(this.dataset.id).delete();
-                            // Refresh both containers
                             loadSuggestions('suggestionsList');
                             loadSuggestions('mySuggestionsList');
                         } catch (error) {
@@ -3312,6 +3330,16 @@
                     };
                 });
 
+                container.querySelectorAll('.reply-suggestion-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        document.getElementById('replySuggestionId').value = id;
+                        document.getElementById('replySuggestionText').value = '';
+                        document.getElementById('replySuggestionMessage').innerHTML = '';
+                        openModal('replySuggestionModal');
+                    };
+                });
+
             } catch (error) {
                 const container = document.getElementById(containerId);
                 if (container) container.innerHTML = '<div class="error">Failed to load suggestions: ' + escapeHtml(error.message) + '</div>';
@@ -3331,7 +3359,6 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 closeModal('editSuggestionModal');
-                // Refresh both containers
                 loadSuggestions('suggestionsList');
                 loadSuggestions('mySuggestionsList');
             } catch (error) {
@@ -3360,7 +3387,6 @@
                 document.getElementById('suggestionText').value = '';
                 showMessage('Thank you! Your suggestion has been submitted.', 'success', 'suggestionMessage');
                 setTimeout(() => { closeModal('suggestionModal'); }, 1500);
-                // Refresh both
                 loadSuggestions('suggestionsList');
                 loadSuggestions('mySuggestionsList');
             } catch (error) {
@@ -3376,8 +3402,29 @@
         document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
         document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
 
+        document.getElementById('submitReplyBtn').onclick = async function() {
+            const id = document.getElementById('replySuggestionId').value;
+            const reply = document.getElementById('replySuggestionText').value.trim();
+            if (!reply) {
+                showMessage('Please write a reply.', 'error', 'replySuggestionMessage');
+                return;
+            }
+            try {
+                await db.collection('suggestions').doc(id).update({
+                    reply: reply,
+                    replyTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal('replySuggestionModal');
+                showMessage('Reply sent.', 'success', 'replySuggestionMessage');
+                loadSuggestions('suggestionsList');
+                loadSuggestions('mySuggestionsList');
+            } catch (error) {
+                showMessage('Error sending reply: ' + error.message, 'error', 'replySuggestionMessage');
+            }
+        };
+
         // ============================================================
-        //  ROLE-BASED UI
+        //  ROLE-BASED UI (UPDATED: Admin no longer sees Bursar)
         // ============================================================
         function setupRoleUI(role, extra) {
             extra = extra || {};
@@ -3422,7 +3469,7 @@
                     { id: 'attendanceModuleBtn', label: '📋 Attendance', moduleId: 'attendanceModule' },
                     { id: 'recordsModuleBtn', label: '📚 Student Records', moduleId: 'recordsModule' },
                     { id: 'teachersModuleBtn', label: '👩‍🏫 Teachers', moduleId: 'teachersModule' },
-                    { id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' },
+                    // BURSAR IS REMOVED FROM ADMIN
                     { id: 'adminModuleBtn', label: '⚙️ Admin', moduleId: 'adminModule' }
                 );
             } else if (role === 'bursar') {
@@ -3611,7 +3658,7 @@
         }
 
         // ============================================================
-        //  WINDOW ONLOAD
+        //  WINDOW ONLOAD - ALL BUTTON LISTENERS ATTACHED HERE
         // ============================================================
         window.onload = function() {
             function updateOnlineStatus() {
@@ -3634,6 +3681,7 @@
 
             ensureDemoUsers().then(() => {}).catch(console.warn);
 
+            // Login
             document.getElementById('demoAdminBtn').onclick = function() { loginAndSetup('admin@school.com', 'admin123'); };
             document.getElementById('demoBursarBtn').onclick = function() { loginAndSetup('bursar@school.com', 'bursar123'); };
             document.getElementById('demoTeacherBtn').onclick = function() { loginAndSetup('teacher@school.com', 'teacher123'); };
@@ -3641,7 +3689,6 @@
             document.getElementById('loginBtn').onclick = function() {
                 loginAndSetup(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
             };
-
             document.getElementById('logoutBtn').onclick = function() {
                 auth.signOut().then(function() {
                     try { localStorage.removeItem('tenantId'); } catch (_) {}
@@ -3650,6 +3697,7 @@
                 });
             };
 
+            // Signup toggle
             const signupToggle = document.getElementById('signupToggle');
             const signupBack = document.getElementById('signupBack');
             const signupFields = document.getElementById('signupFields');
@@ -3657,12 +3705,7 @@
             signupBack.onclick = function() { signupFields.classList.remove('active'); signupToggle.style.display = 'inline-block'; this.style.display = 'none'; };
             document.getElementById('signupBtn').onclick = signUpAndCreateTenant;
 
-            // Fee stats listeners
-            document.getElementById('refreshFeeStatsBtn').onclick = function() { loadFeeStats(); };
-            document.getElementById('feeStatsYear').onchange = function() { loadFeeStats(); };
-            document.getElementById('feeStatsTerm').onchange = function() { loadFeeStats(); };
-
-            // All other button listeners (import, add student, attendance, etc.)
+            // ---- Attendance ----
             document.getElementById('importBtn').onclick = function() {
                 if (currentUserRole !== 'admin') return;
                 const f = document.getElementById('excelFile').files[0];
@@ -3687,6 +3730,49 @@
                 if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('You do not have permission to view class history.'); return; }
                 viewClassHistory();
             };
+
+            // ---- Records ----
+            document.getElementById('searchStudentBtn').onclick = function() {
+                // The handler is set inside setupRoleUI, but we can also set a generic one here.
+                // We'll check role and act accordingly.
+                if (currentUserRole === 'admin') {
+                    // Admin can search any student
+                    const q = document.getElementById('studentSearchInput').value.trim();
+                    const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
+                    if (!found) { showMessage('Student not found', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    const tenantId = getCurrentTenantId();
+                    if (found.tenantId !== tenantId) { showMessage('This student does not belong to your tenant.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    currentStudentDoc = found;
+                    document.getElementById('studentRecordsPanel').style.display = 'block';
+                    document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
+                    loadStudentProfile();
+                    loadPaymentHistory();
+                    loadExamHistory();
+                    loadAttendanceHistory();
+                } else if (currentUserRole === 'teacher') {
+                    // Teacher can only search students in their assigned class
+                    const q = document.getElementById('studentSearchInput').value.trim();
+                    const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
+                    if (!found) { showMessage('Student not found in your class', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    const tenantId = getCurrentTenantId();
+                    if (found.tenantId !== tenantId) { showMessage('This student does not belong to your tenant.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    if (found.class !== teacherAssignedClass) { showMessage('You can only access students in ' + teacherAssignedClass + '. This student is in ' + found.class + '.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    currentStudentDoc = found;
+                    document.getElementById('studentRecordsPanel').style.display = 'block';
+                    document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
+                    loadStudentProfile();
+                    loadPaymentHistory();
+                    loadExamHistory();
+                    loadAttendanceHistory();
+                } else if (currentUserRole === 'parent') {
+                    // Parent can only see their linked child – the search box is hidden for them.
+                    if (parentLinkedStudentId) {
+                        window.loadParentStudent && window.loadParentStudent();
+                    }
+                } else {
+                    showMessage('You do not have permission to search students.', 'error', 'searchResults');
+                }
+            };
             document.getElementById('clearSearchBtn').onclick = function() {
                 document.getElementById('studentSearchInput').value = '';
                 document.getElementById('searchResults').innerHTML = '';
@@ -3694,25 +3780,28 @@
             };
             document.getElementById('editProfileBtn').onclick = editProfile;
             document.getElementById('saveProfileBtn').onclick = saveProfile;
-            document.getElementById('refreshBursarBtn').onclick = function() { if (currentUserRole === 'bursar' || currentUserRole === 'admin') loadBursarSummary(); };
-            document.getElementById('exportBursarCSV').onclick = function() { if (currentUserRole === 'bursar' || currentUserRole === 'admin') exportBursarToCSV(); };
-            document.getElementById('bursarClassFilter').onchange = function() { if (currentUserRole === 'bursar' || currentUserRole === 'admin') loadBursarSummary(); };
-            document.getElementById('searchTeacherRegisterBtn').onclick = loadTeacherRegister;
-            document.getElementById('saveOwnTeacherBtn').onclick = saveOwnTeacherProfile;
-            document.getElementById('saveTeacherBtn').onclick = updateTeacherAdmin;
-            document.getElementById('addTeacherBtn').onclick = addTeacherAdmin;
-            document.getElementById('importTeachersBtn').onclick = function() { const f = document.getElementById('teacherExcelFile').files[0]; if (f) importTeachersExcel(f); };
+
+            // ---- Teachers ----
+            document.getElementById('searchTeacherBtn').onclick = function() {
+                if (currentUserRole !== 'admin') { alert('Only admin can search teachers.'); return; }
+                searchTeacherAdmin();
+            };
+            document.getElementById('clearTeacherSearchBtn').onclick = function() {
+                document.getElementById('teacherSearchInput').value = '';
+                document.getElementById('teacherSearchResults').innerHTML = '';
+                if (currentUserRole === 'admin') loadAllTeachersForAdmin();
+            };
+            document.getElementById('addTeacherBtn').onclick = function() { if (currentUserRole !== 'admin') return; addTeacherAdmin(); };
+            document.getElementById('importTeachersBtn').onclick = function() {
+                if (currentUserRole !== 'admin') return;
+                const f = document.getElementById('teacherExcelFile').files[0];
+                if (f) importTeachersExcel(f);
+            };
             document.getElementById('downloadTeacherSampleBtn').onclick = function() {
                 const ws = XLSX.utils.json_to_sheet([{ TeacherID: 'T001', Name: 'Jane Smith', Email: 'jane@school.com', Class: 'JSS1', Department: 'Science', Subjects: 'Physics, Chemistry', Salary: 5000, DOB: '1990-01-01', EmploymentDate: '2020-01-01', Qualification: 'B.Ed', NIN: 'SL123456789' }]);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
                 XLSX.writeFile(wb, 'teacher_sample.xlsx');
-            };
-            document.getElementById('searchTeacherBtn').onclick = searchTeacherAdmin;
-            document.getElementById('clearTeacherSearchBtn').onclick = function() {
-                document.getElementById('teacherSearchInput').value = '';
-                document.getElementById('teacherSearchResults').innerHTML = '';
-                if (currentUserRole === 'admin') loadAllTeachersForAdmin();
             };
             document.getElementById('printTeachersTable').onclick = function() {
                 if (currentUserRole !== 'admin') return;
@@ -3726,16 +3815,39 @@
                 if (tbl && tbl.children.length) exportTableToCSV(tbl, 'teachers');
                 else alert('No teachers table');
             };
-            document.getElementById('printAttendanceTable').onclick = function() {
-                const tbl = document.querySelector('#studentList table');
-                if (tbl) printTable(tbl, 'Attendance');
-                else alert('No attendance table');
+            document.getElementById('searchTeacherRegisterBtn').onclick = function() {
+                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('Access denied.'); return; }
+                loadTeacherRegister();
             };
-            document.getElementById('exportAttendanceCSV').onclick = function() {
-                const tbl = document.querySelector('#studentList table');
-                if (tbl) exportTableToCSV(tbl, 'attendance');
-                else alert('No attendance table');
+            document.getElementById('editOwnTeacherBtn').onclick = function() {
+                // handled inside displayOwnTeacherProfile
             };
+            document.getElementById('saveOwnTeacherBtn').onclick = saveOwnTeacherProfile;
+            document.getElementById('saveTeacherBtn').onclick = updateTeacherAdmin;
+
+            // ---- Bursar ----
+            document.getElementById('searchBursarStudentBtn').onclick = function() {
+                if (currentUserRole !== 'bursar') { showMessage('Access denied. Only bursar can access this.', 'error', 'bursarPaymentMessage'); return; }
+                loadBursarStudent();
+            };
+            document.getElementById('saveBursarFeesBtn').onclick = function() { if (currentUserRole !== 'bursar') return; saveBursarTermFees(); };
+            document.getElementById('submitBursarPaymentBtn').onclick = function() { if (currentUserRole !== 'bursar') return; recordBursarPayment(); };
+            document.getElementById('refreshBursarBtn').onclick = function() { if (currentUserRole === 'bursar') loadBursarSummary(); };
+            document.getElementById('exportBursarCSV').onclick = function() { if (currentUserRole === 'bursar') exportBursarToCSV(); };
+            document.getElementById('bursarClassFilter').onchange = function() { if (currentUserRole === 'bursar') loadBursarSummary(); };
+            document.getElementById('refreshFeeStatsBtn').onclick = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
+            document.getElementById('feeStatsYear').onchange = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
+            document.getElementById('feeStatsTerm').onchange = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
+
+            // ---- Admin ----
+            document.getElementById('addStaffBtn').onclick = addStaff;
+            document.getElementById('addAssetBtn').onclick = addAsset;
+            document.getElementById('addInventoryBtn').onclick = addInventory;
+            document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
+            document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
+            document.getElementById('postNoticeBtn').onclick = postNotice;
+            document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
+            document.getElementById('refreshFilesBtn').onclick = function() { initFileDB().then(loadFilesList); };
             document.getElementById('printAnyTableBtn').onclick = function() {
                 const tbl = getCurrentVisibleTable();
                 if (tbl) printTable(tbl, 'School Data');
@@ -3753,114 +3865,52 @@
             };
             document.getElementById('exportStudentsCSV').onclick = exportAllStudentsCSV;
             document.getElementById('exportTeachersCSVAdmin').onclick = exportAllTeachersCSV;
-            document.getElementById('addStaffBtn').onclick = addStaff;
-            document.getElementById('addAssetBtn').onclick = addAsset;
-            document.getElementById('addInventoryBtn').onclick = addInventory;
-            document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
-            document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
-            document.getElementById('postNoticeBtn').onclick = postNotice;
-            document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
-            document.getElementById('refreshFilesBtn').onclick = function() { initFileDB().then(loadFilesList); };
+            document.getElementById('printAttendanceTable').onclick = function() {
+                const tbl = document.querySelector('#studentList table');
+                if (tbl) printTable(tbl, 'Attendance');
+                else alert('No attendance table');
+            };
+            document.getElementById('exportAttendanceCSV').onclick = function() {
+                const tbl = document.querySelector('#studentList table');
+                if (tbl) exportTableToCSV(tbl, 'attendance');
+                else alert('No attendance table');
+            };
+
+            // ---- Exam ----
             document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
             document.getElementById('saveExamRecordsBtn').onclick = saveExamRecords;
-            document.getElementById('searchBursarStudentBtn').onclick = loadBursarStudent;
-            document.getElementById('saveBursarFeesBtn').onclick = saveBursarTermFees;
-            document.getElementById('submitBursarPaymentBtn').onclick = recordBursarPayment;
-            document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
-
             document.getElementById('loadExamHistoryAllBtn').onclick = loadExamHistoryAll;
+            document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
             document.getElementById('examHistoryAllYear').onchange = function() {
                 const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
                 if (studentId && this.value) displayExamHistoryAll(studentId, this.value);
             };
-            document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
 
-            // Exam History All (admin)
-            async function loadExamHistoryAll() {
-                try {
-                    const tenantId = getCurrentTenantId();
-                    const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
-                    if (!studentId) { document.getElementById('examHistoryAllContent').innerHTML = '<p>Please enter a Student ID.</p>'; return; }
-                    const found = globalStudentMap.get(studentId) || globalStudentMap.get(studentId.toLowerCase());
-                    if (!found) { document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Student not found.</p>'; return; }
-                    const yearSelect = document.getElementById('examHistoryAllYear');
-                    const examDoc = await db.collection('exam_records').where('tenantId', '==', tenantId).where('studentId', '==', found.id).get();
-                    let records = {};
-                    examDoc.forEach(d => { records = d.data(); });
-                    const years = records.years || {};
-                    const yearKeys = Object.keys(years).sort((a,b) => b - a);
-                    const currentYear = yearSelect.value;
-                    yearSelect.innerHTML = '<option value="">Select Year</option>';
-                    yearKeys.forEach(y => { const selected = (y === currentYear) ? 'selected' : ''; yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`; });
-                    if (yearKeys.length === 0) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found for this student.</p>'; return; }
-                    if (!yearSelect.value) yearSelect.value = yearKeys[0];
-                    displayExamHistoryAll(found.id, yearSelect.value);
-                } catch (error) {
-                    document.getElementById('examHistoryAllContent').innerHTML = '<div class="error">Error loading exam history: ' + escapeHtml(error.message) + '</div>';
-                }
-            }
+            // ---- Dashboard ----
+            document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
+            document.getElementById('dashboardYearFilter').onchange = loadDashboard;
+            document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
+            document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
 
-            function displayExamHistoryAll(studentId, year) {
-                const tenantId = getCurrentTenantId();
-                db.collection('exam_records').where('tenantId', '==', tenantId).where('studentId', '==', studentId).get()
-                    .then(snap => {
-                        if (snap.empty) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found.</p>'; return; }
-                        let records = {};
-                        snap.forEach(d => { records = d.data(); });
-                        const years = records.years || {};
-                        const yearData = years[year];
-                        if (!yearData) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No records for year ' + year + '.</p>'; return; }
-                        let html = `<h4>Exam Records for ${escapeHtml(studentId)} - ${year}</h4>`;
-                        for (const level of Object.keys(yearData)) {
-                            html += `<h5>${level.toUpperCase()}</h5>`;
-                            const levelData = yearData[level];
-                            for (const term of Object.keys(levelData)) {
-                                const termData = levelData[term];
-                                for (const assessment of Object.keys(termData)) {
-                                    const subjects = termData[assessment];
-                                    html += `<p><strong>${term} - ${assessment}</strong></p><ul>`;
-                                    subjects.forEach(s => { html += `<li>${escapeHtml(s.name)}: ${s.score}</li>`; });
-                                    html += '</ul>';
-                                }
-                            }
-                        }
-                        html += `<br><button class="refresh-btn" onclick="editExamHistoryAll('${studentId}','${year}')">✏️ Edit Records</button>`;
-                        html += `<button class="refresh-btn" style="background:#fde8e8; color:#b71c1c;" onclick="deleteExamHistoryAll('${studentId}','${year}')">🗑️ Delete Year</button>`;
-                        document.getElementById('examHistoryAllContent').innerHTML = html;
-                    }).catch(err => {
-                        document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Error loading records: ' + escapeHtml(err.message) + '</p>';
-                    });
-            }
-
-            window.editExamHistoryAll = function(studentId, year) {
-                const found = globalStudentMap.get(studentId);
-                if (!found) { alert('Student not found in memory. Please refresh.'); return; }
-                const attendanceBtn = document.getElementById('attendanceModuleBtn');
-                if (attendanceBtn) attendanceBtn.click();
-                document.getElementById('examStudentSearch').value = studentId;
-                document.getElementById('examYearInput').value = year;
-                document.getElementById('searchExamStudentBtn').click();
+            // ---- Suggestions ----
+            document.getElementById('submitSuggestionBtn').onclick = function() {
+                // Already defined globally
             };
-
-            window.deleteExamHistoryAll = async function(studentId, year) {
-                if (!confirm('Are you sure you want to delete all exam records for ' + studentId + ' in ' + year + '?')) return;
-                try {
-                    const tenantId = getCurrentTenantId();
-                    const docRef = db.collection('exam_records').doc(studentId);
-                    const doc = await docRef.get();
-                    if (!doc.exists) return;
-                    const data = doc.data();
-                    if (data.tenantId !== tenantId) { alert('You do not have permission to delete this record.'); return; }
-                    if (data.years && data.years[year]) {
-                        delete data.years[year];
-                        await docRef.set(data);
-                        alert('Year deleted successfully.');
-                        loadExamHistoryAll();
-                        if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
-                    }
-                } catch (error) { alert('Error deleting: ' + error.message); }
+            document.getElementById('saveSuggestionEditBtn').onclick = function() {
+                // Already defined
             };
+            document.getElementById('submitReplyBtn').onclick = function() {
+                // Already defined
+            };
+            document.getElementById('suggestionFab').onclick = function() {
+                document.getElementById('suggestionText').value = '';
+                document.getElementById('suggestionMessage').innerHTML = '';
+                openModal('suggestionModal');
+            };
+            document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
+            document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
 
+            // ---- Admin Tabs ----
             document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(function(btn) {
                 btn.onclick = function() {
                     const id = this.dataset.tab;
@@ -3879,6 +3929,7 @@
                 };
             });
 
+            // ---- Student Records Tabs ----
             document.querySelectorAll('.tab-btn').forEach(function(btn) {
                 btn.onclick = function() {
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -3891,7 +3942,96 @@
                 };
             });
 
+            // ---- Init ----
             document.getElementById('loginModal').style.display = 'flex';
+        };
+
+        // ============================================================
+        //  EXAM HISTORY ALL (admin) - kept here for completeness
+        // ============================================================
+        async function loadExamHistoryAll() {
+            try {
+                const tenantId = getCurrentTenantId();
+                const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
+                if (!studentId) { document.getElementById('examHistoryAllContent').innerHTML = '<p>Please enter a Student ID.</p>'; return; }
+                const found = globalStudentMap.get(studentId) || globalStudentMap.get(studentId.toLowerCase());
+                if (!found) { document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Student not found.</p>'; return; }
+                const yearSelect = document.getElementById('examHistoryAllYear');
+                const examDoc = await db.collection('exam_records').where('tenantId', '==', tenantId).where('studentId', '==', found.id).get();
+                let records = {};
+                examDoc.forEach(d => { records = d.data(); });
+                const years = records.years || {};
+                const yearKeys = Object.keys(years).sort((a,b) => b - a);
+                const currentYear = yearSelect.value;
+                yearSelect.innerHTML = '<option value="">Select Year</option>';
+                yearKeys.forEach(y => { const selected = (y === currentYear) ? 'selected' : ''; yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`; });
+                if (yearKeys.length === 0) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found for this student.</p>'; return; }
+                if (!yearSelect.value) yearSelect.value = yearKeys[0];
+                displayExamHistoryAll(found.id, yearSelect.value);
+            } catch (error) {
+                document.getElementById('examHistoryAllContent').innerHTML = '<div class="error">Error loading exam history: ' + escapeHtml(error.message) + '</div>';
+            }
+        }
+
+        function displayExamHistoryAll(studentId, year) {
+            const tenantId = getCurrentTenantId();
+            db.collection('exam_records').where('tenantId', '==', tenantId).where('studentId', '==', studentId).get()
+                .then(snap => {
+                    if (snap.empty) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found.</p>'; return; }
+                    let records = {};
+                    snap.forEach(d => { records = d.data(); });
+                    const years = records.years || {};
+                    const yearData = years[year];
+                    if (!yearData) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No records for year ' + year + '.</p>'; return; }
+                    let html = `<h4>Exam Records for ${escapeHtml(studentId)} - ${year}</h4>`;
+                    for (const level of Object.keys(yearData)) {
+                        html += `<h5>${level.toUpperCase()}</h5>`;
+                        const levelData = yearData[level];
+                        for (const term of Object.keys(levelData)) {
+                            const termData = levelData[term];
+                            for (const assessment of Object.keys(termData)) {
+                                const subjects = termData[assessment];
+                                html += `<p><strong>${term} - ${assessment}</strong></p><ul>`;
+                                subjects.forEach(s => { html += `<li>${escapeHtml(s.name)}: ${s.score}</li>`; });
+                                html += '</ul>';
+                            }
+                        }
+                    }
+                    html += `<br><button class="refresh-btn" onclick="editExamHistoryAll('${studentId}','${year}')">✏️ Edit Records</button>`;
+                    html += `<button class="refresh-btn" style="background:#fde8e8; color:#b71c1c;" onclick="deleteExamHistoryAll('${studentId}','${year}')">🗑️ Delete Year</button>`;
+                    document.getElementById('examHistoryAllContent').innerHTML = html;
+                }).catch(err => {
+                    document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Error loading records: ' + escapeHtml(err.message) + '</p>';
+                });
+        }
+
+        window.editExamHistoryAll = function(studentId, year) {
+            const found = globalStudentMap.get(studentId);
+            if (!found) { alert('Student not found in memory. Please refresh.'); return; }
+            const attendanceBtn = document.getElementById('attendanceModuleBtn');
+            if (attendanceBtn) attendanceBtn.click();
+            document.getElementById('examStudentSearch').value = studentId;
+            document.getElementById('examYearInput').value = year;
+            document.getElementById('searchExamStudentBtn').click();
+        };
+
+        window.deleteExamHistoryAll = async function(studentId, year) {
+            if (!confirm('Are you sure you want to delete all exam records for ' + studentId + ' in ' + year + '?')) return;
+            try {
+                const tenantId = getCurrentTenantId();
+                const docRef = db.collection('exam_records').doc(studentId);
+                const doc = await docRef.get();
+                if (!doc.exists) return;
+                const data = doc.data();
+                if (data.tenantId !== tenantId) { alert('You do not have permission to delete this record.'); return; }
+                if (data.years && data.years[year]) {
+                    delete data.years[year];
+                    await docRef.set(data);
+                    alert('Year deleted successfully.');
+                    loadExamHistoryAll();
+                    if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
+                }
+            } catch (error) { alert('Error deleting: ' + error.message); }
         };
     </script>
 </body>
