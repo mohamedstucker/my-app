@@ -6,7 +6,6 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
-        /* ----- RESET & BASE ----- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -19,7 +18,6 @@
         ::-webkit-scrollbar-thumb { background: #b0c4de; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #8aa9d6; }
 
-        /* ----- HEADER ----- */
         .header {
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
             margin-bottom: 20px; background: rgba(255,255,255,0.7); backdrop-filter: blur(12px);
@@ -57,8 +55,6 @@
             font-weight: 500; font-size: 0.95rem; box-shadow: 0 4px 16px rgba(26,75,138,0.25);
             letter-spacing: 0.2px; border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px);
         }
-
-        /* ----- GLOBAL NOTICES ----- */
         #globalNotices {
             background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
             padding: 18px 24px; border-radius: 24px; margin-bottom: 24px;
@@ -73,7 +69,6 @@
         #globalNotices .notice-item .notice-content { color: #2c3e50; margin-top: 2px; }
         #globalNotices .no-notices { color: #6c7a89; font-style: italic; }
 
-        /* ----- BUTTONS ----- */
         button {
             padding: 9px 22px; margin: 4px; border: none; border-radius: 12px; cursor: pointer;
             font-weight: 600; font-size: 0.85rem; transition: 0.2s ease; background: #eef2f7;
@@ -98,7 +93,6 @@
         }
         .demo-btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 28px rgba(243,156,18,0.4); }
 
-        /* ----- CARDS & SECTIONS ----- */
         .import-section, .manual-section {
             background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
             padding: 24px 28px; margin-bottom: 24px; border-radius: 24px;
@@ -131,7 +125,6 @@
         .search-box { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
         .search-box input { flex: 1; min-width: 180px; max-width: 400px; }
 
-        /* ----- TABLES ----- */
         table {
             width: 100%; border-collapse: collapse; margin-top: 14px; border-radius: 18px;
             overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); font-size: 0.85rem; background: #fff;
@@ -142,7 +135,6 @@
         tr:hover { background: #edf3f9; }
         .remark-input { width: 140px; padding: 6px 10px; border-radius: 10px; border: 1px solid #dce4ec; font-size: 0.8rem; max-width: 160px; }
 
-        /* ----- MODULES & TABS ----- */
         .module-buttons { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
         .module-btn {
             padding: 12px 28px; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px);
@@ -170,7 +162,6 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-        /* ----- EXAM / FEE TERM BUTTONS ----- */
         .exam-term-btns, .exam-level-buttons, .fee-term-btns, .assessment-btns {
             display: flex; gap: 8px; margin: 14px 0; flex-wrap: wrap;
         }
@@ -184,12 +175,10 @@
         }
         .term-btn:hover, .exam-level-btn:hover, .fee-term-btn:hover, .assessment-btn:hover { transform: translateY(-2px); }
 
-        /* ----- STATUS COLORS (fee) ----- */
         .fee-paid { background: #d4edda !important; }
         .fee-partial { background: #fff3cd !important; }
         .fee-unpaid { background: #f8d7da !important; }
 
-        /* ----- NOTICE CARDS ----- */
         .notice-card {
             border-left: 6px solid #2a6bb0; background: #fefcf5; margin-bottom: 18px;
             padding: 18px 22px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
@@ -198,7 +187,6 @@
         .notice-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
         .notice-title { font-weight: 700; font-size: 1.05rem; color: #0b2b5c; }
 
-        /* ----- FILE ITEMS ----- */
         .file-item {
             background: #f1f5f9; padding: 14px 20px; margin: 8px 0; border-radius: 16px;
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
@@ -206,7 +194,6 @@
         }
         .file-item:hover { background: #e9eff5; }
 
-        /* ----- EXPORT BUTTONS ----- */
         .export-buttons { margin: 16px 0; display: flex; gap: 12px; flex-wrap: wrap; }
         .share-wa {
             background: #25D366; color: #fff; padding: 5px 16px; border-radius: 40px;
@@ -220,7 +207,6 @@
         }
         .subject-row input { max-width: 200px; margin: 2px; }
 
-        /* ----- MODALS ----- */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
@@ -639,8 +625,6 @@
                 </div>
                 <div id="bursarPaymentMessage"></div>
             </div>
-
-            <!-- NEW: Fee Statistics -->
             <div class="card" id="feeStatsCard">
                 <h3>📊 Fee Payment Statistics by Section</h3>
                 <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
@@ -655,7 +639,6 @@
                 </div>
                 <div id="feeStatsContent"><p>Loading statistics…</p></div>
             </div>
-
             <div class="card">
                 <h3>📊 Fee Payment Overview – All Students by Term</h3>
                 <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
@@ -729,12 +712,25 @@
                 </div>
             </div>
             <div id="suggestionsTab" class="admin-tab">
-                <div class="card"><h3>📋 All Suggestions</h3><button id="refreshSuggestionsBtn" class="refresh-btn">🔄 Refresh</button><div id="suggestionsList"><p>Loading suggestions…</p></div></div>
+                <div class="card">
+                    <h3>📋 All Suggestions</h3>
+                    <button id="refreshSuggestionsBtn" class="refresh-btn">🔄 Refresh</button>
+                    <div id="suggestionsList"><p>Loading suggestions…</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STANDALONE SUGGESTIONS MODULE (for non-admin users) -->
+        <div id="suggestionsModule" style="display:none;">
+            <div class="card">
+                <h3>💬 My Suggestions</h3>
+                <button id="refreshMySuggestionsBtn" class="refresh-btn">🔄 Refresh</button>
+                <div id="mySuggestionsList"><p>Loading your suggestions…</p></div>
             </div>
         </div>
     </div>
 
-    <!-- LOGIN MODAL -->
+    <!-- ===== LOGIN MODAL ===== -->
     <div id="loginModal" class="modal" style="display:flex;">
         <div class="modal-content">
             <h3>🔐 Login</h3>
@@ -765,7 +761,7 @@
         </div>
     </div>
 
-    <!-- SUGGESTION MODAL -->
+    <!-- ===== SUGGESTION MODALS ===== -->
     <div id="suggestionModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('suggestionModal')">&times;</span>
@@ -777,9 +773,20 @@
         </div>
     </div>
 
+    <div id="editSuggestionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('editSuggestionModal')">&times;</span>
+            <h3>✏️ Edit Suggestion</h3>
+            <textarea id="editSuggestionText" rows="5" style="width:100%; max-width:100%;"></textarea>
+            <input type="hidden" id="editSuggestionId" />
+            <button id="saveSuggestionEditBtn" class="refresh-btn">💾 Save Changes</button>
+            <div id="editSuggestionMessage"></div>
+        </div>
+    </div>
+
     <button id="suggestionFab" class="suggestion-fab">💬 Suggestion</button>
 
-    <!-- OTHER MODALS -->
+    <!-- ===== OTHER MODALS ===== -->
     <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name" /><input type="date" id="editProfileDob" /><select id="editProfileClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input id="editProfileDepartment" placeholder="Department" /><input id="editProfileAddress" placeholder="Address" /><input id="editProfileParentPhone" placeholder="Parent Phone" /><input id="editProfileParentName" placeholder="Parent Name" /><input id="editProfileGuardian" placeholder="Guardian" /><input id="editProfileParentEmail" type="email" placeholder="Parent Email" /><select id="editProfileGender"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select><input id="editProfileTempPassword" type="password" placeholder="Temporary Password" /><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
     <div id="editTeacherModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editTeacherModal')">&times;</span><h3>Edit Teacher (Admin)</h3><input type="text" id="editTeacherId" readonly /><input type="text" id="editTeacherName" placeholder="Full Name" /><input type="email" id="editTeacherEmail" placeholder="Email" /><input type="tel" id="editTeacherPhone" placeholder="Phone" /><select id="editTeacherClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input type="text" id="editTeacherQualification" placeholder="Qualification" /><input type="text" id="editTeacherNIN" placeholder="NIN" /><select id="editTeacherStatus"><option>active</option><option>inactive</option></select><button id="saveTeacherBtn" class="refresh-btn">Save Changes</button></div></div>
     <div id="editOwnTeacherModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editOwnTeacherModal')">&times;</span><h3>Edit My Teacher Profile</h3><input type="text" id="editOwnTeacherId" readonly /><input type="text" id="editOwnTeacherName" placeholder="Full Name" /><input type="email" id="editOwnTeacherEmail" placeholder="Email" /><input type="tel" id="editOwnTeacherPhone" placeholder="Phone" /><input type="date" id="editOwnTeacherDob" placeholder="Date of Birth" /><input type="date" id="editOwnTeacherEmploymentDate" placeholder="Employment Date" /><select id="editOwnTeacherDepartment"><option>Science</option><option>Mathematics</option><option>English</option><option>Arts</option><option>Social Sciences</option></select><input type="text" id="editOwnTeacherSubjects" placeholder="Subjects (comma separated)" /><select id="editOwnTeacherClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input type="text" id="editOwnTeacherQualification" placeholder="Qualification" /><input type="text" id="editOwnTeacherNIN" placeholder="NIN" /><input type="number" id="editOwnTeacherSalary" placeholder="Salary (Le)" step="0.01" /><button id="saveOwnTeacherBtn" class="refresh-btn">Save Changes</button></div></div>
@@ -2036,7 +2043,6 @@
                 await loadBursarFeeStatus();
                 if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
 
-                // ✅ Auto-refresh fee statistics
                 await loadFeeStats();
                 await populateFeeStatsYears();
             } catch (error) {
@@ -2083,7 +2089,6 @@
                 if (currentStudentDoc && currentStudentDoc.id === bursarCurrentStudent.id) loadPaymentHistory();
                 if (currentUserRole === 'bursar' && document.getElementById('bursarModule').style.display !== 'none') loadBursarSummary();
 
-                // ✅ Auto-refresh fee statistics
                 await loadFeeStats();
                 await populateFeeStatsYears();
             } catch (error) {
@@ -2099,7 +2104,6 @@
                 let feeData = {};
                 feeDoc.forEach(d => { feeData = d.data(); });
 
-                // Gather all transactions from all years and terms
                 const allTransactions = [];
                 const years = feeData.years || {};
                 for (const year of Object.keys(years)) {
@@ -2157,7 +2161,7 @@
                                 transactions[idx] = { date: newDate, amount: newAmount, type: newType, note: newNote };
                                 termData.transactions = transactions;
                                 feeData.years[year][term] = termData;
-                                feeData[term] = termData; // flat update
+                                feeData[term] = termData;
                                 feeData.tenantId = tenantId;
                                 feeData.studentId = bursarCurrentStudent.id;
                                 await db.collection('fee_records').doc(bursarCurrentStudent.id).set(feeData);
@@ -2347,7 +2351,6 @@
                 const feeDoc = await db.collection('fee_records').where('tenantId', '==', tenantId).where('studentId', '==', studentId).get();
                 let feeData = {};
                 feeDoc.forEach(d => { feeData = d.data(); });
-                // Update both flat and years structure
                 const currentYear = new Date().getFullYear().toString();
                 if (!feeData.years) feeData.years = {};
                 if (!feeData.years[currentYear]) feeData.years[currentYear] = {};
@@ -2371,7 +2374,7 @@
         };
 
         // ============================================================
-        //  FEE STATISTICS (with backward compatibility for old records)
+        //  FEE STATISTICS (backward compatible)
         // ============================================================
         async function loadFeeStats() {
             try {
@@ -2405,22 +2408,17 @@
                     const sec = sections[sectionKey];
                     sec.total++;
 
-                    // ---- Backward compatibility: if no years but flat terms exist, wrap them ----
                     let years = feeData.years || {};
                     if (Object.keys(years).length === 0) {
-                        // Check if flat term data exists
                         const hasTermData = ['term1','term2','term3'].some(t => feeData[t] && (feeData[t].total || feeData[t].paid));
                         if (hasTermData) {
                             const currentYear = new Date().getFullYear().toString();
                             years = { [currentYear]: {} };
                             for (const term of ['term1','term2','term3']) {
-                                if (feeData[term]) {
-                                    years[currentYear][term] = feeData[term];
-                                }
+                                if (feeData[term]) years[currentYear][term] = feeData[term];
                             }
                         }
                     }
-                    // ---- End backward compatibility ----
 
                     let yearsToProcess = [];
                     if (selectedYear === 'all') {
@@ -2450,15 +2448,10 @@
                         }
                     }
 
-                    if (totalFees === 0) {
-                        sec.counts.unpaid++;
-                    } else if (totalPaid >= totalFees) {
-                        sec.counts.fullyPaid++;
-                    } else if (totalPaid > 0) {
-                        sec.counts.partial++;
-                    } else {
-                        sec.counts.unpaid++;
-                    }
+                    if (totalFees === 0) sec.counts.unpaid++;
+                    else if (totalPaid >= totalFees) sec.counts.fullyPaid++;
+                    else if (totalPaid > 0) sec.counts.partial++;
+                    else sec.counts.unpaid++;
                 }
 
                 renderFeeStats(sections);
@@ -2505,27 +2498,19 @@
             document.getElementById('feeStatsContent').innerHTML = html;
         }
 
-        // Populate year dropdown – always include current year for old flat records
         async function populateFeeStatsYears() {
             const tenantId = getCurrentTenantId();
             const snap = await db.collection('fee_records').where('tenantId', '==', tenantId).get();
             const yearsSet = new Set();
             snap.forEach(doc => {
                 const data = doc.data();
-                if (data.years) {
-                    Object.keys(data.years).forEach(y => yearsSet.add(y));
-                } else {
-                    // If no years but flat term data exists, add current year
+                if (data.years) Object.keys(data.years).forEach(y => yearsSet.add(y));
+                else {
                     const hasTermData = ['term1','term2','term3'].some(t => data[t] && (data[t].total || data[t].paid));
-                    if (hasTermData) {
-                        yearsSet.add(new Date().getFullYear().toString());
-                    }
+                    if (hasTermData) yearsSet.add(new Date().getFullYear().toString());
                 }
             });
-            // Always add current year as fallback
-            if (yearsSet.size === 0) {
-                yearsSet.add(new Date().getFullYear().toString());
-            }
+            if (yearsSet.size === 0) yearsSet.add(new Date().getFullYear().toString());
             const yearSelect = document.getElementById('feeStatsYear');
             const currentValue = yearSelect.value;
             yearSelect.innerHTML = '<option value="all">All Years</option>';
@@ -2534,9 +2519,7 @@
                 const selected = (y === currentValue) ? 'selected' : '';
                 yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`;
             });
-            if (!currentValue || currentValue === 'all' || !sortedYears.includes(currentValue)) {
-                yearSelect.value = 'all';
-            }
+            if (!currentValue || currentValue === 'all' || !sortedYears.includes(currentValue)) yearSelect.value = 'all';
         }
 
         // ============================================================
@@ -3234,79 +3217,164 @@
         }
 
         // ============================================================
-        //  SUGGESTIONS
+        //  SUGGESTIONS (FIXED – with containerId parameter)
         // ============================================================
-        document.getElementById('submitSuggestionBtn').onclick = async function() {
-            const tenantId = getCurrentTenantId();
-            const text = document.getElementById('suggestionText').value.trim();
-            if (!text) { showMessage('Please write your suggestion.', 'error', 'suggestionMessage'); return; }
-            try {
-                const user = auth.currentUser;
-                await db.collection('suggestions').add({
-                    text, timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'pending', userEmail: user ? user.email : null,
-                    userName: user ? user.displayName || user.email : 'Anonymous',
-                    tenantId: tenantId
-                });
-                document.getElementById('suggestionText').value = '';
-                showMessage('Thank you! Your suggestion has been submitted.', 'success', 'suggestionMessage');
-                setTimeout(() => { closeModal('suggestionModal'); }, 1500);
-            } catch (error) {
-                showMessage('Error: ' + error.message, 'error', 'suggestionMessage');
-            }
-        };
-
-        async function loadSuggestions() {
-            if (currentUserRole !== 'admin') return;
-            try {
-                const tenantId = getCurrentTenantId();
-                const snap = await db.collection('suggestions').where('tenantId', '==', tenantId).orderBy('timestamp', 'desc').get();
-                if (snap.empty) { document.getElementById('suggestionsList').innerHTML = '<p>No suggestions yet.</p>'; return; }
+    async function loadSuggestions(containerId = 'suggestionsList') {
+    if (!auth.currentUser) return;
+    const tenantId = getCurrentTenantId();
+    const user = auth.currentUser;
+    try {
+        let query = db.collection('suggestions').where('tenantId', '==', tenantId);
+        if (currentUserRole !== 'admin') {
+            query = query.where('uid', '==', user.uid);
+        }
+        // REMOVE this line:
+        // query = query.orderBy('timestamp', 'desc');
+        const snap = await query.get();
+        
+        // Sort manually after fetching:
+        const items = [];
+        snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+        items.sort((a, b) => {
+            const ta = a.timestamp?.toMillis?.() || 0;
+            const tb = b.timestamp?.toMillis?.() || 0;
+            return tb - ta;
+        });
+        
+        const container = document.getElementById(containerId);
+        // ... rest of the code using 'items' instead of 'snap'
+                if (snap.empty) {
+                    container.innerHTML = '<p>No suggestions found.</p>';
+                    return;
+                }
                 let html = '<table><thead><tr><th>Date</th><th>User</th><th>Suggestion</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
                 snap.forEach(doc => {
                     const data = doc.data();
                     const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
                     const status = data.status || 'pending';
                     const statusBadge = status === 'resolved' ? '<span style="color:#27ae60;">✅ Resolved</span>' : '<span style="color:#f39c12;">⏳ Pending</span>';
+                    const isOwn = user && data.uid === user.uid;
+                    const isAdmin = currentUserRole === 'admin';
+                    const canEdit = isAdmin || isOwn;
+                    const canDelete = isAdmin || isOwn;
                     html += `<tr>
                         <td>${escapeHtml(date)}</td>
                         <td>${escapeHtml(data.userName || 'Anonymous')}</td>
                         <td>${escapeHtml(data.text)}</td>
                         <td>${statusBadge}</td>
-                        <td>${status === 'pending' ? `<button class="resolve-suggestion-btn" data-id="${doc.id}">✅ Resolve</button>` : ''}
-                        <button class="delete-suggestion-btn" data-id="${doc.id}" style="background:#fde8e8; color:#b71c1c;">🗑️ Delete</button></td>
+                        <td>
+                            ${canEdit ? `<button class="edit-suggestion-btn" data-id="${doc.id}" data-text="${escapeHtml(data.text)}">✏️ Edit</button>` : ''}
+                            ${canDelete ? `<button class="delete-suggestion-btn" data-id="${doc.id}" style="background:#fde8e8; color:#b71c1c;">🗑️ Delete</button>` : ''}
+                            ${isAdmin && status === 'pending' ? `<button class="resolve-suggestion-btn" data-id="${doc.id}">✅ Resolve</button>` : ''}
+                        </td>
                     </tr>`;
                 });
                 html += '</tbody></table>';
-                document.getElementById('suggestionsList').innerHTML = html;
+                container.innerHTML = html;
 
-                document.querySelectorAll('.resolve-suggestion-btn').forEach(btn => {
+                // Attach event listeners scoped to this container
+                container.querySelectorAll('.edit-suggestion-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        const text = this.dataset.text;
+                        document.getElementById('editSuggestionId').value = id;
+                        document.getElementById('editSuggestionText').value = text;
+                        document.getElementById('editSuggestionMessage').innerHTML = '';
+                        openModal('editSuggestionModal');
+                    };
+                });
+
+                container.querySelectorAll('.delete-suggestion-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (!confirm('Delete this suggestion?')) return;
+                        try {
+                            await db.collection('suggestions').doc(this.dataset.id).delete();
+                            // Refresh both containers
+                            loadSuggestions('suggestionsList');
+                            loadSuggestions('mySuggestionsList');
+                        } catch (error) {
+                            showMessage('Error deleting: ' + error.message, 'error', containerId);
+                        }
+                    };
+                });
+
+                container.querySelectorAll('.resolve-suggestion-btn').forEach(btn => {
                     btn.onclick = async function() {
                         if (confirm('Mark this suggestion as resolved?')) {
-                            await db.collection('suggestions').doc(this.dataset.id).update({ status: 'resolved' });
-                            loadSuggestions();
+                            try {
+                                await db.collection('suggestions').doc(this.dataset.id).update({ status: 'resolved' });
+                                loadSuggestions('suggestionsList');
+                                loadSuggestions('mySuggestionsList');
+                            } catch (error) {
+                                showMessage('Error resolving: ' + error.message, 'error', containerId);
+                            }
                         }
                     };
                 });
-                document.querySelectorAll('.delete-suggestion-btn').forEach(btn => {
-                    btn.onclick = async function() {
-                        if (confirm('Delete this suggestion?')) {
-                            await db.collection('suggestions').doc(this.dataset.id).delete();
-                            loadSuggestions();
-                        }
-                    };
-                });
+
             } catch (error) {
-                document.getElementById('suggestionsList').innerHTML = '<div class="error">Failed to load suggestions: ' + escapeHtml(error.message) + '</div>';
+                const container = document.getElementById(containerId);
+                if (container) container.innerHTML = '<div class="error">Failed to load suggestions: ' + escapeHtml(error.message) + '</div>';
             }
         }
+
+        document.getElementById('saveSuggestionEditBtn').onclick = async function() {
+            const id = document.getElementById('editSuggestionId').value;
+            const newText = document.getElementById('editSuggestionText').value.trim();
+            if (!newText) {
+                showMessage('Suggestion text cannot be empty.', 'error', 'editSuggestionMessage');
+                return;
+            }
+            try {
+                await db.collection('suggestions').doc(id).update({
+                    text: newText,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal('editSuggestionModal');
+                // Refresh both containers
+                loadSuggestions('suggestionsList');
+                loadSuggestions('mySuggestionsList');
+            } catch (error) {
+                showMessage('Error updating: ' + error.message, 'error', 'editSuggestionMessage');
+            }
+        };
+
+        document.getElementById('submitSuggestionBtn').onclick = async function() {
+            const tenantId = getCurrentTenantId();
+            const text = document.getElementById('suggestionText').value.trim();
+            if (!text) {
+                showMessage('Please write your suggestion.', 'error', 'suggestionMessage');
+                return;
+            }
+            try {
+                const user = auth.currentUser;
+                await db.collection('suggestions').add({
+                    text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending',
+                    userEmail: user ? user.email : null,
+                    userName: user ? user.displayName || user.email : 'Anonymous',
+                    uid: user ? user.uid : null,
+                    tenantId: tenantId
+                });
+                document.getElementById('suggestionText').value = '';
+                showMessage('Thank you! Your suggestion has been submitted.', 'success', 'suggestionMessage');
+                setTimeout(() => { closeModal('suggestionModal'); }, 1500);
+                // Refresh both
+                loadSuggestions('suggestionsList');
+                loadSuggestions('mySuggestionsList');
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error', 'suggestionMessage');
+            }
+        };
 
         document.getElementById('suggestionFab').onclick = function() {
             document.getElementById('suggestionText').value = '';
             document.getElementById('suggestionMessage').innerHTML = '';
             openModal('suggestionModal');
         };
-        document.getElementById('refreshSuggestionsBtn').onclick = loadSuggestions;
+        document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
+        document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
 
         // ============================================================
         //  ROLE-BASED UI
@@ -3321,6 +3389,7 @@
             document.getElementById('teachersModule').style.display = 'none';
             document.getElementById('bursarModule').style.display = 'none';
             document.getElementById('adminModule').style.display = 'none';
+            document.getElementById('suggestionsModule').style.display = 'none';
 
             document.getElementById('suggestionFab').style.display = 'flex';
 
@@ -3344,24 +3413,28 @@
             };
 
             let modules = [];
+            // All roles get a Suggestions button
+            modules.push({ id: 'suggestionsModuleBtn', label: '💬 Suggestions', moduleId: 'suggestionsModule' });
+
             if (role === 'admin') {
-                modules = [
+                modules.unshift(
                     { id: 'dashboardModuleBtn', label: '📊 Dashboard', moduleId: 'dashboardModule' },
                     { id: 'attendanceModuleBtn', label: '📋 Attendance', moduleId: 'attendanceModule' },
                     { id: 'recordsModuleBtn', label: '📚 Student Records', moduleId: 'recordsModule' },
                     { id: 'teachersModuleBtn', label: '👩‍🏫 Teachers', moduleId: 'teachersModule' },
+                    { id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' },
                     { id: 'adminModuleBtn', label: '⚙️ Admin', moduleId: 'adminModule' }
-                ];
+                );
             } else if (role === 'bursar') {
-                modules = [{ id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' }];
+                modules.unshift({ id: 'bursarModuleBtn', label: '💰 Bursar', moduleId: 'bursarModule' });
             } else if (role === 'teacher') {
-                modules = [
+                modules.unshift(
                     { id: 'attendanceModuleBtn', label: '📋 Attendance', moduleId: 'attendanceModule' },
                     { id: 'recordsModuleBtn', label: '📚 Student Records', moduleId: 'recordsModule' },
                     { id: 'teachersModuleBtn', label: '👩‍🏫 My Profile', moduleId: 'teachersModule' }
-                ];
+                );
             } else if (role === 'parent') {
-                modules = [{ id: 'recordsModuleBtn', label: '📚 My Child\'s Records', moduleId: 'recordsModule' }];
+                modules.unshift({ id: 'recordsModuleBtn', label: '📚 My Child\'s Records', moduleId: 'recordsModule' });
             }
 
             modules.forEach(m => {
@@ -3379,6 +3452,7 @@
                     if (m.moduleId === 'teachersModule') { if (role === 'admin') loadAllTeachersForAdmin(); displayOwnTeacherProfile(); }
                     if (m.moduleId === 'bursarModule') { loadBursarSummary(); populateFeeStatsYears().then(loadFeeStats); }
                     if (m.moduleId === 'adminModule') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); renderNotices(); initFileDB().then(loadFilesList); }
+                    if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
                 };
                 moduleContainer.appendChild(btn);
             });
@@ -3801,7 +3875,7 @@
                     else if (id === 'noticeboard') renderNotices();
                     else if (id === 'filestorage') initFileDB().then(loadFilesList);
                     else if (id === 'examhistoryall') { /* handled on load */ }
-                    else if (id === 'suggestions') loadSuggestions();
+                    else if (id === 'suggestions') loadSuggestions('suggestionsList');
                 };
             });
 
