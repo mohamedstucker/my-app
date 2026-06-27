@@ -6,7 +6,6 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
-        /* ----- RESET & BASE ----- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -598,7 +597,7 @@
             </div>
         </div>
 
-        <!-- BURSAR (only visible to bursar role) -->
+        <!-- BURSAR -->
         <div id="bursarModule" style="display:none;">
             <div class="card">
                 <h3>💰 Record Payment / Manage Fees</h3>
@@ -1959,7 +1958,7 @@
         }
 
         // ============================================================
-        //  BURSAR MODULE (only accessible to bursar role)
+        //  BURSAR MODULE
         // ============================================================
         async function loadBursarStudent() {
             if (currentUserRole !== 'bursar') {
@@ -3238,8 +3237,36 @@
         }
 
         // ============================================================
-        //  SUGGESTIONS (FIXED – with containerId parameter)
+        //  SUGGESTIONS (FULL – with reply and working submit)
         // ============================================================
+        document.getElementById('submitSuggestionBtn').onclick = async function() {
+            const tenantId = getCurrentTenantId();
+            const text = document.getElementById('suggestionText').value.trim();
+            if (!text) {
+                showMessage('Please write your suggestion.', 'error', 'suggestionMessage');
+                return;
+            }
+            try {
+                const user = auth.currentUser;
+                await db.collection('suggestions').add({
+                    text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending',
+                    userEmail: user ? user.email : null,
+                    userName: user ? user.displayName || user.email : 'Anonymous',
+                    uid: user ? user.uid : null,
+                    tenantId: tenantId
+                });
+                document.getElementById('suggestionText').value = '';
+                showMessage('Thank you! Your suggestion has been submitted.', 'success', 'suggestionMessage');
+                setTimeout(() => { closeModal('suggestionModal'); }, 1500);
+                loadSuggestions('suggestionsList');
+                loadSuggestions('mySuggestionsList');
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error', 'suggestionMessage');
+            }
+        };
+
         async function loadSuggestions(containerId = 'suggestionsList') {
             if (!auth.currentUser) return;
             const tenantId = getCurrentTenantId();
@@ -3249,7 +3276,7 @@
                 if (currentUserRole !== 'admin') {
                     query = query.where('uid', '==', user.uid);
                 }
-                // No orderBy to avoid index requirement
+                // No orderBy to avoid index requirement – sort in memory
                 const snap = await query.get();
                 const items = [];
                 snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
@@ -3291,7 +3318,7 @@
                 html += '</tbody></table>';
                 container.innerHTML = html;
 
-                // Attach event listeners scoped to this container
+                // Attach event listeners
                 container.querySelectorAll('.edit-suggestion-btn').forEach(btn => {
                     btn.onclick = function() {
                         const id = this.dataset.id;
@@ -3366,42 +3393,6 @@
             }
         };
 
-        document.getElementById('submitSuggestionBtn').onclick = async function() {
-            const tenantId = getCurrentTenantId();
-            const text = document.getElementById('suggestionText').value.trim();
-            if (!text) {
-                showMessage('Please write your suggestion.', 'error', 'suggestionMessage');
-                return;
-            }
-            try {
-                const user = auth.currentUser;
-                await db.collection('suggestions').add({
-                    text,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'pending',
-                    userEmail: user ? user.email : null,
-                    userName: user ? user.displayName || user.email : 'Anonymous',
-                    uid: user ? user.uid : null,
-                    tenantId: tenantId
-                });
-                document.getElementById('suggestionText').value = '';
-                showMessage('Thank you! Your suggestion has been submitted.', 'success', 'suggestionMessage');
-                setTimeout(() => { closeModal('suggestionModal'); }, 1500);
-                loadSuggestions('suggestionsList');
-                loadSuggestions('mySuggestionsList');
-            } catch (error) {
-                showMessage('Error: ' + error.message, 'error', 'suggestionMessage');
-            }
-        };
-
-        document.getElementById('suggestionFab').onclick = function() {
-            document.getElementById('suggestionText').value = '';
-            document.getElementById('suggestionMessage').innerHTML = '';
-            openModal('suggestionModal');
-        };
-        document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
-        document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
-
         document.getElementById('submitReplyBtn').onclick = async function() {
             const id = document.getElementById('replySuggestionId').value;
             const reply = document.getElementById('replySuggestionText').value.trim();
@@ -3423,8 +3414,16 @@
             }
         };
 
+        document.getElementById('suggestionFab').onclick = function() {
+            document.getElementById('suggestionText').value = '';
+            document.getElementById('suggestionMessage').innerHTML = '';
+            openModal('suggestionModal');
+        };
+        document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
+        document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
+
         // ============================================================
-        //  ROLE-BASED UI (UPDATED: Admin no longer sees Bursar)
+        //  ROLE-BASED UI (Admin no longer sees Bursar)
         // ============================================================
         function setupRoleUI(role, extra) {
             extra = extra || {};
@@ -3469,7 +3468,6 @@
                     { id: 'attendanceModuleBtn', label: '📋 Attendance', moduleId: 'attendanceModule' },
                     { id: 'recordsModuleBtn', label: '📚 Student Records', moduleId: 'recordsModule' },
                     { id: 'teachersModuleBtn', label: '👩‍🏫 Teachers', moduleId: 'teachersModule' },
-                    // BURSAR IS REMOVED FROM ADMIN
                     { id: 'adminModuleBtn', label: '⚙️ Admin', moduleId: 'adminModule' }
                 );
             } else if (role === 'bursar') {
@@ -3658,296 +3656,7 @@
         }
 
         // ============================================================
-        //  WINDOW ONLOAD - ALL BUTTON LISTENERS ATTACHED HERE
-        // ============================================================
-        window.onload = function() {
-            function updateOnlineStatus() {
-                const badge = document.getElementById('onlineStatus'), bar = document.getElementById('syncBar');
-                if (navigator.onLine) {
-                    badge.innerHTML = '🟢 Online';
-                    badge.className = 'online-badge online';
-                    bar.innerHTML = '✅ Connected to Firestore';
-                    bar.style.background = 'linear-gradient(135deg, #1a7a3a, #2e9b5e)';
-                } else {
-                    badge.innerHTML = '🔴 Offline';
-                    badge.className = 'online-badge offline';
-                    bar.innerHTML = '⚠️ Offline mode – data cached';
-                    bar.style.background = 'linear-gradient(135deg, #b9770e, #d68910)';
-                }
-            }
-            updateOnlineStatus();
-            window.addEventListener('online', updateOnlineStatus);
-            window.addEventListener('offline', updateOnlineStatus);
-
-            ensureDemoUsers().then(() => {}).catch(console.warn);
-
-            // Login
-            document.getElementById('demoAdminBtn').onclick = function() { loginAndSetup('admin@school.com', 'admin123'); };
-            document.getElementById('demoBursarBtn').onclick = function() { loginAndSetup('bursar@school.com', 'bursar123'); };
-            document.getElementById('demoTeacherBtn').onclick = function() { loginAndSetup('teacher@school.com', 'teacher123'); };
-            document.getElementById('demoParentBtn').onclick = function() { loginAndSetup('parent@school.com', 'parent123'); };
-            document.getElementById('loginBtn').onclick = function() {
-                loginAndSetup(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-            };
-            document.getElementById('logoutBtn').onclick = function() {
-                auth.signOut().then(function() {
-                    try { localStorage.removeItem('tenantId'); } catch (_) {}
-                    _tenantId = 'default_tenant';
-                    location.reload();
-                });
-            };
-
-            // Signup toggle
-            const signupToggle = document.getElementById('signupToggle');
-            const signupBack = document.getElementById('signupBack');
-            const signupFields = document.getElementById('signupFields');
-            signupToggle.onclick = function() { signupFields.classList.toggle('active'); this.style.display = 'none'; signupBack.style.display = 'inline-block'; };
-            signupBack.onclick = function() { signupFields.classList.remove('active'); signupToggle.style.display = 'inline-block'; this.style.display = 'none'; };
-            document.getElementById('signupBtn').onclick = signUpAndCreateTenant;
-
-            // ---- Attendance ----
-            document.getElementById('importBtn').onclick = function() {
-                if (currentUserRole !== 'admin') return;
-                const f = document.getElementById('excelFile').files[0];
-                if (f) { importExcelStudents(f).then(function() { loadStudents(); renderAttendance(); showMessage('Imported', 'success', 'importMessage'); }).catch(function(err) { showMessage('Import error: ' + err.message, 'error', 'importMessage'); }); }
-                else alert('Select file');
-            };
-            document.getElementById('downloadSampleBtn').onclick = function() {
-                if (currentUserRole !== 'admin') return;
-                const ws = XLSX.utils.json_to_sheet([{ ID: 'STU001', Name: 'John Doe', Class: 'JSS1', ParentPhone: '23276123456' }]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Students');
-                XLSX.writeFile(wb, 'sample_students.xlsx');
-            };
-            document.getElementById('addStudentBtn').onclick = function() { if (currentUserRole !== 'admin') return; addManualStudent(); };
-            document.getElementById('loadBtn').onclick = function() { if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') return; renderAttendance(); };
-            document.getElementById('refreshBtn').onclick = function() { if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') return; loadStudents().then(renderAttendance); };
-            document.getElementById('batchWhatsappBtn').onclick = function() {
-                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('You do not have permission to send reports.'); return; }
-                sendBatchWhatsApp();
-            };
-            document.getElementById('classHistoryBtn').onclick = function() {
-                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('You do not have permission to view class history.'); return; }
-                viewClassHistory();
-            };
-
-            // ---- Records ----
-            document.getElementById('searchStudentBtn').onclick = function() {
-                // The handler is set inside setupRoleUI, but we can also set a generic one here.
-                // We'll check role and act accordingly.
-                if (currentUserRole === 'admin') {
-                    // Admin can search any student
-                    const q = document.getElementById('studentSearchInput').value.trim();
-                    const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
-                    if (!found) { showMessage('Student not found', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
-                    const tenantId = getCurrentTenantId();
-                    if (found.tenantId !== tenantId) { showMessage('This student does not belong to your tenant.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
-                    currentStudentDoc = found;
-                    document.getElementById('studentRecordsPanel').style.display = 'block';
-                    document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
-                    loadStudentProfile();
-                    loadPaymentHistory();
-                    loadExamHistory();
-                    loadAttendanceHistory();
-                } else if (currentUserRole === 'teacher') {
-                    // Teacher can only search students in their assigned class
-                    const q = document.getElementById('studentSearchInput').value.trim();
-                    const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
-                    if (!found) { showMessage('Student not found in your class', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
-                    const tenantId = getCurrentTenantId();
-                    if (found.tenantId !== tenantId) { showMessage('This student does not belong to your tenant.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
-                    if (found.class !== teacherAssignedClass) { showMessage('You can only access students in ' + teacherAssignedClass + '. This student is in ' + found.class + '.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
-                    currentStudentDoc = found;
-                    document.getElementById('studentRecordsPanel').style.display = 'block';
-                    document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
-                    loadStudentProfile();
-                    loadPaymentHistory();
-                    loadExamHistory();
-                    loadAttendanceHistory();
-                } else if (currentUserRole === 'parent') {
-                    // Parent can only see their linked child – the search box is hidden for them.
-                    if (parentLinkedStudentId) {
-                        window.loadParentStudent && window.loadParentStudent();
-                    }
-                } else {
-                    showMessage('You do not have permission to search students.', 'error', 'searchResults');
-                }
-            };
-            document.getElementById('clearSearchBtn').onclick = function() {
-                document.getElementById('studentSearchInput').value = '';
-                document.getElementById('searchResults').innerHTML = '';
-                document.getElementById('studentRecordsPanel').style.display = 'none';
-            };
-            document.getElementById('editProfileBtn').onclick = editProfile;
-            document.getElementById('saveProfileBtn').onclick = saveProfile;
-
-            // ---- Teachers ----
-            document.getElementById('searchTeacherBtn').onclick = function() {
-                if (currentUserRole !== 'admin') { alert('Only admin can search teachers.'); return; }
-                searchTeacherAdmin();
-            };
-            document.getElementById('clearTeacherSearchBtn').onclick = function() {
-                document.getElementById('teacherSearchInput').value = '';
-                document.getElementById('teacherSearchResults').innerHTML = '';
-                if (currentUserRole === 'admin') loadAllTeachersForAdmin();
-            };
-            document.getElementById('addTeacherBtn').onclick = function() { if (currentUserRole !== 'admin') return; addTeacherAdmin(); };
-            document.getElementById('importTeachersBtn').onclick = function() {
-                if (currentUserRole !== 'admin') return;
-                const f = document.getElementById('teacherExcelFile').files[0];
-                if (f) importTeachersExcel(f);
-            };
-            document.getElementById('downloadTeacherSampleBtn').onclick = function() {
-                const ws = XLSX.utils.json_to_sheet([{ TeacherID: 'T001', Name: 'Jane Smith', Email: 'jane@school.com', Class: 'JSS1', Department: 'Science', Subjects: 'Physics, Chemistry', Salary: 5000, DOB: '1990-01-01', EmploymentDate: '2020-01-01', Qualification: 'B.Ed', NIN: 'SL123456789' }]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
-                XLSX.writeFile(wb, 'teacher_sample.xlsx');
-            };
-            document.getElementById('printTeachersTable').onclick = function() {
-                if (currentUserRole !== 'admin') return;
-                const tbl = document.getElementById('allTeachersList');
-                if (tbl && tbl.children.length) printTable(tbl, 'Teachers');
-                else alert('No teachers table');
-            };
-            document.getElementById('exportTeachersCSVBtn').onclick = function() {
-                if (currentUserRole !== 'admin') return;
-                const tbl = document.getElementById('allTeachersList');
-                if (tbl && tbl.children.length) exportTableToCSV(tbl, 'teachers');
-                else alert('No teachers table');
-            };
-            document.getElementById('searchTeacherRegisterBtn').onclick = function() {
-                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('Access denied.'); return; }
-                loadTeacherRegister();
-            };
-            document.getElementById('editOwnTeacherBtn').onclick = function() {
-                // handled inside displayOwnTeacherProfile
-            };
-            document.getElementById('saveOwnTeacherBtn').onclick = saveOwnTeacherProfile;
-            document.getElementById('saveTeacherBtn').onclick = updateTeacherAdmin;
-
-            // ---- Bursar ----
-            document.getElementById('searchBursarStudentBtn').onclick = function() {
-                if (currentUserRole !== 'bursar') { showMessage('Access denied. Only bursar can access this.', 'error', 'bursarPaymentMessage'); return; }
-                loadBursarStudent();
-            };
-            document.getElementById('saveBursarFeesBtn').onclick = function() { if (currentUserRole !== 'bursar') return; saveBursarTermFees(); };
-            document.getElementById('submitBursarPaymentBtn').onclick = function() { if (currentUserRole !== 'bursar') return; recordBursarPayment(); };
-            document.getElementById('refreshBursarBtn').onclick = function() { if (currentUserRole === 'bursar') loadBursarSummary(); };
-            document.getElementById('exportBursarCSV').onclick = function() { if (currentUserRole === 'bursar') exportBursarToCSV(); };
-            document.getElementById('bursarClassFilter').onchange = function() { if (currentUserRole === 'bursar') loadBursarSummary(); };
-            document.getElementById('refreshFeeStatsBtn').onclick = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
-            document.getElementById('feeStatsYear').onchange = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
-            document.getElementById('feeStatsTerm').onchange = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
-
-            // ---- Admin ----
-            document.getElementById('addStaffBtn').onclick = addStaff;
-            document.getElementById('addAssetBtn').onclick = addAsset;
-            document.getElementById('addInventoryBtn').onclick = addInventory;
-            document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
-            document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
-            document.getElementById('postNoticeBtn').onclick = postNotice;
-            document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
-            document.getElementById('refreshFilesBtn').onclick = function() { initFileDB().then(loadFilesList); };
-            document.getElementById('printAnyTableBtn').onclick = function() {
-                const tbl = getCurrentVisibleTable();
-                if (tbl) printTable(tbl, 'School Data');
-                else alert('No table visible');
-            };
-            document.getElementById('exportAnyTableCSV').onclick = function() {
-                const tbl = getCurrentVisibleTable();
-                if (tbl) exportTableToCSV(tbl, 'exported_data');
-                else alert('No table visible');
-            };
-            document.getElementById('printNoticesBtn').onclick = function() {
-                const div = document.getElementById('globalNoticesList');
-                if (div) printTable(div, 'Notices');
-                else alert('No notices to print');
-            };
-            document.getElementById('exportStudentsCSV').onclick = exportAllStudentsCSV;
-            document.getElementById('exportTeachersCSVAdmin').onclick = exportAllTeachersCSV;
-            document.getElementById('printAttendanceTable').onclick = function() {
-                const tbl = document.querySelector('#studentList table');
-                if (tbl) printTable(tbl, 'Attendance');
-                else alert('No attendance table');
-            };
-            document.getElementById('exportAttendanceCSV').onclick = function() {
-                const tbl = document.querySelector('#studentList table');
-                if (tbl) exportTableToCSV(tbl, 'attendance');
-                else alert('No attendance table');
-            };
-
-            // ---- Exam ----
-            document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
-            document.getElementById('saveExamRecordsBtn').onclick = saveExamRecords;
-            document.getElementById('loadExamHistoryAllBtn').onclick = loadExamHistoryAll;
-            document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
-            document.getElementById('examHistoryAllYear').onchange = function() {
-                const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
-                if (studentId && this.value) displayExamHistoryAll(studentId, this.value);
-            };
-
-            // ---- Dashboard ----
-            document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
-            document.getElementById('dashboardYearFilter').onchange = loadDashboard;
-            document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
-            document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
-
-            // ---- Suggestions ----
-            document.getElementById('submitSuggestionBtn').onclick = function() {
-                // Already defined globally
-            };
-            document.getElementById('saveSuggestionEditBtn').onclick = function() {
-                // Already defined
-            };
-            document.getElementById('submitReplyBtn').onclick = function() {
-                // Already defined
-            };
-            document.getElementById('suggestionFab').onclick = function() {
-                document.getElementById('suggestionText').value = '';
-                document.getElementById('suggestionMessage').innerHTML = '';
-                openModal('suggestionModal');
-            };
-            document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
-            document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
-
-            // ---- Admin Tabs ----
-            document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(function(btn) {
-                btn.onclick = function() {
-                    const id = this.dataset.tab;
-                    document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display = 'none');
-                    document.getElementById(id + 'Tab').style.display = 'block';
-                    if (id === 'staff') loadStaffList();
-                    else if (id === 'assets') loadAssetsList();
-                    else if (id === 'inventory') loadInventoryList();
-                    else if (id === 'visitors') loadVisitorsList();
-                    else if (id === 'noticeboard') renderNotices();
-                    else if (id === 'filestorage') initFileDB().then(loadFilesList);
-                    else if (id === 'examhistoryall') { /* handled on load */ }
-                    else if (id === 'suggestions') loadSuggestions('suggestionsList');
-                };
-            });
-
-            // ---- Student Records Tabs ----
-            document.querySelectorAll('.tab-btn').forEach(function(btn) {
-                btn.onclick = function() {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                    document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
-                    if (this.dataset.tab === 'examhistory' && currentStudentDoc) loadExamHistory();
-                    if (this.dataset.tab === 'paymenthistory' && currentStudentDoc) loadPaymentHistory();
-                    if (this.dataset.tab === 'attendancehistory' && currentStudentDoc) loadAttendanceHistory();
-                };
-            });
-
-            // ---- Init ----
-            document.getElementById('loginModal').style.display = 'flex';
-        };
-
-        // ============================================================
-        //  EXAM HISTORY ALL (admin) - kept here for completeness
+        //  EXAM HISTORY ALL (admin)
         // ============================================================
         async function loadExamHistoryAll() {
             try {
@@ -4032,6 +3741,273 @@
                     if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
                 }
             } catch (error) { alert('Error deleting: ' + error.message); }
+        };
+
+        // ============================================================
+        //  WINDOW ONLOAD (ALL BUTTONS ATTACHED)
+        // ============================================================
+        window.onload = function() {
+            function updateOnlineStatus() {
+                const badge = document.getElementById('onlineStatus'), bar = document.getElementById('syncBar');
+                if (navigator.onLine) {
+                    badge.innerHTML = '🟢 Online';
+                    badge.className = 'online-badge online';
+                    bar.innerHTML = '✅ Connected to Firestore';
+                    bar.style.background = 'linear-gradient(135deg, #1a7a3a, #2e9b5e)';
+                } else {
+                    badge.innerHTML = '🔴 Offline';
+                    badge.className = 'online-badge offline';
+                    bar.innerHTML = '⚠️ Offline mode – data cached';
+                    bar.style.background = 'linear-gradient(135deg, #b9770e, #d68910)';
+                }
+            }
+            updateOnlineStatus();
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+
+            ensureDemoUsers().then(() => {}).catch(console.warn);
+
+            // Login
+            document.getElementById('demoAdminBtn').onclick = function() { loginAndSetup('admin@school.com', 'admin123'); };
+            document.getElementById('demoBursarBtn').onclick = function() { loginAndSetup('bursar@school.com', 'bursar123'); };
+            document.getElementById('demoTeacherBtn').onclick = function() { loginAndSetup('teacher@school.com', 'teacher123'); };
+            document.getElementById('demoParentBtn').onclick = function() { loginAndSetup('parent@school.com', 'parent123'); };
+            document.getElementById('loginBtn').onclick = function() {
+                loginAndSetup(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+            };
+            document.getElementById('logoutBtn').onclick = function() {
+                auth.signOut().then(function() {
+                    try { localStorage.removeItem('tenantId'); } catch (_) {}
+                    _tenantId = 'default_tenant';
+                    location.reload();
+                });
+            };
+
+            // Signup toggle
+            const signupToggle = document.getElementById('signupToggle');
+            const signupBack = document.getElementById('signupBack');
+            const signupFields = document.getElementById('signupFields');
+            signupToggle.onclick = function() { signupFields.classList.toggle('active'); this.style.display = 'none'; signupBack.style.display = 'inline-block'; };
+            signupBack.onclick = function() { signupFields.classList.remove('active'); signupToggle.style.display = 'inline-block'; this.style.display = 'none'; };
+            document.getElementById('signupBtn').onclick = signUpAndCreateTenant;
+
+            // Attendance
+            document.getElementById('importBtn').onclick = function() {
+                if (currentUserRole !== 'admin') return;
+                const f = document.getElementById('excelFile').files[0];
+                if (f) { importExcelStudents(f).then(function() { loadStudents(); renderAttendance(); showMessage('Imported', 'success', 'importMessage'); }).catch(function(err) { showMessage('Import error: ' + err.message, 'error', 'importMessage'); }); }
+                else alert('Select file');
+            };
+            document.getElementById('downloadSampleBtn').onclick = function() {
+                if (currentUserRole !== 'admin') return;
+                const ws = XLSX.utils.json_to_sheet([{ ID: 'STU001', Name: 'John Doe', Class: 'JSS1', ParentPhone: '23276123456' }]);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Students');
+                XLSX.writeFile(wb, 'sample_students.xlsx');
+            };
+            document.getElementById('addStudentBtn').onclick = function() { if (currentUserRole !== 'admin') return; addManualStudent(); };
+            document.getElementById('loadBtn').onclick = function() { if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') return; renderAttendance(); };
+            document.getElementById('refreshBtn').onclick = function() { if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') return; loadStudents().then(renderAttendance); };
+            document.getElementById('batchWhatsappBtn').onclick = function() {
+                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('You do not have permission to send reports.'); return; }
+                sendBatchWhatsApp();
+            };
+            document.getElementById('classHistoryBtn').onclick = function() {
+                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('You do not have permission to view class history.'); return; }
+                viewClassHistory();
+            };
+
+            // Records
+            document.getElementById('searchStudentBtn').onclick = function() {
+                if (currentUserRole === 'admin') {
+                    const q = document.getElementById('studentSearchInput').value.trim();
+                    const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
+                    if (!found) { showMessage('Student not found', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    const tenantId = getCurrentTenantId();
+                    if (found.tenantId !== tenantId) { showMessage('This student does not belong to your tenant.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    currentStudentDoc = found;
+                    document.getElementById('studentRecordsPanel').style.display = 'block';
+                    document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
+                    loadStudentProfile();
+                    loadPaymentHistory();
+                    loadExamHistory();
+                    loadAttendanceHistory();
+                } else if (currentUserRole === 'teacher') {
+                    const q = document.getElementById('studentSearchInput').value.trim();
+                    const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
+                    if (!found) { showMessage('Student not found in your class', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    const tenantId = getCurrentTenantId();
+                    if (found.tenantId !== tenantId) { showMessage('This student does not belong to your tenant.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    if (found.class !== teacherAssignedClass) { showMessage('You can only access students in ' + teacherAssignedClass + '. This student is in ' + found.class + '.', 'error', 'searchResults'); document.getElementById('studentRecordsPanel').style.display = 'none'; return; }
+                    currentStudentDoc = found;
+                    document.getElementById('studentRecordsPanel').style.display = 'block';
+                    document.getElementById('searchResults').innerHTML = `<div class="success">Found: ${escapeHtml(found.name)} (${found.id})</div>`;
+                    loadStudentProfile();
+                    loadPaymentHistory();
+                    loadExamHistory();
+                    loadAttendanceHistory();
+                } else if (currentUserRole === 'parent') {
+                    if (parentLinkedStudentId) {
+                        window.loadParentStudent && window.loadParentStudent();
+                    }
+                } else {
+                    showMessage('You do not have permission to search students.', 'error', 'searchResults');
+                }
+            };
+            document.getElementById('clearSearchBtn').onclick = function() {
+                document.getElementById('studentSearchInput').value = '';
+                document.getElementById('searchResults').innerHTML = '';
+                document.getElementById('studentRecordsPanel').style.display = 'none';
+            };
+            document.getElementById('editProfileBtn').onclick = editProfile;
+            document.getElementById('saveProfileBtn').onclick = saveProfile;
+
+            // Teachers
+            document.getElementById('searchTeacherBtn').onclick = function() {
+                if (currentUserRole !== 'admin') { alert('Only admin can search teachers.'); return; }
+                searchTeacherAdmin();
+            };
+            document.getElementById('clearTeacherSearchBtn').onclick = function() {
+                document.getElementById('teacherSearchInput').value = '';
+                document.getElementById('teacherSearchResults').innerHTML = '';
+                if (currentUserRole === 'admin') loadAllTeachersForAdmin();
+            };
+            document.getElementById('addTeacherBtn').onclick = function() { if (currentUserRole !== 'admin') return; addTeacherAdmin(); };
+            document.getElementById('importTeachersBtn').onclick = function() {
+                if (currentUserRole !== 'admin') return;
+                const f = document.getElementById('teacherExcelFile').files[0];
+                if (f) importTeachersExcel(f);
+            };
+            document.getElementById('downloadTeacherSampleBtn').onclick = function() {
+                const ws = XLSX.utils.json_to_sheet([{ TeacherID: 'T001', Name: 'Jane Smith', Email: 'jane@school.com', Class: 'JSS1', Department: 'Science', Subjects: 'Physics, Chemistry', Salary: 5000, DOB: '1990-01-01', EmploymentDate: '2020-01-01', Qualification: 'B.Ed', NIN: 'SL123456789' }]);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
+                XLSX.writeFile(wb, 'teacher_sample.xlsx');
+            };
+            document.getElementById('printTeachersTable').onclick = function() {
+                if (currentUserRole !== 'admin') return;
+                const tbl = document.getElementById('allTeachersList');
+                if (tbl && tbl.children.length) printTable(tbl, 'Teachers');
+                else alert('No teachers table');
+            };
+            document.getElementById('exportTeachersCSVBtn').onclick = function() {
+                if (currentUserRole !== 'admin') return;
+                const tbl = document.getElementById('allTeachersList');
+                if (tbl && tbl.children.length) exportTableToCSV(tbl, 'teachers');
+                else alert('No teachers table');
+            };
+            document.getElementById('searchTeacherRegisterBtn').onclick = function() {
+                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('Access denied.'); return; }
+                loadTeacherRegister();
+            };
+            document.getElementById('saveOwnTeacherBtn').onclick = saveOwnTeacherProfile;
+            document.getElementById('saveTeacherBtn').onclick = updateTeacherAdmin;
+
+            // Bursar
+            document.getElementById('searchBursarStudentBtn').onclick = function() {
+                if (currentUserRole !== 'bursar') { showMessage('Access denied. Only bursar can access this.', 'error', 'bursarPaymentMessage'); return; }
+                loadBursarStudent();
+            };
+            document.getElementById('saveBursarFeesBtn').onclick = function() { if (currentUserRole !== 'bursar') return; saveBursarTermFees(); };
+            document.getElementById('submitBursarPaymentBtn').onclick = function() { if (currentUserRole !== 'bursar') return; recordBursarPayment(); };
+            document.getElementById('refreshBursarBtn').onclick = function() { if (currentUserRole === 'bursar') loadBursarSummary(); };
+            document.getElementById('exportBursarCSV').onclick = function() { if (currentUserRole === 'bursar') exportBursarToCSV(); };
+            document.getElementById('bursarClassFilter').onchange = function() { if (currentUserRole === 'bursar') loadBursarSummary(); };
+            document.getElementById('refreshFeeStatsBtn').onclick = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
+            document.getElementById('feeStatsYear').onchange = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
+            document.getElementById('feeStatsTerm').onchange = function() { if (currentUserRole === 'bursar') loadFeeStats(); };
+
+            // Admin
+            document.getElementById('addStaffBtn').onclick = addStaff;
+            document.getElementById('addAssetBtn').onclick = addAsset;
+            document.getElementById('addInventoryBtn').onclick = addInventory;
+            document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
+            document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
+            document.getElementById('postNoticeBtn').onclick = postNotice;
+            document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
+            document.getElementById('refreshFilesBtn').onclick = function() { initFileDB().then(loadFilesList); };
+            document.getElementById('printAnyTableBtn').onclick = function() {
+                const tbl = getCurrentVisibleTable();
+                if (tbl) printTable(tbl, 'School Data');
+                else alert('No table visible');
+            };
+            document.getElementById('exportAnyTableCSV').onclick = function() {
+                const tbl = getCurrentVisibleTable();
+                if (tbl) exportTableToCSV(tbl, 'exported_data');
+                else alert('No table visible');
+            };
+            document.getElementById('printNoticesBtn').onclick = function() {
+                const div = document.getElementById('globalNoticesList');
+                if (div) printTable(div, 'Notices');
+                else alert('No notices to print');
+            };
+            document.getElementById('exportStudentsCSV').onclick = exportAllStudentsCSV;
+            document.getElementById('exportTeachersCSVAdmin').onclick = exportAllTeachersCSV;
+            document.getElementById('printAttendanceTable').onclick = function() {
+                const tbl = document.querySelector('#studentList table');
+                if (tbl) printTable(tbl, 'Attendance');
+                else alert('No attendance table');
+            };
+            document.getElementById('exportAttendanceCSV').onclick = function() {
+                const tbl = document.querySelector('#studentList table');
+                if (tbl) exportTableToCSV(tbl, 'attendance');
+                else alert('No attendance table');
+            };
+
+            // Exam
+            document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
+            document.getElementById('saveExamRecordsBtn').onclick = saveExamRecords;
+            document.getElementById('loadExamHistoryAllBtn').onclick = loadExamHistoryAll;
+            document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
+            document.getElementById('examHistoryAllYear').onchange = function() {
+                const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
+                if (studentId && this.value) displayExamHistoryAll(studentId, this.value);
+            };
+
+            // Dashboard
+            document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
+            document.getElementById('dashboardYearFilter').onchange = loadDashboard;
+            document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
+            document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
+
+            // Suggestions – the real handlers are already defined above, so we don't overwrite them here.
+            // We just assign the refresh buttons.
+            // The fab button is already defined above.
+            // No further action needed – the submit, edit, reply, delete handlers are already attached.
+
+            // Admin Tabs
+            document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(function(btn) {
+                btn.onclick = function() {
+                    const id = this.dataset.tab;
+                    document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display = 'none');
+                    document.getElementById(id + 'Tab').style.display = 'block';
+                    if (id === 'staff') loadStaffList();
+                    else if (id === 'assets') loadAssetsList();
+                    else if (id === 'inventory') loadInventoryList();
+                    else if (id === 'visitors') loadVisitorsList();
+                    else if (id === 'noticeboard') renderNotices();
+                    else if (id === 'filestorage') initFileDB().then(loadFilesList);
+                    else if (id === 'examhistoryall') { /* handled on load */ }
+                    else if (id === 'suggestions') loadSuggestions('suggestionsList');
+                };
+            });
+
+            // Student Records Tabs
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.onclick = function() {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
+                    if (this.dataset.tab === 'examhistory' && currentStudentDoc) loadExamHistory();
+                    if (this.dataset.tab === 'paymenthistory' && currentStudentDoc) loadPaymentHistory();
+                    if (this.dataset.tab === 'attendancehistory' && currentStudentDoc) loadAttendanceHistory();
+                };
+            });
+
+            document.getElementById('loginModal').style.display = 'flex';
         };
     </script>
 </body>
