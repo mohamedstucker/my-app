@@ -162,18 +162,18 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-        .exam-term-btns, .exam-level-buttons, .fee-term-btns, .assessment-btns {
-            display: flex; gap: 8px; margin: 14px 0; flex-wrap: wrap;
+        .exam-term-btns, .exam-level-buttons, .fee-term-btns, .assessment-btns, .attendance-term-btns {
+            display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap;
         }
-        .term-btn, .exam-level-btn, .fee-term-btn, .assessment-btn {
+        .term-btn, .exam-level-btn, .fee-term-btn, .assessment-btn, .att-term-btn {
             background: #eef2f7; padding: 6px 18px; border-radius: 30px;
             font-weight: 600; font-size: 0.8rem; border: 1px solid transparent; transition: 0.2s; cursor: pointer;
         }
-        .term-btn.active, .exam-level-btn.active, .fee-term-btn.active, .assessment-btn.active {
+        .term-btn.active, .exam-level-btn.active, .fee-term-btn.active, .assessment-btn.active, .att-term-btn.active {
             background: linear-gradient(135deg, #1a4b8a, #2a6bb0); color: #fff;
             border-color: #1a4b8a; box-shadow: 0 4px 12px rgba(26,75,138,0.2);
         }
-        .term-btn:hover, .exam-level-btn:hover, .fee-term-btn:hover, .assessment-btn:hover { transform: translateY(-2px); }
+        .term-btn:hover, .exam-level-btn:hover, .fee-term-btn:hover, .assessment-btn:hover, .att-term-btn:hover { transform: translateY(-2px); }
 
         .fee-paid { background: #d4edda !important; }
         .fee-partial { background: #fff3cd !important; }
@@ -273,6 +273,59 @@
         .stat-card { background: #f8fafc; border-radius: 16px; padding: 16px; border: 1px solid #e6edf4; }
         .stat-card h5 { font-size: 1rem; color: #0b2b5c; margin-bottom: 12px; text-align: center; }
 
+        /* attendance summary styling */
+        .attendance-summary {
+            background: #f0f5fa;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border-left: 5px solid #1a4b8a;
+        }
+        .attendance-summary h4 {
+            margin: 0 0 10px 0;
+            color: #0b2b5c;
+            font-size: 1.1rem;
+        }
+        .attendance-summary .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .attendance-summary .stat-item {
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px 14px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .attendance-summary .stat-item .label {
+            font-size: 0.8rem;
+            color: #6c7a89;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .attendance-summary .stat-item .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .attendance-summary .stat-item .value.present { color: #27ae60; }
+        .attendance-summary .stat-item .value.absent { color: #e74c3c; }
+        .attendance-summary .stat-item .value.late { color: #f39c12; }
+        .attendance-summary .stat-item .value.total { color: #1a4b8a; }
+
+        .attendance-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .attendance-filter-bar select {
+            max-width: 150px;
+        }
+
         @media (max-width: 768px) {
             body { padding: 12px; }
             .header { flex-direction: column; align-items: stretch; padding: 16px 18px; }
@@ -299,7 +352,7 @@
             .header h1 svg { height: 30px; }
             .module-btn { padding: 8px 14px; font-size: 0.75rem; }
             .tab-btn, .admin-tab-btn { padding: 6px 14px; font-size: 0.75rem; }
-            .term-btn, .exam-level-btn, .fee-term-btn, .assessment-btn { padding: 4px 12px; font-size: 0.7rem; }
+            .term-btn, .exam-level-btn, .fee-term-btn, .assessment-btn, .att-term-btn { padding: 4px 12px; font-size: 0.7rem; }
             .modal-content { padding: 16px 12px; }
             .sync-bar { font-size: 0.8rem; padding: 12px 16px; }
             #globalNotices { padding: 12px 14px; max-height: 120px; }
@@ -503,7 +556,22 @@
                     </div>
                 </div>
                 <div id="attendancehistoryTab" class="tab-content">
-                    <div class="card"><h3>Attendance History (Read‑only)</h3><div id="attendanceHistoryContent"></div></div>
+                    <div class="card">
+                        <h3>Attendance History (Read‑only)</h3>
+                        <!-- Filter bar for year and term -->
+                        <div class="attendance-filter-bar">
+                            <label>Year:</label>
+                            <select id="attendanceYearFilter"><option value="all">All Years</option></select>
+                            <div class="attendance-term-btns">
+                                <button class="att-term-btn active" data-term="all">All</button>
+                                <button class="att-term-btn" data-term="term1">Term 1</button>
+                                <button class="att-term-btn" data-term="term2">Term 2</button>
+                                <button class="att-term-btn" data-term="term3">Term 3</button>
+                            </div>
+                            <button id="refreshAttendanceHistoryBtn" class="refresh-btn" style="margin-left:auto;">Refresh</button>
+                        </div>
+                        <div id="attendanceHistoryContent"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -845,6 +913,10 @@
         let _tenantId = 'default_tenant';
         let cachedRegistrationKey = null;
 
+        // For attendance history filter
+        let currentAttendanceItems = [];
+        let currentAttendanceFilter = { year: 'all', term: 'all' };
+
         // ============================================================
         //  TENANT HELPER
         // ============================================================
@@ -883,6 +955,18 @@
                     if (!db.objectStoreNames.contains('files')) db.createObjectStore('files', { keyPath: 'id', autoIncrement: true });
                 };
             });
+        }
+
+        // ============================================================
+        //  TERM HELPER (from date)
+        // ============================================================
+        function getTermFromDate(dateStr) {
+            if (!dateStr) return 'unknown';
+            const month = parseInt(dateStr.split('-')[1], 10);
+            if (month >= 1 && month <= 4) return 'term1';
+            if (month >= 5 && month <= 8) return 'term2';
+            if (month >= 9 && month <= 12) return 'term3';
+            return 'unknown';
         }
 
         // ============================================================
@@ -1395,6 +1479,9 @@
             alert('Opening WhatsApp for ' + validRecipients.length + ' parent(s).\n\nIf your browser blocks popups, please allow them for this site.');
         }
 
+        // ============================================================
+        //  CLASS HISTORY - with statistics breakdown
+        // ============================================================
         async function viewClassHistory() {
             try {
                 const tenantId = getCurrentTenantId();
@@ -1416,7 +1503,48 @@
                 snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
 
                 const students = allStudents[classVal];
-                let html = `<h3>${classVal} – Attendance for ${date}</h3><table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>`;
+                // Compute stats
+                let total = students.length;
+                let presentCount = 0, absentCount = 0, lateCount = 0;
+                for (const s of students) {
+                    const status = attMap[s.id]?.status;
+                    if (status === 'present') presentCount++;
+                    else if (status === 'absent') absentCount++;
+                    else if (status === 'late') lateCount++;
+                }
+
+                let html = `<h3>${classVal} – Attendance for ${date}</h3>`;
+
+                // Summary section
+                if (total > 0) {
+                    const presentPct = ((presentCount / total) * 100).toFixed(1);
+                    const absentPct = ((absentCount / total) * 100).toFixed(1);
+                    const latePct = ((lateCount / total) * 100).toFixed(1);
+                    html += `<div class="attendance-summary">
+                        <h4>Class Summary</h4>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="label">Total Students</div>
+                                <div class="value total">${total}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Present</div>
+                                <div class="value present">${presentCount} (${presentPct}%)</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Absent</div>
+                                <div class="value absent">${absentCount} (${absentPct}%)</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Late</div>
+                                <div class="value late">${lateCount} (${latePct}%)</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+
+                // Detailed table
+                html += '<table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
                 for (const s of students) {
                     const a = attMap[s.id] || { status: 'Not marked', remark: '' };
                     const statusText = a.status === 'present' ? 'Present' : (a.status === 'absent' ? 'Absent' : (a.status === 'late' ? 'Late' : 'Not marked'));
@@ -1809,27 +1937,126 @@
         }
 
         // ============================================================
-        //  ATTENDANCE HISTORY (student records)
+        //  ATTENDANCE HISTORY (student records) - WITH FILTERS (Year + Term)
         // ============================================================
         async function loadAttendanceHistory() {
             try {
-                if (!currentStudentDoc) { document.getElementById('attendanceHistoryContent').innerHTML = '<p>No student selected.</p>'; return; }
+                if (!currentStudentDoc) { 
+                    document.getElementById('attendanceHistoryContent').innerHTML = '<p>No student selected.</p>'; 
+                    return; 
+                }
                 const tenantId = getCurrentTenantId();
-                const snap = await db.collection('attendance').where('tenantId', '==', tenantId).where('studentId', '==', currentStudentDoc.id).get();
+                const snap = await db.collection('attendance')
+                    .where('tenantId', '==', tenantId)
+                    .where('studentId', '==', currentStudentDoc.id)
+                    .get();
                 const items = [];
                 snap.forEach(doc => items.push(doc.data()));
-                if (items.length === 0) { document.getElementById('attendanceHistoryContent').innerHTML = '<p>No attendance records found.</p>'; return; }
-                items.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-                let html = '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
-                for (const rec of items) {
-                    const statusText = rec.status === 'present' ? 'Present' : (rec.status === 'absent' ? 'Absent' : (rec.status === 'late' ? 'Late' : rec.status));
-                    html += `<tr><td>${escapeHtml(rec.date)}</td><td>${statusText}</td><td>${escapeHtml(rec.remark || '')}</td></tr>`;
+                currentAttendanceItems = items;
+
+                // Populate year filter dropdown
+                const yearSet = new Set();
+                items.forEach(rec => {
+                    if (rec.date) {
+                        const year = rec.date.split('-')[0];
+                        if (year) yearSet.add(year);
+                    }
+                });
+                const yearSelect = document.getElementById('attendanceYearFilter');
+                const currentYearVal = yearSelect.value;
+                yearSelect.innerHTML = '<option value="all">All Years</option>';
+                const sortedYears = Array.from(yearSet).sort((a,b) => b - a);
+                sortedYears.forEach(y => {
+                    const selected = (y === currentYearVal) ? 'selected' : '';
+                    yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`;
+                });
+                if (!currentYearVal || currentYearVal === 'all' || !sortedYears.includes(currentYearVal)) {
+                    yearSelect.value = 'all';
                 }
-                html += '</tbody></table>';
-                document.getElementById('attendanceHistoryContent').innerHTML = html;
+
+                // Set term filter from active button
+                const activeTermBtn = document.querySelector('.att-term-btn.active');
+                currentAttendanceFilter.term = activeTermBtn ? activeTermBtn.dataset.term : 'all';
+                currentAttendanceFilter.year = yearSelect.value;
+
+                renderFilteredAttendanceHistory();
             } catch (error) {
                 document.getElementById('attendanceHistoryContent').innerHTML = '<div class="error">Failed to load attendance history: ' + escapeHtml(error.message) + '</div>';
             }
+        }
+
+        function renderFilteredAttendanceHistory() {
+            const items = currentAttendanceItems;
+            const filterYear = currentAttendanceFilter.year;
+            const filterTerm = currentAttendanceFilter.term;
+
+            // Apply filters
+            let filtered = items;
+            if (filterYear !== 'all') {
+                filtered = filtered.filter(rec => rec.date && rec.date.startsWith(filterYear));
+            }
+            if (filterTerm !== 'all') {
+                filtered = filtered.filter(rec => {
+                    const term = getTermFromDate(rec.date);
+                    return term === filterTerm;
+                });
+            }
+
+            let total = filtered.length;
+            let presentCount = 0, absentCount = 0, lateCount = 0;
+            filtered.forEach(rec => {
+                const status = rec.status ? rec.status.toLowerCase() : '';
+                if (status === 'present') presentCount++;
+                else if (status === 'absent') absentCount++;
+                else if (status === 'late') lateCount++;
+            });
+
+            let html = '';
+
+            if (total === 0) {
+                html = '<p>No attendance records match the selected filters.</p>';
+                document.getElementById('attendanceHistoryContent').innerHTML = html;
+                return;
+            }
+
+            const presentPct = ((presentCount / total) * 100).toFixed(1);
+            const absentPct = ((absentCount / total) * 100).toFixed(1);
+            const latePct = ((lateCount / total) * 100).toFixed(1);
+
+            html += `<div class="attendance-summary">
+                <h4>Attendance Summary ${filterYear !== 'all' ? '- Year ' + filterYear : ''} ${filterTerm !== 'all' ? '- ' + filterTerm.charAt(0).toUpperCase() + filterTerm.slice(1) : ''}</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="label">Total Records</div>
+                        <div class="value total">${total}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Present</div>
+                        <div class="value present">${presentCount} (${presentPct}%)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Absent</div>
+                        <div class="value absent">${absentCount} (${absentPct}%)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Late</div>
+                        <div class="value late">${lateCount} (${latePct}%)</div>
+                    </div>
+                </div>
+            </div>`;
+
+            // Table
+            filtered.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+            html += '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
+            for (const rec of filtered) {
+                const statusText = rec.status === 'present' ? 'Present' : 
+                                  (rec.status === 'absent' ? 'Absent' : 
+                                  (rec.status === 'late' ? 'Late' : rec.status));
+                html += `<tr><td>${escapeHtml(rec.date)}</td><td>${statusText}</td><td>${escapeHtml(rec.remark || '')}</td></tr>`;
+            }
+            html += '</tbody></table>';
+
+            document.getElementById('attendanceHistoryContent').innerHTML = html;
         }
 
         // ============================================================
@@ -3640,6 +3867,23 @@
                     if (defaultLevel) defaultLevel.classList.add('active');
                     currentExamLevel = defaultLevel ? defaultLevel.dataset.examLevel : 'npse';
                 }
+
+                // Attendance history filter controls
+                document.querySelectorAll('.att-term-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        document.querySelectorAll('.att-term-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        currentAttendanceFilter.term = this.dataset.term;
+                        renderFilteredAttendanceHistory();
+                    };
+                });
+                document.getElementById('attendanceYearFilter')?.addEventListener('change', function() {
+                    currentAttendanceFilter.year = this.value;
+                    renderFilteredAttendanceHistory();
+                });
+                document.getElementById('refreshAttendanceHistoryBtn')?.addEventListener('click', function() {
+                    if (currentStudentDoc) loadAttendanceHistory();
+                });
 
                 document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
                 document.getElementById('dashboardYearFilter').onchange = loadDashboard;
