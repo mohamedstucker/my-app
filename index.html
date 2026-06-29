@@ -346,7 +346,6 @@
             color: #1a4b8a;
         }
 
-        /* teacher class restriction indicator */
         .teacher-class-badge {
             background: #1a4b8a;
             color: #fff;
@@ -355,6 +354,63 @@
             font-size: 0.8rem;
             font-weight: 600;
             margin-left: 8px;
+        }
+
+        /* Voice Recorder Widget */
+        .voice-recorder {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            padding: 4px 10px;
+            border-radius: 30px;
+            border: 1px solid #e2e8f0;
+            margin: 2px 0;
+            flex-wrap: nowrap;
+        }
+        .voice-recorder button {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 30px;
+            transition: 0.2s;
+            margin: 0;
+            line-height: 1.4;
+        }
+        .voice-recorder button.record { color: #e74c3c; }
+        .voice-recorder button.record:hover { background: #fde8e8; }
+        .voice-recorder button.stop {
+            color: #e74c3c;
+            background: #fde8e8;
+        }
+        .voice-recorder button.play { color: #1a4b8a; }
+        .voice-recorder button.play:hover { background: #e8f0fe; }
+        .voice-recorder .status {
+            font-size: 0.7rem;
+            color: #6c7a89;
+            min-width: 40px;
+        }
+        .voice-recorder audio {
+            max-width: 80px;
+            height: 28px;
+        }
+        .voice-recorder .recording-indicator {
+            width: 8px;
+            height: 8px;
+            background: #e74c3c;
+            border-radius: 50%;
+            display: none;
+            animation: pulse 0.8s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .voice-recorder.recording .recording-indicator {
+            display: inline-block;
         }
 
         @media (max-width: 768px) {
@@ -369,7 +425,7 @@
             table { font-size: 0.75rem; }
             th, td { padding: 8px 10px; }
             input, select, textarea { max-width: 100%; font-size: 0.85rem; }
-            .remark-input { width: 100px; }
+            .voice-recorder audio { max-width: 60px; }
             .subject-row input { max-width: 140px; }
             .form-row { flex-direction: column; align-items: stretch; }
             .search-box { flex-direction: column; align-items: stretch; }
@@ -388,6 +444,8 @@
             .sync-bar { font-size: 0.8rem; padding: 12px 16px; }
             #globalNotices { padding: 12px 14px; max-height: 120px; }
             .suggestion-fab { bottom: 16px; right: 16px; padding: 10px 16px; font-size: 0.8rem; }
+            .voice-recorder audio { max-width: 50px; }
+            .voice-recorder { padding: 2px 6px; }
         }
     </style>
 </head>
@@ -867,13 +925,25 @@
         </div>
     </div>
 
-    <!-- SUGGESTION MODALS -->
+    <!-- SUGGESTION MODAL (with voice recorder) -->
     <div id="suggestionModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('suggestionModal')">&times;</span>
             <h3>Submit Your Suggestion</h3>
             <p>Your suggestion helps us improve the system. You may remain anonymous if you prefer.</p>
             <textarea id="suggestionText" rows="5" placeholder="Write your suggestion here…" style="width:100%; max-width:100%;"></textarea>
+            <div style="margin: 12px 0;">
+                <label style="font-weight:600;">Voice Note (optional):</label>
+                <div class="voice-recorder" id="voiceRecorder_suggestion">
+                    <span class="recording-indicator"></span>
+                    <span class="status" id="recStatus_suggestion">Ready</span>
+                    <button class="record" id="recBtn_suggestion" title="Record">🎙️</button>
+                    <button class="stop" id="stopBtn_suggestion" title="Stop" style="display:none;">⏹️</button>
+                    <button class="play" id="playBtn_suggestion" title="Play" style="display:none;">▶️</button>
+                    <audio id="audioPlayer_suggestion" controls style="display:none;"></audio>
+                    <input type="hidden" id="audioData_suggestion" value="" />
+                </div>
+            </div>
             <button id="submitSuggestionBtn" class="refresh-btn">Submit</button>
             <div id="suggestionMessage"></div>
         </div>
@@ -950,6 +1020,7 @@
         let examCurrentStudent = null, bursarCurrentStudent = null, editPaymentCallback = null;
         let _tenantId = 'default_tenant';
         let cachedRegistrationKey = null;
+        let voiceRecorders = {}; // store recorder instances
 
         // For attendance history filter
         let currentAttendanceItems = [];
@@ -1018,6 +1089,140 @@
                 all: 'All Terms'
             };
             return map[term] || term;
+        }
+
+        // ============================================================
+        //  VOICE RECORDER CLASS
+        // ============================================================
+        class VoiceRecorder {
+            constructor(containerId, onSaveCallback) {
+                this.container = document.getElementById(containerId);
+                if (!this.container) return;
+                this.uniqueId = containerId.replace('voiceRecorder_', '');
+                this.mediaRecorder = null;
+                this.audioChunks = [];
+                this.audioBlob = null;
+                this.audioUrl = null;
+                this.isRecording = false;
+                this.onSave = onSaveCallback || null;
+
+                // DOM refs
+                this.statusEl = document.getElementById('recStatus_' + this.uniqueId);
+                this.recBtn = document.getElementById('recBtn_' + this.uniqueId);
+                this.stopBtn = document.getElementById('stopBtn_' + this.uniqueId);
+                this.playBtn = document.getElementById('playBtn_' + this.uniqueId);
+                this.audioPlayer = document.getElementById('audioPlayer_' + this.uniqueId);
+                this.hiddenInput = document.getElementById('audioData_' + this.uniqueId);
+
+                if (!this.recBtn) return;
+
+                // Events
+                this.recBtn.addEventListener('click', () => this.startRecording());
+                this.stopBtn.addEventListener('click', () => this.stopRecording());
+                this.playBtn.addEventListener('click', () => this.playRecording());
+
+                // Clean up on page unload
+                window.addEventListener('beforeunload', () => {
+                    if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+                });
+
+                // If there is already audio data, load it
+                if (this.hiddenInput && this.hiddenInput.value) {
+                    this.loadAudio(this.hiddenInput.value);
+                }
+            }
+
+            async startRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.mediaRecorder = new MediaRecorder(stream);
+                    this.audioChunks = [];
+
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        this.audioChunks.push(event.data);
+                    };
+
+                    this.mediaRecorder.onstop = () => {
+                        this.audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                        this.audioUrl = URL.createObjectURL(this.audioBlob);
+                        this.audioPlayer.src = this.audioUrl;
+                        this.audioPlayer.style.display = 'inline';
+                        this.playBtn.style.display = 'inline-block';
+                        this.statusEl.textContent = 'Done';
+                        this.container.classList.remove('recording');
+
+                        // Save to hidden input as Base64 (for Firestore)
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            const base64 = reader.result; // data:audio/webm;base64,...
+                            this.hiddenInput.value = base64;
+                            if (this.onSave) this.onSave(base64);
+                        };
+                        reader.readAsDataURL(this.audioBlob);
+
+                        // Stop all tracks
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    this.container.classList.add('recording');
+                    this.recBtn.style.display = 'none';
+                    this.stopBtn.style.display = 'inline-block';
+                    this.playBtn.style.display = 'none';
+                    this.statusEl.textContent = 'Recording...';
+                } catch (error) {
+                    alert('Microphone access denied or not available.');
+                    console.error('Voice recorder error:', error);
+                }
+            }
+
+            stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                    this.recBtn.style.display = 'inline-block';
+                    this.stopBtn.style.display = 'none';
+                    this.statusEl.textContent = 'Stopped';
+                }
+            }
+
+            playRecording() {
+                if (this.audioPlayer && this.audioUrl) {
+                    this.audioPlayer.play();
+                }
+            }
+
+            getAudioData() {
+                return this.hiddenInput.value;
+            }
+
+            clear() {
+                this.audioChunks = [];
+                this.audioBlob = null;
+                if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+                this.audioUrl = null;
+                this.hiddenInput.value = '';
+                this.audioPlayer.src = '';
+                this.audioPlayer.style.display = 'none';
+                this.playBtn.style.display = 'none';
+                this.statusEl.textContent = 'Ready';
+                this.recBtn.style.display = 'inline-block';
+                this.stopBtn.style.display = 'none';
+                this.container.classList.remove('recording');
+            }
+
+            loadAudio(base64Data) {
+                if (!base64Data) return;
+                this.hiddenInput.value = base64Data;
+                this.audioPlayer.src = base64Data;
+                this.audioPlayer.style.display = 'inline';
+                this.playBtn.style.display = 'inline-block';
+                this.statusEl.textContent = 'Loaded';
+                this.recBtn.style.display = 'inline-block';
+                this.stopBtn.style.display = 'none';
+                this.container.classList.remove('recording');
+            }
         }
 
         // ============================================================
@@ -1325,8 +1530,7 @@
             if (currentUserRole === 'teacher' && teacherAssignedClass) {
                 const count = (allStudents[teacherAssignedClass] || []).length;
                 sel.innerHTML = `<option value="${teacherAssignedClass}">${teacherAssignedClass} (${count})</option>`;
-                sel.disabled = true; // teacher cannot change class
-                // show a badge
+                sel.disabled = true;
                 const badge = document.getElementById('teacherClassBadge');
                 if (badge) {
                     badge.style.display = 'inline-block';
@@ -1345,8 +1549,8 @@
             sel.innerHTML = optionsHtml;
         }
 
-        // Updated saveAttendance: now stores year and term (Sierra Leone calendar)
-        async function saveAttendance(cls, sid, status, remark) {
+        // Updated saveAttendance: now stores year, term, and audioRemark
+        async function saveAttendance(cls, sid, status, remark, audioRemark) {
             const tenantId = getCurrentTenantId();
             const today = new Date().toISOString().split('T')[0];
             const year = today.split('-')[0];
@@ -1354,11 +1558,12 @@
             await db.collection('attendance').doc(today + '_' + cls + '_' + sid).set({
                 studentId: sid, class: cls, date: today, year: year, term: term,
                 status, remark: remark || '',
+                audioRemark: audioRemark || '',
                 tenantId: tenantId, timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
         }
 
-        // Update renderAttendance to show the info bar and enforce teacher class
+        // Update renderAttendance to include voice recorder per student
         async function renderAttendance() {
             try {
                 const tenantId = getCurrentTenantId();
@@ -1389,21 +1594,33 @@
                     .where('class', '==', cls)
                     .where('date', '==', today)
                     .get()
-                ).forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
+                ).forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '', audioRemark: d.data().audioRemark || '' });
 
-                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th><th>Actions</th></tr></thead><tbody>';
+                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark &amp; Voice</th><th>Actions</th></tr></thead><tbody>';
                 for (const s of students) {
-                    const a = attMap[s.id] || { status: 'none', remark: '' };
+                    const a = attMap[s.id] || { status: 'none', remark: '', audioRemark: '' };
                     let statusText = a.status === 'present' ? 'Present' : (a.status === 'absent' ? 'Absent' : (a.status === 'late' ? 'Late' : 'Not marked'));
+                    const uniqueId = s.id + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
                     html += `<tr>
                         <td>${escapeHtml(s.id)}</td>
                         <td>${escapeHtml(s.name)}</td>
                         <td>${statusText}</td>
-                        <td><input type="text" id="remark_${s.id}" class="remark-input" value="${escapeHtml(a.remark)}" placeholder="Remark"></td>
                         <td>
-                            <button class="present-btn" data-id="${s.id}">Present</button>
-                            <button class="absent-btn" data-id="${s.id}">Absent</button>
-                            <button class="late-btn" data-id="${s.id}">Late</button>
+                            <input type="text" id="remark_${s.id}" class="remark-input" value="${escapeHtml(a.remark)}" placeholder="Remark" />
+                            <div class="voice-recorder" id="voiceRecorder_${uniqueId}">
+                                <span class="recording-indicator"></span>
+                                <span class="status" id="recStatus_${uniqueId}">Voice</span>
+                                <button class="record" id="recBtn_${uniqueId}" title="Record">🎙️</button>
+                                <button class="stop" id="stopBtn_${uniqueId}" title="Stop" style="display:none;">⏹️</button>
+                                <button class="play" id="playBtn_${uniqueId}" title="Play" style="display:none;">▶️</button>
+                                <audio id="audioPlayer_${uniqueId}" controls style="display:none;"></audio>
+                                <input type="hidden" id="audioData_${uniqueId}" value="${escapeHtml(a.audioRemark)}" />
+                            </div>
+                        </td>
+                        <td>
+                            <button class="present-btn" data-id="${s.id}" data-uid="${uniqueId}">Present</button>
+                            <button class="absent-btn" data-id="${s.id}" data-uid="${uniqueId}">Absent</button>
+                            <button class="late-btn" data-id="${s.id}" data-uid="${uniqueId}">Late</button>
                             <button class="history-student-btn" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-class="${cls}">History</button>
                         </td>
                     </tr>`;
@@ -1411,12 +1628,21 @@
                 html += '</tbody></table>';
                 document.getElementById('studentList').innerHTML = html;
 
-                // Attach events
+                // Initialise voice recorders for each row
+                document.querySelectorAll('.voice-recorder').forEach(el => {
+                    const id = el.id;
+                    voiceRecorders[id] = new VoiceRecorder(id, null);
+                });
+
+                // Attach events for status buttons
                 document.querySelectorAll('.present-btn').forEach(btn => {
                     btn.onclick = async function() {
                         const sid = this.dataset.id;
+                        const uid = this.dataset.uid;
                         const remark = document.getElementById('remark_' + sid).value;
-                        await saveAttendance(cls, sid, 'present', remark);
+                        const recorder = voiceRecorders['voiceRecorder_' + uid];
+                        const audioData = recorder ? recorder.getAudioData() : '';
+                        await saveAttendance(cls, sid, 'present', remark, audioData);
                         renderAttendance();
                     };
                 });
@@ -1424,8 +1650,11 @@
                 document.querySelectorAll('.absent-btn').forEach(btn => {
                     btn.onclick = async function() {
                         const sid = this.dataset.id;
+                        const uid = this.dataset.uid;
                         const remark = document.getElementById('remark_' + sid).value;
-                        await saveAttendance(cls, sid, 'absent', remark);
+                        const recorder = voiceRecorders['voiceRecorder_' + uid];
+                        const audioData = recorder ? recorder.getAudioData() : '';
+                        await saveAttendance(cls, sid, 'absent', remark, audioData);
 
                         const student = students.find(s => s.id === sid);
                         if (!student) { renderAttendance(); return; }
@@ -1448,8 +1677,11 @@
                 document.querySelectorAll('.late-btn').forEach(btn => {
                     btn.onclick = async function() {
                         const sid = this.dataset.id;
+                        const uid = this.dataset.uid;
                         const remark = document.getElementById('remark_' + sid).value;
-                        await saveAttendance(cls, sid, 'late', remark);
+                        const recorder = voiceRecorders['voiceRecorder_' + uid];
+                        const audioData = recorder ? recorder.getAudioData() : '';
+                        await saveAttendance(cls, sid, 'late', remark, audioData);
                         renderAttendance();
                     };
                 });
@@ -1465,8 +1697,8 @@
                         const items = [];
                         snap.forEach(d => items.push(d.data()));
                         items.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-                        let histHtml = `<h3>${name} (${sid}) - All Attendance Records</h3><table><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>` +
-                            items.map(i => `<tr><td>${i.date}</td><td>${i.status}</td><td>${escapeHtml(i.remark||'')}</td></tr>`).join('') +
+                        let histHtml = `<h3>${name} (${sid}) - All Attendance Records</h3><table><thead><tr><th>Date</th><th>Status</th><th>Remark</th><th>Voice</th></tr></thead><tbody>` +
+                            items.map(i => `<tr><td>${i.date}</td><td>${i.status}</td><td>${escapeHtml(i.remark||'')}</td><td>${i.audioRemark ? '<span style="color:#1a4b8a;">🎤</span>' : '—'}</td></tr>`).join('') +
                             '</tbody></table>';
                         if (items.length === 0) histHtml = `<h3>${name} (${sid})</h3><p>No attendance records found.</p>`;
                         document.getElementById('historyContent').innerHTML = histHtml;
@@ -1565,7 +1797,7 @@
         }
 
         // ============================================================
-        //  CLASS HISTORY - with statistics breakdown, enforce teacher class
+        //  CLASS HISTORY - with statistics breakdown
         // ============================================================
         async function viewClassHistory() {
             try {
@@ -1593,7 +1825,6 @@
                 snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
 
                 const students = allStudents[classVal];
-                // Compute stats
                 let total = students.length;
                 let presentCount = 0, absentCount = 0, lateCount = 0;
                 for (const s of students) {
@@ -1605,7 +1836,6 @@
 
                 let html = `<h3>${classVal} – Attendance for ${date}</h3>`;
 
-                // Summary section
                 if (total > 0) {
                     const presentPct = ((presentCount / total) * 100).toFixed(1);
                     const absentPct = ((absentCount / total) * 100).toFixed(1);
@@ -1633,7 +1863,6 @@
                     </div>`;
                 }
 
-                // Detailed table
                 html += '<table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
                 for (const s of students) {
                     const a = attMap[s.id] || { status: 'Not marked', remark: '' };
@@ -1917,7 +2146,7 @@
         }
 
         // ============================================================
-        //  EXAM HISTORY (read-only) - FIXED
+        //  EXAM HISTORY (read-only)
         // ============================================================
         async function loadExamHistory() {
             try {
@@ -1926,7 +2155,6 @@
                     return; 
                 }
                 const tenantId = getCurrentTenantId();
-                // Fetch the document directly using student ID (since doc ID == studentId)
                 const docRef = db.collection('exam_records').doc(currentStudentDoc.id);
                 const doc = await docRef.get();
                 if (!doc.exists) {
@@ -1934,7 +2162,6 @@
                     return;
                 }
                 const records = doc.data();
-                // Check tenant
                 if (records.tenantId !== tenantId) {
                     document.getElementById('examHistoryContent').innerHTML = '<p class="error">This record does not belong to your tenant.</p>';
                     return;
@@ -2044,7 +2271,6 @@
 
         // ============================================================
         //  ATTENDANCE HISTORY (student records) - WITH FILTERS (Year + Term)
-        //  uses Sierra Leone term mapping
         // ============================================================
         async function loadAttendanceHistory() {
             try {
@@ -2053,7 +2279,6 @@
                     return; 
                 }
                 const tenantId = getCurrentTenantId();
-                // Try to use stored year/term if available, otherwise derive from date
                 const snap = await db.collection('attendance')
                     .where('tenantId', '==', tenantId)
                     .where('studentId', '==', currentStudentDoc.id)
@@ -2061,14 +2286,12 @@
                 const items = [];
                 snap.forEach(doc => {
                     const data = doc.data();
-                    // If year/term not stored, compute from date
                     if (!data.year && data.date) data.year = data.date.split('-')[0];
                     if (!data.term && data.date) data.term = getTermFromDate(data.date);
                     items.push(data);
                 });
                 currentAttendanceItems = items;
 
-                // Populate year filter dropdown
                 const yearSet = new Set();
                 items.forEach(rec => {
                     if (rec.year) yearSet.add(rec.year);
@@ -2085,7 +2308,6 @@
                     yearSelect.value = 'all';
                 }
 
-                // Set term filter from active button
                 const activeTermBtn = document.querySelector('.att-term-btn.active');
                 currentAttendanceFilter.term = activeTermBtn ? activeTermBtn.dataset.term : 'all';
                 currentAttendanceFilter.year = yearSelect.value;
@@ -2101,7 +2323,6 @@
             const filterYear = currentAttendanceFilter.year;
             const filterTerm = currentAttendanceFilter.term;
 
-            // Apply filters
             let filtered = items;
             if (filterYear !== 'all') {
                 filtered = filtered.filter(rec => rec.year === filterYear);
@@ -2153,14 +2374,13 @@
                 </div>
             </div>`;
 
-            // Table
             filtered.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-            html += '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
+            html += '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th><th>Voice</th></tr></thead><tbody>';
             for (const rec of filtered) {
                 const statusText = rec.status === 'present' ? 'Present' : 
                                   (rec.status === 'absent' ? 'Absent' : 
                                   (rec.status === 'late' ? 'Late' : rec.status));
-                html += `<tr><td>${escapeHtml(rec.date)}</td><td>${statusText}</td><td>${escapeHtml(rec.remark || '')}</td></tr>`;
+                html += `<tr><td>${escapeHtml(rec.date)}</td><td>${statusText}</td><td>${escapeHtml(rec.remark || '')}</td><td>${rec.audioRemark ? '<span style="color:#1a4b8a;">🎤</span>' : '—'}</td></tr>`;
             }
             html += '</tbody></table>';
 
@@ -3521,14 +3741,12 @@
         }
 
         // ============================================================
-        //  EXPORT / PRINT - FULLY FIXED
+        //  EXPORT / PRINT
         // ============================================================
         function getCurrentVisibleTable() {
-            // First, try to find a table inside the currently active module
             const activeModule = document.querySelector('.module-btn.active');
             let moduleId = null;
             if (activeModule) {
-                // Get the module ID from the onclick handler or by mapping
                 const modMap = {
                     'dashboardModuleBtn': 'dashboardModule',
                     'attendanceModuleBtn': 'attendanceModule',
@@ -3543,7 +3761,6 @@
             if (moduleId) {
                 const moduleEl = document.getElementById(moduleId);
                 if (moduleEl && moduleEl.style.display !== 'none') {
-                    // Look for a visible table inside this module
                     const tables = moduleEl.querySelectorAll('table');
                     for (const t of tables) {
                         if (t.offsetParent !== null) {
@@ -3552,8 +3769,6 @@
                     }
                 }
             }
-
-            // Fallback: scan all modules
             const modules = ['attendanceModule', 'recordsModule', 'teachersModule', 'bursarModule', 'adminModule'];
             for (const modId of modules) {
                 const mod = document.getElementById(modId);
@@ -3566,8 +3781,6 @@
                     }
                 }
             }
-
-            // Final fallback: any visible table in mainApp
             const mainApp = document.getElementById('mainApp');
             if (mainApp) {
                 const tables = mainApp.querySelectorAll('table');
@@ -3626,7 +3839,7 @@
         }
 
         // ============================================================
-        //  ADMIN EXAM HISTORY (ALL YEARS) - FULLY FIXED
+        //  ADMIN EXAM HISTORY (ALL YEARS)
         // ============================================================
         async function loadExamHistoryAll() {
             try {
@@ -3636,18 +3849,15 @@
                     document.getElementById('examHistoryAllContent').innerHTML = '<p>Please enter a Student ID.</p>';
                     return;
                 }
-                // Verify student exists in the tenant
                 const studentDoc = await db.collection('students').doc(studentId).get();
                 if (!studentDoc.exists || studentDoc.data().tenantId !== tenantId) {
                     document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Student not found or does not belong to your tenant.</p>';
                     return;
                 }
 
-                // Get exam records directly using student ID as doc ID
                 const examDoc = await db.collection('exam_records').doc(studentId).get();
                 if (!examDoc.exists) {
                     document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found for this student.</p>';
-                    // Still populate year dropdown with empty options
                     const yearSelect = document.getElementById('examHistoryAllYear');
                     yearSelect.innerHTML = '<option value="">Select Year</option>';
                     return;
@@ -3672,7 +3882,6 @@
                     return;
                 }
                 if (!yearSelect.value) yearSelect.value = yearKeys[0];
-                // Display the selected year
                 displayExamHistoryAll(studentId, yearSelect.value);
             } catch (error) {
                 document.getElementById('examHistoryAllContent').innerHTML = '<div class="error">Error loading exam history: ' + escapeHtml(error.message) + '</div>';
@@ -3681,7 +3890,6 @@
 
         function displayExamHistoryAll(studentId, year) {
             const tenantId = getCurrentTenantId();
-            // Direct fetch using doc ID
             db.collection('exam_records').doc(studentId).get()
                 .then(doc => {
                     if (!doc.exists) {
@@ -3722,7 +3930,6 @@
         }
 
         window.editExamHistoryAll = function(studentId, year) {
-            // Switch to the Attendance module and load the exam for that student/year
             const attendanceBtn = document.getElementById('attendanceModuleBtn');
             if (attendanceBtn) attendanceBtn.click();
             document.getElementById('examStudentSearch').value = studentId;
@@ -3743,7 +3950,6 @@
                     delete data.years[year];
                     await docRef.set(data);
                     alert('Year deleted successfully.');
-                    // Refresh the admin exam history view
                     document.getElementById('loadExamHistoryAllBtn').click();
                     if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
                 }
@@ -3751,19 +3957,25 @@
         };
 
         // ============================================================
-        //  SUGGESTIONS (FULL – with reply and working submit)
+        //  SUGGESTIONS (with voice recorder support)
         // ============================================================
+        // Submit suggestion with voice note
         document.getElementById('submitSuggestionBtn').onclick = async function() {
             const tenantId = getCurrentTenantId();
             const text = document.getElementById('suggestionText').value.trim();
-            if (!text) {
-                showMessage('Please write your suggestion.', 'error', 'suggestionMessage');
+            let voiceData = '';
+            if (voiceRecorders['voiceRecorder_suggestion']) {
+                voiceData = voiceRecorders['voiceRecorder_suggestion'].getAudioData();
+            }
+            if (!text && !voiceData) {
+                showMessage('Please write a suggestion or record a voice note.', 'error', 'suggestionMessage');
                 return;
             }
             try {
                 const user = auth.currentUser;
                 await db.collection('suggestions').add({
-                    text,
+                    text: text || 'Voice note only',
+                    voiceNote: voiceData || '',
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     status: 'pending',
                     userEmail: user ? user.email : null,
@@ -3772,6 +3984,7 @@
                     tenantId: tenantId
                 });
                 document.getElementById('suggestionText').value = '';
+                if (voiceRecorders['voiceRecorder_suggestion']) voiceRecorders['voiceRecorder_suggestion'].clear();
                 showMessage('Thank you! Your suggestion has been submitted.', 'success', 'suggestionMessage');
                 setTimeout(() => { closeModal('suggestionModal'); }, 1500);
                 loadSuggestions('suggestionsList');
@@ -3790,7 +4003,6 @@
                 if (currentUserRole !== 'admin') {
                     query = query.where('uid', '==', user.uid);
                 }
-                // No orderBy to avoid index requirement – sort in memory
                 const snap = await query.get();
                 const items = [];
                 snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
@@ -3805,7 +4017,7 @@
                     container.innerHTML = '<p>No suggestions found.</p>';
                     return;
                 }
-                let html = '<table><thead><tr><th>Date</th><th>User</th><th>Suggestion</th><th>Reply</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                let html = '<table><thead><tr><th>Date</th><th>User</th><th>Suggestion</th><th>Voice</th><th>Reply</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
                 items.forEach(data => {
                     const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A';
                     const status = data.status || 'pending';
@@ -3815,17 +4027,20 @@
                     const canEdit = isAdmin || isOwn;
                     const canDelete = isAdmin || isOwn;
                     const replyHtml = data.reply ? `<div style="background:#e8f0fe; padding:6px 10px; border-radius:6px; margin-top:4px; font-size:0.85rem;"><strong>Admin reply:</strong> ${escapeHtml(data.reply)}</div>` : '';
+                    const voiceHtml = data.voiceNote ? '<span style="color:#1a4b8a;">🎤</span>' : '—';
 
                     html += `<tr>
                         <td>${escapeHtml(date)}</td>
                         <td>${escapeHtml(data.userName || 'Anonymous')}</td>
                         <td>${escapeHtml(data.text)}${replyHtml}</td>
-                        <td>${isAdmin ? `<button class="reply-suggestion-btn" data-id="${data.id}">Reply</button>` : (data.reply ? 'Replied' : '—')}</td>
+                        <td>${voiceHtml}</td>
+                        <td>${isAdmin ? `<button class="reply-suggestion-btn" data-id="${data.id}">Reply</button>` : (data.reply ? '✅' : '—')}</td>
                         <td>${statusBadge}</td>
                         <td>
                             ${canEdit ? `<button class="edit-suggestion-btn" data-id="${data.id}" data-text="${escapeHtml(data.text)}">Edit</button>` : ''}
                             ${canDelete ? `<button class="delete-suggestion-btn" data-id="${data.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>` : ''}
                             ${isAdmin && status === 'pending' ? `<button class="resolve-suggestion-btn" data-id="${data.id}">Resolve</button>` : ''}
+                            ${data.voiceNote ? `<button class="play-voice-btn" data-audio="${escapeHtml(data.voiceNote)}">▶️ Play</button>` : ''}
                         </td>
                     </tr>`;
                 });
@@ -3881,6 +4096,16 @@
                     };
                 });
 
+                container.querySelectorAll('.play-voice-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const audioData = this.dataset.audio;
+                        if (audioData) {
+                            const audio = new Audio(audioData);
+                            audio.play().catch(e => console.warn('Playback error:', e));
+                        }
+                    };
+                });
+
             } catch (error) {
                 const container = document.getElementById(containerId);
                 if (container) container.innerHTML = '<div class="error">Failed to load suggestions: ' + escapeHtml(error.message) + '</div>';
@@ -3931,6 +4156,13 @@
         document.getElementById('suggestionFab').onclick = function() {
             document.getElementById('suggestionText').value = '';
             document.getElementById('suggestionMessage').innerHTML = '';
+            // Reset voice recorder
+            if (voiceRecorders['voiceRecorder_suggestion']) {
+                voiceRecorders['voiceRecorder_suggestion'].clear();
+            } else {
+                // Create recorder if not exists
+                voiceRecorders['voiceRecorder_suggestion'] = new VoiceRecorder('voiceRecorder_suggestion', null);
+            }
             openModal('suggestionModal');
         };
         document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
@@ -4035,8 +4267,6 @@
                 document.getElementById('adminTeacherSections').style.display = 'none';
                 document.getElementById('teacherOwnProfileCard').style.display = 'block';
                 document.getElementById('editOwnTeacherBtn').style.display = 'inline-block';
-                // Student search restricted to teacher class already handled in the click event
-                // But we also need to ensure the search respects it – already implemented.
                 document.getElementById('searchStudentBtn').onclick = async function() {
                     try {
                         const tenantId = getCurrentTenantId();
@@ -4054,12 +4284,9 @@
                     }
                 };
                 setTimeout(() => {
-                    // Ensure class dropdown is properly set for teacher
                     const classSelect = document.getElementById('classSelect');
                     if (classSelect) {
-                        // updateClassDropdown will be called after loadStudents, but we can force it
                         updateClassDropdown();
-                        // Also ensure the select is disabled
                         classSelect.disabled = true;
                         classSelect.value = teacherAssignedClass;
                         const badge = document.getElementById('teacherClassBadge');
@@ -4165,7 +4392,6 @@
                     currentExamLevel = defaultLevel ? defaultLevel.dataset.examLevel : 'npse';
                 }
 
-                // Attendance history filter controls
                 document.querySelectorAll('.att-term-btn').forEach(btn => {
                     btn.onclick = function() {
                         document.querySelectorAll('.att-term-btn').forEach(b => b.classList.remove('active'));
