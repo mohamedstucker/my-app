@@ -346,6 +346,17 @@
             color: #1a4b8a;
         }
 
+        /* teacher class restriction indicator */
+        .teacher-class-badge {
+            background: #1a4b8a;
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
         @media (max-width: 768px) {
             body { padding: 12px; }
             .header { flex-direction: column; align-items: stretch; padding: 16px 18px; }
@@ -487,6 +498,7 @@
                 <button id="refreshBtn" class="refresh-btn">Refresh</button>
                 <button id="batchWhatsappBtn" class="refresh-btn">Send Reports</button>
                 <button id="classHistoryBtn" class="refresh-btn">Class History</button>
+                <span id="teacherClassBadge" class="teacher-class-badge" style="display:none;"></span>
             </div>
             <!-- Attendance info bar: shows current date, year, and term -->
             <div id="attendanceInfoBar" class="attendance-info-bar">
@@ -1313,8 +1325,18 @@
             if (currentUserRole === 'teacher' && teacherAssignedClass) {
                 const count = (allStudents[teacherAssignedClass] || []).length;
                 sel.innerHTML = `<option value="${teacherAssignedClass}">${teacherAssignedClass} (${count})</option>`;
+                sel.disabled = true; // teacher cannot change class
+                // show a badge
+                const badge = document.getElementById('teacherClassBadge');
+                if (badge) {
+                    badge.style.display = 'inline-block';
+                    badge.textContent = 'Assigned: ' + teacherAssignedClass;
+                }
                 return;
             }
+            sel.disabled = false;
+            const badge = document.getElementById('teacherClassBadge');
+            if (badge) badge.style.display = 'none';
             let optionsHtml = '<option value="">-- Select Class --</option>';
             for (const cls of ALL_CLASSES) {
                 const count = (allStudents[cls] || []).length;
@@ -1336,11 +1358,16 @@
             }, { merge: true });
         }
 
-        // Update renderAttendance to show the info bar
+        // Update renderAttendance to show the info bar and enforce teacher class
         async function renderAttendance() {
             try {
                 const tenantId = getCurrentTenantId();
-                const cls = document.getElementById('classSelect').value;
+                let cls;
+                if (currentUserRole === 'teacher' && teacherAssignedClass) {
+                    cls = teacherAssignedClass;
+                } else {
+                    cls = document.getElementById('classSelect').value;
+                }
                 if (!cls || !allStudents[cls]) {
                     document.getElementById('studentList').innerHTML = '<p>Please select a class and click "Load" to view students.</p>';
                     return;
@@ -1452,7 +1479,12 @@
         }
 
         async function sendBatchWhatsApp() {
-            const classVal = document.getElementById('classSelect').value;
+            let classVal;
+            if (currentUserRole === 'teacher' && teacherAssignedClass) {
+                classVal = teacherAssignedClass;
+            } else {
+                classVal = document.getElementById('classSelect').value;
+            }
             if (!classVal) { alert('Please select a class first.'); return; }
             const students = allStudents[classVal];
             if (!students || students.length === 0) {
@@ -1533,12 +1565,17 @@
         }
 
         // ============================================================
-        //  CLASS HISTORY - with statistics breakdown
+        //  CLASS HISTORY - with statistics breakdown, enforce teacher class
         // ============================================================
         async function viewClassHistory() {
             try {
                 const tenantId = getCurrentTenantId();
-                const classVal = document.getElementById('classSelect').value;
+                let classVal;
+                if (currentUserRole === 'teacher' && teacherAssignedClass) {
+                    classVal = teacherAssignedClass;
+                } else {
+                    classVal = document.getElementById('classSelect').value;
+                }
                 if (!classVal) { alert('Please select a class first.'); return; }
                 if (!allStudents[classVal] || allStudents[classVal].length === 0) {
                     alert('No students found in class "' + classVal + '".');
@@ -1649,6 +1686,7 @@
         //  ADD SINGLE STUDENT
         // ============================================================
         async function addManualStudent() {
+            if (currentUserRole !== 'admin') return;
             try {
                 const tenantId = getCurrentTenantId();
                 const id = document.getElementById('newStudentId').value.trim();
@@ -3899,7 +3937,7 @@
         document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
 
         // ============================================================
-        //  ROLE-BASED UI (Admin no longer sees Bursar)
+        //  ROLE-BASED UI
         // ============================================================
         function setupRoleUI(role, extra) {
             extra = extra || {};
@@ -3935,7 +3973,6 @@
             };
 
             let modules = [];
-            // All roles get a Suggestions button
             modules.push({ id: 'suggestionsModuleBtn', label: 'Suggestions', moduleId: 'suggestionsModule' });
 
             if (role === 'admin') {
@@ -3998,6 +4035,8 @@
                 document.getElementById('adminTeacherSections').style.display = 'none';
                 document.getElementById('teacherOwnProfileCard').style.display = 'block';
                 document.getElementById('editOwnTeacherBtn').style.display = 'inline-block';
+                // Student search restricted to teacher class already handled in the click event
+                // But we also need to ensure the search respects it – already implemented.
                 document.getElementById('searchStudentBtn').onclick = async function() {
                     try {
                         const tenantId = getCurrentTenantId();
@@ -4015,9 +4054,19 @@
                     }
                 };
                 setTimeout(() => {
+                    // Ensure class dropdown is properly set for teacher
                     const classSelect = document.getElementById('classSelect');
-                    if (classSelect && classSelect.querySelector(`option[value="${teacherAssignedClass}"]`)) {
+                    if (classSelect) {
+                        // updateClassDropdown will be called after loadStudents, but we can force it
+                        updateClassDropdown();
+                        // Also ensure the select is disabled
+                        classSelect.disabled = true;
                         classSelect.value = teacherAssignedClass;
+                        const badge = document.getElementById('teacherClassBadge');
+                        if (badge) {
+                            badge.style.display = 'inline-block';
+                            badge.textContent = 'Assigned: ' + teacherAssignedClass;
+                        }
                         renderAttendance();
                     }
                 }, 500);
@@ -4149,7 +4198,7 @@
         }
 
         // ============================================================
-        //  WINDOW ONLOAD (ALL BUTTONS ATTACHED)
+        //  WINDOW ONLOAD
         // ============================================================
         window.onload = function() {
             function updateOnlineStatus() {
@@ -4362,13 +4411,11 @@
             // Exam
             document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
             document.getElementById('saveExamRecordsBtn').onclick = saveExamRecords;
-            // Admin exam history (fixed)
             document.getElementById('loadExamHistoryAllBtn').onclick = loadExamHistoryAll;
             document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
             document.getElementById('examHistoryAllYear').onchange = function() {
                 const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
                 if (studentId && this.value) {
-                    // Verify student exists in tenant
                     const tenantId = getCurrentTenantId();
                     db.collection('students').doc(studentId).get().then(doc => {
                         if (doc.exists && doc.data().tenantId === tenantId) {
@@ -4387,11 +4434,6 @@
             document.getElementById('dashboardYearFilter').onchange = loadDashboard;
             document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
             document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
-
-            // Suggestions – the real handlers are already defined above, so we don't overwrite them here.
-            // We just assign the refresh buttons.
-            // The fab button is already defined above.
-            // No further action needed – the submit, edit, reply, delete handlers are already attached.
 
             // Admin Tabs
             document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(function(btn) {
