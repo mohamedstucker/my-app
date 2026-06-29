@@ -413,6 +413,12 @@
             display: inline-block;
         }
 
+        /* small audio player in table */
+        .voice-audio {
+            max-width: 100px;
+            height: 28px;
+        }
+
         @media (max-width: 768px) {
             body { padding: 12px; }
             .header { flex-direction: column; align-items: stretch; padding: 16px 18px; }
@@ -426,6 +432,7 @@
             th, td { padding: 8px 10px; }
             input, select, textarea { max-width: 100%; font-size: 0.85rem; }
             .voice-recorder audio { max-width: 60px; }
+            .voice-audio { max-width: 70px; }
             .subject-row input { max-width: 140px; }
             .form-row { flex-direction: column; align-items: stretch; }
             .search-box { flex-direction: column; align-items: stretch; }
@@ -445,6 +452,7 @@
             #globalNotices { padding: 12px 14px; max-height: 120px; }
             .suggestion-fab { bottom: 16px; right: 16px; padding: 10px 16px; font-size: 0.8rem; }
             .voice-recorder audio { max-width: 50px; }
+            .voice-audio { max-width: 50px; }
             .voice-recorder { padding: 2px 6px; }
         }
     </style>
@@ -1020,7 +1028,7 @@
         let examCurrentStudent = null, bursarCurrentStudent = null, editPaymentCallback = null;
         let _tenantId = 'default_tenant';
         let cachedRegistrationKey = null;
-        let voiceRecorders = {}; // store recorder instances
+        let voiceRecorders = {};
 
         // For attendance history filter
         let currentAttendanceItems = [];
@@ -1068,9 +1076,6 @@
 
         // ============================================================
         //  TERM HELPER (Sierra Leone calendar)
-        //  Term 1: Sep-Dec (months 9-12)
-        //  Term 2: Jan-Mar (months 1-3)
-        //  Term 3: Apr-Jul (months 4-7)
         // ============================================================
         function getTermFromDate(dateStr) {
             if (!dateStr) return 'unknown';
@@ -1106,7 +1111,6 @@
                 this.isRecording = false;
                 this.onSave = onSaveCallback || null;
 
-                // DOM refs
                 this.statusEl = document.getElementById('recStatus_' + this.uniqueId);
                 this.recBtn = document.getElementById('recBtn_' + this.uniqueId);
                 this.stopBtn = document.getElementById('stopBtn_' + this.uniqueId);
@@ -1116,17 +1120,14 @@
 
                 if (!this.recBtn) return;
 
-                // Events
                 this.recBtn.addEventListener('click', () => this.startRecording());
                 this.stopBtn.addEventListener('click', () => this.stopRecording());
                 this.playBtn.addEventListener('click', () => this.playRecording());
 
-                // Clean up on page unload
                 window.addEventListener('beforeunload', () => {
                     if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
                 });
 
-                // If there is already audio data, load it
                 if (this.hiddenInput && this.hiddenInput.value) {
                     this.loadAudio(this.hiddenInput.value);
                 }
@@ -1151,16 +1152,14 @@
                         this.statusEl.textContent = 'Done';
                         this.container.classList.remove('recording');
 
-                        // Save to hidden input as Base64 (for Firestore)
                         const reader = new FileReader();
                         reader.onload = () => {
-                            const base64 = reader.result; // data:audio/webm;base64,...
+                            const base64 = reader.result;
                             this.hiddenInput.value = base64;
                             if (this.onSave) this.onSave(base64);
                         };
                         reader.readAsDataURL(this.audioBlob);
 
-                        // Stop all tracks
                         stream.getTracks().forEach(track => track.stop());
                     };
 
@@ -1549,7 +1548,6 @@
             sel.innerHTML = optionsHtml;
         }
 
-        // Updated saveAttendance: now stores year, term, and audioRemark
         async function saveAttendance(cls, sid, status, remark, audioRemark) {
             const tenantId = getCurrentTenantId();
             const today = new Date().toISOString().split('T')[0];
@@ -1563,7 +1561,6 @@
             }, { merge: true });
         }
 
-        // Update renderAttendance to include voice recorder per student
         async function renderAttendance() {
             try {
                 const tenantId = getCurrentTenantId();
@@ -1583,7 +1580,6 @@
                 const term = getTermFromDate(today);
                 const termLabel = getTermLabel(term);
 
-                // Update info bar
                 document.getElementById('attendanceDateDisplay').textContent = 'Date: ' + today;
                 document.getElementById('attendanceYearDisplay').textContent = 'Year: ' + year;
                 document.getElementById('attendanceTermDisplay').textContent = 'Term: ' + termLabel;
@@ -2271,6 +2267,7 @@
 
         // ============================================================
         //  ATTENDANCE HISTORY (student records) - WITH FILTERS (Year + Term)
+        //  Now includes audio player for voice notes (parents can listen)
         // ============================================================
         async function loadAttendanceHistory() {
             try {
@@ -2374,13 +2371,24 @@
                 </div>
             </div>`;
 
+            // Table with audio player for voice notes
             filtered.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-            html += '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th><th>Voice</th></tr></thead><tbody>';
+            html += '<table><thead><tr><th>Date</th><th>Status</th><th>Remark</th><th>Voice Note</th></tr></thead><tbody>';
             for (const rec of filtered) {
                 const statusText = rec.status === 'present' ? 'Present' : 
                                   (rec.status === 'absent' ? 'Absent' : 
                                   (rec.status === 'late' ? 'Late' : rec.status));
-                html += `<tr><td>${escapeHtml(rec.date)}</td><td>${statusText}</td><td>${escapeHtml(rec.remark || '')}</td><td>${rec.audioRemark ? '<span style="color:#1a4b8a;">🎤</span>' : '—'}</td></tr>`;
+                let voiceHtml = '—';
+                if (rec.audioRemark) {
+                    // Use a small audio element for playback
+                    voiceHtml = `<audio controls class="voice-audio" src="${escapeHtml(rec.audioRemark)}"></audio>`;
+                }
+                html += `<tr>
+                    <td>${escapeHtml(rec.date)}</td>
+                    <td>${statusText}</td>
+                    <td>${escapeHtml(rec.remark || '')}</td>
+                    <td>${voiceHtml}</td>
+                </tr>`;
             }
             html += '</tbody></table>';
 
@@ -3959,7 +3967,6 @@
         // ============================================================
         //  SUGGESTIONS (with voice recorder support)
         // ============================================================
-        // Submit suggestion with voice note
         document.getElementById('submitSuggestionBtn').onclick = async function() {
             const tenantId = getCurrentTenantId();
             const text = document.getElementById('suggestionText').value.trim();
@@ -4156,11 +4163,9 @@
         document.getElementById('suggestionFab').onclick = function() {
             document.getElementById('suggestionText').value = '';
             document.getElementById('suggestionMessage').innerHTML = '';
-            // Reset voice recorder
             if (voiceRecorders['voiceRecorder_suggestion']) {
                 voiceRecorders['voiceRecorder_suggestion'].clear();
             } else {
-                // Create recorder if not exists
                 voiceRecorders['voiceRecorder_suggestion'] = new VoiceRecorder('voiceRecorder_suggestion', null);
             }
             openModal('suggestionModal');
