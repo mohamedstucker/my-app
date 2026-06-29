@@ -326,6 +326,26 @@
             max-width: 150px;
         }
 
+        .attendance-info-bar {
+            background: #e8f0fe;
+            border-radius: 12px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #1a4b8a;
+            font-weight: 500;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+        .attendance-info-bar span {
+            background: #fff;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            color: #1a4b8a;
+        }
+
         @media (max-width: 768px) {
             body { padding: 12px; }
             .header { flex-direction: column; align-items: stretch; padding: 16px 18px; }
@@ -467,6 +487,12 @@
                 <button id="refreshBtn" class="refresh-btn">Refresh</button>
                 <button id="batchWhatsappBtn" class="refresh-btn">Send Reports</button>
                 <button id="classHistoryBtn" class="refresh-btn">Class History</button>
+            </div>
+            <!-- Attendance info bar: shows current date, year, and term -->
+            <div id="attendanceInfoBar" class="attendance-info-bar">
+                <span id="attendanceDateDisplay"></span>
+                <span id="attendanceYearDisplay"></span>
+                <span id="attendanceTermDisplay"></span>
             </div>
             <div id="studentList"></div>
             <div class="card" id="examRecordsSection">
@@ -958,15 +984,28 @@
         }
 
         // ============================================================
-        //  TERM HELPER (from date)
+        //  TERM HELPER (Sierra Leone calendar)
+        //  Term 1: Sep-Dec (months 9-12)
+        //  Term 2: Jan-Mar (months 1-3)
+        //  Term 3: Apr-Jul (months 4-7)
         // ============================================================
         function getTermFromDate(dateStr) {
             if (!dateStr) return 'unknown';
             const month = parseInt(dateStr.split('-')[1], 10);
-            if (month >= 1 && month <= 4) return 'term1';
-            if (month >= 5 && month <= 8) return 'term2';
-            if (month >= 9 && month <= 12) return 'term3';
+            if (month >= 9 && month <= 12) return 'term1';
+            if (month >= 1 && month <= 3) return 'term2';
+            if (month >= 4 && month <= 7) return 'term3';
             return 'unknown';
+        }
+
+        function getTermLabel(term) {
+            const map = {
+                term1: 'Term 1 (Sep-Dec)',
+                term2: 'Term 2 (Jan-Mar)',
+                term3: 'Term 3 (Apr-Jul)',
+                all: 'All Terms'
+            };
+            return map[term] || term;
         }
 
         // ============================================================
@@ -1284,15 +1323,20 @@
             sel.innerHTML = optionsHtml;
         }
 
+        // Updated saveAttendance: now stores year and term (Sierra Leone calendar)
         async function saveAttendance(cls, sid, status, remark) {
             const tenantId = getCurrentTenantId();
             const today = new Date().toISOString().split('T')[0];
+            const year = today.split('-')[0];
+            const term = getTermFromDate(today);
             await db.collection('attendance').doc(today + '_' + cls + '_' + sid).set({
-                studentId: sid, class: cls, date: today, status, remark: remark || '',
+                studentId: sid, class: cls, date: today, year: year, term: term,
+                status, remark: remark || '',
                 tenantId: tenantId, timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
         }
 
+        // Update renderAttendance to show the info bar
         async function renderAttendance() {
             try {
                 const tenantId = getCurrentTenantId();
@@ -1303,6 +1347,15 @@
                 }
                 const students = allStudents[cls];
                 const today = new Date().toISOString().split('T')[0];
+                const year = today.split('-')[0];
+                const term = getTermFromDate(today);
+                const termLabel = getTermLabel(term);
+
+                // Update info bar
+                document.getElementById('attendanceDateDisplay').textContent = 'Date: ' + today;
+                document.getElementById('attendanceYearDisplay').textContent = 'Year: ' + year;
+                document.getElementById('attendanceTermDisplay').textContent = 'Term: ' + termLabel;
+
                 let attMap = {};
                 (await db.collection('attendance')
                     .where('tenantId', '==', tenantId)
@@ -1826,19 +1879,34 @@
         }
 
         // ============================================================
-        //  EXAM HISTORY (read-only)
+        //  EXAM HISTORY (read-only) - FIXED
         // ============================================================
         async function loadExamHistory() {
             try {
-                if (!currentStudentDoc) { document.getElementById('examHistoryContent').innerHTML = '<p>No student selected.</p>'; return; }
+                if (!currentStudentDoc) { 
+                    document.getElementById('examHistoryContent').innerHTML = '<p>No student selected.</p>'; 
+                    return; 
+                }
                 const tenantId = getCurrentTenantId();
-                const examDoc = await db.collection('exam_records').where('tenantId', '==', tenantId).where('studentId', '==', currentStudentDoc.id).get();
-                let records = {};
-                examDoc.forEach(d => { records = d.data(); });
-
+                // Fetch the document directly using student ID (since doc ID == studentId)
+                const docRef = db.collection('exam_records').doc(currentStudentDoc.id);
+                const doc = await docRef.get();
+                if (!doc.exists) {
+                    document.getElementById('examHistoryContent').innerHTML = '<p>No exam records found for this student.</p>';
+                    return;
+                }
+                const records = doc.data();
+                // Check tenant
+                if (records.tenantId !== tenantId) {
+                    document.getElementById('examHistoryContent').innerHTML = '<p class="error">This record does not belong to your tenant.</p>';
+                    return;
+                }
                 const years = records.years || {};
                 const yearKeys = Object.keys(years).sort((a,b) => b - a);
-                if (yearKeys.length === 0) { document.getElementById('examHistoryContent').innerHTML = '<p>No exam records found.</p>'; return; }
+                if (yearKeys.length === 0) {
+                    document.getElementById('examHistoryContent').innerHTML = '<p>No exam records found.</p>';
+                    return;
+                }
                 const latestYear = yearKeys[0];
                 const yearData = years[latestYear];
                 let html = `<h4>Exam Records for ${latestYear}</h4>`;
@@ -1938,6 +2006,7 @@
 
         // ============================================================
         //  ATTENDANCE HISTORY (student records) - WITH FILTERS (Year + Term)
+        //  uses Sierra Leone term mapping
         // ============================================================
         async function loadAttendanceHistory() {
             try {
@@ -1946,21 +2015,25 @@
                     return; 
                 }
                 const tenantId = getCurrentTenantId();
+                // Try to use stored year/term if available, otherwise derive from date
                 const snap = await db.collection('attendance')
                     .where('tenantId', '==', tenantId)
                     .where('studentId', '==', currentStudentDoc.id)
                     .get();
                 const items = [];
-                snap.forEach(doc => items.push(doc.data()));
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    // If year/term not stored, compute from date
+                    if (!data.year && data.date) data.year = data.date.split('-')[0];
+                    if (!data.term && data.date) data.term = getTermFromDate(data.date);
+                    items.push(data);
+                });
                 currentAttendanceItems = items;
 
                 // Populate year filter dropdown
                 const yearSet = new Set();
                 items.forEach(rec => {
-                    if (rec.date) {
-                        const year = rec.date.split('-')[0];
-                        if (year) yearSet.add(year);
-                    }
+                    if (rec.year) yearSet.add(rec.year);
                 });
                 const yearSelect = document.getElementById('attendanceYearFilter');
                 const currentYearVal = yearSelect.value;
@@ -1993,13 +2066,10 @@
             // Apply filters
             let filtered = items;
             if (filterYear !== 'all') {
-                filtered = filtered.filter(rec => rec.date && rec.date.startsWith(filterYear));
+                filtered = filtered.filter(rec => rec.year === filterYear);
             }
             if (filterTerm !== 'all') {
-                filtered = filtered.filter(rec => {
-                    const term = getTermFromDate(rec.date);
-                    return term === filterTerm;
-                });
+                filtered = filtered.filter(rec => rec.term === filterTerm);
             }
 
             let total = filtered.length;
@@ -2024,7 +2094,7 @@
             const latePct = ((lateCount / total) * 100).toFixed(1);
 
             html += `<div class="attendance-summary">
-                <h4>Attendance Summary ${filterYear !== 'all' ? '- Year ' + filterYear : ''} ${filterTerm !== 'all' ? '- ' + filterTerm.charAt(0).toUpperCase() + filterTerm.slice(1) : ''}</h4>
+                <h4>Attendance Summary ${filterYear !== 'all' ? '- Year ' + filterYear : ''} ${filterTerm !== 'all' ? '- ' + getTermLabel(filterTerm) : ''}</h4>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="label">Total Records</div>
@@ -3413,9 +3483,67 @@
         }
 
         // ============================================================
-        //  EXPORT / PRINT
+        //  EXPORT / PRINT - FULLY FIXED
         // ============================================================
+        function getCurrentVisibleTable() {
+            // First, try to find a table inside the currently active module
+            const activeModule = document.querySelector('.module-btn.active');
+            let moduleId = null;
+            if (activeModule) {
+                // Get the module ID from the onclick handler or by mapping
+                const modMap = {
+                    'dashboardModuleBtn': 'dashboardModule',
+                    'attendanceModuleBtn': 'attendanceModule',
+                    'recordsModuleBtn': 'recordsModule',
+                    'teachersModuleBtn': 'teachersModule',
+                    'bursarModuleBtn': 'bursarModule',
+                    'adminModuleBtn': 'adminModule',
+                    'suggestionsModuleBtn': 'suggestionsModule'
+                };
+                moduleId = modMap[activeModule.id] || null;
+            }
+            if (moduleId) {
+                const moduleEl = document.getElementById(moduleId);
+                if (moduleEl && moduleEl.style.display !== 'none') {
+                    // Look for a visible table inside this module
+                    const tables = moduleEl.querySelectorAll('table');
+                    for (const t of tables) {
+                        if (t.offsetParent !== null) {
+                            return t;
+                        }
+                    }
+                }
+            }
+
+            // Fallback: scan all modules
+            const modules = ['attendanceModule', 'recordsModule', 'teachersModule', 'bursarModule', 'adminModule'];
+            for (const modId of modules) {
+                const mod = document.getElementById(modId);
+                if (mod && mod.style.display !== 'none') {
+                    const tables = mod.querySelectorAll('table');
+                    for (const t of tables) {
+                        if (t.offsetParent !== null) {
+                            return t;
+                        }
+                    }
+                }
+            }
+
+            // Final fallback: any visible table in mainApp
+            const mainApp = document.getElementById('mainApp');
+            if (mainApp) {
+                const tables = mainApp.querySelectorAll('table');
+                for (const t of tables) {
+                    if (t.offsetParent !== null) {
+                        return t;
+                    }
+                }
+            }
+            return null;
+        }
+
         function exportTableToCSV(table, filename) {
+            if (!table) { alert('No table visible to export.'); return; }
             const rows = table.querySelectorAll('tr');
             const csv = [...rows].map(r => [...r.querySelectorAll('th,td')].map(cell => cell.innerText.trim()).join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -3423,6 +3551,14 @@
             a.href = URL.createObjectURL(blob);
             a.download = filename + '.csv';
             a.click();
+        }
+
+        function printTable(el, title) {
+            if (!el) { alert('No table visible to print.'); return; }
+            const win = window.open();
+            win.document.write(`<html><head><title>${title}</title><style>body{font-family:system-ui,sans-serif;padding:24px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:10px;text-align:left}th{background:#f0f2f5}</style></head><body><h2>${title}</h2>${el.outerHTML}</body></html>`);
+            win.document.close();
+            win.print();
         }
 
         async function exportAllStudentsCSV() {
@@ -3451,18 +3587,130 @@
             } catch (error) { alert('Error exporting teachers: ' + error.message); }
         }
 
-        function printTable(el, title) {
-            const win = window.open();
-            win.document.write(`<html><head><title>${title}</title><style>body{font-family:system-ui,sans-serif;padding:24px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:10px;text-align:left}th{background:#f0f2f5}</style></head><body><h2>${title}</h2>${el.outerHTML}</body></html>`);
-            win.document.close();
-            win.print();
+        // ============================================================
+        //  ADMIN EXAM HISTORY (ALL YEARS) - FULLY FIXED
+        // ============================================================
+        async function loadExamHistoryAll() {
+            try {
+                const tenantId = getCurrentTenantId();
+                const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
+                if (!studentId) { 
+                    document.getElementById('examHistoryAllContent').innerHTML = '<p>Please enter a Student ID.</p>';
+                    return;
+                }
+                // Verify student exists in the tenant
+                const studentDoc = await db.collection('students').doc(studentId).get();
+                if (!studentDoc.exists || studentDoc.data().tenantId !== tenantId) {
+                    document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Student not found or does not belong to your tenant.</p>';
+                    return;
+                }
+
+                // Get exam records directly using student ID as doc ID
+                const examDoc = await db.collection('exam_records').doc(studentId).get();
+                if (!examDoc.exists) {
+                    document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found for this student.</p>';
+                    // Still populate year dropdown with empty options
+                    const yearSelect = document.getElementById('examHistoryAllYear');
+                    yearSelect.innerHTML = '<option value="">Select Year</option>';
+                    return;
+                }
+                const records = examDoc.data();
+                if (records.tenantId !== tenantId) {
+                    document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">This record does not belong to your tenant.</p>';
+                    return;
+                }
+
+                const years = records.years || {};
+                const yearKeys = Object.keys(years).sort((a,b) => b - a);
+                const yearSelect = document.getElementById('examHistoryAllYear');
+                const currentYear = yearSelect.value;
+                yearSelect.innerHTML = '<option value="">Select Year</option>';
+                yearKeys.forEach(y => {
+                    const selected = (y === currentYear) ? 'selected' : '';
+                    yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`;
+                });
+                if (yearKeys.length === 0) {
+                    document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found for this student.</p>';
+                    return;
+                }
+                if (!yearSelect.value) yearSelect.value = yearKeys[0];
+                // Display the selected year
+                displayExamHistoryAll(studentId, yearSelect.value);
+            } catch (error) {
+                document.getElementById('examHistoryAllContent').innerHTML = '<div class="error">Error loading exam history: ' + escapeHtml(error.message) + '</div>';
+            }
         }
 
-        function getCurrentVisibleTable() {
-            if (document.getElementById('attendanceModule').style.display !== 'none') return document.querySelector('#studentList table');
-            if (document.getElementById('teachersModule').style.display !== 'none') return document.querySelector('#allTeachersList table');
-            return null;
+        function displayExamHistoryAll(studentId, year) {
+            const tenantId = getCurrentTenantId();
+            // Direct fetch using doc ID
+            db.collection('exam_records').doc(studentId).get()
+                .then(doc => {
+                    if (!doc.exists) {
+                        document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found.</p>';
+                        return;
+                    }
+                    const records = doc.data();
+                    if (records.tenantId !== tenantId) {
+                        document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">This record does not belong to your tenant.</p>';
+                        return;
+                    }
+                    const years = records.years || {};
+                    const yearData = years[year];
+                    if (!yearData) {
+                        document.getElementById('examHistoryAllContent').innerHTML = '<p>No records for year ' + year + '.</p>';
+                        return;
+                    }
+                    let html = `<h4>Exam Records for ${escapeHtml(studentId)} - ${year}</h4>`;
+                    for (const level of Object.keys(yearData)) {
+                        html += `<h5>${level.toUpperCase()}</h5>`;
+                        const levelData = yearData[level];
+                        for (const term of Object.keys(levelData)) {
+                            const termData = levelData[term];
+                            for (const assessment of Object.keys(termData)) {
+                                const subjects = termData[assessment];
+                                html += `<p><strong>${term} - ${assessment}</strong></p><ul>`;
+                                subjects.forEach(s => { html += `<li>${escapeHtml(s.name)}: ${s.score}</li>`; });
+                                html += '</ul>';
+                            }
+                        }
+                    }
+                    html += `<br><button class="refresh-btn" onclick="editExamHistoryAll('${studentId}','${year}')">Edit Records</button>`;
+                    html += `<button class="refresh-btn" style="background:#fde8e8; color:#b71c1c;" onclick="deleteExamHistoryAll('${studentId}','${year}')">Delete Year</button>`;
+                    document.getElementById('examHistoryAllContent').innerHTML = html;
+                }).catch(err => {
+                    document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Error loading records: ' + escapeHtml(err.message) + '</p>';
+                });
         }
+
+        window.editExamHistoryAll = function(studentId, year) {
+            // Switch to the Attendance module and load the exam for that student/year
+            const attendanceBtn = document.getElementById('attendanceModuleBtn');
+            if (attendanceBtn) attendanceBtn.click();
+            document.getElementById('examStudentSearch').value = studentId;
+            document.getElementById('examYearInput').value = year;
+            document.getElementById('searchExamStudentBtn').click();
+        };
+
+        window.deleteExamHistoryAll = async function(studentId, year) {
+            if (!confirm('Are you sure you want to delete all exam records for ' + studentId + ' in ' + year + '?')) return;
+            try {
+                const tenantId = getCurrentTenantId();
+                const docRef = db.collection('exam_records').doc(studentId);
+                const doc = await docRef.get();
+                if (!doc.exists) return;
+                const data = doc.data();
+                if (data.tenantId !== tenantId) { alert('You do not have permission to delete this record.'); return; }
+                if (data.years && data.years[year]) {
+                    delete data.years[year];
+                    await docRef.set(data);
+                    alert('Year deleted successfully.');
+                    // Refresh the admin exam history view
+                    document.getElementById('loadExamHistoryAllBtn').click();
+                    if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
+                }
+            } catch (error) { alert('Error deleting: ' + error.message); }
+        };
 
         // ============================================================
         //  SUGGESTIONS (FULL – with reply and working submit)
@@ -3901,94 +4149,6 @@
         }
 
         // ============================================================
-        //  EXAM HISTORY ALL (admin)
-        // ============================================================
-        async function loadExamHistoryAll() {
-            try {
-                const tenantId = getCurrentTenantId();
-                const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
-                if (!studentId) { document.getElementById('examHistoryAllContent').innerHTML = '<p>Please enter a Student ID.</p>'; return; }
-                const found = globalStudentMap.get(studentId) || globalStudentMap.get(studentId.toLowerCase());
-                if (!found) { document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Student not found.</p>'; return; }
-                const yearSelect = document.getElementById('examHistoryAllYear');
-                const examDoc = await db.collection('exam_records').where('tenantId', '==', tenantId).where('studentId', '==', found.id).get();
-                let records = {};
-                examDoc.forEach(d => { records = d.data(); });
-                const years = records.years || {};
-                const yearKeys = Object.keys(years).sort((a,b) => b - a);
-                const currentYear = yearSelect.value;
-                yearSelect.innerHTML = '<option value="">Select Year</option>';
-                yearKeys.forEach(y => { const selected = (y === currentYear) ? 'selected' : ''; yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`; });
-                if (yearKeys.length === 0) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found for this student.</p>'; return; }
-                if (!yearSelect.value) yearSelect.value = yearKeys[0];
-                displayExamHistoryAll(found.id, yearSelect.value);
-            } catch (error) {
-                document.getElementById('examHistoryAllContent').innerHTML = '<div class="error">Error loading exam history: ' + escapeHtml(error.message) + '</div>';
-            }
-        }
-
-        function displayExamHistoryAll(studentId, year) {
-            const tenantId = getCurrentTenantId();
-            db.collection('exam_records').where('tenantId', '==', tenantId).where('studentId', '==', studentId).get()
-                .then(snap => {
-                    if (snap.empty) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No exam records found.</p>'; return; }
-                    let records = {};
-                    snap.forEach(d => { records = d.data(); });
-                    const years = records.years || {};
-                    const yearData = years[year];
-                    if (!yearData) { document.getElementById('examHistoryAllContent').innerHTML = '<p>No records for year ' + year + '.</p>'; return; }
-                    let html = `<h4>Exam Records for ${escapeHtml(studentId)} - ${year}</h4>`;
-                    for (const level of Object.keys(yearData)) {
-                        html += `<h5>${level.toUpperCase()}</h5>`;
-                        const levelData = yearData[level];
-                        for (const term of Object.keys(levelData)) {
-                            const termData = levelData[term];
-                            for (const assessment of Object.keys(termData)) {
-                                const subjects = termData[assessment];
-                                html += `<p><strong>${term} - ${assessment}</strong></p><ul>`;
-                                subjects.forEach(s => { html += `<li>${escapeHtml(s.name)}: ${s.score}</li>`; });
-                                html += '</ul>';
-                            }
-                        }
-                    }
-                    html += `<br><button class="refresh-btn" onclick="editExamHistoryAll('${studentId}','${year}')">Edit Records</button>`;
-                    html += `<button class="refresh-btn" style="background:#fde8e8; color:#b71c1c;" onclick="deleteExamHistoryAll('${studentId}','${year}')">Delete Year</button>`;
-                    document.getElementById('examHistoryAllContent').innerHTML = html;
-                }).catch(err => {
-                    document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Error loading records: ' + escapeHtml(err.message) + '</p>';
-                });
-        }
-
-        window.editExamHistoryAll = function(studentId, year) {
-            const found = globalStudentMap.get(studentId);
-            if (!found) { alert('Student not found in memory. Please refresh.'); return; }
-            const attendanceBtn = document.getElementById('attendanceModuleBtn');
-            if (attendanceBtn) attendanceBtn.click();
-            document.getElementById('examStudentSearch').value = studentId;
-            document.getElementById('examYearInput').value = year;
-            document.getElementById('searchExamStudentBtn').click();
-        };
-
-        window.deleteExamHistoryAll = async function(studentId, year) {
-            if (!confirm('Are you sure you want to delete all exam records for ' + studentId + ' in ' + year + '?')) return;
-            try {
-                const tenantId = getCurrentTenantId();
-                const docRef = db.collection('exam_records').doc(studentId);
-                const doc = await docRef.get();
-                if (!doc.exists) return;
-                const data = doc.data();
-                if (data.tenantId !== tenantId) { alert('You do not have permission to delete this record.'); return; }
-                if (data.years && data.years[year]) {
-                    delete data.years[year];
-                    await docRef.set(data);
-                    alert('Year deleted successfully.');
-                    loadExamHistoryAll();
-                    if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
-                }
-            } catch (error) { alert('Error deleting: ' + error.message); }
-        };
-
-        // ============================================================
         //  WINDOW ONLOAD (ALL BUTTONS ATTACHED)
         // ============================================================
         window.onload = function() {
@@ -4202,11 +4362,24 @@
             // Exam
             document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
             document.getElementById('saveExamRecordsBtn').onclick = saveExamRecords;
+            // Admin exam history (fixed)
             document.getElementById('loadExamHistoryAllBtn').onclick = loadExamHistoryAll;
             document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
             document.getElementById('examHistoryAllYear').onchange = function() {
                 const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
-                if (studentId && this.value) displayExamHistoryAll(studentId, this.value);
+                if (studentId && this.value) {
+                    // Verify student exists in tenant
+                    const tenantId = getCurrentTenantId();
+                    db.collection('students').doc(studentId).get().then(doc => {
+                        if (doc.exists && doc.data().tenantId === tenantId) {
+                            displayExamHistoryAll(studentId, this.value);
+                        } else {
+                            document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Student not found or does not belong to your tenant.</p>';
+                        }
+                    }).catch(() => {
+                        document.getElementById('examHistoryAllContent').innerHTML = '<p class="error">Error verifying student.</p>';
+                    });
+                }
             };
 
             // Dashboard
