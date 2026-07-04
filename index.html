@@ -6,7 +6,7 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
-        /* ===== ALL ORIGINAL STYLES – unchanged ===== */
+        /* ===== ALL ORIGINAL STYLES (unchanged) ===== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -531,7 +531,7 @@
                 <div id="dashboardContent"><p>Loading dashboard data...</p></div>
             </div>
 
-            <!-- NEW: Staff Statistics -->
+            <!-- Staff Statistics -->
             <div class="card">
                 <h3>Staff Statistics Dashboard</h3>
                 <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:16px;">
@@ -739,10 +739,15 @@
                         <input id="teacherEmploymentDate" type="date" />
                     </div>
                     <div class="form-row">
-                    <select id="teacherDepartment">
-                        <option>Science</option><option>Mathematics</option><option>English</option><option>Arts</option>
-                        <option>Social Sciences</option><option>Business & Economics</option><option>Science & Technology</option>
-                   </select>
+                        <select id="teacherDepartment">
+                            <option>Science</option>
+                            <option>Mathematics</option>
+                            <option>English</option>
+                            <option>Arts</option>
+                            <option>Social Sciences</option>
+                            <option>Business & Economics</option>
+                            <option>Science Technology</option>
+                        </select>
                         <input id="teacherSubjects" placeholder="Subjects (comma separated)" />
                         <select id="teacherClass">
                             <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
@@ -800,6 +805,7 @@
                 </div>
                 <div id="teacherRegisterInfo"></div>
                 <div id="teacherRegisterAttendance"></div>
+                <div id="teacherLocationInfo"></div> <!-- NEW: location display -->
                 <div id="teacherRegisterHistory"></div>
             </div>
         </div>
@@ -895,6 +901,7 @@
                 <button class="admin-tab-btn" data-tab="examhistoryall">Exam History (All Years)</button>
                 <button class="admin-tab-btn" data-tab="suggestions">Suggestions</button>
                 <button class="admin-tab-btn" data-tab="loginactivity">Login Activity</button>
+                <button class="admin-tab-btn" data-tab="schoollocation">School Location</button> <!-- NEW -->
             </div>
             <div id="staffTab" class="admin-tab active">
                 <div class="card"><h3>Add Staff Member</h3><input id="staffId" placeholder="Staff ID" /><input id="staffName" placeholder="Full Name" /><select id="staffType"><option>Teacher</option><option>Admin</option><option>Cleaner</option><option>Security</option><option>Driver</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div><div id="staffListContainer"></div></div>
@@ -950,6 +957,16 @@
                     <button id="refreshLoginActivityBtn" class="refresh-btn">Refresh</button>
                     <button id="clearLoginActivityBtn" class="refresh-btn" style="background:#fde8e8; color:#b71c1c; margin-left:8px;">Clear All Logs</button>
                     <div id="loginActivityContent"><p>Loading login activity...</p></div>
+                </div>
+            </div>
+            <!-- NEW: School Location Tab -->
+            <div id="schoollocationTab" class="admin-tab" style="display:none;">
+                <div class="card">
+                    <h3>School Location Settings</h3>
+                    <label>Latitude: <input type="text" id="schoolLat" placeholder="e.g. 8.4844" /></label>
+                    <label>Longitude: <input type="text" id="schoolLng" placeholder="e.g. -13.2344" /></label>
+                    <button id="saveSchoolLocationBtn" class="refresh-btn">Save Location</button>
+                    <div id="schoolLocationMessage"></div>
                 </div>
             </div>
         </div>
@@ -1089,10 +1106,44 @@
         </div>
     </div>
 
-    <!-- OTHER MODALS -->
+    <!-- Teacher Self‑Edit Modal -->
+    <div id="editOwnTeacherModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('editOwnTeacherModal')">&times;</span>
+            <h3>Edit My Teacher Profile</h3>
+            <input type="text" id="editOwnTeacherId" readonly />
+            <input type="text" id="editOwnTeacherName" placeholder="Full Name" />
+            <input type="email" id="editOwnTeacherEmail" placeholder="Email" />
+            <input type="tel" id="editOwnTeacherPhone" placeholder="Phone" />
+            <input type="date" id="editOwnTeacherDob" placeholder="Date of Birth" />
+            <input type="date" id="editOwnTeacherEmploymentDate" placeholder="Employment Date" />
+            <select id="editOwnTeacherDepartment">
+                <option>Science</option>
+                <option>Mathematics</option>
+                <option>English</option>
+                <option>Arts</option>
+                <option>Social Sciences</option>
+                <option>Business & Economics</option>
+                <option>Science Technology</option>
+            </select>
+            <input type="text" id="editOwnTeacherSubjects" placeholder="Subjects (comma separated)" />
+            <select id="editOwnTeacherClass">
+                <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                <option>Class1</option><option>Class2</option><option>Class3</option>
+                <option>Class4</option><option>Class5</option><option>Class6</option>
+                <option>JSS1</option><option>JSS2</option><option>JSS3</option>
+                <option>SSS1</option><option>SSS2</option><option>SSS3</option>
+            </select>
+            <input type="text" id="editOwnTeacherQualification" placeholder="Qualification" />
+            <input type="text" id="editOwnTeacherNIN" placeholder="NIN" />
+            <input type="number" id="editOwnTeacherSalary" placeholder="Salary (Le)" step="0.01" />
+            <button id="saveOwnTeacherBtn" class="refresh-btn">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- OTHER MODALS (unchanged) -->
     <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name" /><input type="date" id="editProfileDob" /><select id="editProfileClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input id="editProfileDepartment" placeholder="Department" /><input id="editProfileAddress" placeholder="Address" /><input id="editProfileParentPhone" placeholder="Parent Phone" /><input id="editProfileParentName" placeholder="Parent Name" /><input id="editProfileGuardian" placeholder="Guardian" /><input id="editProfileParentEmail" type="email" placeholder="Parent Email" /><select id="editProfileGender"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select><input id="editProfileTempPassword" type="password" placeholder="Temporary Password" /><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
     <div id="editTeacherModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editTeacherModal')">&times;</span><h3>Edit Teacher (Admin)</h3><input type="text" id="editTeacherId" readonly /><input type="text" id="editTeacherName" placeholder="Full Name" /><input type="email" id="editTeacherEmail" placeholder="Email" /><input type="tel" id="editTeacherPhone" placeholder="Phone" /><select id="editTeacherClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input type="text" id="editTeacherQualification" placeholder="Qualification" /><input type="text" id="editTeacherNIN" placeholder="NIN" /><select id="editTeacherStatus"><option>active</option><option>inactive</option></select><button id="saveTeacherBtn" class="refresh-btn">Save Changes</button></div></div>
-    <div id="editOwnTeacherModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editOwnTeacherModal')">&times;</span><h3>Edit My Teacher Profile</h3><input type="text" id="editOwnTeacherId" readonly /><input type="text" id="editOwnTeacherName" placeholder="Full Name" /><input type="email" id="editOwnTeacherEmail" placeholder="Email" /><input type="tel" id="editOwnTeacherPhone" placeholder="Phone" /><input type="date" id="editOwnTeacherDob" placeholder="Date of Birth" /><input type="date" id="editOwnTeacherEmploymentDate" placeholder="Employment Date" /><select id="editOwnTeacherDepartment"><option>Science</option><option>Mathematics</option><option>English</option><option>Arts</option><option>Social Sciences</option></select><input type="text" id="editOwnTeacherSubjects" placeholder="Subjects (comma separated)" /><select id="editOwnTeacherClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input type="text" id="editOwnTeacherQualification" placeholder="Qualification" /><input type="text" id="editOwnTeacherNIN" placeholder="NIN" /><input type="number" id="editOwnTeacherSalary" placeholder="Salary (Le)" step="0.01" /><button id="saveOwnTeacherBtn" class="refresh-btn">Save Changes</button></div></div>
     <div id="historyModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('historyModal')">&times;</span><h3>Attendance History</h3><div id="historyContent"></div></div></div>
     <div id="editPaymentModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editPaymentModal')">&times;</span><h3>Edit Payment</h3><input type="text" id="editPaymentTerm" readonly /><input type="date" id="editPaymentDate" /><input type="number" id="editPaymentAmount" step="0.01" placeholder="Amount (Le)" /><select id="editPaymentType"><option value="full">Full Payment</option><option value="partial">Partial Payment</option></select><input type="text" id="editPaymentNote" placeholder="Note" /><button id="savePaymentEditBtn" class="refresh-btn">Save Changes</button></div></div>
     <div id="staffHistoryModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('staffHistoryModal')">&times;</span><h3>Staff Attendance History</h3><div id="staffHistoryContent"></div></div></div>
@@ -1107,7 +1158,7 @@
 
     <script>
         // ==================================================================
-        //  ALL ORIGINAL JAVASCRIPT – WITH STAFF DASHBOARD ADDED
+        //  FULL ORIGINAL JAVASCRIPT – WITH LOCATION TRACKING ADDED
         // ==================================================================
 
         // ==================================================================
@@ -3145,7 +3196,32 @@
         }
 
         // ==================================================================
-        //  ADMIN/TEACHER FUNCTIONS
+        //  LOCATION HELPERS (NEW)
+        // ==================================================================
+        async function getSchoolLocation() {
+            const tenantId = getCurrentTenantId();
+            const doc = await db.collection('settings').doc('schoolLocation').get();
+            if (doc.exists && doc.data().tenantId === tenantId) {
+                return { lat: doc.data().lat, lng: doc.data().lng };
+            }
+            return null;
+        }
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // earth radius in meters
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // in meters
+        }
+
+        // ==================================================================
+        //  ADMIN/TEACHER FUNCTIONS (with location updates)
         // ==================================================================
         async function addTeacherAdmin() {
             if (currentUserRole !== 'admin') { showMessage('Only admin can add teachers.', 'error', 'teacherMessage'); return; }
@@ -3336,7 +3412,7 @@
         }
 
         // ==================================================================
-        //  TEACHER REGISTER (FIXED HISTORY)
+        //  TEACHER REGISTER (FIXED HISTORY + LOCATION)
         // ==================================================================
         async function loadTeacherRegister() {
             const q = document.getElementById('teacherRegisterSearch').value.trim();
@@ -3353,31 +3429,115 @@
             const today = new Date().toISOString().split('T')[0];
             const attDoc = await db.collection('staff_attendance').doc(today + '_' + found.id).get();
             const status = attDoc.exists ? attDoc.data().status : 'Not checked in';
+
+            // Display current day's location info if available
+            const locData = attDoc.exists ? attDoc.data() : null;
+            let locHtml = '';
+            if (locData && locData.latitude) {
+                locHtml = `
+                    <p><strong>Location:</strong> ${locData.latitude.toFixed(6)}, ${locData.longitude.toFixed(6)}</p>
+                    <p><strong>Distance from school:</strong> ${locData.distanceFromSchool !== null ? locData.distanceFromSchool.toFixed(1) + ' m' : 'N/A'}</p>
+                    <p><strong>Status:</strong> ${locData.locationStatus || 'Unknown'}</p>
+                `;
+            } else {
+                locHtml = '<p>No location data for today.</p>';
+            }
+            document.getElementById('teacherLocationInfo').innerHTML = `<div class="card"><h4>Today's Location</h4>${locHtml}</div>`;
+
             const html = `<p>Today: ${today} – Status: <strong>${status}</strong></p>
                 <button id="checkInBtn" class="refresh-btn">Check In</button>
                 <button id="checkOutBtn" style="background:#fde8e8; color:#b71c1c;">Check Out</button>`;
             document.getElementById('teacherRegisterAttendance').innerHTML = html;
 
-            document.getElementById('checkInBtn').onclick = async function() {
-                await db.collection('staff_attendance').doc(today + '_' + found.id).set({ staffId: found.id, date: today, status: 'Checked In', tenantId: tenantId }, { merge: true });
-                loadTeacherRegister();
-            };
-            document.getElementById('checkOutBtn').onclick = async function() {
-                await db.collection('staff_attendance').doc(today + '_' + found.id).set({ staffId: found.id, date: today, status: 'Checked Out', tenantId: tenantId }, { merge: true });
-                loadTeacherRegister();
+            // Check In with location
+            document.getElementById('checkInBtn').onclick = function() {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser.');
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude, accuracy } = position.coords;
+                        const schoolLoc = await getSchoolLocation();
+                        const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
+                        const status = 'Checked In';
+                        const docId = today + '_' + found.id;
+                        await db.collection('staff_attendance').doc(docId).set({
+                            staffId: found.id,
+                            date: today,
+                            status: status,
+                            tenantId: tenantId,
+                            latitude,
+                            longitude,
+                            accuracy,
+                            distanceFromSchool: distance,
+                            locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises'
+                        }, { merge: true });
+                        loadTeacherRegister();
+                    },
+                    (error) => {
+                        alert('Unable to get location. Please allow location access.');
+                        console.error(error);
+                    },
+                    { enableHighAccuracy: true }
+                );
             };
 
-            // ----- FIX: History query with proper ordering -----
+            // Check Out with location
+            document.getElementById('checkOutBtn').onclick = function() {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser.');
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude, accuracy } = position.coords;
+                        const schoolLoc = await getSchoolLocation();
+                        const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
+                        const status = 'Checked Out';
+                        const docId = today + '_' + found.id;
+                        await db.collection('staff_attendance').doc(docId).set({
+                            staffId: found.id,
+                            date: today,
+                            status: status,
+                            tenantId: tenantId,
+                            latitude,
+                            longitude,
+                            accuracy,
+                            distanceFromSchool: distance,
+                            locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises'
+                        }, { merge: true });
+                        loadTeacherRegister();
+                    },
+                    (error) => {
+                        alert('Unable to get location. Please allow location access.');
+                        console.error(error);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            };
+
+            // History with location columns
             const histSnap = await db.collection('staff_attendance')
                 .where('tenantId', '==', tenantId)
                 .where('staffId', '==', found.id)
                 .orderBy('date', 'desc')
                 .get();
-            let histHtml = '<h4>Attendance History</h4><table><thead><tr><th>Date</th><th>Status</th></tr></thead><tbody>';
+            let histHtml = '<h4>Attendance History</h4><table><thead><tr><th>Date</th><th>Status</th><th>Latitude</th><th>Longitude</th><th>Distance (m)</th><th>Location Status</th></tr></thead><tbody>';
             if (histSnap.empty) {
-                histHtml += '<tr><td colspan="2">No records found.</td></tr>';
+                histHtml += '<tr><td colspan="6">No records found.</td></tr>';
             } else {
-                histSnap.forEach(d => histHtml += `<tr><td>${d.data().date}</td><td>${d.data().status}</td></tr>`);
+                histSnap.forEach(d => {
+                 const data = d.data();
+                    histHtml += `<tr>
+                       <td>${data.date}</td>
+                       <td>${data.status}</td>
+                       <td>${data.latitude ? data.latitude.toFixed(6) : '—'}</td>
+                       <td>${data.longitude ? data.longitude.toFixed(6) : '—'}</td>
+                       <td>${data.distanceFromSchool !== null && data.distanceFromSchool !== undefined ? data.distanceFromSchool.toFixed(1) : '—'}</td>
+                       <td>${data.locationStatus || '—'}</td>
+                  </tr>`;
+                });
             }
             histHtml += '</tbody></table>';
             document.getElementById('teacherRegisterHistory').innerHTML = histHtml;
@@ -3390,7 +3550,7 @@
         }
 
         // ==================================================================
-        //  ADMIN: STAFF, ASSETS, INVENTORY, VISITORS, FILES, SUGGESTIONS
+        //  ADMIN: STAFF, ASSETS, INVENTORY, VISITORS, FILES, SUGGESTIONS, LOCATION SETTINGS
         // ==================================================================
         async function addStaff() {
             if (currentUserRole !== 'admin') return;
@@ -3582,6 +3742,31 @@
                     };
                 });
             };
+        }
+
+        // School Location settings
+        document.getElementById('saveSchoolLocationBtn').onclick = async function() {
+            const lat = parseFloat(document.getElementById('schoolLat').value);
+            const lng = parseFloat(document.getElementById('schoolLng').value);
+            if (isNaN(lat) || isNaN(lng)) {
+                showMessage('Enter valid latitude and longitude.', 'error', 'schoolLocationMessage');
+                return;
+            }
+            const tenantId = getCurrentTenantId();
+            await db.collection('settings').doc('schoolLocation').set({
+                lat, lng, tenantId,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            showMessage('School location saved.', 'success', 'schoolLocationMessage');
+        };
+
+        async function loadSchoolLocation() {
+            const tenantId = getCurrentTenantId();
+            const doc = await db.collection('settings').doc('schoolLocation').get();
+            if (doc.exists && doc.data().tenantId === tenantId) {
+                document.getElementById('schoolLat').value = doc.data().lat;
+                document.getElementById('schoolLng').value = doc.data().lng;
+            }
         }
 
         // ==================================================================
@@ -4113,7 +4298,7 @@
         };
 
         // ==================================================================
-        //  LOGIN AND SETUP (original)
+        //  LOGIN AND SETUP (original + location tab load)
         // ==================================================================
         async function loginAndSetup(email, password, skipAuth = false) {
             try {
@@ -4286,7 +4471,7 @@
                     if (m.moduleId === 'attendanceModule') renderAttendance();
                     if (m.moduleId === 'teachersModule') { if (role === 'admin') loadAllTeachersForAdmin(); displayOwnTeacherProfile(); }
                     if (m.moduleId === 'bursarModule') { loadBursarSummary(); populateFeeStatsYears().then(loadFeeStats); }
-                    if (m.moduleId === 'adminModule') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); renderNotices(); initFileDB().then(loadFilesList); loadLoginActivity(); }
+                    if (m.moduleId === 'adminModule') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); renderNotices(); initFileDB().then(loadFilesList); loadLoginActivity(); loadSchoolLocation(); }
                     if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
                 };
                 moduleContainer.appendChild(btn);
@@ -4317,6 +4502,7 @@
                         else if (id === 'examhistoryall') { /* handled on load */ }
                         else if (id === 'suggestions') loadSuggestions('suggestionsList');
                         else if (id === 'loginactivity') loadLoginActivity();
+                        else if (id === 'schoollocation') loadSchoolLocation();
                     };
                 });
             } else if (role === 'bursar') {
@@ -4401,7 +4587,7 @@
         }
 
         // ==================================================================
-        //  WINDOW ONLOAD (original)
+        //  WINDOW ONLOAD (original + location settings)
         // ==================================================================
         window.onload = function() {
             function updateOnlineStatus() {
@@ -4632,7 +4818,7 @@
                 loadStaffDashboard();
             };
 
-            // Admin Tabs
+            // Admin Tabs (including School Location)
             document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(function(btn) {
                 btn.onclick = function() {
                     const id = this.dataset.tab;
@@ -4649,6 +4835,7 @@
                     else if (id === 'examhistoryall') { /* handled on load */ }
                     else if (id === 'suggestions') loadSuggestions('suggestionsList');
                     else if (id === 'loginactivity') loadLoginActivity();
+                    else if (id === 'schoollocation') loadSchoolLocation();
                 };
             });
 
