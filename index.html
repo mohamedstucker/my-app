@@ -3414,135 +3414,159 @@
         // ==================================================================
         //  TEACHER REGISTER (FIXED HISTORY + LOCATION)
         // ==================================================================
-        async function loadTeacherRegister() {
-            const q = document.getElementById('teacherRegisterSearch').value.trim();
-            const tenantId = getCurrentTenantId();
-            const snap = await db.collection('teachers').where('tenantId', '==', tenantId).get();
-            let found = null;
-            snap.forEach(d => {
+       async function loadTeacherRegister() {
+    const q = document.getElementById('teacherRegisterSearch').value.trim();
+    const tenantId = getCurrentTenantId();
+    const snap = await db.collection('teachers').where('tenantId', '==', tenantId).get();
+    let found = null;
+    snap.forEach(d => {
+        const data = d.data();
+        if (data.id === q || data.name.toLowerCase() === q.toLowerCase()) found = { docId: d.id, ...data };
+    });
+    if (!found) { showMessage('Teacher not found.', 'error', 'teacherRegisterInfo'); return; }
+    currentTeacherRegister = found;
+    document.getElementById('teacherRegisterInfo').innerHTML = `<div class="success">${escapeHtml(found.name)} (${found.id})</div>`;
+    const today = new Date().toISOString().split('T')[0];
+    const attDoc = await db.collection('staff_attendance').doc(today + '_' + found.id).get();
+    const status = attDoc.exists ? attDoc.data().status : 'Not checked in';
+
+    // Display today's location info (with safe time checks)
+    const locData = attDoc.exists ? attDoc.data() : null;
+    let locHtml = '';
+    if (locData && locData.latitude) {
+        const checkInTime = (locData.checkInTime && typeof locData.checkInTime.toDate === 'function') 
+            ? new Date(locData.checkInTime.toDate()).toLocaleTimeString() 
+            : 'Not checked in';
+        const checkOutTime = (locData.checkOutTime && typeof locData.checkOutTime.toDate === 'function') 
+            ? new Date(locData.checkOutTime.toDate()).toLocaleTimeString() 
+            : 'Not checked out';
+        locHtml = `
+            <p><strong>Location:</strong> ${locData.latitude.toFixed(6)}, ${locData.longitude.toFixed(6)}</p>
+            <p><strong>Distance from school:</strong> ${locData.distanceFromSchool !== null ? locData.distanceFromSchool.toFixed(1) + ' m' : 'N/A'}</p>
+            <p><strong>Status:</strong> ${locData.locationStatus || 'Unknown'}</p>
+            <p><strong>Check In Time:</strong> ${checkInTime}</p>
+            <p><strong>Check Out Time:</strong> ${checkOutTime}</p>
+        `;
+    } else {
+        locHtml = '<p>No location data for today.</p>';
+    }
+    document.getElementById('teacherLocationInfo').innerHTML = `<div class="card"><h4>Today's Location</h4>${locHtml}</div>`;
+
+    // Check In / Check Out buttons
+    const html = `<p>Today: ${today} – Status: <strong>${status}</strong></p>
+        <button id="checkInBtn" class="refresh-btn">Check In</button>
+        <button id="checkOutBtn" style="background:#fde8e8; color:#b71c1c;">Check Out</button>`;
+    document.getElementById('teacherRegisterAttendance').innerHTML = html;
+
+    // Check In
+    document.getElementById('checkInBtn').onclick = function() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude, accuracy } = position.coords;
+                const schoolLoc = await getSchoolLocation();
+                const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
+                await db.collection('staff_attendance').doc(today + '_' + found.id).set({
+                    staffId: found.id,
+                    date: today,
+                    status: 'Checked In',
+                    tenantId: tenantId,
+                    latitude,
+                    longitude,
+                    accuracy,
+                    distanceFromSchool: distance,
+                    locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises',
+                    checkInTime: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                loadTeacherRegister();
+            },
+            (error) => {
+                alert('Unable to get location. Please allow location access.');
+                console.error(error);
+            },
+            { enableHighAccuracy: true }
+        );
+    };
+
+    // Check Out
+    document.getElementById('checkOutBtn').onclick = function() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude, accuracy } = position.coords;
+                const schoolLoc = await getSchoolLocation();
+                const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
+                await db.collection('staff_attendance').doc(today + '_' + found.id).set({
+                    staffId: found.id,
+                    date: today,
+                    status: 'Checked Out',
+                    tenantId: tenantId,
+                    latitude,
+                    longitude,
+                    accuracy,
+                    distanceFromSchool: distance,
+                    locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises',
+                    checkOutTime: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                loadTeacherRegister();
+            },
+            (error) => {
+                alert('Unable to get location. Please allow location access.');
+                console.error(error);
+            },
+            { enableHighAccuracy: true }
+        );
+    };
+
+    // ----- HISTORY TABLE (with safe time formatting) -----
+    try {
+        const histSnap = await db.collection('staff_attendance')
+            .where('tenantId', '==', tenantId)
+            .where('staffId', '==', found.id)
+            .orderBy('date', 'desc')
+            .get();
+
+        let histHtml = '<h4>Attendance History</h4><table><thead><tr><th>Date</th><th>Status</th><th>Check In Time</th><th>Check Out Time</th><th>Latitude</th><th>Longitude</th><th>Distance (m)</th><th>Location Status</th></tr></thead><tbody>';
+
+        if (histSnap.empty) {
+            histHtml += '<tr><td colspan="8">No records found.</td></tr>';
+        } else {
+            histSnap.forEach(d => {
                 const data = d.data();
-                if (data.id === q || data.name.toLowerCase() === q.toLowerCase()) found = { docId: d.id, ...data };
+                // Safe check for checkInTime / checkOutTime
+                const checkInTime = (data.checkInTime && typeof data.checkInTime.toDate === 'function') 
+                    ? new Date(data.checkInTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) 
+                    : '—';
+                const checkOutTime = (data.checkOutTime && typeof data.checkOutTime.toDate === 'function') 
+                    ? new Date(data.checkOutTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) 
+                    : '—';
+
+                histHtml += `<tr>
+                    <td>${data.date}</td>
+                    <td>${data.status}</td>
+                    <td>${checkInTime}</td>
+                    <td>${checkOutTime}</td>
+                    <td>${data.latitude ? data.latitude.toFixed(6) : '—'}</td>
+                    <td>${data.longitude ? data.longitude.toFixed(6) : '—'}</td>
+                    <td>${data.distanceFromSchool !== null && data.distanceFromSchool !== undefined ? data.distanceFromSchool.toFixed(1) : '—'}</td>
+                    <td>${data.locationStatus || '—'}</td>
+                </tr>`;
             });
-            if (!found) { showMessage('Teacher not found.', 'error', 'teacherRegisterInfo'); return; }
-            currentTeacherRegister = found;
-            document.getElementById('teacherRegisterInfo').innerHTML = `<div class="success">${escapeHtml(found.name)} (${found.id})</div>`;
-            const today = new Date().toISOString().split('T')[0];
-            const attDoc = await db.collection('staff_attendance').doc(today + '_' + found.id).get();
-            const status = attDoc.exists ? attDoc.data().status : 'Not checked in';
-
-            // Display current day's location info if available
-            const locData = attDoc.exists ? attDoc.data() : null;
-            let locHtml = '';
-            if (locData && locData.latitude) {
-                locHtml = `
-                    <p><strong>Location:</strong> ${locData.latitude.toFixed(6)}, ${locData.longitude.toFixed(6)}</p>
-                    <p><strong>Distance from school:</strong> ${locData.distanceFromSchool !== null ? locData.distanceFromSchool.toFixed(1) + ' m' : 'N/A'}</p>
-                    <p><strong>Status:</strong> ${locData.locationStatus || 'Unknown'}</p>
-                `;
-            } else {
-                locHtml = '<p>No location data for today.</p>';
-            }
-            document.getElementById('teacherLocationInfo').innerHTML = `<div class="card"><h4>Today's Location</h4>${locHtml}</div>`;
-
-            const html = `<p>Today: ${today} – Status: <strong>${status}</strong></p>
-                <button id="checkInBtn" class="refresh-btn">Check In</button>
-                <button id="checkOutBtn" style="background:#fde8e8; color:#b71c1c;">Check Out</button>`;
-            document.getElementById('teacherRegisterAttendance').innerHTML = html;
-
-            // Check In with location
-            document.getElementById('checkInBtn').onclick = function() {
-                if (!navigator.geolocation) {
-                    alert('Geolocation is not supported by your browser.');
-                    return;
-                }
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        const { latitude, longitude, accuracy } = position.coords;
-                        const schoolLoc = await getSchoolLocation();
-                        const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
-                        const status = 'Checked In';
-                        const docId = today + '_' + found.id;
-                        await db.collection('staff_attendance').doc(docId).set({
-                            staffId: found.id,
-                            date: today,
-                            status: status,
-                            tenantId: tenantId,
-                            latitude,
-                            longitude,
-                            accuracy,
-                            distanceFromSchool: distance,
-                            locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises'
-                        }, { merge: true });
-                        loadTeacherRegister();
-                    },
-                    (error) => {
-                        alert('Unable to get location. Please allow location access.');
-                        console.error(error);
-                    },
-                    { enableHighAccuracy: true }
-                );
-            };
-
-            // Check Out with location
-            document.getElementById('checkOutBtn').onclick = function() {
-                if (!navigator.geolocation) {
-                    alert('Geolocation is not supported by your browser.');
-                    return;
-                }
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        const { latitude, longitude, accuracy } = position.coords;
-                        const schoolLoc = await getSchoolLocation();
-                        const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
-                        const status = 'Checked Out';
-                        const docId = today + '_' + found.id;
-                        await db.collection('staff_attendance').doc(docId).set({
-                            staffId: found.id,
-                            date: today,
-                            status: status,
-                            tenantId: tenantId,
-                            latitude,
-                            longitude,
-                            accuracy,
-                            distanceFromSchool: distance,
-                            locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises'
-                        }, { merge: true });
-                        loadTeacherRegister();
-                    },
-                    (error) => {
-                        alert('Unable to get location. Please allow location access.');
-                        console.error(error);
-                    },
-                    { enableHighAccuracy: true }
-                );
-            };
-
-            // History with location columns
-            const histSnap = await db.collection('staff_attendance')
-                .where('tenantId', '==', tenantId)
-                .where('staffId', '==', found.id)
-                .orderBy('date', 'desc')
-                .get();
-            let histHtml = '<h4>Attendance History</h4><table><thead><tr><th>Date</th><th>Status</th><th>Latitude</th><th>Longitude</th><th>Distance (m)</th><th>Location Status</th></tr></thead><tbody>';
-            if (histSnap.empty) {
-                histHtml += '<tr><td colspan="6">No records found.</td></tr>';
-            } else {
-                histSnap.forEach(d => {
-                 const data = d.data();
-                    histHtml += `<tr>
-                       <td>${data.date}</td>
-                       <td>${data.status}</td>
-                       <td>${data.latitude ? data.latitude.toFixed(6) : '—'}</td>
-                       <td>${data.longitude ? data.longitude.toFixed(6) : '—'}</td>
-                       <td>${data.distanceFromSchool !== null && data.distanceFromSchool !== undefined ? data.distanceFromSchool.toFixed(1) : '—'}</td>
-                       <td>${data.locationStatus || '—'}</td>
-                  </tr>`;
-                });
-            }
-            histHtml += '</tbody></table>';
-            document.getElementById('teacherRegisterHistory').innerHTML = histHtml;
         }
 
+        histHtml += '</tbody></table>';
+        document.getElementById('teacherRegisterHistory').innerHTML = histHtml;
+    } catch (error) {
+        console.error('History error:', error);
+        document.getElementById('teacherRegisterHistory').innerHTML = `<div class="error">Error loading history: ${escapeHtml(error.message)}</div>`;
+    }
+}
         // Helper: load teacher register by ID (for teacher auto-load)
         async function loadTeacherRegisterForId(id) {
             document.getElementById('teacherRegisterSearch').value = id;
