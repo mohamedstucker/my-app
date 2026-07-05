@@ -437,6 +437,33 @@
             border-radius: 20px;
         }
 
+        /* Chat styling */
+        .chat-message {
+            margin-bottom: 12px;
+            padding: 10px 16px;
+            border-radius: 16px;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+        .chat-message.user {
+            margin-left: auto;
+            background: #1a4b8a;
+            color: #fff;
+        }
+        .chat-message.ai {
+            margin-right: auto;
+            background: #f0f5fa;
+            color: #1a2634;
+        }
+        .chat-message.system {
+            margin: 0 auto;
+            background: #fde8e8;
+            color: #842029;
+            text-align: center;
+            max-width: 100%;
+        }
+
         @media (max-width: 768px) {
             body { padding: 12px; }
             .header { flex-direction: column; align-items: stretch; padding: 16px 18px; }
@@ -458,6 +485,7 @@
             #globalNotices { padding: 14px 16px; max-height: 150px; }
             .suggestion-fab { bottom: 20px; right: 20px; padding: 12px 20px; font-size: 0.9rem; }
             .dashboard-grid { grid-template-columns: 1fr; }
+            .chat-message { max-width: 95%; }
         }
         @media (max-width: 480px) {
             .header h1 { font-size: 1.1rem; }
@@ -513,7 +541,6 @@
 
         <!-- DASHBOARD -->
         <div id="dashboardModule" style="display:none;">
-            <!-- Student Statistics -->
             <div class="card">
                 <h3>Student Statistics Dashboard
                     <span id="dashboardFilterBadge" class="filter-badge">All Years | All</span>
@@ -653,6 +680,8 @@
                     <button class="tab-btn" data-tab="examhistory">Exam History</button>
                     <button class="tab-btn" data-tab="paymenthistory">Payment History</button>
                     <button class="tab-btn" data-tab="attendancehistory">Attendance History</button>
+                    <!-- NEW: AI Chat Tab -->
+                    <button class="tab-btn" data-tab="aichat">AI Chat</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
                     <div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">Edit Profile</button></div>
@@ -710,6 +739,27 @@
                             <button id="refreshAttendanceHistoryBtn" class="refresh-btn" style="margin-left:auto;">Refresh</button>
                         </div>
                         <div id="attendanceHistoryContent"></div>
+                    </div>
+                </div>
+                <!-- NEW: AI Chat Tab Content -->
+                <div id="aichatTab" class="tab-content">
+                    <div class="card">
+                        <h3>🤖 AI Assistant</h3>
+                        <p style="color:#6c7a89; margin-bottom:12px;">
+                            Ask me anything about your child's attendance, fees, or school notices.
+                        </p>
+                        <div id="chatMessages" style="height:350px; overflow-y:auto; border:1px solid #e6edf4; border-radius:12px; padding:14px; background:#fafcfe; margin-bottom:12px;">
+                            <div style="color:#6c7a89; text-align:center; padding:40px 0;">
+                                👋 Ask me about your child's school life...
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                            <input id="chatInput" placeholder="Type your question here..." style="flex:1; padding:12px 16px; border-radius:14px; border:1.5px solid #dce4ec; font-size:0.9rem; min-width:150px;" />
+                            <button id="sendChatBtn" class="refresh-btn" style="padding:10px 24px;">Send</button>
+                            <button id="voiceChatBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer; padding:8px 12px; border-radius:30px; background:#f0f5fa;" title="Voice Input">🎙️</button>
+                            <button id="clearChatBtn" style="background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px 12px; border-radius:30px; background:#fde8e8; color:#b71c1c;" title="Clear Chat">🗑️</button>
+                        </div>
+                        <div id="chatStatus" style="margin-top:8px; font-size:0.8rem; color:#6c7a89;"></div>
                     </div>
                 </div>
             </div>
@@ -805,7 +855,7 @@
                 </div>
                 <div id="teacherRegisterInfo"></div>
                 <div id="teacherRegisterAttendance"></div>
-                <div id="teacherLocationInfo"></div> <!-- NEW: location display -->
+                <div id="teacherLocationInfo"></div>
                 <div id="teacherRegisterHistory"></div>
             </div>
         </div>
@@ -877,7 +927,6 @@
                     <div id="staffPayrollList"></div>
                     <div id="payrollMessage"></div>
                 </div>
-                <!-- Staff Payment History -->
                 <div style="margin-top:20px;">
                     <button id="showPaymentHistoryBtn" class="refresh-btn">View Payment History</button>
                     <div id="paymentHistoryContainer" style="display:none; margin-top:10px;">
@@ -901,7 +950,7 @@
                 <button class="admin-tab-btn" data-tab="examhistoryall">Exam History (All Years)</button>
                 <button class="admin-tab-btn" data-tab="suggestions">Suggestions</button>
                 <button class="admin-tab-btn" data-tab="loginactivity">Login Activity</button>
-                <button class="admin-tab-btn" data-tab="schoollocation">School Location</button> <!-- NEW -->
+                <button class="admin-tab-btn" data-tab="schoollocation">School Location</button>
             </div>
             <div id="staffTab" class="admin-tab active">
                 <div class="card"><h3>Add Staff Member</h3><input id="staffId" placeholder="Staff ID" /><input id="staffName" placeholder="Full Name" /><select id="staffType"><option>Teacher</option><option>Admin</option><option>Cleaner</option><option>Security</option><option>Driver</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div><div id="staffListContainer"></div></div>
@@ -959,7 +1008,6 @@
                     <div id="loginActivityContent"><p>Loading login activity...</p></div>
                 </div>
             </div>
-            <!-- NEW: School Location Tab -->
             <div id="schoollocationTab" class="admin-tab" style="display:none;">
                 <div class="card">
                     <h3>School Location Settings</h3>
@@ -1141,7 +1189,7 @@
         </div>
     </div>
 
-    <!-- OTHER MODALS (unchanged) -->
+    <!-- OTHER MODALS -->
     <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name" /><input type="date" id="editProfileDob" /><select id="editProfileClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input id="editProfileDepartment" placeholder="Department" /><input id="editProfileAddress" placeholder="Address" /><input id="editProfileParentPhone" placeholder="Parent Phone" /><input id="editProfileParentName" placeholder="Parent Name" /><input id="editProfileGuardian" placeholder="Guardian" /><input id="editProfileParentEmail" type="email" placeholder="Parent Email" /><select id="editProfileGender"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select><input id="editProfileTempPassword" type="password" placeholder="Temporary Password" /><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
     <div id="editTeacherModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editTeacherModal')">&times;</span><h3>Edit Teacher (Admin)</h3><input type="text" id="editTeacherId" readonly /><input type="text" id="editTeacherName" placeholder="Full Name" /><input type="email" id="editTeacherEmail" placeholder="Email" /><input type="tel" id="editTeacherPhone" placeholder="Phone" /><select id="editTeacherClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input type="text" id="editTeacherQualification" placeholder="Qualification" /><input type="text" id="editTeacherNIN" placeholder="NIN" /><select id="editTeacherStatus"><option>active</option><option>inactive</option></select><button id="saveTeacherBtn" class="refresh-btn">Save Changes</button></div></div>
     <div id="historyModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('historyModal')">&times;</span><h3>Attendance History</h3><div id="historyContent"></div></div></div>
@@ -1157,10 +1205,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
     <script>
-        // ==================================================================
-        //  FULL ORIGINAL JAVASCRIPT – WITH LOCATION TRACKING ADDED
-        // ==================================================================
-
         // ==================================================================
         //  FIREBASE INIT
         // ==================================================================
@@ -1238,7 +1282,7 @@
         }
 
         // ==================================================================
-        //  TERM HELPER (Sierra Leone calendar)
+        //  TERM HELPER
         // ==================================================================
         function getTermFromDate(dateStr) {
             if (!dateStr) return 'unknown';
@@ -1260,7 +1304,7 @@
         }
 
         // ==================================================================
-        //  VOICE RECORDER CLASS
+        //  VOICE RECORDER CLASS (unchanged)
         // ==================================================================
         class VoiceRecorder {
             constructor(containerId, onSaveCallback) {
@@ -1583,7 +1627,7 @@
         }
 
         // ==================================================================
-        //  DASHBOARD – STUDENT STATS (original)
+        //  DASHBOARD – STUDENT STATS
         // ==================================================================
         let dashboardStudentRecords = [];
         let dashboardExamYearsMap = {};
@@ -1744,7 +1788,7 @@
         }
 
         // ==================================================================
-        //  NEW: STAFF DASHBOARD STATISTICS
+        //  STAFF DASHBOARD STATISTICS
         // ==================================================================
         async function loadStaffDashboard() {
             const container = document.getElementById('staffDashboardContent');
@@ -1760,7 +1804,6 @@
                     return;
                 }
 
-                // Count by department, gender, status
                 const deptCount = {};
                 const genderCount = { Male: 0, Female: 0, Other: 0 };
                 const statusCount = { active: 0, inactive: 0 };
@@ -1768,23 +1811,19 @@
                 staff.forEach(t => {
                     const dept = t.department || 'Unassigned';
                     deptCount[dept] = (deptCount[dept] || 0) + 1;
-
                     const gender = t.gender || 'Other';
                     if (gender.toLowerCase() === 'male') genderCount.Male++;
                     else if (gender.toLowerCase() === 'female') genderCount.Female++;
                     else genderCount.Other++;
-
                     const status = t.status || 'active';
                     if (status === 'active') statusCount.active++;
                     else statusCount.inactive++;
                 });
 
-                // Build HTML
                 let html = `<div style="margin-bottom:12px; font-size:0.95rem; color:#1a3a5c; background:#f0f5fa; padding:10px 16px; border-radius:12px;">
                     <strong>Total Staff:</strong> ${staff.length}
                 </div>`;
 
-                // Department bars
                 html += `<div class="dashboard-grid">`;
                 html += `<div class="dash-card"><h4>By Department</h4>`;
                 const deptKeys = Object.keys(deptCount).sort();
@@ -1798,7 +1837,6 @@
                 }
                 html += `</div>`;
 
-                // Gender bars
                 html += `<div class="dash-card"><h4>By Gender</h4>`;
                 const genderKeys = ['Male', 'Female', 'Other'];
                 for (const g of genderKeys) {
@@ -1812,7 +1850,6 @@
                 }
                 html += `</div>`;
 
-                // Status bars
                 html += `<div class="dash-card"><h4>By Status</h4>`;
                 const statusKeys = ['active', 'inactive'];
                 for (const s of statusKeys) {
@@ -2239,7 +2276,7 @@
         }
 
         // ==================================================================
-        //  ADD SINGLE STUDENT – with entryDate
+        //  ADD SINGLE STUDENT
         // ==================================================================
         async function addManualStudent() {
             if (currentUserRole !== 'admin') {
@@ -2290,7 +2327,6 @@
                     showMessage('Student added successfully!', 'success', 'manualMessage');
                 }
 
-                // Clear fields
                 document.getElementById('newStudentId').value = '';
                 document.getElementById('newStudentName').value = '';
                 document.getElementById('newStudentDob').value = '';
@@ -2484,7 +2520,7 @@
         }
 
         // ==================================================================
-        //  EXAM HISTORY (read-only) – UPDATED with year filter
+        //  EXAM HISTORY (read-only)
         // ==================================================================
         async function loadExamHistory() {
             if (!currentStudentDoc) {
@@ -2504,7 +2540,6 @@
                 return;
             }
 
-            // Get selected year, term, level, assessment
             const year = document.getElementById('examHistoryYear').value.trim();
             const termBtn = document.querySelector('#examhistoryTab .term-btn2.active');
             const term = termBtn ? termBtn.dataset.term : 'term1';
@@ -2535,7 +2570,6 @@
             }
             const subjects = termData[assessment];
 
-            // Build HTML
             let html = `<h4>${level.toUpperCase()} – ${term} – ${assessment} (${year})</h4><ul>`;
             subjects.forEach(s => {
                 html += `<li>${escapeHtml(s.name)}: ${s.score}</li>`;
@@ -2574,11 +2608,10 @@
                     };
                 });
             }
-            // Year input and refresh button events are set in window.onload
         }
 
         // ==================================================================
-        //  PAYMENT HISTORY (read-only)
+        //  PAYMENT HISTORY
         // ==================================================================
         async function loadPaymentHistory() {
             try {
@@ -2621,7 +2654,7 @@
         }
 
         // ==================================================================
-        //  ATTENDANCE HISTORY (with reply & delete)
+        //  ATTENDANCE HISTORY
         // ==================================================================
         async function loadAttendanceHistory() {
             try {
@@ -2991,7 +3024,7 @@
         }
 
         // ==================================================================
-        //  BURSAR FUNCTIONS (original)
+        //  BURSAR FUNCTIONS
         // ==================================================================
         async function loadBursarStudent() {
             const q = document.getElementById('bursarStudentSearch').value.trim();
@@ -3025,7 +3058,6 @@
             html += '</tbody></table>';
             document.getElementById('bursarFeeStatus').innerHTML = html;
 
-            // Transactions
             let transHtml = '<h4>Transactions</h4><table><thead><tr><th>Date</th><th>Term</th><th>Amount (Le)</th><th>Type</th><th>Note</th></tr></thead><tbody>';
             let allTrans = [];
             for (const t of terms) {
@@ -3041,7 +3073,6 @@
             transHtml += '</tbody></table>';
             document.getElementById('bursarPaymentTransactions').innerHTML = transHtml;
 
-            // Fill edit fields
             document.getElementById('editTerm1FeesBursar').value = data.term1?.total || 0;
             document.getElementById('editTerm2FeesBursar').value = data.term2?.total || 0;
             document.getElementById('editTerm3FeesBursar').value = data.term3?.total || 0;
@@ -3129,15 +3160,7 @@
             const tenantId = getCurrentTenantId();
             const year = document.getElementById('feeStatsYear').value;
             const term = document.getElementById('feeStatsTerm').value;
-            // Build year filter for students
-            let studentsSnap;
-            if (year !== 'all') {
-                // We need to filter students by year of registration (if stored) or use exam years as proxy
-                // For simplicity, we'll use all students
-                studentsSnap = await db.collection('students').where('tenantId', '==', tenantId).get();
-            } else {
-                studentsSnap = await db.collection('students').where('tenantId', '==', tenantId).get();
-            }
+            let studentsSnap = await db.collection('students').where('tenantId', '==', tenantId).get();
             const students = [];
             studentsSnap.forEach(d => students.push({ id: d.id, ...d.data() }));
 
@@ -3196,7 +3219,7 @@
         }
 
         // ==================================================================
-        //  LOCATION HELPERS (NEW)
+        //  LOCATION HELPERS
         // ==================================================================
         async function getSchoolLocation() {
             const tenantId = getCurrentTenantId();
@@ -3208,7 +3231,7 @@
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // earth radius in meters
+            const R = 6371e3;
             const φ1 = lat1 * Math.PI/180;
             const φ2 = lat2 * Math.PI/180;
             const Δφ = (lat2-lat1) * Math.PI/180;
@@ -3217,11 +3240,257 @@
                       Math.cos(φ1) * Math.cos(φ2) *
                       Math.sin(Δλ/2) * Math.sin(Δλ/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c; // in meters
+            return R * c;
         }
 
         // ==================================================================
-        //  ADMIN/TEACHER FUNCTIONS (with location updates)
+        //  AI CHATBOT – RULE-BASED (FREE, NO API KEY REQUIRED)
+        // ==================================================================
+        let chatHistory = [];
+        let chatbotStudentData = null;
+        let chatbotAttendance = [];
+        let chatbotFeeData = null;
+        let chatbotNotices = [];
+
+        // Fetch all data needed for the chatbot
+        async function loadChatbotData(studentId) {
+            const tenantId = getCurrentTenantId();
+            
+            // Student data
+            const studentDoc = await db.collection('students').doc(studentId).get();
+            if (studentDoc.exists) {
+                chatbotStudentData = studentDoc.data();
+            }
+
+            // Attendance (last 30 days)
+            const attSnap = await db.collection('attendance')
+                .where('tenantId', '==', tenantId)
+                .where('studentId', '==', studentId)
+                .orderBy('date', 'desc')
+                .limit(30)
+                .get();
+            chatbotAttendance = [];
+            attSnap.forEach(doc => chatbotAttendance.push(doc.data()));
+
+            // Fee records
+            const feeDoc = await db.collection('fee_records').doc(studentId).get();
+            chatbotFeeData = feeDoc.exists ? feeDoc.data() : null;
+
+            // Latest notices
+            const noticeSnap = await db.collection('notices')
+                .where('tenantId', '==', tenantId)
+                .orderBy('timestamp', 'desc')
+                .limit(5)
+                .get();
+            chatbotNotices = [];
+            noticeSnap.forEach(doc => chatbotNotices.push(doc.data()));
+        }
+
+        // Get today's attendance status
+        function getTodayAttendance() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayAtt = chatbotAttendance.find(a => a.date === today);
+            return todayAtt || null;
+        }
+
+        // Get attendance summary
+        function getAttendanceSummary() {
+            if (chatbotAttendance.length === 0) return 'No attendance records found.';
+            const present = chatbotAttendance.filter(a => a.status === 'present').length;
+            const absent = chatbotAttendance.filter(a => a.status === 'absent').length;
+            const late = chatbotAttendance.filter(a => a.status === 'late').length;
+            const total = chatbotAttendance.length;
+            return `Out of ${total} recorded days: ${present} present, ${absent} absent, ${late} late.`;
+        }
+
+        // Get fee summary
+        function getFeeSummary() {
+            if (!chatbotFeeData) return 'No fee records found.';
+            const terms = ['term1', 'term2', 'term3'];
+            const termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
+            let summary = [];
+            for (const t of terms) {
+                const term = chatbotFeeData[t] || { total: 0, paid: 0 };
+                const balance = term.total - term.paid;
+                summary.push(`${termNames[t]}: Paid Le ${term.paid.toLocaleString()}, Balance Le ${balance.toLocaleString()}`);
+            }
+            return summary.join('\n');
+        }
+
+        // Get notices summary
+        function getNoticesSummary() {
+            if (chatbotNotices.length === 0) return 'No notices available.';
+            return chatbotNotices.map(n => `• ${n.title}: ${n.content}`).join('\n');
+        }
+
+        // Process chatbot message
+        async function processChatbotMessage(message) {
+            const lower = message.toLowerCase();
+            
+            // Wait for data if not loaded
+            if (!chatbotStudentData) {
+                return "I'm still loading your child's information. Please try again in a moment.";
+            }
+
+            // Attendance questions
+            if (lower.includes('attendance') || lower.includes('present') || lower.includes('absent') || lower.includes('late') || lower.includes('today')) {
+                const todayAtt = getTodayAttendance();
+                if (todayAtt) {
+                    return `Today (${todayAtt.date}), your child was marked as: **${todayAtt.status.toUpperCase()}**.\nRemark: ${todayAtt.remark || 'No remark'}`;
+                } else {
+                    return `No attendance recorded for today. Here's the summary:\n${getAttendanceSummary()}`;
+                }
+            }
+
+            // Fee questions
+            if (lower.includes('fee') || lower.includes('payment') || lower.includes('balance') || lower.includes('money') || lower.includes('pay')) {
+                const summary = getFeeSummary();
+                return `Here's the fee summary:\n${summary}`;
+            }
+
+            // Notice questions
+            if (lower.includes('notice') || lower.includes('news') || lower.includes('announce') || lower.includes('update') || lower.includes('event')) {
+                const summary = getNoticesSummary();
+                return `Latest school notices:\n${summary}`;
+            }
+
+            // Exam/grade questions
+            if (lower.includes('exam') || lower.includes('grade') || lower.includes('score') || lower.includes('result') || lower.includes('test')) {
+                return "I'm checking the exam records. Please ask a specific question like 'What were the exam results for Term 1?'";
+            }
+
+            // Class/schedule questions
+            if (lower.includes('class') || lower.includes('schedule') || lower.includes('time') || lower.includes('subject')) {
+                const className = chatbotStudentData.class || 'Not assigned';
+                return `Your child is in ${className}. For the full timetable, please contact the school office.`;
+            }
+
+            // General / About the child
+            if (lower.includes('child') || lower.includes('name') || lower.includes('student') || lower.includes('about')) {
+                return `Your child is ${chatbotStudentData.name} (ID: ${chatbotStudentData.id}).\nClass: ${chatbotStudentData.class || 'Not assigned'}\nGender: ${chatbotStudentData.gender || 'Not provided'}`;
+            }
+
+            // Help / What can you do
+            if (lower.includes('help') || lower.includes('what can you do') || lower.includes('capabilities')) {
+                return "I can answer questions about:\n• Today's attendance\n• Attendance summary\n• Fee status and balance\n• Latest school notices\n• Your child's basic information\nJust ask naturally!";
+            }
+
+            // Default / Unknown
+            return "I'm not sure about that. You can ask me about:\n• Attendance (today or summary)\n• Fees and balances\n• School notices\n• Your child's class and information\n\nIf you need more detailed help, please contact the school office.";
+        }
+
+        // ==================================================================
+        //  CHAT UI FUNCTIONS
+        // ==================================================================
+        function addChatMessage(sender, text, isUser = false) {
+            const container = document.getElementById('chatMessages');
+            if (!container) return;
+            const div = document.createElement('div');
+            div.className = `chat-message ${isUser ? 'user' : (sender === 'System' ? 'system' : 'ai')}`;
+            div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            chatHistory.push({ sender, text, isUser });
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            addChatMessage('You', msg, true);
+            input.value = '';
+            document.getElementById('chatStatus').textContent = '⏳ Thinking...';
+
+            try {
+                // Check if we have a student linked
+                if (!parentLinkedStudentId) {
+                    throw new Error('No student linked to your account.');
+                }
+
+                // Load data if not already loaded or if student changed
+                if (!chatbotStudentData || chatbotStudentData.id !== parentLinkedStudentId) {
+                    await loadChatbotData(parentLinkedStudentId);
+                }
+
+                const reply = await processChatbotMessage(msg);
+                addChatMessage('AI Assistant', reply);
+                document.getElementById('chatStatus').textContent = '✅ Response sent';
+            } catch (error) {
+                console.error('Chat error:', error);
+                addChatMessage('System', 'Sorry, I could not process your request. Please try again.');
+                document.getElementById('chatStatus').textContent = '❌ Error occurred';
+            }
+        }
+
+        function setupVoiceInput() {
+            const voiceBtn = document.getElementById('voiceChatBtn');
+            if (!voiceBtn) return;
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            if (!recognition) {
+                voiceBtn.style.display = 'none';
+                return;
+            }
+            recognition.lang = 'en-US';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            voiceBtn.onclick = function() {
+                document.getElementById('chatStatus').textContent = '🎤 Listening...';
+                recognition.start();
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chatInput').value = transcript;
+                document.getElementById('chatStatus').textContent = '✅ Voice captured';
+                setTimeout(() => document.getElementById('sendChatBtn').click(), 500);
+            };
+
+            recognition.onerror = function(event) {
+                document.getElementById('chatStatus').textContent = '❌ Voice error: ' + event.error;
+            };
+
+            recognition.onend = function() {
+                document.getElementById('chatStatus').textContent = '';
+            };
+        }
+
+        function clearChat() {
+            if (!confirm('Clear the conversation history?')) return;
+            const container = document.getElementById('chatMessages');
+            if (!container) return;
+            container.innerHTML = `
+                <div style="color:#6c7a89; text-align:center; padding:40px 0;">
+                    👋 Ask me about your child's school life...
+                </div>
+            `;
+            chatHistory = [];
+        }
+
+        function initChatbot() {
+            const sendBtn = document.getElementById('sendChatBtn');
+            if (!sendBtn) return;
+            
+            sendBtn.onclick = sendChatMessage;
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+            document.getElementById('clearChatBtn').onclick = clearChat;
+            setupVoiceInput();
+
+            // Welcome message
+            if (parentLinkedStudentId) {
+                setTimeout(() => {
+                    addChatMessage('AI Assistant', '👋 Hello! I\'m your AI school assistant. You can ask me about:\n• Today\'s attendance\n• Fee status and balances\n• School notices\n• Your child\'s information\n\nJust type or speak your question!');
+                    // Preload data
+                    loadChatbotData(parentLinkedStudentId).catch(console.warn);
+                }, 500);
+            }
+        }
+
+        // ==================================================================
+        //  ADMIN/TEACHER FUNCTIONS
         // ==================================================================
         async function addTeacherAdmin() {
             if (currentUserRole !== 'admin') { showMessage('Only admin can add teachers.', 'error', 'teacherMessage'); return; }
@@ -3236,16 +3505,10 @@
             try {
                 const userCred = await auth.createUserWithEmailAndPassword(email, password);
                 await db.collection('users').doc(userCred.user.uid).set({
-                    role: role,
-                    email: email,
-                    name: name,
-                    tenantId: tenantId
+                    role: role, email: email, name: name, tenantId: tenantId
                 });
                 const teacherData = {
-                    id: id,
-                    name: name,
-                    email: email,
-                    role: role,
+                    id: id, name: name, email: email, role: role,
                     phone: document.getElementById('teacherPhone').value.trim(),
                     dob: document.getElementById('teacherDob').value,
                     employmentDate: document.getElementById('teacherEmploymentDate').value,
@@ -3299,8 +3562,7 @@
             document.querySelectorAll('.delete-teacher-btn').forEach(btn => {
                 btn.onclick = async function() {
                     if (confirm('Delete this teacher?')) {
-                        const id = this.dataset.id;
-                        await db.collection('teachers').doc(id).delete();
+                        await db.collection('teachers').doc(this.dataset.id).delete();
                         loadAllTeachersForAdmin();
                     }
                 };
@@ -3412,169 +3674,152 @@
         }
 
         // ==================================================================
-        //  TEACHER REGISTER (FIXED HISTORY + LOCATION)
+        //  TEACHER REGISTER (with Location Tracking)
         // ==================================================================
-       async function loadTeacherRegister() {
-    const q = document.getElementById('teacherRegisterSearch').value.trim();
-    const tenantId = getCurrentTenantId();
-    const snap = await db.collection('teachers').where('tenantId', '==', tenantId).get();
-    let found = null;
-    snap.forEach(d => {
-        const data = d.data();
-        if (data.id === q || data.name.toLowerCase() === q.toLowerCase()) found = { docId: d.id, ...data };
-    });
-    if (!found) { showMessage('Teacher not found.', 'error', 'teacherRegisterInfo'); return; }
-    currentTeacherRegister = found;
-    document.getElementById('teacherRegisterInfo').innerHTML = `<div class="success">${escapeHtml(found.name)} (${found.id})</div>`;
-    const today = new Date().toISOString().split('T')[0];
-    const attDoc = await db.collection('staff_attendance').doc(today + '_' + found.id).get();
-    const status = attDoc.exists ? attDoc.data().status : 'Not checked in';
-
-    // Display today's location info (with safe time checks)
-    const locData = attDoc.exists ? attDoc.data() : null;
-    let locHtml = '';
-    if (locData && locData.latitude) {
-        const checkInTime = (locData.checkInTime && typeof locData.checkInTime.toDate === 'function') 
-            ? new Date(locData.checkInTime.toDate()).toLocaleTimeString() 
-            : 'Not checked in';
-        const checkOutTime = (locData.checkOutTime && typeof locData.checkOutTime.toDate === 'function') 
-            ? new Date(locData.checkOutTime.toDate()).toLocaleTimeString() 
-            : 'Not checked out';
-        locHtml = `
-            <p><strong>Location:</strong> ${locData.latitude.toFixed(6)}, ${locData.longitude.toFixed(6)}</p>
-            <p><strong>Distance from school:</strong> ${locData.distanceFromSchool !== null ? locData.distanceFromSchool.toFixed(1) + ' m' : 'N/A'}</p>
-            <p><strong>Status:</strong> ${locData.locationStatus || 'Unknown'}</p>
-            <p><strong>Check In Time:</strong> ${checkInTime}</p>
-            <p><strong>Check Out Time:</strong> ${checkOutTime}</p>
-        `;
-    } else {
-        locHtml = '<p>No location data for today.</p>';
-    }
-    document.getElementById('teacherLocationInfo').innerHTML = `<div class="card"><h4>Today's Location</h4>${locHtml}</div>`;
-
-    // Check In / Check Out buttons
-    const html = `<p>Today: ${today} – Status: <strong>${status}</strong></p>
-        <button id="checkInBtn" class="refresh-btn">Check In</button>
-        <button id="checkOutBtn" style="background:#fde8e8; color:#b71c1c;">Check Out</button>`;
-    document.getElementById('teacherRegisterAttendance').innerHTML = html;
-
-    // Check In
-    document.getElementById('checkInBtn').onclick = function() {
-        if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser.');
-            return;
-        }
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude, accuracy } = position.coords;
-                const schoolLoc = await getSchoolLocation();
-                const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
-                await db.collection('staff_attendance').doc(today + '_' + found.id).set({
-                    staffId: found.id,
-                    date: today,
-                    status: 'Checked In',
-                    tenantId: tenantId,
-                    latitude,
-                    longitude,
-                    accuracy,
-                    distanceFromSchool: distance,
-                    locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises',
-                    checkInTime: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                loadTeacherRegister();
-            },
-            (error) => {
-                alert('Unable to get location. Please allow location access.');
-                console.error(error);
-            },
-            { enableHighAccuracy: true }
-        );
-    };
-
-    // Check Out
-    document.getElementById('checkOutBtn').onclick = function() {
-        if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser.');
-            return;
-        }
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude, accuracy } = position.coords;
-                const schoolLoc = await getSchoolLocation();
-                const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
-                await db.collection('staff_attendance').doc(today + '_' + found.id).set({
-                    staffId: found.id,
-                    date: today,
-                    status: 'Checked Out',
-                    tenantId: tenantId,
-                    latitude,
-                    longitude,
-                    accuracy,
-                    distanceFromSchool: distance,
-                    locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises',
-                    checkOutTime: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                loadTeacherRegister();
-            },
-            (error) => {
-                alert('Unable to get location. Please allow location access.');
-                console.error(error);
-            },
-            { enableHighAccuracy: true }
-        );
-    };
-
-    // ----- HISTORY TABLE (with safe time formatting) -----
-    try {
-        const histSnap = await db.collection('staff_attendance')
-            .where('tenantId', '==', tenantId)
-            .where('staffId', '==', found.id)
-            .orderBy('date', 'desc')
-            .get();
-
-        let histHtml = '<h4>Attendance History</h4><table><thead><tr><th>Date</th><th>Status</th><th>Check In Time</th><th>Check Out Time</th><th>Latitude</th><th>Longitude</th><th>Distance (m)</th><th>Location Status</th></tr></thead><tbody>';
-
-        if (histSnap.empty) {
-            histHtml += '<tr><td colspan="8">No records found.</td></tr>';
-        } else {
-            histSnap.forEach(d => {
+        async function loadTeacherRegister() {
+            const q = document.getElementById('teacherRegisterSearch').value.trim();
+            const tenantId = getCurrentTenantId();
+            const snap = await db.collection('teachers').where('tenantId', '==', tenantId).get();
+            let found = null;
+            snap.forEach(d => {
                 const data = d.data();
-                // Safe check for checkInTime / checkOutTime
-                const checkInTime = (data.checkInTime && typeof data.checkInTime.toDate === 'function') 
-                    ? new Date(data.checkInTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) 
-                    : '—';
-                const checkOutTime = (data.checkOutTime && typeof data.checkOutTime.toDate === 'function') 
-                    ? new Date(data.checkOutTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) 
-                    : '—';
-
-                histHtml += `<tr>
-                    <td>${data.date}</td>
-                    <td>${data.status}</td>
-                    <td>${checkInTime}</td>
-                    <td>${checkOutTime}</td>
-                    <td>${data.latitude ? data.latitude.toFixed(6) : '—'}</td>
-                    <td>${data.longitude ? data.longitude.toFixed(6) : '—'}</td>
-                    <td>${data.distanceFromSchool !== null && data.distanceFromSchool !== undefined ? data.distanceFromSchool.toFixed(1) : '—'}</td>
-                    <td>${data.locationStatus || '—'}</td>
-                </tr>`;
+                if (data.id === q || data.name.toLowerCase() === q.toLowerCase()) found = { docId: d.id, ...data };
             });
+            if (!found) { showMessage('Teacher not found.', 'error', 'teacherRegisterInfo'); return; }
+            currentTeacherRegister = found;
+            document.getElementById('teacherRegisterInfo').innerHTML = `<div class="success">${escapeHtml(found.name)} (${found.id})</div>`;
+            const today = new Date().toISOString().split('T')[0];
+            const attDoc = await db.collection('staff_attendance').doc(today + '_' + found.id).get();
+            const status = attDoc.exists ? attDoc.data().status : 'Not checked in';
+
+            const locData = attDoc.exists ? attDoc.data() : null;
+            let locHtml = '';
+            if (locData && locData.latitude) {
+                const checkInTime = (locData.checkInTime && typeof locData.checkInTime.toDate === 'function') 
+                    ? new Date(locData.checkInTime.toDate()).toLocaleTimeString() 
+                    : 'Not checked in';
+                const checkOutTime = (locData.checkOutTime && typeof locData.checkOutTime.toDate === 'function') 
+                    ? new Date(locData.checkOutTime.toDate()).toLocaleTimeString() 
+                    : 'Not checked out';
+                locHtml = `
+                    <p><strong>Location:</strong> ${locData.latitude.toFixed(6)}, ${locData.longitude.toFixed(6)}</p>
+                    <p><strong>Distance from school:</strong> ${locData.distanceFromSchool !== null ? locData.distanceFromSchool.toFixed(1) + ' m' : 'N/A'}</p>
+                    <p><strong>Status:</strong> ${locData.locationStatus || 'Unknown'}</p>
+                    <p><strong>Check In Time:</strong> ${checkInTime}</p>
+                    <p><strong>Check Out Time:</strong> ${checkOutTime}</p>
+                `;
+            } else {
+                locHtml = '<p>No location data for today.</p>';
+            }
+            document.getElementById('teacherLocationInfo').innerHTML = `<div class="card"><h4>Today's Location</h4>${locHtml}</div>`;
+
+            const html = `<p>Today: ${today} – Status: <strong>${status}</strong></p>
+                <button id="checkInBtn" class="refresh-btn">Check In</button>
+                <button id="checkOutBtn" style="background:#fde8e8; color:#b71c1c;">Check Out</button>`;
+            document.getElementById('teacherRegisterAttendance').innerHTML = html;
+
+            document.getElementById('checkInBtn').onclick = function() {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser.');
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude, accuracy } = position.coords;
+                        const schoolLoc = await getSchoolLocation();
+                        const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
+                        await db.collection('staff_attendance').doc(today + '_' + found.id).set({
+                            staffId: found.id, date: today, status: 'Checked In', tenantId: tenantId,
+                            latitude, longitude, accuracy,
+                            distanceFromSchool: distance,
+                            locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises',
+                            checkInTime: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        loadTeacherRegister();
+                    },
+                    (error) => {
+                        alert('Unable to get location. Please allow location access.');
+                        console.error(error);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            };
+
+            document.getElementById('checkOutBtn').onclick = function() {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser.');
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude, accuracy } = position.coords;
+                        const schoolLoc = await getSchoolLocation();
+                        const distance = schoolLoc ? getDistance(latitude, longitude, schoolLoc.lat, schoolLoc.lng) : null;
+                        await db.collection('staff_attendance').doc(today + '_' + found.id).set({
+                            staffId: found.id, date: today, status: 'Checked Out', tenantId: tenantId,
+                            latitude, longitude, accuracy,
+                            distanceFromSchool: distance,
+                            locationStatus: distance !== null && distance < 100 ? 'On Premises' : 'Off Premises',
+                            checkOutTime: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        loadTeacherRegister();
+                    },
+                    (error) => {
+                        alert('Unable to get location. Please allow location access.');
+                        console.error(error);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            };
+
+            try {
+                const histSnap = await db.collection('staff_attendance')
+                    .where('tenantId', '==', tenantId)
+                    .where('staffId', '==', found.id)
+                    .orderBy('date', 'desc')
+                    .get();
+
+                let histHtml = '<h4>Attendance History</h4><table><thead><tr><th>Date</th><th>Status</th><th>Check In Time</th><th>Check Out Time</th><th>Latitude</th><th>Longitude</th><th>Distance (m)</th><th>Location Status</th></tr></thead><tbody>';
+
+                if (histSnap.empty) {
+                    histHtml += '<tr><td colspan="8">No records found.</td></tr>';
+                } else {
+                    histSnap.forEach(d => {
+                        const data = d.data();
+                        const checkInTime = (data.checkInTime && typeof data.checkInTime.toDate === 'function') 
+                            ? new Date(data.checkInTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) 
+                            : '—';
+                        const checkOutTime = (data.checkOutTime && typeof data.checkOutTime.toDate === 'function') 
+                            ? new Date(data.checkOutTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) 
+                            : '—';
+
+                        histHtml += `<tr>
+                            <td>${data.date}</td>
+                            <td>${data.status}</td>
+                            <td>${checkInTime}</td>
+                            <td>${checkOutTime}</td>
+                            <td>${data.latitude ? data.latitude.toFixed(6) : '—'}</td>
+                            <td>${data.longitude ? data.longitude.toFixed(6) : '—'}</td>
+                            <td>${data.distanceFromSchool !== null && data.distanceFromSchool !== undefined ? data.distanceFromSchool.toFixed(1) : '—'}</td>
+                            <td>${data.locationStatus || '—'}</td>
+                        </tr>`;
+                    });
+                }
+                histHtml += '</tbody></table>';
+                document.getElementById('teacherRegisterHistory').innerHTML = histHtml;
+            } catch (error) {
+                console.error('History error:', error);
+                document.getElementById('teacherRegisterHistory').innerHTML = `<div class="error">Error loading history: ${escapeHtml(error.message)}</div>`;
+            }
         }
 
-        histHtml += '</tbody></table>';
-        document.getElementById('teacherRegisterHistory').innerHTML = histHtml;
-    } catch (error) {
-        console.error('History error:', error);
-        document.getElementById('teacherRegisterHistory').innerHTML = `<div class="error">Error loading history: ${escapeHtml(error.message)}</div>`;
-    }
-}
-        // Helper: load teacher register by ID (for teacher auto-load)
         async function loadTeacherRegisterForId(id) {
             document.getElementById('teacherRegisterSearch').value = id;
             await loadTeacherRegister();
         }
 
         // ==================================================================
-        //  ADMIN: STAFF, ASSETS, INVENTORY, VISITORS, FILES, SUGGESTIONS, LOCATION SETTINGS
+        //  ADMIN: STAFF, ASSETS, INVENTORY, VISITORS, FILES, SCHOOL LOCATION
         // ==================================================================
         async function addStaff() {
             if (currentUserRole !== 'admin') return;
@@ -3768,7 +4013,6 @@
             };
         }
 
-        // School Location settings
         document.getElementById('saveSchoolLocationBtn').onclick = async function() {
             const lat = parseFloat(document.getElementById('schoolLat').value);
             const lng = parseFloat(document.getElementById('schoolLng').value);
@@ -4114,7 +4358,7 @@
         };
 
         // ==================================================================
-        //  NEW: STAFF PAYROLL / PAYMENT VOUCHER
+        //  STAFF PAYROLL / PAYMENT VOUCHER
         // ==================================================================
         async function loadStaffPayroll() {
             const container = document.getElementById('staffPayrollList');
@@ -4196,11 +4440,7 @@
             try {
                 const tenantId = getCurrentTenantId();
                 const paymentData = {
-                    staffId,
-                    staffName,
-                    amount,
-                    month: month,
-                    year: year,
+                    staffId, staffName, amount, month: month, year: year,
                     note: note || 'Salary payment',
                     date: new Date().toISOString().split('T')[0],
                     tenantId: tenantId,
@@ -4221,7 +4461,6 @@
                 `;
                 document.getElementById('voucherContent').innerHTML = voucherHtml;
                 document.getElementById('voucherDisplay').style.display = 'block';
-
                 window._voucherHtml = voucherHtml;
             } catch (error) {
                 showMessage('Error recording payment: ' + error.message, 'error', 'payrollModalMessage');
@@ -4322,7 +4561,81 @@
         };
 
         // ==================================================================
-        //  LOGIN AND SETUP (original + location tab load)
+        //  IMPORT TEACHERS (Excel)
+        // ==================================================================
+        async function importTeachersExcel(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const tenantId = getCurrentTenantId();
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const rows = XLSX.utils.sheet_to_json(sheet);
+                        for (const row of rows) {
+                            const teacher = {
+                                id: row.TeacherID || row.id,
+                                name: row.Name || row.name,
+                                email: row.Email || row.email,
+                                class: row.Class || row.class,
+                                department: row.Department || '',
+                                subjects: (row.Subjects || '').split(',').map(s => s.trim()),
+                                salary: parseFloat(row.Salary) || 0,
+                                dob: row.DOB || '',
+                                employmentDate: row.EmploymentDate || '',
+                                qualification: row.Qualification || '',
+                                nin: row.NIN || '',
+                                status: 'active',
+                                tenantId: tenantId
+                            };
+                            if (teacher.id && teacher.name) {
+                                await db.collection('teachers').doc(teacher.id).set(teacher, { merge: true });
+                            }
+                        }
+                        resolve();
+                        loadAllTeachersForAdmin();
+                    } catch (err) { console.error('Import error:', err); resolve(); }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // ==================================================================
+        //  SUGGESTION FAB
+        // ==================================================================
+        document.getElementById('suggestionFab').onclick = function() {
+            document.getElementById('suggestionText').value = '';
+            document.getElementById('suggestionMessage').innerHTML = '';
+            if (voiceRecorders['voiceRecorder_suggestion']) {
+                voiceRecorders['voiceRecorder_suggestion'].clear();
+            } else {
+                voiceRecorders['voiceRecorder_suggestion'] = new VoiceRecorder('voiceRecorder_suggestion', null);
+            }
+            openModal('suggestionModal');
+        };
+
+        document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
+        document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
+
+        // ==================================================================
+        //  IMPORT BUTTONS
+        // ==================================================================
+        document.getElementById('importTeachersBtn').onclick = function() {
+            if (currentUserRole !== 'admin') return;
+            const f = document.getElementById('teacherExcelFile').files[0];
+            if (f) importTeachersExcel(f);
+        };
+
+        document.getElementById('downloadTeacherSampleBtn').onclick = function() {
+            const ws = XLSX.utils.json_to_sheet([{ TeacherID: 'T001', Name: 'Jane Smith', Email: 'jane@school.com', Class: 'JSS1', Department: 'Science', Subjects: 'Physics, Chemistry', Salary: 5000, DOB: '1990-01-01', EmploymentDate: '2020-01-01', Qualification: 'B.Ed', NIN: 'SL123456789' }]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
+            XLSX.writeFile(wb, 'teacher_sample.xlsx');
+        };
+
+        // ==================================================================
+        //  LOGIN AND SETUP
         // ==================================================================
         async function loginAndSetup(email, password, skipAuth = false) {
             try {
@@ -4359,6 +4672,7 @@
                 } else if (role === 'parent') {
                     const studentId = userData.studentId;
                     if (!studentId) throw new Error('No student linked to this parent account');
+                    parentLinkedStudentId = studentId;
                     setupRoleUI('parent', { studentId: studentId });
                 } else { throw new Error('Invalid role'); }
 
@@ -4397,19 +4711,24 @@
                 document.getElementById('dashboardYearFilter').onchange = loadDashboard;
                 document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
                 document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
-
-                // Exam history refresh & year change
                 document.getElementById('refreshExamHistoryBtn').onclick = function() {
                     if (currentStudentDoc) loadExamHistory();
                 };
                 document.getElementById('examHistoryYear').addEventListener('change', function() {
                     if (currentStudentDoc) loadExamHistory();
                 });
+                document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
 
-                // Staff dashboard refresh
-                document.getElementById('refreshStaffDashboardBtn').onclick = function() {
-                    loadStaffDashboard();
-                };
+                // Initialize chatbot if parent
+                if (role === 'parent') {
+                    setTimeout(() => {
+                        const chatTab = document.querySelector('[data-tab="aichat"]');
+                        if (chatTab) {
+                            chatTab.click();
+                            initChatbot();
+                        }
+                    }, 1000);
+                }
 
                 const firstModuleBtn = document.querySelector('.module-btn');
                 if (firstModuleBtn) firstModuleBtn.click();
@@ -4453,6 +4772,10 @@
                     loadPaymentHistory();
                     loadExamHistory();
                     loadAttendanceHistory();
+                    // Initialize chatbot if parent
+                    if (currentUserRole === 'parent' && parentLinkedStudentId) {
+                        initChatbot();
+                    }
                 } catch (error) {
                     showMessage('Error searching: ' + error.message, 'error', 'searchResults');
                 }
@@ -4497,6 +4820,10 @@
                     if (m.moduleId === 'bursarModule') { loadBursarSummary(); populateFeeStatsYears().then(loadFeeStats); }
                     if (m.moduleId === 'adminModule') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); renderNotices(); initFileDB().then(loadFilesList); loadLoginActivity(); loadSchoolLocation(); }
                     if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
+                    // Initialize chatbot if parent and records module
+                    if (m.moduleId === 'recordsModule' && role === 'parent' && parentLinkedStudentId) {
+                        setTimeout(initChatbot, 300);
+                    }
                 };
                 moduleContainer.appendChild(btn);
             });
@@ -4593,6 +4920,8 @@
                         document.getElementById('studentRecordsPanel').style.display = 'block';
                         document.getElementById('searchResults').innerHTML = `<div class="success">Viewing record for: ${escapeHtml(found.name)} (${found.id})</div>`;
                         loadStudentProfile(); loadPaymentHistory(); loadExamHistory(); loadAttendanceHistory();
+                        // Initialize chatbot
+                        setTimeout(initChatbot, 300);
                     } catch (error) {
                         showMessage('Error loading student: ' + error.message, 'error', 'searchResults');
                     }
@@ -4607,11 +4936,21 @@
                         if (window.loadParentStudent) window.loadParentStudent();
                     };
                 }
+                // Initialize chatbot after a short delay
+                setTimeout(() => {
+                    if (parentLinkedStudentId) {
+                        const chatTab = document.querySelector('[data-tab="aichat"]');
+                        if (chatTab) {
+                            chatTab.click();
+                            initChatbot();
+                        }
+                    }
+                }, 1500);
             }
         }
 
         // ==================================================================
-        //  WINDOW ONLOAD (original + location settings)
+        //  WINDOW ONLOAD
         // ==================================================================
         window.onload = function() {
             function updateOnlineStatus() {
@@ -4697,6 +5036,9 @@
                     loadPaymentHistory();
                     loadExamHistory();
                     loadAttendanceHistory();
+                    if (currentUserRole === 'parent' && parentLinkedStudentId) {
+                        initChatbot();
+                    }
                 } else if (currentUserRole === 'teacher') {
                     const q = document.getElementById('studentSearchInput').value.trim();
                     const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
@@ -4735,17 +5077,6 @@
                 if (currentUserRole === 'admin') loadAllTeachersForAdmin();
             };
             document.getElementById('addTeacherBtn').onclick = function() { if (currentUserRole !== 'admin') return; addTeacherAdmin(); };
-            document.getElementById('importTeachersBtn').onclick = function() {
-                if (currentUserRole !== 'admin') return;
-                const f = document.getElementById('teacherExcelFile').files[0];
-                if (f) importTeachersExcel(f);
-            };
-            document.getElementById('downloadTeacherSampleBtn').onclick = function() {
-                const ws = XLSX.utils.json_to_sheet([{ TeacherID: 'T001', Name: 'Jane Smith', Email: 'jane@school.com', Class: 'JSS1', Department: 'Science', Subjects: 'Physics, Chemistry', Salary: 5000, DOB: '1990-01-01', EmploymentDate: '2020-01-01', Qualification: 'B.Ed', NIN: 'SL123456789' }]);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Teachers');
-                XLSX.writeFile(wb, 'teacher_sample.xlsx');
-            };
             document.getElementById('printTeachersTable').onclick = function() {
                 if (currentUserRole !== 'admin') return;
                 const tbl = document.getElementById('allTeachersList');
@@ -4837,12 +5168,7 @@
                 }
             };
 
-            // Dashboard – staff stats refresh
-            document.getElementById('refreshStaffDashboardBtn').onclick = function() {
-                loadStaffDashboard();
-            };
-
-            // Admin Tabs (including School Location)
+            document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
             document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(function(btn) {
                 btn.onclick = function() {
                     const id = this.dataset.tab;
@@ -4863,7 +5189,7 @@
                 };
             });
 
-            // Student Records Tabs
+            // Student Records Tabs (including AI Chat)
             document.querySelectorAll('.tab-btn').forEach(function(btn) {
                 btn.onclick = function() {
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -4873,70 +5199,45 @@
                     if (this.dataset.tab === 'examhistory' && currentStudentDoc) loadExamHistory();
                     if (this.dataset.tab === 'paymenthistory' && currentStudentDoc) loadPaymentHistory();
                     if (this.dataset.tab === 'attendancehistory' && currentStudentDoc) loadAttendanceHistory();
+                    if (this.dataset.tab === 'aichat' && currentUserRole === 'parent' && parentLinkedStudentId) {
+                        setTimeout(initChatbot, 200);
+                    }
                 };
             });
+
+            // Payroll buttons
+            document.getElementById('showPayrollBtn').onclick = function() {
+                const container = document.getElementById('payrollContainer');
+                if (container.style.display === 'none') {
+                    container.style.display = 'block';
+                    loadStaffPayroll();
+                    this.textContent = 'Hide Payroll';
+                } else {
+                    container.style.display = 'none';
+                    this.textContent = 'View Payroll';
+                }
+            };
+            document.getElementById('showPaymentHistoryBtn').onclick = function() {
+                const container = document.getElementById('paymentHistoryContainer');
+                if (container.style.display === 'none') {
+                    container.style.display = 'block';
+                    loadStaffPaymentHistory();
+                    this.textContent = 'Hide Payment History';
+                } else {
+                    container.style.display = 'none';
+                    this.textContent = 'View Payment History';
+                }
+            };
 
             document.getElementById('loginModal').style.display = 'flex';
+
+            // Preload chatbot data for parents after login
+            setTimeout(() => {
+                if (currentUserRole === 'parent' && parentLinkedStudentId) {
+                    loadChatbotData(parentLinkedStudentId).catch(console.warn);
+                }
+            }, 2000);
         };
-
-        // ==================================================================
-        //  MISSING FUNCTIONS (importTeachersExcel)
-        // ==================================================================
-        async function importTeachersExcel(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    try {
-                        const tenantId = getCurrentTenantId();
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const rows = XLSX.utils.sheet_to_json(sheet);
-                        for (const row of rows) {
-                            const teacher = {
-                                id: row.TeacherID || row.id,
-                                name: row.Name || row.name,
-                                email: row.Email || row.email,
-                                class: row.Class || row.class,
-                                department: row.Department || '',
-                                subjects: (row.Subjects || '').split(',').map(s => s.trim()),
-                                salary: parseFloat(row.Salary) || 0,
-                                dob: row.DOB || '',
-                                employmentDate: row.EmploymentDate || '',
-                                qualification: row.Qualification || '',
-                                nin: row.NIN || '',
-                                status: 'active',
-                                tenantId: tenantId
-                            };
-                            if (teacher.id && teacher.name) {
-                                await db.collection('teachers').doc(teacher.id).set(teacher, { merge: true });
-                            }
-                        }
-                        resolve();
-                        loadAllTeachersForAdmin();
-                    } catch (err) { console.error('Import error:', err); resolve(); }
-                };
-                reader.readAsArrayBuffer(file);
-            });
-        }
-
-        // Suggestion Fab
-        document.getElementById('suggestionFab').onclick = function() {
-            document.getElementById('suggestionText').value = '';
-            document.getElementById('suggestionMessage').innerHTML = '';
-            if (voiceRecorders['voiceRecorder_suggestion']) {
-                voiceRecorders['voiceRecorder_suggestion'].clear();
-            } else {
-                voiceRecorders['voiceRecorder_suggestion'] = new VoiceRecorder('voiceRecorder_suggestion', null);
-            }
-            openModal('suggestionModal');
-        };
-        document.getElementById('refreshSuggestionsBtn').onclick = function() { loadSuggestions('suggestionsList'); };
-        document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
-
-        // ==================================================================
-        //  END
-        // ==================================================================
     </script>
 </body>
 </html>
