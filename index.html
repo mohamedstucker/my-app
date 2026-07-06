@@ -558,6 +558,23 @@
                 <div id="dashboardContent"><p>Loading dashboard data...</p></div>
             </div>
 
+            <!-- NEW: Risk Predictions Card (inserted here) -->
+            <div class="card">
+                <h3>📊 Attendance Risk Predictions</h3>
+                <p style="color:#6c7a89; margin-bottom:12px;">
+                    Predicts which students are likely to be absent based on recent patterns.
+                    Click the button below to compute risk scores.
+                </p>
+                <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:16px;">
+                    <button id="predictRiskBtn" class="refresh-btn">Predict Risk</button>
+                    <button id="sendRiskAlertsBtn" class="refresh-btn" style="background:#e67e22;">Send Alerts</button>
+                    <span id="riskLastUpdate" style="font-size:0.85rem; color:#6c7a89;"></span>
+                </div>
+                <div id="riskPredictionsContainer">
+                    <p>Click "Predict Risk" to analyze attendance patterns.</p>
+                </div>
+            </div>
+
             <!-- Staff Statistics -->
             <div class="card">
                 <h3>Staff Statistics Dashboard</h3>
@@ -680,7 +697,6 @@
                     <button class="tab-btn" data-tab="examhistory">Exam History</button>
                     <button class="tab-btn" data-tab="paymenthistory">Payment History</button>
                     <button class="tab-btn" data-tab="attendancehistory">Attendance History</button>
-                    <!-- NEW: AI Chat Tab -->
                     <button class="tab-btn" data-tab="aichat">AI Chat</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
@@ -741,7 +757,6 @@
                         <div id="attendanceHistoryContent"></div>
                     </div>
                 </div>
-                <!-- NEW: AI Chat Tab Content -->
                 <div id="aichatTab" class="tab-content">
                     <div class="card">
                         <h3>🤖 AI Assistant</h3>
@@ -3252,17 +3267,14 @@
         let chatbotFeeData = null;
         let chatbotNotices = [];
 
-        // Fetch all data needed for the chatbot
         async function loadChatbotData(studentId) {
             const tenantId = getCurrentTenantId();
             
-            // Student data
             const studentDoc = await db.collection('students').doc(studentId).get();
             if (studentDoc.exists) {
                 chatbotStudentData = studentDoc.data();
             }
 
-            // Attendance (last 30 days)
             const attSnap = await db.collection('attendance')
                 .where('tenantId', '==', tenantId)
                 .where('studentId', '==', studentId)
@@ -3272,11 +3284,9 @@
             chatbotAttendance = [];
             attSnap.forEach(doc => chatbotAttendance.push(doc.data()));
 
-            // Fee records
             const feeDoc = await db.collection('fee_records').doc(studentId).get();
             chatbotFeeData = feeDoc.exists ? feeDoc.data() : null;
 
-            // Latest notices
             const noticeSnap = await db.collection('notices')
                 .where('tenantId', '==', tenantId)
                 .orderBy('timestamp', 'desc')
@@ -3286,14 +3296,12 @@
             noticeSnap.forEach(doc => chatbotNotices.push(doc.data()));
         }
 
-        // Get today's attendance status
         function getTodayAttendance() {
             const today = new Date().toISOString().split('T')[0];
             const todayAtt = chatbotAttendance.find(a => a.date === today);
             return todayAtt || null;
         }
 
-        // Get attendance summary
         function getAttendanceSummary() {
             if (chatbotAttendance.length === 0) return 'No attendance records found.';
             const present = chatbotAttendance.filter(a => a.status === 'present').length;
@@ -3303,7 +3311,6 @@
             return `Out of ${total} recorded days: ${present} present, ${absent} absent, ${late} late.`;
         }
 
-        // Get fee summary
         function getFeeSummary() {
             if (!chatbotFeeData) return 'No fee records found.';
             const terms = ['term1', 'term2', 'term3'];
@@ -3317,22 +3324,18 @@
             return summary.join('\n');
         }
 
-        // Get notices summary
         function getNoticesSummary() {
             if (chatbotNotices.length === 0) return 'No notices available.';
             return chatbotNotices.map(n => `• ${n.title}: ${n.content}`).join('\n');
         }
 
-        // Process chatbot message
         async function processChatbotMessage(message) {
             const lower = message.toLowerCase();
             
-            // Wait for data if not loaded
             if (!chatbotStudentData) {
                 return "I'm still loading your child's information. Please try again in a moment.";
             }
 
-            // Attendance questions
             if (lower.includes('attendance') || lower.includes('present') || lower.includes('absent') || lower.includes('late') || lower.includes('today')) {
                 const todayAtt = getTodayAttendance();
                 if (todayAtt) {
@@ -3342,40 +3345,33 @@
                 }
             }
 
-            // Fee questions
             if (lower.includes('fee') || lower.includes('payment') || lower.includes('balance') || lower.includes('money') || lower.includes('pay')) {
                 const summary = getFeeSummary();
                 return `Here's the fee summary:\n${summary}`;
             }
 
-            // Notice questions
             if (lower.includes('notice') || lower.includes('news') || lower.includes('announce') || lower.includes('update') || lower.includes('event')) {
                 const summary = getNoticesSummary();
                 return `Latest school notices:\n${summary}`;
             }
 
-            // Exam/grade questions
             if (lower.includes('exam') || lower.includes('grade') || lower.includes('score') || lower.includes('result') || lower.includes('test')) {
                 return "I'm checking the exam records. Please ask a specific question like 'What were the exam results for Term 1?'";
             }
 
-            // Class/schedule questions
             if (lower.includes('class') || lower.includes('schedule') || lower.includes('time') || lower.includes('subject')) {
                 const className = chatbotStudentData.class || 'Not assigned';
                 return `Your child is in ${className}. For the full timetable, please contact the school office.`;
             }
 
-            // General / About the child
             if (lower.includes('child') || lower.includes('name') || lower.includes('student') || lower.includes('about')) {
                 return `Your child is ${chatbotStudentData.name} (ID: ${chatbotStudentData.id}).\nClass: ${chatbotStudentData.class || 'Not assigned'}\nGender: ${chatbotStudentData.gender || 'Not provided'}`;
             }
 
-            // Help / What can you do
             if (lower.includes('help') || lower.includes('what can you do') || lower.includes('capabilities')) {
                 return "I can answer questions about:\n• Today's attendance\n• Attendance summary\n• Fee status and balance\n• Latest school notices\n• Your child's basic information\nJust ask naturally!";
             }
 
-            // Default / Unknown
             return "I'm not sure about that. You can ask me about:\n• Attendance (today or summary)\n• Fees and balances\n• School notices\n• Your child's class and information\n\nIf you need more detailed help, please contact the school office.";
         }
 
@@ -3403,12 +3399,10 @@
             document.getElementById('chatStatus').textContent = '⏳ Thinking...';
 
             try {
-                // Check if we have a student linked
                 if (!parentLinkedStudentId) {
                     throw new Error('No student linked to your account.');
                 }
 
-                // Load data if not already loaded or if student changed
                 if (!chatbotStudentData || chatbotStudentData.id !== parentLinkedStudentId) {
                     await loadChatbotData(parentLinkedStudentId);
                 }
@@ -3479,14 +3473,177 @@
             document.getElementById('clearChatBtn').onclick = clearChat;
             setupVoiceInput();
 
-            // Welcome message
             if (parentLinkedStudentId) {
                 setTimeout(() => {
                     addChatMessage('AI Assistant', '👋 Hello! I\'m your AI school assistant. You can ask me about:\n• Today\'s attendance\n• Fee status and balances\n• School notices\n• Your child\'s information\n\nJust type or speak your question!');
-                    // Preload data
                     loadChatbotData(parentLinkedStudentId).catch(console.warn);
                 }, 500);
             }
+        }
+
+        // ==================================================================
+        //  RISK PREDICTION FUNCTIONS (Spark‑friendly)
+        // ==================================================================
+
+        function computeRiskScore(attendanceRecords) {
+            if (!attendanceRecords || attendanceRecords.length === 0) return 0;
+            let score = 0;
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+            const todayRec = attendanceRecords.find(r => r.date === today);
+            if (todayRec && todayRec.status === 'absent') score += 30;
+
+            const yestRec = attendanceRecords.find(r => r.date === yesterday);
+            if (yestRec && yestRec.status === 'absent') score += 40;
+
+            const last5 = attendanceRecords.slice(0, 5);
+            const absentCount = last5.filter(r => r.status === 'absent').length;
+            if (absentCount >= 3) score += 30;
+
+            const total = attendanceRecords.length;
+            const absentTotal = attendanceRecords.filter(r => r.status === 'absent').length;
+            if (total > 5 && (absentTotal / total) > 0.3) score += 20;
+
+            return Math.min(score, 100);
+        }
+
+        async function loadRiskPredictions(forceRefresh = false) {
+            const container = document.getElementById('riskPredictionsContainer');
+            const lastUpdateEl = document.getElementById('riskLastUpdate');
+            container.innerHTML = '<p>Loading data...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const today = new Date().toISOString().split('T')[0];
+
+                let predictions = [];
+                if (!forceRefresh) {
+                    const cacheSnap = await db.collection('risk_predictions')
+                        .where('tenantId', '==', tenantId)
+                        .where('date', '==', today)
+                        .get();
+                    cacheSnap.forEach(doc => {
+                        predictions.push({ id: doc.id, ...doc.data() });
+                    });
+                }
+
+                if (predictions.length === 0 || forceRefresh) {
+                    const studentsSnap = await db.collection('students')
+                        .where('tenantId', '==', tenantId)
+                        .get();
+                    const students = [];
+                    studentsSnap.forEach(doc => students.push({ id: doc.id, ...doc.data() }));
+
+                    const batch = db.batch();
+                    predictions = [];
+                    for (const student of students) {
+                        const attSnap = await db.collection('attendance')
+                            .where('tenantId', '==', tenantId)
+                            .where('studentId', '==', student.id)
+                            .orderBy('date', 'desc')
+                            .limit(30)
+                            .get();
+                        const records = attSnap.docs.map(d => d.data());
+                        const score = computeRiskScore(records);
+                        const prediction = {
+                            studentId: student.id,
+                            studentName: student.name,
+                            class: student.class,
+                            score: score,
+                            date: today,
+                            tenantId: tenantId,
+                            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+                        predictions.push(prediction);
+                        const docRef = db.collection('risk_predictions').doc(student.id);
+                        batch.set(docRef, prediction, { merge: true });
+                    }
+                    await batch.commit();
+                }
+
+                renderRiskPredictions(predictions);
+                lastUpdateEl.textContent = `Last updated: ${new Date().toLocaleString()}`;
+            } catch (error) {
+                container.innerHTML = `<div class="error">Error: ${escapeHtml(error.message)}</div>`;
+                console.error('Risk prediction error:', error);
+            }
+        }
+
+        function renderRiskPredictions(predictions) {
+            const container = document.getElementById('riskPredictionsContainer');
+            if (!predictions || predictions.length === 0) {
+                container.innerHTML = '<p>No predictions available.</p>';
+                return;
+            }
+
+            const highRisk = predictions.filter(p => p.score >= 70).sort((a,b) => b.score - a.score);
+            const mediumRisk = predictions.filter(p => p.score >= 50 && p.score < 70).sort((a,b) => b.score - a.score);
+            const lowRisk = predictions.filter(p => p.score < 50).sort((a,b) => b.score - a.score);
+
+            let html = '';
+
+            if (highRisk.length > 0) {
+                html += `<h4 style="color:#e74c3c;">🔴 High Risk (≥70%)</h4>`;
+                html += buildRiskTable(highRisk);
+            }
+            if (mediumRisk.length > 0) {
+                html += `<h4 style="color:#f39c12;">🟡 Medium Risk (50-69%)</h4>`;
+                html += buildRiskTable(mediumRisk);
+            }
+            if (lowRisk.length > 0) {
+                html += `<h4 style="color:#27ae60;">🟢 Low Risk (<50%)</h4>`;
+                html += buildRiskTable(lowRisk);
+            }
+
+            if (highRisk.length === 0 && mediumRisk.length === 0 && lowRisk.length === 0) {
+                html = '<p>No risk data found.</p>';
+            }
+
+            container.innerHTML = html;
+
+            window._highRiskStudents = highRisk;
+        }
+
+        function buildRiskTable(students) {
+            let table = '<table><thead><tr><th>Student</th><th>Class</th><th>Risk Score</th></tr></thead><tbody>';
+            students.forEach(s => {
+                const scoreClass = s.score >= 70 ? 'fee-unpaid' : (s.score >= 50 ? 'fee-partial' : 'fee-paid');
+                table += `<tr><td>${escapeHtml(s.studentName)}</td><td>${escapeHtml(s.class)}</td><td class="${scoreClass}">${s.score}%</td></tr>`;
+            });
+            table += '</tbody></table>';
+            return table;
+        }
+
+        async function sendRiskAlerts() {
+            const highRisk = window._highRiskStudents || [];
+            if (highRisk.length === 0) {
+                alert('No high-risk students found. Run prediction first.');
+                return;
+            }
+
+            if (!confirm(`Send WhatsApp alerts to ${highRisk.length} parent(s) of high-risk students?`)) return;
+
+            let sentCount = 0;
+            const tenantId = getCurrentTenantId();
+
+            for (const student of highRisk) {
+                const studentDoc = await db.collection('students').doc(student.studentId).get();
+                if (!studentDoc.exists) continue;
+                const studentData = studentDoc.data();
+                const phone = studentData.parentPhone;
+                if (!phone) continue;
+
+                const msg = `⚠️ Attendance Alert: Your child ${studentData.name} has a high risk (${student.score}%) of absenteeism. Please encourage them to attend school.`;
+                const url = getValidWhatsAppUrl(phone, msg);
+                if (url) {
+                    window.open(url, '_blank');
+                    sentCount++;
+                    await new Promise(r => setTimeout(r, 700));
+                }
+            }
+
+            alert(`Alerts sent to ${sentCount} parent(s). Note: WhatsApp will open in new tabs.`);
         }
 
         // ==================================================================
@@ -4719,7 +4876,18 @@
                 });
                 document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
 
-                // Initialize chatbot if parent
+                // Risk Prediction listeners (buttons are in dashboard)
+                const predictBtn = document.getElementById('predictRiskBtn');
+                if (predictBtn) {
+                    predictBtn.onclick = function() {
+                        loadRiskPredictions(true);
+                    };
+                }
+                const sendAlertsBtn = document.getElementById('sendRiskAlertsBtn');
+                if (sendAlertsBtn) {
+                    sendAlertsBtn.onclick = sendRiskAlerts;
+                }
+
                 if (role === 'parent') {
                     setTimeout(() => {
                         const chatTab = document.querySelector('[data-tab="aichat"]');
@@ -4772,7 +4940,6 @@
                     loadPaymentHistory();
                     loadExamHistory();
                     loadAttendanceHistory();
-                    // Initialize chatbot if parent
                     if (currentUserRole === 'parent' && parentLinkedStudentId) {
                         initChatbot();
                     }
@@ -4820,7 +4987,6 @@
                     if (m.moduleId === 'bursarModule') { loadBursarSummary(); populateFeeStatsYears().then(loadFeeStats); }
                     if (m.moduleId === 'adminModule') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); renderNotices(); initFileDB().then(loadFilesList); loadLoginActivity(); loadSchoolLocation(); }
                     if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
-                    // Initialize chatbot if parent and records module
                     if (m.moduleId === 'recordsModule' && role === 'parent' && parentLinkedStudentId) {
                         setTimeout(initChatbot, 300);
                     }
@@ -4920,7 +5086,6 @@
                         document.getElementById('studentRecordsPanel').style.display = 'block';
                         document.getElementById('searchResults').innerHTML = `<div class="success">Viewing record for: ${escapeHtml(found.name)} (${found.id})</div>`;
                         loadStudentProfile(); loadPaymentHistory(); loadExamHistory(); loadAttendanceHistory();
-                        // Initialize chatbot
                         setTimeout(initChatbot, 300);
                     } catch (error) {
                         showMessage('Error loading student: ' + error.message, 'error', 'searchResults');
@@ -4936,7 +5101,6 @@
                         if (window.loadParentStudent) window.loadParentStudent();
                     };
                 }
-                // Initialize chatbot after a short delay
                 setTimeout(() => {
                     if (parentLinkedStudentId) {
                         const chatTab = document.querySelector('[data-tab="aichat"]');
@@ -5231,7 +5395,6 @@
 
             document.getElementById('loginModal').style.display = 'flex';
 
-            // Preload chatbot data for parents after login
             setTimeout(() => {
                 if (currentUserRole === 'parent' && parentLinkedStudentId) {
                     loadChatbotData(parentLinkedStudentId).catch(console.warn);
