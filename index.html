@@ -2092,6 +2092,9 @@
             }
         }
 
+        // ==================================================================
+        //  SEND BATCH WHATSAPP (UPDATED – uses modal instead of prompt)
+        // ==================================================================
         async function sendBatchWhatsApp() {
             let classVal;
             if (currentUserRole === 'teacher' && teacherAssignedClass) {
@@ -2120,22 +2123,78 @@
             const absent = students.filter(s => attMap[s.id]?.status === 'absent');
             const late = students.filter(s => attMap[s.id]?.status === 'late');
 
-            const choice = prompt(
-                'Select recipients for ' + classVal + ' (' + new Date().toLocaleDateString() + '):\n\n' +
-                '1 – All (' + students.length + ')\n' +
-                '2 – Absent only (' + absent.length + ')\n' +
-                '3 – Late only (' + late.length + ')\n' +
-                '4 – Present only (' + present.length + ')', '1'
-            );
+            // Create a modal with buttons instead of prompt()
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999; display:flex; justify-content:center; align-items:center;';
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'background:white; padding:30px; border-radius:16px; box-shadow:0 8px 40px rgba(0,0,0,0.3); width:400px; text-align:center; max-width:95%;';
+            
+            const title = document.createElement('h4');
+            title.textContent = 'Select recipients for ' + classVal;
+            title.style.marginBottom = '8px';
+            modal.appendChild(title);
+            
+            const subTitle = document.createElement('p');
+            subTitle.textContent = new Date().toLocaleDateString();
+            subTitle.style.color = '#6c7a89';
+            subTitle.style.marginBottom = '16px';
+            modal.appendChild(subTitle);
+
+            const options = [
+                { label: `All (${students.length})`, value: '1' },
+                { label: `Absent only (${absent.length})`, value: '2' },
+                { label: `Late only (${late.length})`, value: '3' },
+                { label: `Present only (${present.length})`, value: '4' }
+            ];
+
+            const btnContainer = document.createElement('div');
+            btnContainer.style.cssText = 'display:flex; flex-direction:column; gap:8px; margin-bottom:12px;';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.textContent = opt.label;
+                btn.style.cssText = 'padding:10px; border:none; border-radius:10px; cursor:pointer; font-weight:600; background:#eef2f7; color:#1a3a5c; transition:0.2s;';
+                btn.onmouseover = function() { this.style.background = '#dce4ec'; };
+                btn.onmouseout = function() { this.style.background = '#eef2f7'; };
+                btn.onclick = function() {
+                    overlay.remove();
+                    processRecipients(opt.value, students, attMap, classVal);
+                };
+                btnContainer.appendChild(btn);
+            });
+            modal.appendChild(btnContainer);
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.style.cssText = 'padding:10px 24px; border:none; border-radius:10px; cursor:pointer; font-weight:600; background:#fde8e8; color:#b71c1c;';
+            cancelBtn.onclick = function() { overlay.remove(); };
+            modal.appendChild(cancelBtn);
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            overlay.onclick = function(e) {
+                if (e.target === overlay) overlay.remove();
+            };
+        }
+
+        // ==================================================================
+        //  PROCESS RECIPIENTS (helper for sendBatchWhatsApp)
+        // ==================================================================
+        async function processRecipients(choice, students, attMap, classVal) {
             let recipients = [];
             if (choice === '1') recipients = students;
-            else if (choice === '2') recipients = absent;
-            else if (choice === '3') recipients = late;
-            else if (choice === '4') recipients = present;
+            else if (choice === '2') recipients = students.filter(s => attMap[s.id]?.status === 'absent');
+            else if (choice === '3') recipients = students.filter(s => attMap[s.id]?.status === 'late');
+            else if (choice === '4') recipients = students.filter(s => attMap[s.id]?.status === 'present');
             else { alert('Invalid selection. Operation cancelled.'); return; }
 
             if (recipients.length === 0) { alert('No recipients selected.'); return; }
 
+            const present = students.filter(s => attMap[s.id]?.status === 'present');
+            const absent = students.filter(s => attMap[s.id]?.status === 'absent');
+            const late = students.filter(s => attMap[s.id]?.status === 'late');
             const summary = 'Attendance Report - ' + classVal + ' (' + new Date().toLocaleDateString() +
                 ')\nPresent: ' + present.length +
                 '\nAbsent: ' + absent.length +
@@ -2178,6 +2237,9 @@
             alert('Opening WhatsApp for ' + validRecipients.length + ' parent(s).\n\nIf your browser blocks popups, please allow them for this site.');
         }
 
+        // ==================================================================
+        //  VIEW CLASS HISTORY (UPDATED – uses modal instead of prompt)
+        // ==================================================================
         async function viewClassHistory() {
             try {
                 const tenantId = getCurrentTenantId();
@@ -2187,73 +2249,134 @@
                 } else {
                     classVal = document.getElementById('classSelect').value;
                 }
-                if (!classVal) { alert('Please select a class first.'); return; }
+                if (!classVal) {
+                    alert('Please select a class first.');
+                    return;
+                }
                 if (!allStudents[classVal] || allStudents[classVal].length === 0) {
                     alert('No students found in class "' + classVal + '".');
                     return;
                 }
-                const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-                if (!date) return;
 
-                const snap = await db.collection('attendance')
-                    .where('tenantId', '==', tenantId)
-                    .where('class', '==', classVal)
-                    .where('date', '==', date)
-                    .get();
-                const attMap = {};
-                snap.forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999; display:flex; justify-content:center; align-items:center;';
+                
+                const modal = document.createElement('div');
+                modal.style.cssText = 'background:white; padding:30px; border-radius:16px; box-shadow:0 8px 40px rgba(0,0,0,0.3); width:350px; text-align:center;';
+                
+                const label = document.createElement('label');
+                label.textContent = 'Enter date: ';
+                label.style.fontWeight = '600';
+                label.style.display = 'block';
+                label.style.marginBottom = '12px';
+                
+                const dateInput = document.createElement('input');
+                dateInput.type = 'date';
+                dateInput.value = new Date().toISOString().split('T')[0];
+                dateInput.style.cssText = 'padding:10px; width:100%; border:1.5px solid #dce4ec; border-radius:10px; font-size:1rem; margin-bottom:12px;';
+                
+                const btnRow = document.createElement('div');
+                btnRow.style.cssText = 'display:flex; gap:10px; justify-content:center;';
+                
+                const confirmBtn = document.createElement('button');
+                confirmBtn.textContent = 'View History';
+                confirmBtn.className = 'refresh-btn';
+                confirmBtn.style.cssText = 'padding:10px 24px; border:none; border-radius:10px; cursor:pointer; font-weight:600;';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.style.cssText = 'padding:10px 24px; border:none; border-radius:10px; cursor:pointer; font-weight:600; background:#fde8e8; color:#b71c1c;';
+                
+                btnRow.appendChild(confirmBtn);
+                btnRow.appendChild(cancelBtn);
+                modal.appendChild(label);
+                modal.appendChild(dateInput);
+                modal.appendChild(btnRow);
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
 
-                const students = allStudents[classVal];
-                let total = students.length;
-                let presentCount = 0, absentCount = 0, lateCount = 0;
-                for (const s of students) {
-                    const status = attMap[s.id]?.status;
-                    if (status === 'present') presentCount++;
-                    else if (status === 'absent') absentCount++;
-                    else if (status === 'late') lateCount++;
-                }
+                confirmBtn.onclick = function() {
+                    const date = dateInput.value;
+                    overlay.remove();
+                    if (date) fetchClassHistory(date, classVal, tenantId);
+                };
 
-                let html = `<h3>${classVal} – Attendance for ${date}</h3>`;
+                cancelBtn.onclick = function() {
+                    overlay.remove();
+                };
 
-                if (total > 0) {
-                    const presentPct = ((presentCount / total) * 100).toFixed(1);
-                    const absentPct = ((absentCount / total) * 100).toFixed(1);
-                    const latePct = ((lateCount / total) * 100).toFixed(1);
-                    html += `<div class="attendance-summary">
-                        <h4>Class Summary</h4>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="label">Total Students</div>
-                                <div class="value total">${total}</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="label">Present</div>
-                                <div class="value present">${presentCount} (${presentPct}%)</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="label">Absent</div>
-                                <div class="value absent">${absentCount} (${absentPct}%)</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="label">Late</div>
-                                <div class="value late">${lateCount} (${latePct}%)</div>
-                            </div>
-                        </div>
-                    </div>`;
-                }
+                overlay.onclick = function(e) {
+                    if (e.target === overlay) overlay.remove();
+                };
 
-                html += '<table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
-                for (const s of students) {
-                    const a = attMap[s.id] || { status: 'Not marked', remark: '' };
-                    const statusText = a.status === 'present' ? 'Present' : (a.status === 'absent' ? 'Absent' : (a.status === 'late' ? 'Late' : 'Not marked'));
-                    html += `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${statusText}</td><td>${escapeHtml(a.remark)}</td></tr>`;
-                }
-                html += '</tbody></table>';
-                document.getElementById('historyContent').innerHTML = html;
-                openModal('historyModal');
             } catch (error) {
                 alert('Error loading class history: ' + error.message);
             }
+        }
+
+        // ==================================================================
+        //  FETCH CLASS HISTORY (helper for viewClassHistory)
+        // ==================================================================
+        async function fetchClassHistory(date, classVal, tenantId) {
+            if (!date) return;
+            const snap = await db.collection('attendance')
+                .where('tenantId', '==', tenantId)
+                .where('class', '==', classVal)
+                .where('date', '==', date)
+                .get();
+            const attMap = {};
+            snap.forEach(d => {
+                const data = d.data();
+                attMap[d.data().studentId] = {
+                    status: data.status,
+                    remark: data.remark || '',
+                    timestamp: data.timestamp
+                };
+            });
+
+            const students = allStudents[classVal];
+            let total = students.length;
+            let presentCount = 0, absentCount = 0, lateCount = 0;
+            for (const s of students) {
+                const status = attMap[s.id]?.status;
+                if (status === 'present') presentCount++;
+                else if (status === 'absent') absentCount++;
+                else if (status === 'late') lateCount++;
+            }
+
+            let html = `<h3>${classVal} – Attendance for ${date}</h3>`;
+
+            if (total > 0) {
+                const presentPct = ((presentCount / total) * 100).toFixed(1);
+                const absentPct = ((absentCount / total) * 100).toFixed(1);
+                const latePct = ((lateCount / total) * 100).toFixed(1);
+                html += `<div class="attendance-summary">
+                    <h4>Class Summary</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item"><div class="label">Total Students</div><div class="value total">${total}</div></div>
+                        <div class="stat-item"><div class="label">Present</div><div class="value present">${presentCount} (${presentPct}%)</div></div>
+                        <div class="stat-item"><div class="label">Absent</div><div class="value absent">${absentCount} (${absentPct}%)</div></div>
+                        <div class="stat-item"><div class="label">Late</div><div class="value late">${lateCount} (${latePct}%)</div></div>
+                    </div>
+                </div>`;
+            }
+
+            html += '<table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Time</th><th>Remark</th></tr></thead><tbody>';
+            for (const s of students) {
+                const a = attMap[s.id] || { status: 'Not marked', remark: '', timestamp: null };
+                const statusText = a.status === 'present' ? 'Present' : (a.status === 'absent' ? 'Absent' : (a.status === 'late' ? 'Late' : 'Not marked'));
+                let timeStr = '—';
+                if (a.timestamp) {
+                    try {
+                        const ts = a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+                        timeStr = ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    } catch (_) {}
+                }
+                html += `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${statusText}</td><td>${escapeHtml(timeStr)}</td><td>${escapeHtml(a.remark)}</td></tr>`;
+            }
+            html += '</tbody></table>';
+            document.getElementById('historyContent').innerHTML = html;
+            openModal('historyModal');
         }
 
         // ==================================================================
@@ -2369,11 +2492,23 @@
         async function loadExamStudent() {
             try {
                 const q = document.getElementById('examStudentSearch').value.trim();
+                if (!q) {
+                    showMessage('Please enter a Student ID or Name.', 'error', 'examMessage');
+                    return;
+                }
+                if (globalStudentMap.size === 0) await loadStudents();
                 const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
-                if (!found) { showMessage('Student not found', 'error', 'examMessage'); return; }
+                if (!found) {
+                    showMessage('Student not found. Check ID or Name.', 'error', 'examMessage');
+                    document.getElementById('examStudentInfo').innerHTML = '';
+                    document.getElementById('examRecordsContent').innerHTML = '';
+                    return;
+                }
                 examCurrentStudent = found;
                 document.getElementById('examStudentInfo').innerHTML = '<div class="success">Editing exam for: ' + escapeHtml(found.name) + ' (' + found.id + ')</div>';
-                if (!document.getElementById('examYearInput').value) document.getElementById('examYearInput').value = new Date().getFullYear();
+                if (!document.getElementById('examYearInput').value) {
+                    document.getElementById('examYearInput').value = new Date().getFullYear();
+                }
                 if (!document.querySelector('#examTermButtons .term-btn.active')) {
                     document.querySelector('#examTermButtons .term-btn[data-term="term1"]')?.classList.add('active');
                     currentTerm = 'term1';
@@ -2385,6 +2520,7 @@
                 await loadExamUIForStudent();
             } catch (error) {
                 showMessage('Error loading student: ' + error.message, 'error', 'examMessage');
+                console.error('loadExamStudent error:', error);
             }
         }
 
