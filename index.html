@@ -6,7 +6,7 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
-        /* ===== ALL ORIGINAL STYLES (unchanged) ===== */
+        /* ===== ALL STYLES (unchanged) ===== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -553,6 +553,296 @@
             color: #f39c12;
         }
 
+        /* ===== NEW: Startup Flyer Styles ===== */
+        #startupPage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a4b8a 0%, #0b2b5c 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        #startupPage .flyer {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 50px 60px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+            animation: flyerIn 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        #startupPage .flyer::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(26,75,138,0.05), transparent 70%);
+            pointer-events: none;
+        }
+        @keyframes flyerIn {
+            from { opacity: 0; transform: scale(0.9) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        #startupPage .flyer .logo {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #1a4b8a, #2a6bb0);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fff;
+            box-shadow: 0 12px 40px rgba(26,75,138,0.3);
+        }
+        #startupPage .flyer h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #0b2b5c;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        #startupPage .flyer .tagline {
+            font-size: 1.2rem;
+            color: #1a4b8a;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        #startupPage .flyer .subtitle {
+            color: #4a6a8a;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        #startupPage .flyer .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+            text-align: left;
+        }
+        #startupPage .flyer .features .feature {
+            background: #f0f5fa;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1a3a5c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #startupPage .flyer .features .feature span {
+            font-size: 1.2rem;
+        }
+        #startupPage .flyer .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        #startupPage .flyer .btn-group .primary-btn {
+            background: linear-gradient(135deg, #1a4b8a, #2a6bb0);
+            color: #fff;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 8px 30px rgba(26,75,138,0.3);
+        }
+        #startupPage .flyer .btn-group .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(26,75,138,0.4);
+        }
+        #startupPage .flyer .btn-group .secondary-btn {
+            background: #fff;
+            color: #1a4b8a;
+            padding: 14px 40px;
+            border: 2px solid #1a4b8a;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #startupPage .flyer .btn-group .secondary-btn:hover {
+            background: #1a4b8a;
+            color: #fff;
+            transform: translateY(-3px);
+        }
+        #startupPage .flyer .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 24px 0 0;
+            padding-top: 20px;
+            border-top: 2px solid #eef2f7;
+        }
+        #startupPage .flyer .stats .stat-item {
+            text-align: center;
+        }
+        #startupPage .flyer .stats .stat-item .number {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a4b8a;
+        }
+        #startupPage .flyer .stats .stat-item .label {
+            font-size: 0.75rem;
+            color: #6c7a89;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== Schools Page Styles ===== */
+        #schoolsPage {
+            display: none;
+            padding: 20px 0;
+            animation: fadeIn 0.4s ease;
+        }
+        #schoolsPage .school-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #e6edf4;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            transition: 0.3s;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #schoolsPage .school-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        #schoolsPage .school-card .school-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        #schoolsPage .school-card .school-info h4 {
+            font-size: 1.2rem;
+            color: #0b2b5c;
+            margin-bottom: 6px;
+        }
+        #schoolsPage .school-card .school-info p {
+            color: #4a6a8a;
+            font-size: 0.9rem;
+            margin: 2px 0;
+        }
+        #schoolsPage .school-card .school-info .location {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6c7a89;
+            font-size: 0.85rem;
+        }
+        #schoolsPage .school-card .school-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        #schoolsPage .school-card .school-actions .admit-btn {
+            background: #27ae60;
+            color: #fff;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #schoolsPage .school-card .school-actions .admit-btn:hover {
+            background: #1e8449;
+            transform: scale(1.02);
+        }
+        #schoolsPage .school-card .school-actions .view-btn {
+            background: #eef2f7;
+            color: #1a3a5c;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #schoolsPage .school-card .school-actions .view-btn:hover {
+            background: #dce4ec;
+        }
+        #schoolsPage .back-btn {
+            background: #eef2f7;
+            color: #1a3a5c;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        #schoolsPage .back-btn:hover {
+            background: #dce4ec;
+        }
+        .no-schools {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c7a89;
+        }
+        .no-schools h3 {
+            color: #1a3a5c;
+            margin-bottom: 12px;
+        }
+
+        /* ===== Admission Request Styles ===== */
+        #admissionModal .modal-content {
+            max-width: 520px;
+        }
+        #admissionModal .modal-content .school-name-display {
+            background: #f0f5fa;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: #1a4b8a;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        #admissionModal .modal-content .form-group {
+            margin-bottom: 12px;
+        }
+        #admissionModal .modal-content .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1a3a5c;
+            margin-bottom: 4px;
+        }
+        #admissionModal .modal-content .form-group input,
+        #admissionModal .modal-content .form-group select,
+        #admissionModal .modal-content .form-group textarea {
+            width: 100%;
+            max-width: 100%;
+        }
+
         @media (max-width: 768px) {
             body { padding: 12px; }
             .header { flex-direction: column; align-items: stretch; padding: 16px 18px; }
@@ -587,6 +877,31 @@
             .staff-checkin-summary {
                 grid-template-columns: repeat(2, 1fr);
             }
+            #startupPage .flyer {
+                padding: 30px 20px;
+                border-radius: 24px;
+            }
+            #startupPage .flyer h1 {
+                font-size: 2rem;
+            }
+            #startupPage .flyer .features {
+                grid-template-columns: 1fr 1fr;
+            }
+            #startupPage .flyer .stats {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            #schoolsPage .school-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            #schoolsPage .school-card .school-actions {
+                justify-content: stretch;
+            }
+            #schoolsPage .school-card .school-actions button {
+                flex: 1;
+            }
         }
         @media (max-width: 480px) {
             .header h1 { font-size: 1.1rem; }
@@ -604,13 +919,127 @@
             .staff-checkin-summary {
                 grid-template-columns: 1fr 1fr;
             }
+            #startupPage .flyer .features {
+                grid-template-columns: 1fr;
+            }
+            #startupPage .flyer .btn-group {
+                flex-direction: column;
+            }
+            #startupPage .flyer .btn-group button {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <div class="header">
+    <!-- ===== STARTUP FLYER PAGE ===== -->
+    <div id="startupPage" style="display:flex;">
+        <div class="flyer">
+            <div class="logo">🏫</div>
+            <h1>EduSL</h1>
+            <div class="tagline">Empowering Sierra Leone's Education</div>
+            <div class="subtitle">
+                Connecting parents and students to the best schools across Sierra Leone.
+                Find your dream school, track attendance, manage fees, and more — all in one place.
+            </div>
+            <div class="features">
+                <div class="feature"><span>📚</span> School Directory</div>
+                <div class="feature"><span>📊</span> Attendance Tracking</div>
+                <div class="feature"><span>💰</span> Fee Management</div>
+                <div class="feature"><span>📝</span> Exam Records</div>
+                <div class="feature"><span>🤖</span> AI Assistant</div>
+                <div class="feature"><span>📢</span> School Notices</div>
+            </div>
+            <div class="btn-group">
+                <button class="primary-btn" onclick="showSchoolsPage()">🏫 Find Schools Near You</button>
+                <button class="secondary-btn" onclick="showLoginPage()">🔐 School Admin Login</button>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="number" id="schoolCount">0</div>
+                    <div class="label">Schools</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="studentCount">0</div>
+                    <div class="label">Students</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="teacherCount">0</div>
+                    <div class="label">Teachers</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCHOOLS DIRECTORY PAGE ===== -->
+    <div id="schoolsPage">
+        <button class="back-btn" onclick="showStartupPage()">← Back</button>
+        <div class="card">
+            <h3>📚 Schools Near You</h3>
+            <p style="color:#6c7a89; margin-bottom:16px;">
+                Browse through all registered schools and request admission to your preferred school.
+            </p>
+            <div id="schoolsList"><p>Loading schools...</p></div>
+        </div>
+    </div>
+
+    <!-- ===== ADMISSION REQUEST MODAL ===== -->
+    <div id="admissionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('admissionModal')">&times;</span>
+            <h3>📝 Request Admission</h3>
+            <div class="school-name-display" id="admissionSchoolName">School Name</div>
+            <form id="admissionForm">
+                <div class="form-group">
+                    <label>Student's Full Name *</label>
+                    <input type="text" id="admissionStudentName" placeholder="e.g. John Doe" required />
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth *</label>
+                    <input type="date" id="admissionStudentDob" required />
+                </div>
+                <div class="form-group">
+                    <label>Parent/Guardian Name *</label>
+                    <input type="text" id="admissionParentName" placeholder="e.g. Mr. Smith" required />
+                </div>
+                <div class="form-group">
+                    <label>Parent Phone *</label>
+                    <input type="tel" id="admissionParentPhone" placeholder="e.g. 23276123456" required />
+                </div>
+                <div class="form-group">
+                    <label>Parent Email</label>
+                    <input type="email" id="admissionParentEmail" placeholder="parent@example.com" />
+                </div>
+                <div class="form-group">
+                    <label>Previous School</label>
+                    <input type="text" id="admissionPreviousSchool" placeholder="Previous school name" />
+                </div>
+                <div class="form-group">
+                    <label>Class Applying For *</label>
+                    <select id="admissionClass" required>
+                        <option value="">Select Class</option>
+                        <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                        <option>Class1</option><option>Class2</option><option>Class3</option>
+                        <option>Class4</option><option>Class5</option><option>Class6</option>
+                        <option>JSS1</option><option>JSS2</option><option>JSS3</option>
+                        <option>SSS1</option><option>SSS2</option><option>SSS3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea id="admissionNotes" rows="3" placeholder="Any special requirements or notes..."></textarea>
+                </div>
+                <input type="hidden" id="admissionSchoolId" />
+                <button type="button" id="submitAdmissionBtn" class="refresh-btn" style="width:100%;">Submit Admission Request</button>
+                <div id="admissionMessage"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MAIN HEADER ===== -->
+    <div class="header" id="mainHeader" style="display:none;">
         <h1>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60">
                 <rect width="160" height="60" rx="12" fill="#1a4b8a" />
@@ -629,16 +1058,16 @@
         </div>
     </div>
 
-    <!-- SYNC BAR -->
-    <div id="syncBar" class="sync-bar">Initializing system...</div>
+    <!-- ===== SYNC BAR ===== -->
+    <div id="syncBar" class="sync-bar" style="display:none;">Initializing system...</div>
 
-    <!-- GLOBAL NOTICES -->
-    <div id="globalNotices">
+    <!-- ===== GLOBAL NOTICES ===== -->
+    <div id="globalNotices" style="display:none;">
         <h3>Latest Notices</h3>
         <div id="globalNoticesList"><span class="no-notices">Loading notices...</span></div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- ===== MAIN APP ===== -->
     <div id="mainApp" style="display:none;">
 
         <div class="module-buttons" id="moduleButtons"></div>
@@ -685,6 +1114,13 @@
                 </div>
                 <div id="staffDashboardContent"><p>Loading staff statistics...</p></div>
             </div>
+
+            <!-- Admin: Admission Requests -->
+            <div class="card" id="admissionRequestsCard" style="display:none;">
+                <h3>📋 Admission Requests</h3>
+                <button id="refreshAdmissionRequestsBtn" class="refresh-btn">Refresh</button>
+                <div id="admissionRequestsList"><p>Loading admission requests...</p></div>
+            </div>
         </div>
 
         <!-- ATTENDANCE -->
@@ -711,7 +1147,7 @@
                     <input type="date" id="newStudentEntryDate" />
                 </div>
                 <div class="form-row">
-                    <input type="text" id="newClassLevel" placeholder="Enter Class (e.g. Nursery1, JSS2, SSS3)" />
+                    <input type="text" id="newClassLevel" placeholder="Enter Class (e.g. Nursery1, JSS2, SSS3) *" />
                     <input id="newDepartment" placeholder="Department" />
                     <input id="newAddress" placeholder="Address" />
                 </div>
@@ -915,14 +1351,14 @@
                             <option>Arts</option>
                             <option>Social Sciences</option>
                             <option>Business & Economics</option>
-                            <option>Science & Technology</option>
-                             <option>Computer Science</option>
+                            <option>Science Technology</option>
+                            <option>Computer Science</option>
                             <option>Physical Education</option>
                             <option>Music</option>
                             <option>Religious Studies</option>
                             <option>Special Education</option>
                             <option>Vocational Studies</option>
-                            <option>Others</option>
+                            <option>Agriculture</option>
                         </select>
                         <input id="teacherSubjects" placeholder="Subjects (comma separated)" />
                         <select id="teacherClass">
@@ -930,7 +1366,7 @@
                             <option>Class1</option><option>Class2</option><option>Class3</option>
                             <option>Class4</option><option>Class5</option><option>Class6</option>
                             <option>JSS1</option><option>JSS2</option><option>JSS3</option>
-                            <option>SSS1</option><option>SSS2</option><option>SSS3</option><option>Others</option>
+                            <option>SSS1</option><option>SSS2</option><option>SSS3</option>
                         </select>
                     </div>
                     <div class="form-row">
@@ -1078,9 +1514,38 @@
                 <button class="admin-tab-btn" data-tab="loginactivity">Login Activity</button>
                 <button class="admin-tab-btn" data-tab="schoollocation">School Location</button>
                 <button class="admin-tab-btn" data-tab="staffcheckins">📋 Staff Attendance</button>
+                <button class="admin-tab-btn" data-tab="admissionrequests">📩 Admission Requests</button>
             </div>
             <div id="staffTab" class="admin-tab active">
-                <div class="card"><h3>Add Staff Member</h3><input id="staffId" placeholder="Staff ID" /><input id="staffName" placeholder="Full Name" /><select id="staffType"><option>Teacher</option><option>Admin</option><option>Cleaner</option><option>Security</option><option>Driver</option></select><button id="addStaffBtn" class="refresh-btn">Register</button><div id="staffMessage"></div><div id="staffListContainer"></div></div>
+                <div class="card">
+                    <h3>Add Staff Member</h3>
+                    <input id="staffId" placeholder="Staff ID" />
+                    <input id="staffName" placeholder="Full Name" />
+                    <select id="staffType">
+                        <option>Teacher</option>
+                        <option>Admin</option>
+                        <option>Cleaner</option>
+                        <option>Security</option>
+                        <option>Driver</option>
+                        <option>Librarian</option>
+                        <option>Counselor</option>
+                        <option>Accountant</option>
+                        <option>Nurse</option>
+                        <option>IT Support</option>
+                        <option>Cook</option>
+                        <option>Groundskeeper</option>
+                    </select>
+                    <input id="staffPhone" placeholder="Phone Number" />
+                    <input id="staffEmail" placeholder="Email Address" />
+                    <input id="staffDepartment" placeholder="Department (e.g., Administration, Academics)" />
+                    <select id="staffStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <button id="addStaffBtn" class="refresh-btn">Register</button>
+                    <div id="staffMessage"></div>
+                    <div id="staffListContainer"></div>
+                </div>
             </div>
             <div id="assetsTab" class="admin-tab">
                 <div class="card"><h3>Add Asset</h3><input id="assetName" placeholder="Asset Name" /><input id="assetLocation" placeholder="Location" /><select id="assetStatus"><option>Good</option><option>Fair</option><option>Poor</option></select><button id="addAssetBtn" class="refresh-btn">Add Asset</button><div id="assetMessage"></div><div id="assetsListContainer"></div></div>
@@ -1192,6 +1657,17 @@
                     </div>
                 </div>
             </div>
+            <!-- Admission Requests Tab -->
+            <div id="admissionrequestsTab" class="admin-tab" style="display:none;">
+                <div class="card">
+                    <h3>📩 Admission Requests</h3>
+                    <p style="color:#6c7a89; margin-bottom:12px;">
+                        View and manage all admission requests submitted by parents and students.
+                    </p>
+                    <button id="refreshAdmissionRequestsAdminBtn" class="refresh-btn">Refresh</button>
+                    <div id="admissionRequestsAdminList"><p>Loading admission requests...</p></div>
+                </div>
+            </div>
         </div>
 
         <!-- STANDALONE SUGGESTIONS MODULE -->
@@ -1204,8 +1680,8 @@
         </div>
     </div>
 
-    <!-- LOGIN MODAL -->
-    <div id="loginModal" class="modal" style="display:flex;">
+    <!-- ===== LOGIN MODAL ===== -->
+    <div id="loginModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>Login</h3>
             <input id="loginEmail" placeholder="Email" />
@@ -1222,6 +1698,9 @@
             <span class="signup-toggle" id="signupToggle">Create a new school →</span>
             <div id="signupFields">
                 <input type="text" id="signupSchoolName" placeholder="School Name *" />
+                <input type="text" id="signupSchoolLocation" placeholder="School Location (City/District) *" />
+                <input type="text" id="signupSchoolAddress" placeholder="School Address" />
+                <input type="text" id="signupSchoolPhone" placeholder="School Phone" />
                 <input type="text" id="signupAdminName" placeholder="Your Full Name *" />
                 <input type="email" id="signupEmail" placeholder="Admin Email *" />
                 <input type="password" id="signupPassword" placeholder="Password *" />
@@ -1235,7 +1714,7 @@
         </div>
     </div>
 
-    <!-- SUGGESTION MODAL -->
+    <!-- ===== SUGGESTION MODAL ===== -->
     <div id="suggestionModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('suggestionModal')">&times;</span>
@@ -1259,7 +1738,7 @@
         </div>
     </div>
 
-    <!-- REPLY TO VOICE NOTE MODAL -->
+    <!-- ===== REPLY TO VOICE NOTE MODAL ===== -->
     <div id="replyAttendanceModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('replyAttendanceModal')">&times;</span>
@@ -1285,6 +1764,7 @@
         </div>
     </div>
 
+    <!-- ===== EDIT SUGGESTION MODAL ===== -->
     <div id="editSuggestionModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editSuggestionModal')">&times;</span>
@@ -1296,6 +1776,7 @@
         </div>
     </div>
 
+    <!-- ===== REPLY SUGGESTION MODAL ===== -->
     <div id="replySuggestionModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('replySuggestionModal')">&times;</span>
@@ -1307,9 +1788,10 @@
         </div>
     </div>
 
+    <!-- ===== SUGGESTION FAB ===== -->
     <button id="suggestionFab" class="suggestion-fab">Suggestion</button>
 
-    <!-- STAFF PAYMENT MODAL -->
+    <!-- ===== STAFF PAYMENT MODAL ===== -->
     <div id="staffPaymentModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('staffPaymentModal')">&times;</span>
@@ -1329,7 +1811,7 @@
         </div>
     </div>
 
-    <!-- Teacher Self‑Edit Modal -->
+    <!-- ===== TEACHER SELF‑EDIT MODAL ===== -->
     <div id="editOwnTeacherModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editOwnTeacherModal')">&times;</span>
@@ -1347,14 +1829,7 @@
                 <option>Arts</option>
                 <option>Social Sciences</option>
                 <option>Business & Economics</option>
-                <option>Science & Technology</option>
-                 <option>Computer Science</option>
-                <option>Physical Education</option>
-                <option>Music</option>
-                <option>Religious Studies</option>
-                <option>Special Education</option>
-                <option>Others</option>
-                
+                <option>Science Technology</option>
             </select>
             <input type="text" id="editOwnTeacherSubjects" placeholder="Subjects (comma separated)" />
             <select id="editOwnTeacherClass">
@@ -1371,10 +1846,9 @@
         </div>
     </div>
 
-    <!-- OTHER MODALS -->
+    <!-- ===== OTHER MODALS ===== -->
     <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name" /><input type="date" id="editProfileDob" /><select id="editProfileClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option></select><input id="editProfileDepartment" placeholder="Department" /><input id="editProfileAddress" placeholder="Address" /><input id="editProfileParentPhone" placeholder="Parent Phone" /><input id="editProfileParentName" placeholder="Parent Name" /><input id="editProfileGuardian" placeholder="Guardian" /><input id="editProfileParentEmail" type="email" placeholder="Parent Email" /><select id="editProfileGender"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select><input id="editProfileTempPassword" type="password" placeholder="Temporary Password" /><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
 
-    <!-- UPDATED Edit Teacher Modal -->
     <div id="editTeacherModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editTeacherModal')">&times;</span>
@@ -1404,7 +1878,7 @@
 
     <div id="historyModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('historyModal')">&times;</span><h3>Attendance History</h3><div id="historyContent"></div></div></div>
 
-    <!-- Edit Payment Modal -->
+    <!-- ===== EDIT PAYMENT MODAL ===== -->
     <div id="editPaymentModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editPaymentModal')">&times;</span>
@@ -1429,7 +1903,7 @@
     <div id="bursarHistoryModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('bursarHistoryModal')">&times;</span><h3>Payment History</h3><div id="bursarHistoryContent"></div></div></div>
     <div id="bursarEditFeesModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('bursarEditFeesModal')">&times;</span><h3>Edit Term Fees</h3><label>Term 1: <input type="number" id="bursarEditTerm1" step="0.01" /></label><label>Term 2: <input type="number" id="bursarEditTerm2" step="0.01" /></label><label>Term 3: <input type="number" id="bursarEditTerm3" step="0.01" /></label><button id="saveBursarEditFeesBtn" class="refresh-btn">Save Changes</button><div id="bursarEditFeesMessage"></div></div></div>
 
-    <!-- SCRIPTS -->
+    <!-- ===== SCRIPTS ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -1452,10 +1926,11 @@
         const db = firebase.firestore();
 
         const ALL_CLASSES = [
+            'Pre-Nursery',
             'Nursery1','Nursery2','Nursery3',
             'Class1','Class2','Class3','Class4','Class5','Class6',
             'JSS1','JSS2','JSS3',
-            'SSS1','SSS2','SSS3', 'Others'
+            'SSS1','SSS2','SSS3'
         ];
 
         // ----- GLOBAL STATE -----
@@ -1754,18 +2229,21 @@
         }
 
         // ==================================================================
-        //  SIGNUP
+        //  SIGNUP – now also saves school to 'schools' collection
         // ==================================================================
         async function signUpAndCreateTenant() {
             const schoolName = document.getElementById('signupSchoolName').value.trim();
+            const schoolLocation = document.getElementById('signupSchoolLocation').value.trim();
+            const schoolAddress = document.getElementById('signupSchoolAddress').value.trim();
+            const schoolPhone = document.getElementById('signupSchoolPhone').value.trim();
             const adminName = document.getElementById('signupAdminName').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
             const confirm = document.getElementById('signupConfirm').value;
             const providedKey = document.getElementById('signupKey').value.trim();
 
-            if (!schoolName || !adminName || !email || !password || !confirm || !providedKey) {
-                showMessage('Please fill in all fields.', 'error', 'signupMessage');
+            if (!schoolName || !schoolLocation || !adminName || !email || !password || !confirm || !providedKey) {
+                showMessage('Please fill in all required fields.', 'error', 'signupMessage');
                 return;
             }
             if (password !== confirm) { showMessage('Passwords do not match.', 'error', 'signupMessage'); return; }
@@ -1781,6 +2259,8 @@
                 const userCred = await auth.createUserWithEmailAndPassword(email, password);
                 const base = schoolName.toLowerCase().replace(/[^a-z0-9]/g, '');
                 const unique = base + '_' + Date.now().toString(36);
+
+                // Save user
                 await db.collection('users').doc(userCred.user.uid).set({
                     role: 'admin',
                     email: email,
@@ -1788,6 +2268,20 @@
                     tenantId: unique,
                     schoolName: schoolName
                 });
+
+                // Save school to schools collection (for the directory)
+                await db.collection('schools').doc(unique).set({
+                    schoolId: unique,
+                    name: schoolName,
+                    location: schoolLocation,
+                    address: schoolAddress,
+                    phone: schoolPhone,
+                    email: email,
+                    adminName: adminName,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    tenantId: unique
+                });
+
                 try { localStorage.setItem('tenantId', unique); } catch (_) { _tenantId = unique; }
                 showMessage('School created! Logging you in…', 'success', 'signupMessage');
                 setTimeout(() => {
@@ -1800,7 +2294,7 @@
         }
 
         // ==================================================================
-        //  DEMO USERS
+        //  DEMO USERS – FIXED: gracefully handles existing accounts
         // ==================================================================
         async function ensureDemoUsers() {
             const adminEmail = 'admin@school.com', adminPass = 'admin123';
@@ -1809,55 +2303,383 @@
             const bursarEmail = 'bursar@school.com', bursarPass = 'bursar123';
             const defaultTenant = 'default_tenant';
 
+            async function getOrCreateUser(email, password, role, extraData = {}) {
+                try {
+                    // Try to sign in first
+                    let userCred = await auth.signInWithEmailAndPassword(email, password).catch(() => null);
+                    if (!userCred) {
+                        // Create new user
+                        userCred = await auth.createUserWithEmailAndPassword(email, password);
+                        // Set user role in Firestore
+                        await db.collection('users').doc(userCred.user.uid).set({
+                            role: role,
+                            email: email,
+                            name: extraData.name || email.split('@')[0],
+                            tenantId: defaultTenant,
+                            ...extraData
+                        });
+                    } else {
+                        // Ensure user doc exists
+                        const doc = await db.collection('users').doc(userCred.user.uid).get();
+                        if (!doc.exists) {
+                            await db.collection('users').doc(userCred.user.uid).set({
+                                role: role,
+                                email: email,
+                                name: extraData.name || email.split('@')[0],
+                                tenantId: defaultTenant,
+                                ...extraData
+                            });
+                        } else if (!doc.data().tenantId) {
+                            await db.collection('users').doc(userCred.user.uid).update({ tenantId: defaultTenant });
+                        }
+                    }
+                    return userCred;
+                } catch (e) {
+                    console.warn(`User ${email} setup issue:`, e.message);
+                    return null;
+                }
+            }
+
             try {
-                let adminUser = await auth.signInWithEmailAndPassword(adminEmail, adminPass).catch(() => null);
-                if (!adminUser) {
-                    adminUser = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
-                    await db.collection('users').doc(adminUser.user.uid).set({ role: 'admin', email: adminEmail, name: 'System Admin', tenantId: defaultTenant });
-                } else {
-                    const doc = await db.collection('users').doc(adminUser.user.uid).get();
-                    if (!doc.exists) await db.collection('users').doc(adminUser.user.uid).set({ role: 'admin', email: adminEmail, name: 'System Admin', tenantId: defaultTenant });
-                    else if (!doc.data().tenantId) await db.collection('users').doc(adminUser.user.uid).update({ tenantId: defaultTenant });
+                // Create/get users
+                const adminUser = await getOrCreateUser(adminEmail, adminPass, 'admin', { name: 'System Admin' });
+                const teacherUser = await getOrCreateUser(teacherEmail, teacherPass, 'teacher', { name: 'Demo Teacher' });
+                const parentUser = await getOrCreateUser(parentEmail, parentPass, 'parent', { name: 'Demo Parent', studentId: 'STU001' });
+                const bursarUser = await getOrCreateUser(bursarEmail, bursarPass, 'bursar', { name: 'Bursar Officer' });
+
+                // Ensure demo teacher record in 'teachers'
+                if (teacherUser) {
+                    const teacherSnap = await db.collection('teachers').where('uid', '==', teacherUser.user.uid).get();
+                    if (teacherSnap.empty) {
+                        await db.collection('teachers').doc('T001').set({
+                            id: 'T001',
+                            name: 'Demo Teacher',
+                            email: teacherEmail,
+                            class: 'JSS1',
+                            phone: '23276123456',
+                            status: 'active',
+                            uid: teacherUser.user.uid,
+                            department: 'Science',
+                            subjects: 'Physics, Chemistry',
+                            salary: 5000,
+                            dob: '1990-01-01',
+                            employmentDate: '2020-01-01',
+                            qualification: 'B.Ed',
+                            nin: 'SL123456789',
+                            tenantId: defaultTenant
+                        });
+                    } else if (!teacherSnap.docs[0].data().tenantId) {
+                        await db.collection('teachers').doc(teacherSnap.docs[0].id).update({ tenantId: defaultTenant });
+                    }
                 }
 
-                let teacherUser = await auth.signInWithEmailAndPassword(teacherEmail, teacherPass).catch(() => null);
-                if (!teacherUser) {
-                    teacherUser = await auth.createUserWithEmailAndPassword(teacherEmail, teacherPass);
-                    await db.collection('users').doc(teacherUser.user.uid).set({ role: 'teacher', email: teacherEmail, name: 'Demo Teacher', tenantId: defaultTenant });
-                    await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher', email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active', uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry', salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01', qualification: 'B.Ed', nin: 'SL123456789', tenantId: defaultTenant });
-                } else {
-                    const snap = await db.collection('teachers').where('uid', '==', teacherUser.user.uid).get();
-                    if (snap.empty) await db.collection('teachers').doc('T001').set({ id: 'T001', name: 'Demo Teacher', email: teacherEmail, class: 'JSS1', phone: '23276123456', status: 'active', uid: teacherUser.user.uid, department: 'Science', subjects: 'Physics, Chemistry', salary: 5000, dob: '1990-01-01', employmentDate: '2020-01-01', qualification: 'B.Ed', nin: 'SL123456789', tenantId: defaultTenant });
-                    else if (!snap.docs[0].data().tenantId) await db.collection('teachers').doc(snap.docs[0].id).update({ tenantId: defaultTenant });
-                }
-
-                let parentUser = await auth.signInWithEmailAndPassword(parentEmail, parentPass).catch(() => null);
-                if (!parentUser) {
-                    parentUser = await auth.createUserWithEmailAndPassword(parentEmail, parentPass);
-                    await db.collection('users').doc(parentUser.user.uid).set({ role: 'parent', email: parentEmail, name: 'Demo Parent', studentId: 'STU001', tenantId: defaultTenant });
-                } else {
-                    const doc = await db.collection('users').doc(parentUser.user.uid).get();
-                    if (!doc.exists) await db.collection('users').doc(parentUser.user.uid).set({ role: 'parent', email: parentEmail, name: 'Demo Parent', studentId: 'STU001', tenantId: defaultTenant });
-                    else if (!doc.data().tenantId) await db.collection('users').doc(parentUser.user.uid).update({ tenantId: defaultTenant });
-                }
-
-                let bursarUser = await auth.signInWithEmailAndPassword(bursarEmail, bursarPass).catch(() => null);
-                if (!bursarUser) {
-                    bursarUser = await auth.createUserWithEmailAndPassword(bursarEmail, bursarPass);
-                    await db.collection('users').doc(bursarUser.user.uid).set({ role: 'bursar', email: bursarEmail, name: 'Bursar Officer', tenantId: defaultTenant });
-                } else {
-                    const doc = await db.collection('users').doc(bursarUser.user.uid).get();
-                    if (!doc.exists) await db.collection('users').doc(bursarUser.user.uid).set({ role: 'bursar', email: bursarEmail, name: 'Bursar Officer', tenantId: defaultTenant });
-                    else if (!doc.data().tenantId) await db.collection('users').doc(bursarUser.user.uid).update({ tenantId: defaultTenant });
-                }
-
+                // Ensure demo student
                 const studentRef = db.collection('students').doc('STU001');
                 const studentDoc = await studentRef.get();
-                if (!studentDoc.exists) await studentRef.set({ id: 'STU001', name: 'John Doe', class: 'JSS1', parentPhone: '23276123456', parentName: 'Parent Name', status: 'active', tenantId: defaultTenant });
-                else if (!studentDoc.data().tenantId) await studentRef.update({ tenantId: defaultTenant });
+                if (!studentDoc.exists) {
+                    await studentRef.set({
+                        id: 'STU001',
+                        name: 'John Doe',
+                        class: 'JSS1',
+                        parentPhone: '23276123456',
+                        parentName: 'Parent Name',
+                        status: 'active',
+                        tenantId: defaultTenant
+                    });
+                } else if (!studentDoc.data().tenantId) {
+                    await studentRef.update({ tenantId: defaultTenant });
+                }
+
+                // Ensure school record
+                const schoolRef = db.collection('schools').doc(defaultTenant);
+                const schoolDoc = await schoolRef.get();
+                if (!schoolDoc.exists) {
+                    await schoolRef.set({
+                        schoolId: defaultTenant,
+                        name: 'Demo School',
+                        location: 'Freetown',
+                        address: '123 Main Street, Freetown',
+                        phone: '23276123456',
+                        email: adminEmail,
+                        adminName: 'System Admin',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        tenantId: defaultTenant
+                    });
+                } else if (!schoolDoc.data().tenantId) {
+                    await schoolRef.update({ tenantId: defaultTenant });
+                }
 
                 await auth.signOut();
-            } catch (e) { console.warn('Demo user creation issue:', e); }
+                console.log('✅ Demo users ready.');
+            } catch (e) {
+                console.warn('Demo user creation issue:', e);
+            }
+        }
+
+        // ==================================================================
+        //  SCHOOLS DIRECTORY FUNCTIONS
+        // ==================================================================
+        let allSchools = [];
+
+        async function loadSchools() {
+            try {
+                const snap = await db.collection('schools').get();
+                allSchools = [];
+                snap.forEach(doc => {
+                    allSchools.push({ id: doc.id, ...doc.data() });
+                });
+                renderSchools(allSchools);
+                updateStats();
+            } catch (error) {
+                document.getElementById('schoolsList').innerHTML = '<div class="error">Error loading schools: ' + escapeHtml(error.message) + '</div>';
+                console.error('Error loading schools:', error);
+            }
+        }
+
+        function renderSchools(schools) {
+            const container = document.getElementById('schoolsList');
+            if (!schools || schools.length === 0) {
+                container.innerHTML = `
+                    <div class="no-schools">
+                        <h3>🏫 No Schools Registered Yet</h3>
+                        <p>Be the first to register your school on EduSL!</p>
+                        <button class="primary-btn" onclick="showLoginPage()" style="margin-top:12px; padding:12px 24px; border:none; border-radius:30px; background:linear-gradient(135deg,#1a4b8a,#2a6bb0); color:#fff; font-weight:700; cursor:pointer;">Register Your School</button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            for (const school of schools) {
+                html += `
+                    <div class="school-card">
+                        <div class="school-info">
+                            <h4>🏫 ${escapeHtml(school.name)}</h4>
+                            <p><strong>Location:</strong> ${escapeHtml(school.location || 'N/A')}</p>
+                            ${school.address ? `<p><strong>Address:</strong> ${escapeHtml(school.address)}</p>` : ''}
+                            ${school.phone ? `<p><strong>Contact:</strong> ${escapeHtml(school.phone)}</p>` : ''}
+                            ${school.email ? `<p><strong>Email:</strong> ${escapeHtml(school.email)}</p>` : ''}
+                        </div>
+                        <div class="school-actions">
+                            <button class="admit-btn" onclick="openAdmissionModal('${school.id}', '${escapeHtml(school.name)}')">📝 Request Admission</button>
+                            <button class="view-btn" onclick="viewSchoolDetails('${school.id}')">View Details</button>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function viewSchoolDetails(schoolId) {
+            const school = allSchools.find(s => s.id === schoolId);
+            if (!school) return;
+            alert(`🏫 ${school.name}\n\nLocation: ${school.location || 'N/A'}\nAddress: ${school.address || 'N/A'}\nPhone: ${school.phone || 'N/A'}\nEmail: ${school.email || 'N/A'}\n\nContact the school directly for more information.`);
+        }
+
+        async function updateStats() {
+            try {
+                // Update school count
+                const schoolSnap = await db.collection('schools').get();
+                document.getElementById('schoolCount').textContent = schoolSnap.size;
+
+                // Get student count
+                const studentSnap = await db.collection('students').get();
+                document.getElementById('studentCount').textContent = studentSnap.size;
+
+                // Get teacher count – FIXED
+                const teacherSnap = await db.collection('teachers').get();
+                document.getElementById('teacherCount').textContent = teacherSnap.size;
+            } catch (error) {
+                console.warn('Error updating stats:', error);
+                // Set default values so the UI doesn't break
+                document.getElementById('schoolCount').textContent = '0';
+                document.getElementById('studentCount').textContent = '0';
+                document.getElementById('teacherCount').textContent = '0';
+            }
+        }
+
+        // ==================================================================
+        //  ADMISSION REQUEST FUNCTIONS
+        // ==================================================================
+        function openAdmissionModal(schoolId, schoolName) {
+            document.getElementById('admissionSchoolId').value = schoolId;
+            document.getElementById('admissionSchoolName').textContent = schoolName;
+            document.getElementById('admissionStudentName').value = '';
+            document.getElementById('admissionStudentDob').value = '';
+            document.getElementById('admissionParentName').value = '';
+            document.getElementById('admissionParentPhone').value = '';
+            document.getElementById('admissionParentEmail').value = '';
+            document.getElementById('admissionPreviousSchool').value = '';
+            document.getElementById('admissionClass').value = '';
+            document.getElementById('admissionNotes').value = '';
+            document.getElementById('admissionMessage').innerHTML = '';
+            openModal('admissionModal');
+        }
+
+        document.getElementById('submitAdmissionBtn').onclick = async function() {
+            const schoolId = document.getElementById('admissionSchoolId').value;
+            const schoolName = document.getElementById('admissionSchoolName').textContent;
+            const studentName = document.getElementById('admissionStudentName').value.trim();
+            const studentDob = document.getElementById('admissionStudentDob').value;
+            const parentName = document.getElementById('admissionParentName').value.trim();
+            const parentPhone = document.getElementById('admissionParentPhone').value.trim();
+            const parentEmail = document.getElementById('admissionParentEmail').value.trim();
+            const previousSchool = document.getElementById('admissionPreviousSchool').value.trim();
+            const classApplying = document.getElementById('admissionClass').value;
+            const notes = document.getElementById('admissionNotes').value.trim();
+
+            if (!studentName || !studentDob || !parentName || !parentPhone || !classApplying) {
+                showMessage('Please fill in all required fields.', 'error', 'admissionMessage');
+                return;
+            }
+
+            try {
+                const tenantId = getCurrentTenantId();
+                await db.collection('admissions').add({
+                    schoolId: schoolId,
+                    schoolName: schoolName,
+                    studentName: studentName,
+                    studentDob: studentDob,
+                    parentName: parentName,
+                    parentPhone: parentPhone,
+                    parentEmail: parentEmail || '',
+                    previousSchool: previousSchool || '',
+                    classApplying: classApplying,
+                    notes: notes || '',
+                    status: 'pending',
+                    tenantId: tenantId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showMessage('✅ Admission request submitted successfully! The school will contact you soon.', 'success', 'admissionMessage');
+                setTimeout(() => {
+                    closeModal('admissionModal');
+                }, 2000);
+            } catch (error) {
+                showMessage('Error submitting admission request: ' + error.message, 'error', 'admissionMessage');
+                console.error('Admission error:', error);
+            }
+        };
+
+        // ==================================================================
+        //  LOAD ADMISSION REQUESTS (Admin)
+        // ==================================================================
+        async function loadAdmissionRequests(containerId = 'admissionRequestsList') {
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('admissions')
+                    .where('tenantId', '==', tenantId)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                const requests = [];
+                snap.forEach(doc => requests.push({ id: doc.id, ...doc.data() }));
+
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                if (requests.length === 0) {
+                    container.innerHTML = '<p>No admission requests received yet.</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>Date</th><th>Student</th><th>Parent</th><th>Phone</th><th>School</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                for (const req of requests) {
+                    const date = req.createdAt ? new Date(req.createdAt.toDate()).toLocaleDateString() : 'N/A';
+                    const statusBadge = req.status === 'approved' ? '<span style="color:#27ae60;">✅ Approved</span>' : 
+                                      (req.status === 'rejected' ? '<span style="color:#e74c3c;">❌ Rejected</span>' : 
+                                      '<span style="color:#f39c12;">⏳ Pending</span>');
+                    
+                    html += `<tr>
+                        <td>${date}</td>
+                        <td>${escapeHtml(req.studentName)}</td>
+                        <td>${escapeHtml(req.parentName)}</td>
+                        <td>${escapeHtml(req.parentPhone)}</td>
+                        <td>${escapeHtml(req.schoolName)}</td>
+                        <td>${escapeHtml(req.classApplying)}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            ${req.status === 'pending' ? `
+                                <button class="approve-admission-btn" data-id="${req.id}" style="background:#27ae60; color:#fff;">Approve</button>
+                                <button class="reject-admission-btn" data-id="${req.id}" style="background:#e74c3c; color:#fff;">Reject</button>
+                            ` : ''}
+                            <button class="delete-admission-btn" data-id="${req.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
+                        </td>
+                    </tr>`;
+                }
+                html += '</tbody></table>';
+                container.innerHTML = html;
+
+                // Attach event listeners
+                container.querySelectorAll('.approve-admission-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Approve this admission request?')) {
+                            await db.collection('admissions').doc(this.dataset.id).update({ status: 'approved' });
+                            loadAdmissionRequests(containerId);
+                            if (containerId === 'admissionRequestsList') loadAdmissionRequests('admissionRequestsAdminList');
+                        }
+                    };
+                });
+                container.querySelectorAll('.reject-admission-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Reject this admission request?')) {
+                            await db.collection('admissions').doc(this.dataset.id).update({ status: 'rejected' });
+                            loadAdmissionRequests(containerId);
+                            if (containerId === 'admissionRequestsList') loadAdmissionRequests('admissionRequestsAdminList');
+                        }
+                    };
+                });
+                container.querySelectorAll('.delete-admission-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Delete this admission request?')) {
+                            await db.collection('admissions').doc(this.dataset.id).delete();
+                            loadAdmissionRequests(containerId);
+                            if (containerId === 'admissionRequestsList') loadAdmissionRequests('admissionRequestsAdminList');
+                        }
+                    };
+                });
+
+            } catch (error) {
+                const container = document.getElementById(containerId);
+                if (container) container.innerHTML = '<div class="error">Error loading admission requests: ' + escapeHtml(error.message) + '</div>';
+                console.error('Error loading admission requests:', error);
+            }
+        }
+
+        // ==================================================================
+        //  PAGE NAVIGATION
+        // ==================================================================
+        function showStartupPage() {
+            document.getElementById('startupPage').style.display = 'flex';
+            document.getElementById('schoolsPage').style.display = 'none';
+            document.getElementById('mainHeader').style.display = 'none';
+            document.getElementById('syncBar').style.display = 'none';
+            document.getElementById('globalNotices').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginModal').style.display = 'none';
+            loadSchools();
+        }
+
+        function showSchoolsPage() {
+            document.getElementById('startupPage').style.display = 'none';
+            document.getElementById('schoolsPage').style.display = 'block';
+            document.getElementById('mainHeader').style.display = 'none';
+            document.getElementById('syncBar').style.display = 'none';
+            document.getElementById('globalNotices').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginModal').style.display = 'none';
+            loadSchools();
+        }
+
+        function showLoginPage() {
+            document.getElementById('startupPage').style.display = 'none';
+            document.getElementById('schoolsPage').style.display = 'none';
+            document.getElementById('mainHeader').style.display = 'none';
+            document.getElementById('syncBar').style.display = 'none';
+            document.getElementById('globalNotices').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginModal').style.display = 'flex';
+            loadSchools(); // Keep stats updated in background
         }
 
         // ==================================================================
@@ -2664,7 +3486,7 @@
                 const tenantId = getCurrentTenantId();
                 const id = document.getElementById('newStudentId').value.trim();
                 const name = document.getElementById('newStudentName').value.trim();
-                const cls = document.getElementById('newClassLevel').value;
+                const cls = document.getElementById('newClassLevel').value.trim();
                 if (!id || !name || !cls) { showMessage('ID, Name and Class required', 'error', 'manualMessage'); return; }
 
                 const dob = document.getElementById('newStudentDob').value;
@@ -4218,7 +5040,7 @@
         async function updateTeacherAdmin() {
             const id = document.getElementById('editTeacherId').value;
             const newPassword = document.getElementById('editTeacherPassword').value.trim();
-            
+
             const updates = {
                 name: document.getElementById('editTeacherName').value.trim(),
                 email: document.getElementById('editTeacherEmail').value.trim(),
@@ -4230,15 +5052,15 @@
                 nin: document.getElementById('editTeacherNIN').value.trim(),
                 status: document.getElementById('editTeacherStatus').value
             };
-            
+
             // If new password is provided, store it in the teacher doc (and optionally update auth)
             if (newPassword) {
                 updates.tempPassword = newPassword;
             }
-            
+
             try {
                 await db.collection('teachers').doc(id).update(updates);
-                
+
                 // If new password provided, attempt to update Firebase Auth password (if the user is logged in and matches)
                 // Since we may not have the UID readily available, we'll store it in the doc and show a message.
                 if (newPassword) {
@@ -4490,9 +5312,28 @@
             const id = document.getElementById('staffId').value.trim();
             const name = document.getElementById('staffName').value.trim();
             const type = document.getElementById('staffType').value;
-            if (!id || !name) { showMessage('ID and Name required.', 'error', 'staffMessage'); return; }
-            await db.collection('staff').doc(id).set({ id, name, type, tenantId, createdAt: new Date().toISOString() });
-            showMessage('Staff added.', 'success', 'staffMessage');
+            const phone = document.getElementById('staffPhone').value.trim();
+            const email = document.getElementById('staffEmail').value.trim();
+            const department = document.getElementById('staffDepartment').value.trim();
+            const status = document.getElementById('staffStatus').value;
+
+            if (!id || !name) {
+                showMessage('ID and Name are required.', 'error', 'staffMessage');
+                return;
+            }
+
+            await db.collection('staff').doc(id).set({
+                id, name, type, phone, email, department, status,
+                tenantId,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            showMessage('Staff added successfully.', 'success', 'staffMessage');
+            document.getElementById('staffId').value = '';
+            document.getElementById('staffName').value = '';
+            document.getElementById('staffPhone').value = '';
+            document.getElementById('staffEmail').value = '';
+            document.getElementById('staffDepartment').value = '';
             loadStaffList();
         }
 
@@ -4500,16 +5341,44 @@
             if (currentUserRole !== 'admin') return;
             const tenantId = getCurrentTenantId();
             const snap = await db.collection('staff').where('tenantId', '==', tenantId).get();
-            let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Actions</th></tr></thead><tbody>';
+            let html = `<table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>`;
             snap.forEach(d => {
                 const data = d.data();
-                html += `<tr><td>${escapeHtml(data.id)}</td><td>${escapeHtml(data.name)}</td><td>${escapeHtml(data.type)}</td><td><button class="delete-staff" data-id="${data.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button></td></tr>`;
+                html += `<tr>
+                    <td>${escapeHtml(data.id)}</td>
+                    <td>${escapeHtml(data.name)}</td>
+                    <td>${escapeHtml(data.type)}</td>
+                    <td>${escapeHtml(data.phone || '')}</td>
+                    <td>${escapeHtml(data.email || '')}</td>
+                    <td>${escapeHtml(data.department || '')}</td>
+                    <td>${escapeHtml(data.status || 'active')}</td>
+                    <td>
+                        <button class="delete-staff" data-id="${data.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
+                    </td>
+                </tr>`;
             });
             html += '</tbody></table>';
             document.getElementById('staffListContainer').innerHTML = html;
+
             document.querySelectorAll('.delete-staff').forEach(btn => {
                 btn.onclick = async function() {
-                    if (confirm('Delete staff?')) { await db.collection('staff').doc(this.dataset.id).delete(); loadStaffList(); }
+                    if (confirm('Delete this staff member?')) {
+                        await db.collection('staff').doc(this.dataset.id).delete();
+                        loadStaffList();
+                    }
                 };
             });
         }
@@ -5558,10 +6427,18 @@
                 try { localStorage.setItem('tenantId', tenantId); } catch (_) { _tenantId = tenantId; }
                 await logLoginActivity(user, userData, tenantId);
                 currentUserRole = role;
+
+                // Hide startup and schools pages, show main app
+                document.getElementById('startupPage').style.display = 'none';
+                document.getElementById('schoolsPage').style.display = 'none';
                 document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('mainHeader').style.display = 'flex';
+                document.getElementById('syncBar').style.display = 'block';
+                document.getElementById('globalNotices').style.display = 'block';
                 document.getElementById('mainApp').style.display = 'block';
                 document.getElementById('userInfo').innerText = role.toUpperCase() + ': ' + email;
                 document.getElementById('logoutBtn').style.display = 'inline-block';
+
                 await loadStudents();
                 renderNotices();
 
@@ -5647,6 +6524,13 @@
                             initChatbot();
                         }
                     }, 1000);
+                }
+
+                // Load admission requests if admin
+                if (role === 'admin') {
+                    document.getElementById('admissionRequestsCard').style.display = 'block';
+                    loadAdmissionRequests('admissionRequestsList');
+                    loadAdmissionRequests('admissionRequestsAdminList');
                 }
 
                 const firstModuleBtn = document.querySelector('.module-btn');
@@ -5736,7 +6620,7 @@
                     if (m.moduleId === 'attendanceModule') renderAttendance();
                     if (m.moduleId === 'teachersModule') { if (role === 'admin') loadAllTeachersForAdmin(); displayOwnTeacherProfile(); }
                     if (m.moduleId === 'bursarModule') { loadBursarSummary(); populateFeeStatsYears().then(loadFeeStats); }
-                    if (m.moduleId === 'adminModule') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); renderNotices(); initFileDB().then(loadFilesList); loadLoginActivity(); loadSchoolLocation(); loadStaffCheckinHistory(); }
+                    if (m.moduleId === 'adminModule') { loadStaffList(); loadAssetsList(); loadInventoryList(); loadVisitorsList(); renderNotices(); initFileDB().then(loadFilesList); loadLoginActivity(); loadSchoolLocation(); loadStaffCheckinHistory(); loadAdmissionRequests('admissionRequestsAdminList'); }
                     if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
                     if (m.moduleId === 'recordsModule' && role === 'parent' && parentLinkedStudentId) {
                         setTimeout(initChatbot, 300);
@@ -5772,6 +6656,7 @@
                         else if (id === 'loginactivity') loadLoginActivity();
                         else if (id === 'schoollocation') loadSchoolLocation();
                         else if (id === 'staffcheckins') loadStaffCheckinHistory();
+                        else if (id === 'admissionrequests') loadAdmissionRequests('admissionRequestsAdminList');
                     };
                 });
             } else if (role === 'bursar') {
@@ -5887,8 +6772,16 @@
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
 
-            ensureDemoUsers().then(() => {}).catch(console.warn);
+            ensureDemoUsers().then(() => {
+                console.log('✅ Demo users ready.');
+                // Now load schools data
+                loadSchools();
+            }).catch(console.warn);
 
+            // Show startup page
+            showStartupPage();
+
+            // Setup login
             document.getElementById('demoAdminBtn').onclick = function() { loginAndSetup('admin@school.com', 'admin123'); };
             document.getElementById('demoBursarBtn').onclick = function() { loginAndSetup('bursar@school.com', 'bursar123'); };
             document.getElementById('demoTeacherBtn').onclick = function() { loginAndSetup('teacher@school.com', 'teacher123'); };
@@ -5900,10 +6793,11 @@
                 auth.signOut().then(function() {
                     try { localStorage.removeItem('tenantId'); } catch (_) {}
                     _tenantId = 'default_tenant';
-                    location.reload();
+                    showStartupPage();
                 });
             };
 
+            // Signup toggle
             const signupToggle = document.getElementById('signupToggle');
             const signupBack = document.getElementById('signupBack');
             const signupFields = document.getElementById('signupFields');
@@ -5911,7 +6805,42 @@
             signupBack.onclick = function() { signupFields.classList.remove('active'); signupToggle.style.display = 'inline-block'; this.style.display = 'none'; };
             document.getElementById('signupBtn').onclick = signUpAndCreateTenant;
 
-            // Attendance import buttons already updated above
+            // Attendance import buttons
+            document.getElementById('importBtn').onclick = function() {
+                if (currentUserRole !== 'admin') {
+                    showMessage('Only admin can import students.', 'error', 'importMessage');
+                    return;
+                }
+                const fileInput = document.getElementById('excelFile');
+                const f = fileInput.files[0];
+                if (!f) {
+                    showMessage('Please select a file.', 'error', 'importMessage');
+                    return;
+                }
+
+                importExcelStudents(f)
+                    .then(function(count) {
+                        showMessage(`✅ Successfully imported ${count} student(s).`, 'success', 'importMessage');
+                        loadStudents().then(() => renderAttendance());
+                        fileInput.value = ''; // reset file input
+                    })
+                    .catch(function(err) {
+                        showMessage('❌ Import error: ' + err.message, 'error', 'importMessage');
+                        console.error(err);
+                    });
+            };
+
+            document.getElementById('downloadSampleBtn').onclick = function() {
+                if (currentUserRole !== 'admin') return;
+                const sampleData = [
+                    { 'ID': 'STU001', 'Name': 'John Doe', 'Class': 'JSS1', 'ParentPhone': '23276123456', 'ParentName': 'Mr. Doe' },
+                    { 'ID': 'STU002', 'Name': 'Jane Smith', 'Class': 'SSS2', 'ParentPhone': '2327654321', 'ParentName': 'Mrs. Smith' }
+                ];
+                const ws = XLSX.utils.json_to_sheet(sampleData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Students');
+                XLSX.writeFile(wb, 'sample_students.xlsx');
+            };
 
             // Other attendance buttons
             document.getElementById('addStudentBtn').onclick = function() { if (currentUserRole !== 'admin') return; addManualStudent(); };
@@ -5999,7 +6928,7 @@
                 loadTeacherRegister();
             };
             document.getElementById('saveOwnTeacherBtn').onclick = saveOwnTeacherProfile;
-            // saveTeacherBtn is already attached to updateTeacherAdmin
+            document.getElementById('saveTeacherBtn').onclick = updateTeacherAdmin;
 
             // Bursar
             document.getElementById('searchBursarStudentBtn').onclick = function() {
@@ -6092,6 +7021,7 @@
                     else if (id === 'loginactivity') loadLoginActivity();
                     else if (id === 'schoollocation') loadSchoolLocation();
                     else if (id === 'staffcheckins') loadStaffCheckinHistory();
+                    else if (id === 'admissionrequests') loadAdmissionRequests('admissionRequestsAdminList');
                 };
             });
 
@@ -6142,10 +7072,15 @@
                 }
             };
 
-            // Attach saveTeacherBtn to updateTeacherAdmin (already defined)
-            document.getElementById('saveTeacherBtn').onclick = updateTeacherAdmin;
+            // Admission request buttons
+            document.getElementById('refreshAdmissionRequestsBtn').onclick = function() {
+                loadAdmissionRequests('admissionRequestsList');
+            };
+            document.getElementById('refreshAdmissionRequestsAdminBtn').onclick = function() {
+                loadAdmissionRequests('admissionRequestsAdminList');
+            };
 
-            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('loginModal').style.display = 'none';
 
             setTimeout(() => {
                 if (currentUserRole === 'parent' && parentLinkedStudentId) {
