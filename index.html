@@ -6,7 +6,7 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
-        /* ===== ALL STYLES (unchanged) ===== */
+        /* ===== ALL ORIGINAL STYLES (unchanged) ===== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -553,7 +553,7 @@
             color: #f39c12;
         }
 
-        /* ===== NEW: Startup Flyer Styles ===== */
+        /* ===== STARTUP FLYER – MOBILE OPTIMIZED ===== */
         #startupPage {
             position: fixed;
             top: 0;
@@ -565,20 +565,23 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            padding: 20px;
+            padding: 12px;
+            overflow-y: auto;
         }
         #startupPage .flyer {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(20px);
-            border-radius: 40px;
-            padding: 50px 60px;
-            max-width: 700px;
+            border-radius: 28px;
+            padding: 24px 20px;
+            max-width: 500px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: flyerIn 0.8s ease;
             position: relative;
             overflow: hidden;
+            max-height: 95vh;
+            overflow-y: auto;
         }
         #startupPage .flyer::before {
             content: '';
@@ -595,76 +598,78 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
         #startupPage .flyer .logo {
-            width: 120px;
-            height: 120px;
+            width: 80px;
+            height: 80px;
             background: linear-gradient(135deg, #1a4b8a, #2a6bb0);
-            border-radius: 30px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 3rem;
+            margin: 0 auto 12px;
+            font-size: 2.2rem;
             font-weight: 800;
             color: #fff;
-            box-shadow: 0 12px 40px rgba(26,75,138,0.3);
+            box-shadow: 0 8px 24px rgba(26,75,138,0.3);
         }
         #startupPage .flyer h1 {
-            font-size: 2.8rem;
+            font-size: 2rem;
             font-weight: 800;
             color: #0b2b5c;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             letter-spacing: -1px;
         }
         #startupPage .flyer .tagline {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #1a4b8a;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         #startupPage .flyer .subtitle {
             color: #4a6a8a;
-            font-size: 1rem;
-            margin-bottom: 30px;
-            line-height: 1.6;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
         }
         #startupPage .flyer .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-            margin: 24px 0;
-            text-align: left;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: 16px 0;
         }
         #startupPage .flyer .features .feature {
             background: #f0f5fa;
-            padding: 12px 16px;
+            padding: 8px 10px;
             border-radius: 12px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: #1a3a5c;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         #startupPage .flyer .features .feature span {
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
         #startupPage .flyer .btn-group {
             display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        #startupPage .flyer .btn-group .primary-btn,
+        #startupPage .flyer .btn-group .secondary-btn {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
         }
         #startupPage .flyer .btn-group .primary-btn {
             background: linear-gradient(135deg, #1a4b8a, #2a6bb0);
             color: #fff;
-            padding: 14px 40px;
             border: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s;
             box-shadow: 0 8px 30px rgba(26,75,138,0.3);
         }
         #startupPage .flyer .btn-group .primary-btn:hover {
@@ -674,13 +679,7 @@
         #startupPage .flyer .btn-group .secondary-btn {
             background: #fff;
             color: #1a4b8a;
-            padding: 14px 40px;
             border: 2px solid #1a4b8a;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s;
         }
         #startupPage .flyer .btn-group .secondary-btn:hover {
             background: #1a4b8a;
@@ -690,20 +689,22 @@
         #startupPage .flyer .stats {
             display: flex;
             justify-content: space-around;
-            margin: 24px 0 0;
-            padding-top: 20px;
+            margin-top: 16px;
+            padding-top: 12px;
             border-top: 2px solid #eef2f7;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         #startupPage .flyer .stats .stat-item {
             text-align: center;
         }
         #startupPage .flyer .stats .stat-item .number {
-            font-size: 1.6rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: #1a4b8a;
         }
         #startupPage .flyer .stats .stat-item .label {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: #6c7a89;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -843,6 +844,15 @@
             max-width: 100%;
         }
 
+        /* ===== LOGIN MODAL (ensures it appears on top) ===== */
+        #loginModal .modal-content {
+            max-width: 400px;
+            padding: 24px 20px;
+        }
+        #loginModal input {
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
             body { padding: 12px; }
             .header { flex-direction: column; align-items: stretch; padding: 16px 18px; }
@@ -878,18 +888,18 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             #startupPage .flyer {
-                padding: 30px 20px;
-                border-radius: 24px;
+                padding: 20px 16px;
+                border-radius: 20px;
             }
             #startupPage .flyer h1 {
-                font-size: 2rem;
+                font-size: 1.6rem;
             }
             #startupPage .flyer .features {
                 grid-template-columns: 1fr 1fr;
             }
             #startupPage .flyer .stats {
                 flex-wrap: wrap;
-                gap: 12px;
+                gap: 8px;
             }
             #schoolsPage .school-card {
                 flex-direction: column;
@@ -2431,8 +2441,18 @@
                 renderSchools(allSchools);
                 updateStats();
             } catch (error) {
-                document.getElementById('schoolsList').innerHTML = '<div class="error">Error loading schools: ' + escapeHtml(error.message) + '</div>';
-                console.error('Error loading schools:', error);
+                console.warn('Error loading schools:', error);
+                const container = document.getElementById('schoolsList');
+                container.innerHTML = `
+                    <div class="no-schools">
+                        <h3>🏫 Schools Directory</h3>
+                        <p>Unable to load schools. Please ensure you have an internet connection.</p>
+                        ${error.message === 'Missing or insufficient permissions.' ? 
+                            `<p style="color:#e74c3c;">❌ Permission denied. The school directory is not publicly accessible.</p>` : 
+                            `<p style="color:#6c7a89;">${escapeHtml(error.message)}</p>`}
+                        <button class="primary-btn" onclick="showLoginPage()" style="margin-top:12px;">Login to access</button>
+                    </div>
+                `;
             }
         }
 
