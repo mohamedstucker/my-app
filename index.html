@@ -945,43 +945,43 @@
 <body>
 
     <!-- ===== STARTUP FLYER PAGE ===== -->
-    <div id="startupPage" style="display:flex;">
-        <div class="flyer">
-            <div class="logo">🏫</div>
-            <h1>EduSL</h1>
-            <div class="tagline">Empowering Sierra Leone's Education</div>
-            <div class="subtitle">
-                Connecting parents and students to the best schools across Sierra Leone.
-                Find your dream school, track attendance, manage fees, and more — all in one place.
+       <div id="startupPage" style="display:flex;">
+    <div class="flyer">
+        <img src="icon-192.png" alt="School Logo" style="width:80px; height:80px; border-radius:24px; object-fit:contain; display:block; margin:0 auto 12px;" />
+        <h1>EduSL</h1>
+        <div class="tagline">Empowering Sierra Leone's Education</div>
+        <div class="subtitle">
+            Connecting parents and students to the best schools across Sierra Leone.
+            Find your dream school, track attendance, manage fees, and more — all in one place.
+        </div>
+        <div class="features">
+            <div class="feature"><span>📚</span> School Directory</div>
+            <div class="feature"><span>📊</span> Attendance Tracking</div>
+            <div class="feature"><span>💰</span> Fee Management</div>
+            <div class="feature"><span>📝</span> Exam Records</div>
+            <div class="feature"><span>🤖</span> AI Assistant</div>
+            <div class="feature"><span>📢</span> School Notices</div>
+        </div>
+        <div class="btn-group">
+            <button class="primary-btn" onclick="showSchoolsPage()">🏫 Find Schools Near You</button>
+            <button class="secondary-btn" onclick="showLoginPage()">🔐 School Admin Login</button>
+        </div>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="number" id="schoolCount">0</div>
+                <div class="label">Schools</div>
             </div>
-            <div class="features">
-                <div class="feature"><span>📚</span> School Directory</div>
-                <div class="feature"><span>📊</span> Attendance Tracking</div>
-                <div class="feature"><span>💰</span> Fee Management</div>
-                <div class="feature"><span>📝</span> Exam Records</div>
-                <div class="feature"><span>🤖</span> AI Assistant</div>
-                <div class="feature"><span>📢</span> School Notices</div>
+            <div class="stat-item">
+                <div class="number" id="studentCount">0</div>
+                <div class="label">Students</div>
             </div>
-            <div class="btn-group">
-                <button class="primary-btn" onclick="showSchoolsPage()">🏫 Find Schools Near You</button>
-                <button class="secondary-btn" onclick="showLoginPage()">🔐 School Admin Login</button>
-            </div>
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="number" id="schoolCount">0</div>
-                    <div class="label">Schools</div>
-                </div>
-                <div class="stat-item">
-                    <div class="number" id="studentCount">0</div>
-                    <div class="label">Students</div>
-                </div>
-                <div class="stat-item">
-                    <div class="number" id="teacherCount">0</div>
-                    <div class="label">Teachers</div>
-                </div>
+            <div class="stat-item">
+                <div class="number" id="teacherCount">0</div>
+                <div class="label">Teachers</div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- ===== SCHOOLS DIRECTORY PAGE ===== -->
     <div id="schoolsPage">
