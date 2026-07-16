@@ -469,6 +469,30 @@
         .library-book-list li a:hover { text-decoration: underline; }
         .library-syllabus-link { display: inline-block; margin: 6px 0 12px 0; }
 
+        /* ===== DOCUMENT STYLES ===== */
+        .doc-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 8px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #e6edf4;
+            transition: 0.2s;
+        }
+        .doc-item:hover { background: #f0f5fa; border-color: #b0c4de; }
+        .doc-item .doc-info { flex: 1; min-width: 150px; }
+        .doc-item .doc-info .doc-name { font-weight: 600; color: #0b2b5c; }
+        .doc-item .doc-info .doc-meta { font-size: 0.75rem; color: #6c7a89; }
+        .doc-item .doc-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .doc-item .doc-actions button { font-size: 0.7rem; padding: 4px 12px; }
+        .doc-upload-area {
+            display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0;
+        }
+        .doc-upload-area input[type="file"] { max-width: 250px; }
+
         /* ===== MOBILE RESPONSIVE FIXES ===== */
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -532,6 +556,8 @@
             .attendance-summary .stat-item .value { font-size: 1rem; }
             .attendance-summary .stat-item .label { font-size: 0.6rem; }
             .stats-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; }
+            .doc-item { flex-direction: column; align-items: stretch; gap: 8px; }
+            .doc-item .doc-actions { justify-content: flex-start; }
         }
 
         @media (max-width: 480px) {
@@ -558,6 +584,7 @@
             th, td { padding: 4px 6px; }
             .remark-input { width: 60px; font-size: 0.6rem; padding: 3px 4px; }
             .subject-row input { max-width: 80px; font-size: 0.7rem; }
+            .doc-upload-area input[type="file"] { max-width: 100%; }
         }
     </style>
 </head>
@@ -906,8 +933,9 @@
                     <button class="tab-btn" data-tab="paymenthistory">Payment History</button>
                     <button class="tab-btn" data-tab="attendancehistory">Attendance History</button>
                     <button class="tab-btn" data-tab="aichat">AI Chat</button>
-                    <!-- NEW LIBRARY TAB -->
                     <button class="tab-btn" data-tab="library">📚 Library</button>
+                    <!-- NEW: Documents Tab -->
+                    <button class="tab-btn" data-tab="documents">📄 Documents</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
                     <div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">Edit Profile</button></div>
@@ -1003,6 +1031,26 @@
                         </div>
                         <div id="libraryContent">
                             <p>Select a class and/or department to see recommended textbooks and syllabus.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- ===== DOCUMENTS TAB ===== -->
+                <div id="documentsTab" class="tab-content">
+                    <div class="card">
+                        <h3>📄 Documents Exchange</h3>
+                        <p style="color:#6c7a89; margin-bottom:12px;">
+                            Admin can upload documents for the student. Parents can view, download, and reply by uploading a file back.
+                        </p>
+                        <div id="documentsContainer">
+                            <div id="documentList"><p>Loading documents...</p></div>
+                            <div id="documentUploadArea" style="margin-top:16px; display:none;">
+                                <div class="doc-upload-area">
+                                    <input type="file" id="docFileInput" />
+                                    <input type="text" id="docDescription" placeholder="Short description (optional)" style="max-width:250px;" />
+                                    <button id="uploadDocBtn" class="refresh-btn">Upload</button>
+                                    <span id="docUploadStatus"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1621,6 +1669,8 @@
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js">
     </script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js">
+    </script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
     </script>
 
@@ -1639,6 +1689,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
         const ALL_CLASSES = [
             'Pre-Nursery',
@@ -6659,7 +6710,7 @@
                     ]
                 }
             },
-            // --- JSS2 (NEW) ---
+            // --- JSS2 ---
             'JSS2': {
                 syllabus: 'https://www.mbsse.gov.sl/syllabus/jss2-syllabus.pdf',
                 subjects: {
@@ -6680,7 +6731,7 @@
                     ]
                 }
             },
-            // --- JSS3 (NEW) ---
+            // --- JSS3 ---
             'JSS3': {
                 syllabus: 'https://www.mbsse.gov.sl/syllabus/jss3-syllabus.pdf',
                 subjects: {
@@ -6816,6 +6867,169 @@
             }
 
             container.innerHTML = html;
+        }
+
+        // ==================================================================
+        //  DOCUMENT EXCHANGE FUNCTIONS (NEW)
+        // ==================================================================
+      async function loadStudentDocuments(studentId) {
+    const container = document.getElementById('documentList');
+    if (!container) return;
+    container.innerHTML = '<p>Loading documents...</p>';
+
+    try {
+        const tenantId = getCurrentTenantId();
+        const snap = await db.collection('student_documents')
+            .where('tenantId', '==', tenantId)
+            .where('studentId', '==', studentId)
+            .orderBy('timestamp', 'desc')
+            .get();
+
+        const docs = [];
+        snap.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+
+        // ===== FIX: Show upload area for admin or parent =====
+        const uploadArea = document.getElementById('documentUploadArea');
+        if (uploadArea) {
+            uploadArea.style.display = (currentUserRole === 'admin' || currentUserRole === 'parent') ? 'block' : 'none';
+        }
+
+        if (docs.length === 0) {
+            container.innerHTML = '<p>No documents exchanged yet.</p>';
+            return;
+        }
+
+        let html = '';
+        for (const doc of docs) {
+            const uploadedBy = doc.uploadedBy === 'admin' ? 'Admin' : 'Parent';
+            const isAdmin = currentUserRole === 'admin';
+            const isParent = currentUserRole === 'parent';
+            const canDelete = isAdmin || (isParent && doc.uploadedBy === 'parent');
+            const timestamp = doc.timestamp ? new Date(doc.timestamp.toDate()).toLocaleString() : 'N/A';
+
+            html += `
+                <div class="doc-item">
+                    <div class="doc-info">
+                        <div class="doc-name">${escapeHtml(doc.fileName)}</div>
+                        <div class="doc-meta">
+                            Uploaded by <strong>${escapeHtml(uploadedBy)}</strong> • ${escapeHtml(timestamp)}
+                            ${doc.description ? `• ${escapeHtml(doc.description)}` : ''}
+                            <br>Size: ${(doc.fileSize / 1024).toFixed(1)} KB
+                        </div>
+                    </div>
+                    <div class="doc-actions">
+                        <a href="${doc.downloadURL}" target="_blank" class="refresh-btn" style="text-decoration:none; display:inline-block; padding:4px 12px; font-size:0.7rem;">📥 Download</a>
+                        ${canDelete ? `<button class="delete-doc-btn" data-id="${doc.id}" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:4px 12px;">🗑️ Delete</button>` : ''}
+                        ${isParent && doc.uploadedBy === 'admin' ? `<button class="reply-doc-btn" data-id="${doc.id}" style="background:#e8f0fe; color:#1a4b8a; font-size:0.7rem; padding:4px 12px;">📤 Reply</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+
+        // Attach delete event listeners
+        container.querySelectorAll('.delete-doc-btn').forEach(btn => {
+            btn.onclick = async function() {
+                if (confirm('Delete this document?')) {
+                    await deleteDocument(this.dataset.id);
+                }
+            };
+        });
+        // Attach reply event listeners
+        container.querySelectorAll('.reply-doc-btn').forEach(btn => {
+            btn.onclick = function() {
+                const fileInput = document.getElementById('docFileInput');
+                if (fileInput) {
+                    fileInput.dataset.replyTo = this.dataset.id;
+                    fileInput.click();
+                }
+            };
+        });
+
+    } catch (error) {
+        container.innerHTML = '<div class="error">Failed to load documents: ' + escapeHtml(error.message) + '</div>';
+        console.error('Load documents error:', error);
+    }
+}
+
+        document.getElementById('uploadDocBtn').addEventListener('click', async function() {
+            const fileInput = document.getElementById('docFileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                showMessage('Please select a file.', 'error', 'docUploadStatus');
+                return;
+            }
+
+            const description = document.getElementById('docDescription').value.trim();
+            const replyTo = fileInput.dataset.replyTo || null;
+
+            try {
+                await uploadDocument(file, description, replyTo);
+                fileInput.value = '';
+                document.getElementById('docDescription').value = '';
+                delete fileInput.dataset.replyTo;
+                if (currentStudentDoc) loadStudentDocuments(currentStudentDoc.id);
+            } catch (error) {
+                showMessage('Upload failed: ' + error.message, 'error', 'docUploadStatus');
+            }
+        });
+
+        async function uploadDocument(file, description, replyTo) {
+            if (!currentStudentDoc) throw new Error('No student selected');
+            const tenantId = getCurrentTenantId();
+            const user = auth.currentUser;
+            if (!user) throw new Error('Not logged in');
+
+            const role = currentUserRole;
+            const uploaderName = role === 'admin' ? 'Admin' : 'Parent';
+
+            // Upload to Firebase Storage
+            const storagePath = `students/${currentStudentDoc.id}/documents/${Date.now()}_${file.name}`;
+            const storageRef = storage.ref(storagePath);
+            const snapshot = await storageRef.put(file);
+            const downloadURL = await snapshot.ref.getDownloadURL();
+
+            // Save metadata in Firestore
+            const docData = {
+                studentId: currentStudentDoc.id,
+                fileName: file.name,
+                fileType: file.type,
+                fileSize: file.size,
+                description: description || '',
+                uploadedBy: role,
+                uploaderName: uploaderName,
+                downloadURL: downloadURL,
+                tenantId: tenantId,
+                replyTo: replyTo || null,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            await db.collection('student_documents').add(docData);
+            showMessage('Document uploaded successfully.', 'success', 'docUploadStatus');
+            // Reload documents
+            if (currentStudentDoc) loadStudentDocuments(currentStudentDoc.id);
+        }
+
+        async function deleteDocument(docId) {
+            try {
+                const docRef = db.collection('student_documents').doc(docId);
+                const doc = await docRef.get();
+                if (!doc.exists) return;
+
+                const data = doc.data();
+                // Delete file from storage
+                if (data.downloadURL) {
+                    const fileRef = storage.refFromURL(data.downloadURL);
+                    await fileRef.delete().catch(() => { /* ignore if file not found */ });
+                }
+
+                await docRef.delete();
+                showMessage('Document deleted.', 'success', 'docUploadStatus');
+                if (currentStudentDoc) loadStudentDocuments(currentStudentDoc.id);
+            } catch (error) {
+                showMessage('Error deleting document: ' + error.message, 'error', 'docUploadStatus');
+                console.error('Delete document error:', error);
+            }
         }
 
         // ==================================================================
@@ -6989,6 +7203,18 @@
                 document.getElementById('libraryClassSelect').addEventListener('change', showLibraryResources);
                 document.getElementById('libraryDepartmentSelect').addEventListener('change', showLibraryResources);
 
+                // Documents: load when tab is clicked
+                const docTabBtn = document.querySelector('[data-tab="documents"]');
+                if (docTabBtn) {
+                    docTabBtn.addEventListener('click', function() {
+                        if (currentStudentDoc) {
+                            loadStudentDocuments(currentStudentDoc.id);
+                        } else {
+                            document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
+                        }
+                    });
+                }
+
                 const firstModuleBtn = document.querySelector('.module-btn');
                 if (firstModuleBtn) firstModuleBtn.click();
                 else {
@@ -7039,6 +7265,11 @@
                     loadAttendanceHistory();
                     if (currentUserRole === 'parent' && parentLinkedStudentId) {
                         initChatbot();
+                    }
+                    // Load documents if the tab is active
+                    const docTab = document.querySelector('[data-tab="documents"]');
+                    if (docTab && docTab.classList.contains('active')) {
+                        loadStudentDocuments(found.id);
                     }
                 } catch (error) {
                     showMessage('Error searching: ' + error.message, 'error', 'searchResults');
@@ -7183,6 +7414,10 @@
                         loadPaymentHistory();
                         loadExamHistory();
                         loadAttendanceHistory();
+                        const docTab = document.querySelector('[data-tab="documents"]');
+                        if (docTab && docTab.classList.contains('active')) {
+                            loadStudentDocuments(found.id);
+                        }
                     } catch (error) {
                         showMessage('Error searching: ' + error.message, 'error', 'searchResults');
                     }
@@ -7231,6 +7466,8 @@
                         loadExamHistory();
                         loadAttendanceHistory();
                         setTimeout(initChatbot, 300);
+                        // Load documents
+                        loadStudentDocuments(found.id);
                     } catch (error) {
                         showMessage('Error loading student: ' + error.message, 'error', 'searchResults');
                     }
@@ -7397,6 +7634,10 @@
                     if (currentUserRole === 'parent' && parentLinkedStudentId) {
                         initChatbot();
                     }
+                    const docTab = document.querySelector('[data-tab="documents"]');
+                    if (docTab && docTab.classList.contains('active')) {
+                        loadStudentDocuments(found.id);
+                    }
                 } else if (currentUserRole === 'teacher') {
                     const q = document.getElementById('studentSearchInput').value.trim();
                     const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
@@ -7418,6 +7659,10 @@
                     loadPaymentHistory();
                     loadExamHistory();
                     loadAttendanceHistory();
+                    const docTab = document.querySelector('[data-tab="documents"]');
+                    if (docTab && docTab.classList.contains('active')) {
+                        loadStudentDocuments(found.id);
+                    }
                 } else if (currentUserRole === 'parent') {
                     if (parentLinkedStudentId) {
                         window.loadParentStudent && window.loadParentStudent();
@@ -7592,6 +7837,13 @@
                     }
                     if (this.dataset.tab === 'library') {
                         showLibraryResources();
+                    }
+                    if (this.dataset.tab === 'documents') {
+                        if (currentStudentDoc) {
+                            loadStudentDocuments(currentStudentDoc.id);
+                        } else {
+                            document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
+                        }
                     }
                 };
             });
