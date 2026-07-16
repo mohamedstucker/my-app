@@ -565,6 +565,194 @@
             min-width: 30px;
         }
 
+        /* ===== REPORT CARD STYLES ===== */
+        .report-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            max-width: 900px;
+            margin: 0 auto;
+            font-family: 'Times New Roman', serif;
+        }
+        .report-card .report-header {
+            text-align: center;
+            border-bottom: 3px double #1a4b8a;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        .report-card .report-header h2 { font-size: 1.6rem; color: #1a4b8a; margin: 0; }
+        .report-card .report-header p { margin: 4px 0; color: #2c3e50; font-size: 0.9rem; }
+        .report-card .report-student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 20px;
+            margin-bottom: 16px;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        .report-card .report-student-info .label { font-weight: 600; color: #1a3a5c; }
+        .report-card .report-section { margin-bottom: 16px; }
+        .report-card .report-section h4 {
+            background: #1a4b8a;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .report-card table {
+            font-size: 0.8rem;
+            min-width: auto;
+            width: 100%;
+        }
+        .report-card table th { background: #e8f0fe; font-size: 0.7rem; }
+        .report-card table td, .report-card table th { padding: 5px 8px; }
+        .report-card .report-footer {
+            text-align: center;
+            border-top: 2px solid #e6edf4;
+            padding-top: 12px;
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: #6c7a89;
+        }
+        .report-card .grade-pass { color: #27ae60; font-weight: 700; }
+        .report-card .grade-fail { color: #e74c3c; font-weight: 700; }
+        @media print {
+            .report-card { box-shadow: none; padding: 16px; }
+            .report-card .report-header h2 { font-size: 1.4rem; }
+            .no-print { display: none !important; }
+            body { background: #fff; padding: 10px; }
+        }
+
+        /* ===== PROMOTION STYLES ===== */
+        .promotion-student-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin: 4px 0;
+            border: 1px solid #e6edf4;
+        }
+        .promotion-student-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #1a4b8a;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        .promotion-student-item .student-name { font-weight: 600; flex: 1; }
+        .promotion-student-item .student-id { color: #6c7a89; font-size: 0.8rem; }
+
+        /* ===== BULK ATTENDANCE ===== */
+        .bulk-attendance-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 14px;
+            background: #eef4fa;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #d6e2ed;
+        }
+        .bulk-attendance-bar .label { font-weight: 600; font-size: 0.8rem; color: #1a3a5c; }
+        .bulk-attendance-bar .bulk-btn {
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .bulk-attendance-bar .bulk-btn.bulk-present { background: #27ae60; color: #fff; }
+        .bulk-attendance-bar .bulk-btn.bulk-present:hover { background: #1e8449; }
+        .bulk-attendance-bar .bulk-btn.bulk-absent { background: #e74c3c; color: #fff; }
+        .bulk-attendance-bar .bulk-btn.bulk-absent:hover { background: #c0392b; }
+        .bulk-attendance-bar .bulk-btn.bulk-late { background: #f39c12; color: #fff; }
+        .bulk-attendance-bar .bulk-btn.bulk-late:hover { background: #d68910; }
+        .bulk-attendance-bar .bulk-btn.bulk-clear { background: #eef2f7; color: #1a3a5c; }
+        .bulk-attendance-bar .bulk-btn.bulk-clear:hover { background: #dce4ec; }
+
+        /* ===== E-LEARNING STYLES ===== */
+        .elearning-tabs {
+            display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .elearning-tab-btn {
+            background: rgba(233,236,241,0.7); backdrop-filter: blur(4px);
+            padding: 7px 18px; border-radius: 40px; font-weight: 600; font-size: 0.8rem;
+            color: #2c3e50; border: 1px solid transparent; transition: 0.2s;
+            flex: 0 1 auto;
+        }
+        .elearning-tab-btn.active {
+            background: linear-gradient(135deg, #1a4b8a, #2a6bb0); color: #fff;
+            border-color: #1a4b8a; box-shadow: 0 4px 16px rgba(26,75,138,0.2);
+        }
+        .elearning-tab-btn:hover { transform: translateY(-2px); }
+        .elearning-tab-content { display: none; animation: fadeIn 0.25s ease; }
+        .elearning-tab-content.active { display: block; }
+
+        .quiz-card, .assignment-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            border: 1px solid #e6edf4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: 0.2s;
+        }
+        .quiz-card:hover, .assignment-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .quiz-card .quiz-title, .assignment-card .assignment-title {
+            font-weight: 700; font-size: 1rem; color: #0b2b5c;
+        }
+        .quiz-card .quiz-meta, .assignment-card .assignment-meta {
+            font-size: 0.8rem; color: #6c7a89; margin: 4px 0;
+        }
+        .quiz-card .quiz-actions, .assignment-card .assignment-actions {
+            margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;
+        }
+
+        .question-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin: 6px 0;
+            border: 1px solid #e6edf4;
+        }
+        .question-item .q-text { font-weight: 600; }
+        .question-item .q-options { margin: 4px 0 0 16px; font-size: 0.85rem; }
+        .question-item .q-options label { display: block; margin: 2px 0; }
+
+        .timer-display {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e74c3c;
+            padding: 4px 12px;
+            background: #fde8e8;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        .quiz-result-score {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1a4b8a;
+            text-align: center;
+            padding: 16px;
+        }
+        .quiz-result-detail {
+            background: #f0f5fa;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 4px 0;
+        }
+
         /* ===== MOBILE RESPONSIVE FIXES ===== */
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -633,6 +821,14 @@
             .fee-collection-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .fee-collection-summary .summary-card .number { font-size: 1.4rem; }
             .fee-collection-chart .chart-bar-label { min-width: 60px; font-size: 0.7rem; }
+            .bulk-attendance-bar { flex-direction: column; align-items: stretch; gap: 6px; }
+            .bulk-attendance-bar .bulk-btn { text-align: center; }
+            .report-card .report-student-info { grid-template-columns: 1fr; }
+            .elearning-tabs { gap: 4px; }
+            .elearning-tab-btn { padding: 5px 12px; font-size: 0.7rem; flex: 1 1 auto; text-align: center; }
+            .quiz-card, .assignment-card { padding: 12px 14px; }
+            .timer-display { font-size: 1rem; }
+            .quiz-result-score { font-size: 2rem; }
         }
 
         @media (max-width: 480px) {
@@ -663,6 +859,12 @@
             .fee-collection-summary { grid-template-columns: 1fr 1fr; }
             .fee-collection-summary .summary-card .number { font-size: 1.2rem; }
             .fee-collection-chart .chart-bar-label { min-width: 50px; font-size: 0.65rem; }
+            .report-card { padding: 12px; }
+            .report-card .report-header h2 { font-size: 1.2rem; }
+            .promotion-student-item { flex-wrap: wrap; padding: 4px 8px; }
+            .elearning-tab-btn { padding: 4px 10px; font-size: 0.6rem; }
+            .question-item { padding: 8px 10px; }
+            .quiz-result-score { font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -685,6 +887,8 @@
                 <div class="feature"><span>📝</span> Exam Records</div>
                 <div class="feature"><span>🤖</span> AI Assistant</div>
                 <div class="feature"><span>📢</span> School Notices</div>
+                <div class="feature"><span>📝</span> Quizzes</div>
+                <div class="feature"><span>📄</span> Assignments</div>
             </div>
             <div class="btn-group">
                 <button class="primary-btn" onclick="showSchoolsPage()">🏫 Find Schools Near You</button>
@@ -947,6 +1151,16 @@
                 <button id="printAttendanceTable" class="refresh-btn">Print Table</button>
                 <button id="exportAttendanceCSV" class="refresh-btn">Export CSV</button>
             </div>
+
+            <div class="bulk-attendance-bar" id="bulkAttendanceBar">
+                <span class="label">⚡ Bulk Mark:</span>
+                <button class="bulk-btn bulk-present" id="bulkMarkPresent">✅ All Present</button>
+                <button class="bulk-btn bulk-absent" id="bulkMarkAbsent">❌ All Absent</button>
+                <button class="bulk-btn bulk-late" id="bulkMarkLate">⏰ All Late</button>
+                <button class="bulk-btn bulk-clear" id="bulkMarkClear">🗑️ Clear All</button>
+                <span style="font-size:0.75rem; color:#6c7a89; margin-left:4px;" id="bulkStatus"></span>
+            </div>
+
             <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
                 <select id="classSelect"></select>
                 <button id="loadBtn" class="refresh-btn">Load</button>
@@ -1013,6 +1227,7 @@
                     <button class="tab-btn" data-tab="aichat">AI Chat</button>
                     <button class="tab-btn" data-tab="library">📚 Library</button>
                     <button class="tab-btn" data-tab="documents">📄 Documents</button>
+                    <button class="tab-btn" data-tab="reportcard">📋 Report Card</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
                     <div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">Edit Profile</button></div>
@@ -1077,7 +1292,6 @@
                         <div id="chatStatus" style="margin-top:6px; font-size:0.75rem; color:#6c7a89;"></div>
                     </div>
                 </div>
-                <!-- ===== LIBRARY TAB ===== -->
                 <div id="libraryTab" class="tab-content">
                     <div class="card">
                         <h3>📖 Textbooks & Syllabus</h3>
@@ -1111,7 +1325,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ===== DOCUMENTS TAB ===== -->
                 <div id="documentsTab" class="tab-content">
                     <div class="card">
                         <h3>📄 Documents Exchange</h3>
@@ -1128,6 +1341,30 @@
                                     <span id="docUploadStatus"></span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="reportcardTab" class="tab-content">
+                    <div class="card">
+                        <h3>📋 Report Card</h3>
+                        <p style="color:#6c7a89; margin-bottom:12px;">
+                            Generate a printable report card for this student showing exam results, attendance summary, and fee status.
+                        </p>
+                        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
+                            <label style="font-weight:600; font-size:0.85rem;">Year:</label>
+                            <select id="reportCardYear" style="max-width:120px;"><option value="all">All Years</option></select>
+                            <label style="font-weight:600; font-size:0.85rem;">Term:</label>
+                            <select id="reportCardTerm" style="max-width:120px;">
+                                <option value="all">All Terms</option>
+                                <option value="term1">Term 1</option>
+                                <option value="term2">Term 2</option>
+                                <option value="term3">Term 3</option>
+                            </select>
+                            <button id="generateReportCardBtn" class="refresh-btn">Generate Report Card</button>
+                            <button id="printReportCardBtn" class="refresh-btn" style="background:#2c3e50;">🖨️ Print</button>
+                        </div>
+                        <div id="reportCardContainer">
+                            <p>Select a year and term, then click "Generate Report Card".</p>
                         </div>
                     </div>
                 </div>
@@ -1299,14 +1536,11 @@
                 <div id="bursarSummaryContainer" style="overflow-x:auto;"><p>Loading fee summary...</p></div>
             </div>
 
-            <!-- ===== FEE COLLECTIONS DASHBOARD ===== -->
             <div class="card" id="feeCollectionsCard">
                 <h3>📊 Fee Collections Dashboard</h3>
                 <p style="color:#6c7a89; margin-bottom:12px;">
                     Visualize all fee collections across students. Filter by year, term, or month.
                 </p>
-
-                <!-- Filters -->
                 <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:16px;">
                     <label style="font-weight:600; font-size:0.85rem;">Year:</label>
                     <select id="feeCollectionYear" style="max-width:120px;">
@@ -1332,8 +1566,6 @@
                     <button id="refreshFeeCollectionsBtn" class="refresh-btn">Apply Filters</button>
                     <button id="resetFeeCollectionsBtn" style="background:#fde8e8; color:#b71c1c;">Reset</button>
                 </div>
-
-                <!-- Summary Cards -->
                 <div class="fee-collection-summary" id="feeCollectionSummary">
                     <div class="summary-card">
                         <div class="number" id="fcTotalCollected">0</div>
@@ -1352,21 +1584,16 @@
                         <div class="label">Number of Payments</div>
                     </div>
                 </div>
-
-                <!-- Bar Chart -->
                 <div class="fee-collection-chart" id="feeCollectionChart">
                     <h4 style="font-size:1rem; color:#0b2b5c; margin-bottom:8px;">Monthly Collections</h4>
                     <div id="chartContainer"><p>Apply filters to see chart.</p></div>
                 </div>
-
-                <!-- History Table -->
                 <div style="margin-top:16px;">
                     <h4 style="font-size:1rem; color:#0b2b5c; margin-bottom:8px;">Payment History</h4>
                     <div id="feeCollectionTableContainer"><p>Loading data...</p></div>
                 </div>
             </div>
 
-            <!-- Staff Payroll / Payment Voucher -->
             <div class="card">
                 <h3>Staff Payroll / Payment Voucher</h3>
                 <button id="showPayrollBtn" class="refresh-btn">View Payroll</button>
@@ -1401,6 +1628,7 @@
                 <button class="admin-tab-btn" data-tab="staffcheckins">📋 Staff Attendance</button>
                 <button class="admin-tab-btn" data-tab="admissionrequests">📩 Admission Requests</button>
                 <button class="admin-tab-btn" data-tab="registrationrequests">📋 Registration Requests</button>
+                <button class="admin-tab-btn" data-tab="promotion">🎓 Promotion</button>
             </div>
             <div id="staffTab" class="admin-tab active">
                 <div class="card">
@@ -1439,7 +1667,6 @@
             <div id="inventoryTab" class="admin-tab">
                 <div class="card"><h3>Add Inventory Item</h3><input id="itemName" placeholder="Item Name" /><input id="itemQuantity" type="number" placeholder="Quantity" /><input id="itemUnit" placeholder="Unit (pcs, kg, etc)" /><button id="addInventoryBtn" class="refresh-btn">Add Item</button><div id="inventoryMessage"></div><div id="inventoryListContainer"></div></div>
             </div>
-            <!-- ===== VISITORS TAB (FIXED WITH HISTORY TOGGLE) ===== -->
             <div id="visitorsTab" class="admin-tab">
                 <div class="card">
                     <h3>🚪 Visitor Management</h3>
@@ -1573,6 +1800,35 @@
                     <div id="registrationRequestsAdminList"><p>Loading registration requests...</p></div>
                 </div>
             </div>
+            <div id="promotionTab" class="admin-tab" style="display:none;">
+                <div class="card">
+                    <h3>🎓 Student Promotion</h3>
+                    <p style="color:#6c7a89; margin-bottom:12px;">
+                        Promote students from one class to the next at the end of a term or academic year.
+                        Select the source class, choose the target class, and select students to promote.
+                    </p>
+                    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:14px;">
+                        <label style="font-weight:600; font-size:0.85rem;">From Class:</label>
+                        <select id="promotionFromClass" style="max-width:160px;">
+                            <option value="">Select Source Class</option>
+                        </select>
+                        <label style="font-weight:600; font-size:0.85rem;">To Class:</label>
+                        <select id="promotionToClass" style="max-width:160px;">
+                            <option value="">Select Target Class</option>
+                        </select>
+                        <button id="loadPromotionStudentsBtn" class="refresh-btn">Load Students</button>
+                    </div>
+                    <div id="promotionStudentListContainer">
+                        <p>Select a source class and click "Load Students" to see the list.</p>
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;">
+                        <button id="selectAllPromotionBtn" style="background:#e8f0fe; color:#1a4b8a;">Select All</button>
+                        <button id="deselectAllPromotionBtn" style="background:#fde8e8; color:#b71c1c;">Deselect All</button>
+                        <button id="promoteStudentsBtn" class="refresh-btn" style="background:#27ae60;">🚀 Promote Selected</button>
+                    </div>
+                    <div id="promotionMessage" style="margin-top:10px;"></div>
+                </div>
+            </div>
         </div>
 
         <!-- SUGGESTIONS MODULE -->
@@ -1581,6 +1837,40 @@
                 <h3>My Suggestions</h3>
                 <button id="refreshMySuggestionsBtn" class="refresh-btn">Refresh</button>
                 <div id="mySuggestionsList"><p>Loading your suggestions...</p></div>
+            </div>
+        </div>
+
+        <!-- ===== E-LEARNING MODULE (NEW) ===== -->
+        <div id="eLearningModule" style="display:none;">
+            <div class="card">
+                <h3>📚 E-Learning</h3>
+                <p style="color:#6c7a89; margin-bottom:12px;">
+                    Quizzes and assignments for your classes. Teachers can create, students can participate.
+                </p>
+                <div class="elearning-tabs">
+                    <button class="elearning-tab-btn active" data-etab="quizzes">📝 Quizzes</button>
+                    <button class="elearning-tab-btn" data-etab="assignments">📄 Assignments</button>
+                </div>
+
+                <!-- ===== QUIZZES TAB ===== -->
+                <div id="quizzesTab" class="elearning-tab-content active">
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
+                        <button id="createQuizBtn" class="refresh-btn" style="background:#27ae60;">➕ Create Quiz</button>
+                        <button id="refreshQuizzesBtn" class="refresh-btn">🔄 Refresh</button>
+                        <span id="quizFilterInfo" style="font-size:0.8rem; color:#6c7a89;"></span>
+                    </div>
+                    <div id="quizzesList"><p>Loading quizzes...</p></div>
+                </div>
+
+                <!-- ===== ASSIGNMENTS TAB ===== -->
+                <div id="assignmentsTab" class="elearning-tab-content">
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
+                        <button id="createAssignmentBtn" class="refresh-btn" style="background:#27ae60;">➕ Create Assignment</button>
+                        <button id="refreshAssignmentsBtn" class="refresh-btn">🔄 Refresh</button>
+                        <span id="assignmentFilterInfo" style="font-size:0.8rem; color:#6c7a89;"></span>
+                    </div>
+                    <div id="assignmentsList"><p>Loading assignments...</p></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1807,6 +2097,144 @@
     <div id="bursarHistoryModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('bursarHistoryModal')">&times;</span><h3>Payment History</h3><div id="bursarHistoryContent"></div></div></div>
     <div id="bursarEditFeesModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('bursarEditFeesModal')">&times;</span><h3>Edit Term Fees</h3><label>Term 1: <input type="number" id="bursarEditTerm1" step="0.01" /></label><label>Term 2: <input type="number" id="bursarEditTerm2" step="0.01" /></label><label>Term 3: <input type="number" id="bursarEditTerm3" step="0.01" /></label><button id="saveBursarEditFeesBtn" class="refresh-btn">Save Changes</button><div id="bursarEditFeesMessage"></div></div></div>
 
+    <!-- ===== QUIZ MODALS (NEW) ===== -->
+    <div id="createQuizModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('createQuizModal')">&times;</span>
+            <h3>📝 Create Quiz</h3>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Quiz Title *</label>
+                <input type="text" id="quizTitle" placeholder="e.g. Math Test 1" />
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Class / Target</label>
+                <select id="quizClass" style="max-width:100%;">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Time Limit (minutes)</label>
+                <input type="number" id="quizTimeLimit" placeholder="e.g. 15" value="15" min="1" max="120" />
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Description (optional)</label>
+                <textarea id="quizDescription" rows="2" placeholder="Instructions or notes..."></textarea>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="font-weight:600; font-size:0.85rem;">Questions (MCQ) *</label>
+                <div id="quizQuestionsContainer">
+                    <div class="question-item" data-qidx="0">
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                            <input type="text" class="q-text-input" placeholder="Question text" style="flex:1; min-width:150px;" />
+                            <button class="remove-question-btn" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:2px 10px;">✕</button>
+                        </div>
+                        <div class="q-options">
+                            <label><input type="radio" name="q_correct_0" value="0" checked /> A: <input type="text" class="q-opt-input" placeholder="Option A" style="width:120px;" /></label>
+                            <label><input type="radio" name="q_correct_0" value="1" /> B: <input type="text" class="q-opt-input" placeholder="Option B" style="width:120px;" /></label>
+                            <label><input type="radio" name="q_correct_0" value="2" /> C: <input type="text" class="q-opt-input" placeholder="Option C" style="width:120px;" /></label>
+                            <label><input type="radio" name="q_correct_0" value="3" /> D: <input type="text" class="q-opt-input" placeholder="Option D" style="width:120px;" /></label>
+                        </div>
+                    </div>
+                </div>
+                <button id="addQuizQuestionBtn" class="refresh-btn" style="margin-top:6px; font-size:0.75rem; padding:4px 14px;">+ Add Question</button>
+            </div>
+            <button id="saveQuizBtn" class="refresh-btn" style="width:100%;">Save Quiz</button>
+            <div id="quizCreateMessage" style="margin-top:8px;"></div>
+        </div>
+    </div>
+
+    <div id="takeQuizModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('takeQuizModal')">&times;</span>
+            <h3 id="takeQuizTitle">📝 Quiz</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+                <span id="takeQuizMeta" style="font-size:0.85rem; color:#6c7a89;"></span>
+                <span class="timer-display" id="takeQuizTimer">⏱️ 00:00</span>
+            </div>
+            <div id="takeQuizProgress" style="font-size:0.8rem; color:#6c7a89; margin-bottom:8px;">Question 1 of 1</div>
+            <div id="takeQuizQuestionContainer"></div>
+            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                <button id="takeQuizPrevBtn" class="refresh-btn" style="background:#eef2f7; color:#1a3a5c;">← Previous</button>
+                <button id="takeQuizNextBtn" class="refresh-btn">Next →</button>
+                <button id="takeQuizSubmitBtn" class="refresh-btn" style="background:#27ae60; margin-left:auto;">✅ Submit Quiz</button>
+            </div>
+            <div id="takeQuizMessage" style="margin-top:10px;"></div>
+        </div>
+    </div>
+
+    <div id="quizResultModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('quizResultModal')">&times;</span>
+            <h3>📊 Quiz Result</h3>
+            <div id="quizResultContent"></div>
+            <button id="closeQuizResultBtn" class="refresh-btn" onclick="closeModal('quizResultModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- ===== ASSIGNMENT MODALS (NEW) ===== -->
+    <div id="createAssignmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('createAssignmentModal')">&times;</span>
+            <h3>📄 Create Assignment</h3>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Assignment Title *</label>
+                <input type="text" id="assignmentTitle" placeholder="e.g. Essay on Climate Change" />
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Class / Target</label>
+                <select id="assignmentClass" style="max-width:100%;">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Due Date *</label>
+                <input type="datetime-local" id="assignmentDueDate" />
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Description / Instructions *</label>
+                <textarea id="assignmentDescription" rows="4" placeholder="Describe the assignment..."></textarea>
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Attachment (optional)</label>
+                <input type="file" id="assignmentFileInput" />
+            </div>
+            <button id="saveAssignmentBtn" class="refresh-btn" style="width:100%;">Save Assignment</button>
+            <div id="assignmentCreateMessage" style="margin-top:8px;"></div>
+        </div>
+    </div>
+
+    <div id="viewAssignmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('viewAssignmentModal')">&times;</span>
+            <h3 id="viewAssignmentTitle">📄 Assignment</h3>
+            <div id="viewAssignmentContent"></div>
+            <div id="viewAssignmentActions" style="margin-top:12px;"></div>
+            <div id="viewAssignmentMessage" style="margin-top:8px;"></div>
+        </div>
+    </div>
+
+    <div id="gradeSubmissionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('gradeSubmissionModal')">&times;</span>
+            <h3>📊 Grade Submission</h3>
+            <div id="gradeSubmissionContent"></div>
+            <div style="margin-top:12px;">
+                <label style="font-weight:600; font-size:0.85rem;">Grade (out of 100)</label>
+                <input type="number" id="gradeSubmissionScore" placeholder="e.g. 85" min="0" max="100" />
+            </div>
+            <div style="margin-top:8px;">
+                <label style="font-weight:600; font-size:0.85rem;">Feedback (optional)</label>
+                <textarea id="gradeSubmissionFeedback" rows="3" placeholder="Feedback to student..."></textarea>
+            </div>
+            <div style="margin-top:8px;">
+                <label style="font-weight:600; font-size:0.85rem;">Feedback File (optional)</label>
+                <input type="file" id="gradeSubmissionFile" />
+            </div>
+            <button id="submitGradeBtn" class="refresh-btn" style="margin-top:10px; width:100%; background:#27ae60;">Submit Grade</button>
+            <div id="gradeSubmissionMessage" style="margin-top:8px;"></div>
+        </div>
+    </div>
+
     <!-- ===== SCRIPTS ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js">
     </script>
@@ -1868,6 +2296,17 @@
 
         // Staff name cache
         let staffNameCache = {};
+
+        // E-Learning state
+        let currentQuizTaking = null; // { quizId, questions, currentIndex, answers, timerInterval, timeLeft, startTime }
+        let quizTimerInterval = null;
+
+        // ===== Helper: ensure array =====
+        function ensureArray(val) {
+            if (Array.isArray(val)) return val;
+            if (typeof val === 'string') return val.split(',').map(s => s.trim()).filter(Boolean);
+            return [];
+        }
 
         // ==================================================================
         //  TENANT HELPER
@@ -1938,7 +2377,7 @@
         }
 
         // ==================================================================
-        //  VOICE RECORDER CLASS (unchanged)
+        //  VOICE RECORDER CLASS
         // ==================================================================
         class VoiceRecorder {
             constructor(containerId, onSaveCallback) {
@@ -2083,9 +2522,6 @@
             }
         }
 
-        // ==================================================================
-        //  LOAD LOGIN ACTIVITY (ADMIN ONLY)
-        // ==================================================================
         async function loadLoginActivity() {
             if (currentUserRole !== 'admin') return;
             const container = document.getElementById('loginActivityContent');
@@ -2123,9 +2559,6 @@
             }
         }
 
-        // ==================================================================
-        //  CLEAR LOGIN ACTIVITY (ADMIN ONLY)
-        // ==================================================================
         async function clearLoginActivity() {
             if (currentUserRole !== 'admin') return;
             if (!confirm('Are you sure you want to delete ALL login activity logs for your tenant?')) return;
@@ -2156,7 +2589,7 @@
         }
 
         // ==================================================================
-        //  SIGNUP – now also saves school to 'schools' collection
+        //  SIGNUP
         // ==================================================================
         async function signUpAndCreateTenant() {
             const schoolName = document.getElementById('signupSchoolName').value.trim();
@@ -2341,7 +2774,7 @@
         }
 
         // ==================================================================
-        //  SCHOOLS DIRECTORY FUNCTIONS (unchanged)
+        //  SCHOOLS DIRECTORY FUNCTIONS
         // ==================================================================
         let allSchools = [];
 
@@ -2429,7 +2862,7 @@
         }
 
         // ==================================================================
-        //  ADMISSION REQUEST FUNCTIONS (unchanged)
+        //  ADMISSION REQUEST FUNCTIONS
         // ==================================================================
         function openAdmissionModal(schoolId, schoolName) {
             document.getElementById('admissionSchoolId').value = schoolId;
@@ -2579,7 +3012,7 @@
         }
 
         // ==================================================================
-        //  REGISTRATION REQUEST FUNCTIONS (unchanged)
+        //  REGISTRATION REQUEST FUNCTIONS
         // ==================================================================
         function openRegistrationRequest() {
             document.getElementById('regSchoolName').value = '';
@@ -2755,7 +3188,7 @@
         }
 
         // ==================================================================
-        //  DASHBOARD – STUDENT STATS (unchanged)
+        //  DASHBOARD – STUDENT STATS
         // ==================================================================
         let dashboardStudentRecords = [];
         let dashboardExamYearsMap = {};
@@ -2924,7 +3357,7 @@
         }
 
         // ==================================================================
-        //  STAFF DASHBOARD STATISTICS (unchanged)
+        //  STAFF DASHBOARD STATISTICS
         // ==================================================================
         async function loadStaffDashboard() {
             const container = document.getElementById('staffDashboardContent');
@@ -3009,7 +3442,7 @@
         }
 
         // ==================================================================
-        //  ATTENDANCE FUNCTIONS (unchanged)
+        //  ATTENDANCE FUNCTIONS
         // ==================================================================
         async function loadStudents() {
             try {
@@ -3027,6 +3460,8 @@
                     }
                 });
                 updateClassDropdown();
+                populatePromotionDropdowns();
+                populateELearningDropdowns();
             } catch (error) {
                 console.error('Error loading students:', error);
                 document.getElementById('studentList').innerHTML = '<div class="error">Error loading students: ' +
@@ -3233,7 +3668,53 @@
         }
 
         // ==================================================================
-        //  SEND BATCH WHATSAPP (unchanged)
+        //  BULK ATTENDANCE MARKING
+        // ==================================================================
+        async function bulkMarkAttendance(status) {
+            const cls = document.getElementById('classSelect').value;
+            if (!cls || !allStudents[cls]) {
+                showMessage('Please load a class first.', 'error', 'bulkStatus');
+                return;
+            }
+            const students = allStudents[cls];
+            if (students.length === 0) {
+                showMessage('No students in this class.', 'error', 'bulkStatus');
+                return;
+            }
+
+            const confirmMsg = status === 'clear' ?
+                'Clear all attendance marks for today in this class?' :
+                `Mark ALL ${students.length} students as ${status.toUpperCase()} for today?`;
+            if (!confirm(confirmMsg)) return;
+
+            const today = new Date().toISOString().split('T')[0];
+            let count = 0;
+            const tenantId = getCurrentTenantId();
+
+            for (const s of students) {
+                const statusVal = status === 'clear' ? 'none' : status;
+                await db.collection('attendance').doc(today + '_' + cls + '_' + s.id).set({
+                    studentId: s.id,
+                    class: cls,
+                    date: today,
+                    year: today.split('-')[0],
+                    term: getTermFromDate(today),
+                    status: statusVal,
+                    remark: status === 'clear' ? '' : 'Bulk marked',
+                    audioRemark: '',
+                    tenantId: tenantId,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                count++;
+            }
+
+            showMessage(`✅ ${count} students marked as ${status === 'clear' ? 'cleared' : status.toUpperCase()}.`,
+                'success', 'bulkStatus');
+            renderAttendance();
+        }
+
+        // ==================================================================
+        //  SEND BATCH WHATSAPP
         // ==================================================================
         async function sendBatchWhatsApp() {
             let classVal;
@@ -3379,7 +3860,7 @@
         }
 
         // ==================================================================
-        //  VIEW CLASS HISTORY (unchanged)
+        //  VIEW CLASS HISTORY
         // ==================================================================
         async function viewClassHistory() {
             try {
@@ -3528,7 +4009,7 @@
         }
 
         // ==================================================================
-        //  IMPORT STUDENTS (unchanged)
+        //  IMPORT STUDENTS
         // ==================================================================
         async function importExcelStudents(file) {
             return new Promise((resolve, reject) => {
@@ -3590,7 +4071,7 @@
         }
 
         // ==================================================================
-        //  ADD SINGLE STUDENT (unchanged)
+        //  ADD SINGLE STUDENT
         // ==================================================================
         async function addManualStudent() {
             if (currentUserRole !== 'admin') {
@@ -3679,7 +4160,7 @@
         }
 
         // ==================================================================
-        //  EXAM RECORDS (unchanged)
+        //  EXAM RECORDS
         // ==================================================================
         async function loadExamStudent() {
             try {
@@ -3874,7 +4355,7 @@
         }
 
         // ==================================================================
-        //  EXAM HISTORY – shows all records in a table (unchanged)
+        //  EXAM HISTORY
         // ==================================================================
         async function loadExamHistory() {
             if (!currentStudentDoc) {
@@ -3959,7 +4440,7 @@
         }
 
         // ==================================================================
-        //  PAYMENT HISTORY (unchanged)
+        //  PAYMENT HISTORY
         // ==================================================================
         async function loadPaymentHistory() {
             try {
@@ -4007,7 +4488,7 @@
         }
 
         // ==================================================================
-        //  ATTENDANCE HISTORY (unchanged)
+        //  ATTENDANCE HISTORY
         // ==================================================================
         async function loadAttendanceHistory() {
             try {
@@ -4260,7 +4741,7 @@
         };
 
         // ==================================================================
-        //  NOTICES (unchanged)
+        //  NOTICES
         // ==================================================================
         async function renderNotices() {
             try {
@@ -4321,7 +4802,7 @@
         }
 
         // ==================================================================
-        //  STUDENT PROFILE (unchanged)
+        //  STUDENT PROFILE
         // ==================================================================
         async function loadStudentProfile() {
             if (!currentStudentDoc) return;
@@ -4394,7 +4875,7 @@
         }
 
         // ==================================================================
-        //  BURSAR FUNCTIONS (unchanged)
+        //  BURSAR FUNCTIONS
         // ==================================================================
         async function loadBursarStudent() {
             const q = document.getElementById('bursarStudentSearch').value.trim();
@@ -4687,7 +5168,7 @@
         }
 
         // ==================================================================
-        //  LOCATION HELPERS (unchanged)
+        //  LOCATION HELPERS
         // ==================================================================
         async function getSchoolLocation() {
             const tenantId = getCurrentTenantId();
@@ -4712,7 +5193,7 @@
         }
 
         // ==================================================================
-        //  AI CHATBOT (unchanged)
+        //  AI CHATBOT
         // ==================================================================
         let chatHistory = [];
         let chatbotStudentData = null;
@@ -4835,7 +5316,7 @@
         }
 
         // ==================================================================
-        //  CHAT UI FUNCTIONS (unchanged)
+        //  CHAT UI FUNCTIONS
         // ==================================================================
         function addChatMessage(sender, text, isUser = false) {
             const container = document.getElementById('chatMessages');
@@ -4943,7 +5424,7 @@
         }
 
         // ==================================================================
-        //  RISK PREDICTION FUNCTIONS (unchanged)
+        //  RISK PREDICTION FUNCTIONS
         // ==================================================================
         function computeRiskScore(attendanceRecords) {
             if (!attendanceRecords || attendanceRecords.length === 0) return 0;
@@ -5110,7 +5591,7 @@
         }
 
         // ==================================================================
-        //  ADMIN/TEACHER FUNCTIONS (unchanged)
+        //  ADMIN/TEACHER FUNCTIONS
         // ==================================================================
         async function addTeacherAdmin() {
             if (currentUserRole !== 'admin') { showMessage('Only admin can add teachers.', 'error', 'teacherMessage');
@@ -5278,14 +5759,19 @@
             document.getElementById('teacherSearchResults').innerHTML = html;
         }
 
+        // ==================================================================
+        //  HELPER: ensureArray (already defined)
+        // ==================================================================
+
         function displayOwnTeacherProfile() {
             if (!teacherOwnData) return;
+            const subjectsArr = ensureArray(teacherOwnData.subjects);
             const html = `<p><strong>ID:</strong> ${escapeHtml(teacherOwnData.id)}</p>
                 <p><strong>Name:</strong> ${escapeHtml(teacherOwnData.name)}</p>
                 <p><strong>Email:</strong> ${escapeHtml(teacherOwnData.email)}</p>
                 <p><strong>Class:</strong> ${escapeHtml(teacherOwnData.class)}</p>
                 <p><strong>Department:</strong> ${escapeHtml(teacherOwnData.department || '')}</p>
-                <p><strong>Subjects:</strong> ${escapeHtml((teacherOwnData.subjects || []).join(', '))}</p>
+                <p><strong>Subjects:</strong> ${escapeHtml(subjectsArr.join(', '))}</p>
                 <p><strong>Phone:</strong> ${escapeHtml(teacherOwnData.phone || '')}</p>
                 <p><strong>DOB:</strong> ${escapeHtml(teacherOwnData.dob || '')}</p>
                 <p><strong>Employment:</strong> ${escapeHtml(teacherOwnData.employmentDate || '')}</p>
@@ -5299,6 +5785,7 @@
 
         function openEditOwnTeacherModal() {
             if (!teacherOwnData) return;
+            const subjectsArr = ensureArray(teacherOwnData.subjects);
             document.getElementById('editOwnTeacherId').value = teacherOwnData.id;
             document.getElementById('editOwnTeacherName').value = teacherOwnData.name;
             document.getElementById('editOwnTeacherEmail').value = teacherOwnData.email;
@@ -5306,7 +5793,7 @@
             document.getElementById('editOwnTeacherDob').value = teacherOwnData.dob || '';
             document.getElementById('editOwnTeacherEmploymentDate').value = teacherOwnData.employmentDate || '';
             document.getElementById('editOwnTeacherDepartment').value = teacherOwnData.department || 'Science';
-            document.getElementById('editOwnTeacherSubjects').value = (teacherOwnData.subjects || []).join(', ');
+            document.getElementById('editOwnTeacherSubjects').value = subjectsArr.join(', ');
             document.getElementById('editOwnTeacherClass').value = teacherOwnData.class || '';
             document.getElementById('editOwnTeacherQualification').value = teacherOwnData.qualification || '';
             document.getElementById('editOwnTeacherNIN').value = teacherOwnData.nin || '';
@@ -5338,7 +5825,7 @@
         }
 
         // ==================================================================
-        //  TEACHER REGISTER (unchanged)
+        //  TEACHER REGISTER
         // ==================================================================
         async function loadTeacherRegister() {
             const q = document.getElementById('teacherRegisterSearch').value.trim();
@@ -5505,7 +5992,7 @@
         }
 
         // ==================================================================
-        //  ADMIN: STAFF, ASSETS, INVENTORY, FILES, SCHOOL LOCATION (unchanged)
+        //  ADMIN: STAFF, ASSETS, INVENTORY, FILES, SCHOOL LOCATION
         // ==================================================================
         async function addStaff() {
             if (currentUserRole !== 'admin') return;
@@ -5645,7 +6132,7 @@
         }
 
         // ==================================================================
-        //  VISITOR FUNCTIONS – FIXED WITH HISTORY TOGGLE & CLIENT FILTER
+        //  VISITOR FUNCTIONS
         // ==================================================================
         let visitorShowHistory = false;
 
@@ -5683,7 +6170,6 @@
             container.innerHTML = '<p>Loading visitors...</p>';
 
             try {
-                // Query only tenantId + createdAt (uses the existing index)
                 const query = db.collection('visitors')
                     .where('tenantId', '==', tenantId)
                     .orderBy('createdAt', 'desc')
@@ -5693,7 +6179,6 @@
                 const visitors = [];
                 snap.forEach(d => {
                     const data = d.data();
-                    // Client‑side filter: if "Currently In", skip checked‑out visitors
                     if (!visitorShowHistory && data.checkedOut === true) return;
                     visitors.push({ id: d.id, ...data });
                 });
@@ -5729,7 +6214,6 @@
                 html += '</tbody></table></div>';
                 container.innerHTML = html;
 
-                // Checkout button
                 container.querySelectorAll('.checkout-visitor').forEach(btn => {
                     btn.onclick = async function() {
                         await db.collection('visitors').doc(this.dataset.id).update({
@@ -5740,7 +6224,6 @@
                     };
                 });
 
-                // Delete button
                 container.querySelectorAll('.delete-visitor').forEach(btn => {
                     btn.onclick = async function() {
                         if (confirm('Delete this visitor record?')) {
@@ -5775,7 +6258,6 @@
             }
         }
 
-        // Toggle visitor view
         document.getElementById('visitorShowActiveBtn').onclick = function() {
             visitorShowHistory = false;
             document.getElementById('visitorShowActiveBtn').classList.add('active');
@@ -5791,7 +6273,7 @@
         };
 
         // ==================================================================
-        //  FILE STORAGE (unchanged)
+        //  FILE STORAGE
         // ==================================================================
         async function uploadFileToLocal() {
             const fileInput = document.getElementById('uploadFileInput');
@@ -5883,7 +6365,7 @@
         }
 
         // ==================================================================
-        //  STAFF CHECK-IN / CHECK-OUT HISTORY (unchanged)
+        //  STAFF CHECK-IN / CHECK-OUT HISTORY
         // ==================================================================
         let allStaffCheckins = [];
         let staffCheckinFiltered = [];
@@ -6092,7 +6574,7 @@
         }
 
         // ==================================================================
-        //  EXPORT / PRINT (unchanged)
+        //  EXPORT / PRINT
         // ==================================================================
         function getCurrentVisibleTable() {
             const activeModule = document.querySelector('.module-btn.active');
@@ -6105,7 +6587,8 @@
                     'teachersModuleBtn': 'teachersModule',
                     'bursarModuleBtn': 'bursarModule',
                     'adminModuleBtn': 'adminModule',
-                    'suggestionsModuleBtn': 'suggestionsModule'
+                    'suggestionsModuleBtn': 'suggestionsModule',
+                    'eLearningModuleBtn': 'eLearningModule'
                 };
                 moduleId = modMap[activeModule.id] || null;
             }
@@ -6118,7 +6601,9 @@
                     }
                 }
             }
-            const modules = ['attendanceModule', 'recordsModule', 'teachersModule', 'bursarModule', 'adminModule'];
+            const modules = ['attendanceModule', 'recordsModule', 'teachersModule', 'bursarModule', 'adminModule',
+                'eLearningModule'
+            ];
             for (const modId of modules) {
                 const mod = document.getElementById(modId);
                 if (mod && mod.style.display !== 'none') {
@@ -6176,7 +6661,7 @@
         }
 
         // ==================================================================
-        //  ADMIN EXAM HISTORY (ALL YEARS) – unchanged
+        //  ADMIN EXAM HISTORY (ALL YEARS)
         // ==================================================================
         async function loadExamHistoryAll() {
             const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
@@ -6267,7 +6752,7 @@
         };
 
         // ==================================================================
-        //  SUGGESTIONS (unchanged)
+        //  SUGGESTIONS
         // ==================================================================
         document.getElementById('submitSuggestionBtn').onclick = async function() {
             const tenantId = getCurrentTenantId();
@@ -6426,7 +6911,7 @@
         };
 
         // ==================================================================
-        //  STAFF PAYROLL / PAYMENT VOUCHER (unchanged)
+        //  STAFF PAYROLL / PAYMENT VOUCHER
         // ==================================================================
         async function loadStaffPayroll() {
             const container = document.getElementById('staffPayrollList');
@@ -6581,7 +7066,7 @@
         };
 
         // ==================================================================
-        //  STAFF PAYMENT HISTORY (unchanged)
+        //  STAFF PAYMENT HISTORY
         // ==================================================================
         async function loadStaffPaymentHistory() {
             const container = document.getElementById('staffPaymentHistoryList');
@@ -6631,7 +7116,7 @@
         };
 
         // ==================================================================
-        //  IMPORT TEACHERS (Excel) – unchanged
+        //  IMPORT TEACHERS (Excel)
         // ==================================================================
         async function importTeachersExcel(file) {
             return new Promise((resolve) => {
@@ -6673,7 +7158,7 @@
         }
 
         // ==================================================================
-        //  SUGGESTION FAB (unchanged)
+        //  SUGGESTION FAB
         // ==================================================================
         document.getElementById('suggestionFab').onclick = function() {
             document.getElementById('suggestionText').value = '';
@@ -6690,10 +7175,9 @@
         document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
 
         // ==================================================================
-        //  LIBRARY DATA – FULLY UPDATED WITH JSS2, JSS3, NURSERY, PRIMARY, ACCOUNTING
+        //  LIBRARY DATA
         // ==================================================================
         const libraryData = {
-            // --- Nursery (Early Childhood) ---
             'Nursery1': {
                 syllabus: 'https://www.mbsse.gov.sl/syllabus/nursery-syllabus.pdf',
                 subjects: {
@@ -6727,7 +7211,6 @@
                     ]
                 }
             },
-            // --- Primary (Class 1–6) ---
             'Class1': {
                 syllabus: 'https://www.mbsse.gov.sl/syllabus/primary-syllabus.pdf',
                 subjects: {
@@ -6837,7 +7320,6 @@
                     ]
                 }
             },
-            // --- JSS1 ---
             'JSS1': {
                 syllabus: 'https://www.mbsse.gov.sl/syllabus/jss1-syllabus.pdf',
                 subjects: {
@@ -6855,7 +7337,6 @@
                     ]
                 }
             },
-            // --- JSS2 ---
             'JSS2': {
                 syllabus: 'https://www.mbsse.gov.sl/syllabus/jss2-syllabus.pdf',
                 subjects: {
@@ -6876,7 +7357,6 @@
                     ]
                 }
             },
-            // --- JSS3 ---
             'JSS3': {
                 syllabus: 'https://www.mbsse.gov.sl/syllabus/jss3-syllabus.pdf',
                 subjects: {
@@ -6897,7 +7377,6 @@
                     ]
                 }
             },
-            // --- SSS1 (with Accounting) ---
             'SSS1': {
                 syllabus: 'https://www.mbsse.gov.sl/syllabus/sss1-syllabus.pdf',
                 subjects: {
@@ -6967,7 +7446,7 @@
         };
 
         // ==================================================================
-        //  LIBRARY FUNCTIONS (unchanged)
+        //  LIBRARY FUNCTIONS
         // ==================================================================
         function showLibraryResources() {
             const classVal = document.getElementById('libraryClassSelect').value;
@@ -7015,7 +7494,7 @@
         }
 
         // ==================================================================
-        //  DOCUMENT EXCHANGE FUNCTIONS (unchanged)
+        //  DOCUMENT EXCHANGE FUNCTIONS
         // ==================================================================
         async function loadStudentDocuments(studentId) {
             const container = document.getElementById('documentList');
@@ -7174,7 +7653,7 @@
         }
 
         // ==================================================================
-        //  FEE COLLECTIONS DASHBOARD (UPDATED WITH STUDENT NAME FIX)
+        //  FEE COLLECTIONS DASHBOARD
         // ==================================================================
         let allFeeTransactions = [];
         let totalFeesAllGlobal = 0;
@@ -7186,20 +7665,17 @@
 
             try {
                 const tenantId = getCurrentTenantId();
-                // Fetch all fee_records for this tenant
                 const snap = await db.collection('fee_records').where('tenantId', '==', tenantId).get();
 
                 const transactions = [];
                 let totalFeesAll = 0;
                 const studentIds = [];
 
-                // Use for...of to handle async properly
                 for (const doc of snap.docs) {
                     const data = doc.data();
                     const studentId = doc.id;
                     studentIds.push(studentId);
 
-                    // Get student name – try global map first, otherwise fetch from Firestore
                     let studentName = studentId;
                     if (globalStudentMap.has(studentId)) {
                         studentName = globalStudentMap.get(studentId).name || studentId;
@@ -7209,7 +7685,6 @@
                             if (studentDoc.exists) {
                                 const studentData = studentDoc.data();
                                 studentName = studentData.name || studentId;
-                                // Cache it for next time
                                 globalStudentMap.set(studentId, { docId: studentId, ...studentData });
                             }
                         } catch (e) {
@@ -7217,10 +7692,8 @@
                         }
                     }
 
-                    // Process term1, term2, term3
                     ['term1', 'term2', 'term3'].forEach(term => {
                         const termData = data[term] || { total: 0, transactions: [] };
-                        // Accumulate total fees
                         totalFeesAll += termData.total || 0;
                         if (Array.isArray(termData.transactions)) {
                             termData.transactions.forEach(tr => {
@@ -7242,11 +7715,9 @@
                     });
                 }
 
-                // Store total fees globally for later use
                 totalFeesAllGlobal = totalFeesAll;
                 allFeeTransactions = transactions;
 
-                // Populate year filter
                 const yearSelect = document.getElementById('feeCollectionYear');
                 const years = new Set();
                 transactions.forEach(t => { if (t.year) years.add(t.year); });
@@ -7261,7 +7732,6 @@
                     yearSelect.value = 'all';
                 }
 
-                // Apply filters and render
                 applyFeeFilters();
             } catch (error) {
                 container.innerHTML = '<div class="error">Error loading fee collections: ' + escapeHtml(error.message) +
@@ -7287,7 +7757,6 @@
                 filtered = filtered.filter(t => t.month === month);
             }
 
-            // Update summary
             const totalCollected = filtered.reduce((sum, t) => sum + t.amount, 0);
             const transactionCount = filtered.length;
             const totalFeesAll = totalFeesAllGlobal || 0;
@@ -7309,7 +7778,6 @@
                 return;
             }
 
-            // Group by month (YYYY-MM)
             const monthMap = {};
             transactions.forEach(t => {
                 if (t.year && t.month) {
@@ -7350,7 +7818,6 @@
                 return;
             }
 
-            // Sort by date descending
             transactions.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
             let html =
@@ -7371,7 +7838,1399 @@
         }
 
         // ==================================================================
-        //  IMPORT BUTTONS (unchanged)
+        //  STUDENT PROMOTION SYSTEM
+        // ==================================================================
+        function populatePromotionDropdowns() {
+            const fromSel = document.getElementById('promotionFromClass');
+            const toSel = document.getElementById('promotionToClass');
+            const currentFrom = fromSel.value;
+            const currentTo = toSel.value;
+
+            fromSel.innerHTML = '<option value="">Select Source Class</option>';
+            toSel.innerHTML = '<option value="">Select Target Class</option>';
+
+            const classKeys = Object.keys(allStudents).filter(c => allStudents[c] && allStudents[c].length > 0).sort();
+
+            classKeys.forEach(cls => {
+                fromSel.innerHTML += `<option value="${cls}" ${cls === currentFrom ? 'selected' : ''}>${cls}</option>`;
+                toSel.innerHTML += `<option value="${cls}" ${cls === currentTo ? 'selected' : ''}>${cls}</option>`;
+            });
+
+            if (currentFrom && !classKeys.includes(currentFrom)) fromSel.value = '';
+            if (currentTo && !classKeys.includes(currentTo)) toSel.value = '';
+        }
+
+        document.getElementById('loadPromotionStudentsBtn').addEventListener('click', function() {
+            const fromClass = document.getElementById('promotionFromClass').value;
+            if (!fromClass) {
+                showMessage('Please select a source class.', 'error', 'promotionMessage');
+                return;
+            }
+            loadPromotionStudentList(fromClass);
+        });
+
+        function loadPromotionStudentList(fromClass) {
+            const container = document.getElementById('promotionStudentListContainer');
+            const students = allStudents[fromClass] || [];
+
+            if (students.length === 0) {
+                container.innerHTML = `<p>No students found in <strong>${escapeHtml(fromClass)}</strong>.</p>`;
+                return;
+            }
+
+            let html = `<p><strong>${students.length}</strong> students in <strong>${escapeHtml(fromClass)}</strong>. Select students to promote:</p>`;
+            html +=
+                '<div style="max-height:400px; overflow-y:auto; border:1px solid #e6edf4; border-radius:10px; padding:8px; background:#fafcfe;">';
+            students.forEach(s => {
+                const status = s.status || 'active';
+                html += `
+                    <div class="promotion-student-item">
+                        <input type="checkbox" class="promotion-checkbox" data-id="${escapeHtml(s.id)}" ${status === 'active' ? 'checked' : ''}>
+                        <span class="student-name">${escapeHtml(s.name)}</span>
+                        <span class="student-id">${escapeHtml(s.id)}</span>
+                        <span style="font-size:0.7rem; color:#6c7a89;">${status}</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        document.getElementById('selectAllPromotionBtn').addEventListener('click', function() {
+            document.querySelectorAll('.promotion-checkbox').forEach(cb => cb.checked = true);
+        });
+
+        document.getElementById('deselectAllPromotionBtn').addEventListener('click', function() {
+            document.querySelectorAll('.promotion-checkbox').forEach(cb => cb.checked = false);
+        });
+
+        document.getElementById('promoteStudentsBtn').addEventListener('click', async function() {
+            const fromClass = document.getElementById('promotionFromClass').value;
+            const toClass = document.getElementById('promotionToClass').value;
+
+            if (!fromClass || !toClass) {
+                showMessage('Please select both source and target classes.', 'error', 'promotionMessage');
+                return;
+            }
+            if (fromClass === toClass) {
+                showMessage('Source and target classes must be different.', 'error', 'promotionMessage');
+                return;
+            }
+
+            const checkboxes = document.querySelectorAll('.promotion-checkbox:checked');
+            if (checkboxes.length === 0) {
+                showMessage('Please select at least one student to promote.', 'error', 'promotionMessage');
+                return;
+            }
+
+            const studentIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+            if (!confirm(`Promote ${studentIds.length} student(s) from "${fromClass}" to "${toClass}"?`)) return;
+
+            const tenantId = getCurrentTenantId();
+            let promoted = 0;
+            const errors = [];
+
+            for (const id of studentIds) {
+                try {
+                    const docRef = db.collection('students').doc(id);
+                    const doc = await docRef.get();
+                    if (!doc.exists) {
+                        errors.push(`Student ${id} not found.`);
+                        continue;
+                    }
+                    const data = doc.data();
+                    if (data.tenantId !== tenantId) {
+                        errors.push(`Student ${id} does not belong to your tenant.`);
+                        continue;
+                    }
+                    await docRef.update({
+                        class: toClass,
+                        previousClass: fromClass,
+                        promotedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    promoted++;
+                } catch (e) {
+                    errors.push(`Error promoting ${id}: ${e.message}`);
+                }
+            }
+
+            let msg = `✅ ${promoted} student(s) promoted from "${fromClass}" to "${toClass}".`;
+            if (errors.length > 0) msg += `\n\nErrors:\n${errors.join('\n')}`;
+            showMessage(msg, errors.length > 0 && promoted === 0 ? 'error' : 'success', 'promotionMessage');
+
+            await loadStudents();
+            populatePromotionDropdowns();
+            if (fromClass) loadPromotionStudentList(fromClass);
+        });
+
+        // ==================================================================
+        //  REPORT CARD GENERATION
+        // ==================================================================
+        async function generateReportCard() {
+            const container = document.getElementById('reportCardContainer');
+            if (!currentStudentDoc) {
+                container.innerHTML = '<p class="error">Please load a student first.</p>';
+                return;
+            }
+
+            const year = document.getElementById('reportCardYear').value;
+            const term = document.getElementById('reportCardTerm').value;
+            const studentId = currentStudentDoc.id;
+            const studentName = currentStudentDoc.name;
+            const studentClass = currentStudentDoc.class;
+
+            container.innerHTML = '<p>Generating report card...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+
+                const examDoc = await db.collection('exam_records').doc(studentId).get();
+                const examData = examDoc.exists ? examDoc.data() : null;
+
+                const attSnap = await db.collection('attendance')
+                    .where('tenantId', '==', tenantId)
+                    .where('studentId', '==', studentId)
+                    .get();
+                const attendanceRecords = [];
+                attSnap.forEach(d => attendanceRecords.push(d.data()));
+
+                const feeDoc = await db.collection('fee_records').doc(studentId).get();
+                const feeData = feeDoc.exists ? feeDoc.data() : null;
+
+                let filteredExams = [];
+                const allYears = [];
+                if (examData && examData.years) {
+                    const years = Object.keys(examData.years);
+                    years.forEach(y => allYears.push(y));
+                    const targetYears = year === 'all' ? years : [year];
+                    targetYears.forEach(y => {
+                        if (examData.years[y]) {
+                            const yearData = examData.years[y];
+                            const levels = Object.keys(yearData);
+                            levels.forEach(level => {
+                                const levelData = yearData[level];
+                                const terms = term === 'all' ? Object.keys(levelData) : [term];
+                                terms.forEach(t => {
+                                    if (levelData[t]) {
+                                        const termData = levelData[t];
+                                        const assessments = Object.keys(termData);
+                                        assessments.forEach(ass => {
+                                            const subjects = termData[ass];
+                                            if (Array.isArray(subjects)) {
+                                                subjects.forEach(sub => {
+                                                    if (sub.name && sub.score !==
+                                                        '') {
+                                                        filteredExams.push({
+                                                            year: y,
+                                                            level: level,
+                                                            term: t,
+                                                            assessment: ass,
+                                                            subject: sub
+                                                                .name,
+                                                            score: sub.score
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+
+                let filteredAtt = attendanceRecords;
+                if (year !== 'all') {
+                    filteredAtt = filteredAtt.filter(a => a.year === year);
+                }
+                if (term !== 'all') {
+                    filteredAtt = filteredAtt.filter(a => a.term === term);
+                }
+
+                let feeSummary = '';
+                if (feeData) {
+                    const terms = term === 'all' ? ['term1', 'term2', 'term3'] : [term];
+                    const termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
+                    const feeLines = [];
+                    terms.forEach(t => {
+                        const td = feeData[t] || { total: 0, paid: 0 };
+                        const balance = td.total - td.paid;
+                        feeLines.push(
+                            `${termNames[t] || t}: Total ${td.total.toLocaleString()}, Paid ${td.paid.toLocaleString()}, Balance ${balance.toLocaleString()}`
+                            );
+                    });
+                    feeSummary = feeLines.join('<br>');
+                }
+
+                let html = `<div class="report-card" id="reportCardContent">
+                    <div class="report-header">
+                        <h2>📋 STUDENT REPORT CARD</h2>
+                        <p><strong>${escapeHtml(currentStudentDoc.name)}</strong> • ${escapeHtml(currentStudentDoc.id)}</p>
+                        <p>${escapeHtml(currentStudentDoc.class)} • Year: ${year === 'all' ? 'All Years' : year} • Term: ${term === 'all' ? 'All Terms' : getTermLabel(term)}</p>
+                    </div>
+                    <div class="report-student-info">
+                        <div><span class="label">Name:</span> ${escapeHtml(currentStudentDoc.name)}</div>
+                        <div><span class="label">ID:</span> ${escapeHtml(currentStudentDoc.id)}</div>
+                        <div><span class="label">Class:</span> ${escapeHtml(currentStudentDoc.class)}</div>
+                        <div><span class="label">Gender:</span> ${escapeHtml(currentStudentDoc.gender || 'N/A')}</div>
+                        <div><span class="label">DOB:</span> ${escapeHtml(currentStudentDoc.dob || 'N/A')}</div>
+                        <div><span class="label">Parent:</span> ${escapeHtml(currentStudentDoc.parentName || 'N/A')}</div>
+                    </div>`;
+
+                if (filteredExams.length > 0) {
+                    html += `<div class="report-section">
+                        <h4>📝 Exam Results</h4>
+                        <div class="table-wrapper">
+                            <table><thead><tr><th>Year</th><th>Level</th><th>Term</th><th>Assessment</th><th>Subject</th><th>Score</th></tr></thead><tbody>`;
+                    filteredExams.forEach(e => {
+                        const scoreNum = parseFloat(e.score);
+                        const passClass = !isNaN(scoreNum) && scoreNum >= 50 ? 'grade-pass' : 'grade-fail';
+                        html +=
+                            `<tr><td>${e.year}</td><td>${e.level}</td><td>${e.term}</td><td>${e.assessment}</td><td>${escapeHtml(e.subject)}</td><td class="${passClass}">${e.score}</td></tr>`;
+                    });
+                    html += '</tbody></table></div></div>';
+                } else {
+                    html += `<div class="report-section"><h4>📝 Exam Results</h4><p>No exam records found for the selected filters.</p></div>`;
+                }
+
+                if (filteredAtt.length > 0) {
+                    const total = filteredAtt.length;
+                    const present = filteredAtt.filter(a => a.status === 'present').length;
+                    const absent = filteredAtt.filter(a => a.status === 'absent').length;
+                    const late = filteredAtt.filter(a => a.status === 'late').length;
+                    html += `<div class="report-section">
+                        <h4>📊 Attendance Summary</h4>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(100px,1fr)); gap:8px;">
+                            <div style="background:#f0f5fa; padding:8px; border-radius:8px; text-align:center;">
+                                <div style="font-size:1.2rem; font-weight:700; color:#1a4b8a;">${total}</div>
+                                <div style="font-size:0.7rem; color:#6c7a89;">Total Days</div>
+                            </div>
+                            <div style="background:#d4edda; padding:8px; border-radius:8px; text-align:center;">
+                                <div style="font-size:1.2rem; font-weight:700; color:#0b5e2e;">${present}</div>
+                                <div style="font-size:0.7rem; color:#0b5e2e;">Present</div>
+                            </div>
+                            <div style="background:#f8d7da; padding:8px; border-radius:8px; text-align:center;">
+                                <div style="font-size:1.2rem; font-weight:700; color:#842029;">${absent}</div>
+                                <div style="font-size:0.7rem; color:#842029;">Absent</div>
+                            </div>
+                            <div style="background:#fff3cd; padding:8px; border-radius:8px; text-align:center;">
+                                <div style="font-size:1.2rem; font-weight:700; color:#856404;">${late}</div>
+                                <div style="font-size:0.7rem; color:#856404;">Late</div>
+                            </div>
+                        </div>
+                    </div>`;
+                } else {
+                    html +=
+                        `<div class="report-section"><h4>📊 Attendance Summary</h4><p>No attendance records found for the selected filters.</p></div>`;
+                }
+
+                if (feeSummary) {
+                    html += `<div class="report-section">
+                        <h4>💰 Fee Status</h4>
+                        <div style="background:#f8fafc; padding:10px 14px; border-radius:8px; font-size:0.9rem;">
+                            ${feeSummary}
+                        </div>
+                    </div>`;
+                } else {
+                    html += `<div class="report-section"><h4>💰 Fee Status</h4><p>No fee records found.</p></div>`;
+                }
+
+                html += `<div class="report-footer">
+                    Report generated on ${new Date().toLocaleString()} • EduSL School Management System
+                </div>
+                </div>`;
+
+                container.innerHTML = html;
+
+                const yearSelect = document.getElementById('reportCardYear');
+                const currentYear = yearSelect.value;
+                yearSelect.innerHTML = '<option value="all">All Years</option>';
+                const yearsSet = new Set(allYears);
+                yearsSet.forEach(y => {
+                    yearSelect.innerHTML += `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`;
+                });
+                if (!yearsSet.has(currentYear) && currentYear !== 'all') {
+                    yearSelect.value = 'all';
+                }
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error generating report card: ' + escapeHtml(error.message) +
+                '</div>';
+                console.error('Report card error:', error);
+            }
+        }
+
+        document.getElementById('generateReportCardBtn').addEventListener('click', generateReportCard);
+        document.getElementById('printReportCardBtn').addEventListener('click', function() {
+            const content = document.getElementById('reportCardContent');
+            if (!content) {
+                alert('Please generate a report card first.');
+                return;
+            }
+            printTable(content, 'Report Card');
+        });
+
+        // ==================================================================
+        //  E-LEARNING MODULE: QUIZZES & ASSIGNMENTS
+        // ==================================================================
+
+        // ----- Helper: check if user is a teacher/admin (creator) -----
+        function isTeacherOrAdmin() {
+            return currentUserRole === 'admin' || currentUserRole === 'teacher';
+        }
+
+        // ----- Helper: get student ID for a parent user -----
+        function getStudentIdForParent() {
+            if (currentUserRole === 'parent' && parentLinkedStudentId) {
+                return parentLinkedStudentId;
+            }
+            return null;
+        }
+
+        // ----- Populate class dropdowns for E-Learning -----
+        function populateELearningDropdowns() {
+            const quizClassSel = document.getElementById('quizClass');
+            const assignmentClassSel = document.getElementById('assignmentClass');
+            const classKeys = Object.keys(allStudents).filter(c => allStudents[c] && allStudents[c].length > 0).sort();
+
+            const currentQuiz = quizClassSel.value;
+            const currentAssign = assignmentClassSel.value;
+
+            [quizClassSel, assignmentClassSel].forEach(sel => {
+                sel.innerHTML = '<option value="">All Classes</option>';
+                classKeys.forEach(cls => {
+                    sel.innerHTML += `<option value="${cls}" ${cls === (sel === quizClassSel ? currentQuiz : currentAssign) ? 'selected' : ''}>${cls}</option>`;
+                });
+            });
+        }
+
+        // ==================================================================
+        //  QUIZ FUNCTIONS
+        // ==================================================================
+
+        // Create a new quiz
+        document.getElementById('createQuizBtn').addEventListener('click', function() {
+            if (!isTeacherOrAdmin()) {
+                alert('Only teachers and admins can create quizzes.');
+                return;
+            }
+            document.getElementById('quizTitle').value = '';
+            document.getElementById('quizDescription').value = '';
+            document.getElementById('quizTimeLimit').value = 15;
+            document.getElementById('quizClass').value = '';
+            document.getElementById('quizCreateMessage').innerHTML = '';
+            // Reset questions container to one empty question
+            const container = document.getElementById('quizQuestionsContainer');
+            container.innerHTML = `
+                <div class="question-item" data-qidx="0">
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                        <input type="text" class="q-text-input" placeholder="Question text" style="flex:1; min-width:150px;" />
+                        <button class="remove-question-btn" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:2px 10px;">✕</button>
+                    </div>
+                    <div class="q-options">
+                        <label><input type="radio" name="q_correct_0" value="0" checked /> A: <input type="text" class="q-opt-input" placeholder="Option A" style="width:120px;" /></label>
+                        <label><input type="radio" name="q_correct_0" value="1" /> B: <input type="text" class="q-opt-input" placeholder="Option B" style="width:120px;" /></label>
+                        <label><input type="radio" name="q_correct_0" value="2" /> C: <input type="text" class="q-opt-input" placeholder="Option C" style="width:120px;" /></label>
+                        <label><input type="radio" name="q_correct_0" value="3" /> D: <input type="text" class="q-opt-input" placeholder="Option D" style="width:120px;" /></label>
+                    </div>
+                </div>
+            `;
+            openModal('createQuizModal');
+        });
+
+        // Add question
+        document.getElementById('addQuizQuestionBtn').addEventListener('click', function() {
+            const container = document.getElementById('quizQuestionsContainer');
+            const idx = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'question-item';
+            div.dataset.qidx = idx;
+            div.innerHTML = `
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                    <input type="text" class="q-text-input" placeholder="Question text" style="flex:1; min-width:150px;" />
+                    <button class="remove-question-btn" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:2px 10px;">✕</button>
+                </div>
+                <div class="q-options">
+                    <label><input type="radio" name="q_correct_${idx}" value="0" checked /> A: <input type="text" class="q-opt-input" placeholder="Option A" style="width:120px;" /></label>
+                    <label><input type="radio" name="q_correct_${idx}" value="1" /> B: <input type="text" class="q-opt-input" placeholder="Option B" style="width:120px;" /></label>
+                    <label><input type="radio" name="q_correct_${idx}" value="2" /> C: <input type="text" class="q-opt-input" placeholder="Option C" style="width:120px;" /></label>
+                    <label><input type="radio" name="q_correct_${idx}" value="3" /> D: <input type="text" class="q-opt-input" placeholder="Option D" style="width:120px;" /></label>
+                </div>
+            `;
+            container.appendChild(div);
+            updateRemoveButtons();
+        });
+
+        function updateRemoveButtons() {
+            const container = document.getElementById('quizQuestionsContainer');
+            const btns = container.querySelectorAll('.remove-question-btn');
+            if (btns.length <= 1) {
+                btns.forEach(b => b.style.display = 'none');
+            } else {
+                btns.forEach(b => b.style.display = 'inline-block');
+            }
+        }
+
+        // Remove question (delegated)
+        document.getElementById('quizQuestionsContainer').addEventListener('click', function(e) {
+            const btn = e.target.closest('.remove-question-btn');
+            if (!btn) return;
+            const item = btn.closest('.question-item');
+            if (document.getElementById('quizQuestionsContainer').children.length <= 1) {
+                alert('You need at least one question.');
+                return;
+            }
+            item.remove();
+            updateRemoveButtons();
+        });
+
+        // Save quiz
+        document.getElementById('saveQuizBtn').addEventListener('click', async function() {
+            const title = document.getElementById('quizTitle').value.trim();
+            const description = document.getElementById('quizDescription').value.trim();
+            const timeLimit = parseInt(document.getElementById('quizTimeLimit').value) || 15;
+            const targetClass = document.getElementById('quizClass').value || '';
+
+            if (!title) {
+                showMessage('Please enter a quiz title.', 'error', 'quizCreateMessage');
+                return;
+            }
+
+            const questionItems = document.querySelectorAll('#quizQuestionsContainer .question-item');
+            const questions = [];
+            let valid = true;
+
+            questionItems.forEach((item, idx) => {
+                const text = item.querySelector('.q-text-input').value.trim();
+                const opts = item.querySelectorAll('.q-opt-input');
+                const options = [];
+                opts.forEach(o => options.push(o.value.trim()));
+                const correctRadio = item.querySelector(`input[name="q_correct_${idx}"]:checked`);
+                const correct = correctRadio ? parseInt(correctRadio.value) : 0;
+
+                if (!text) { valid = false; return; }
+                if (options.some(o => !o)) { valid = false; return; }
+
+                questions.push({ text, options, correct });
+            });
+
+            if (!valid || questions.length === 0) {
+                showMessage('Please fill in all question fields and options.', 'error', 'quizCreateMessage');
+                return;
+            }
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const user = auth.currentUser;
+
+                await db.collection('quizzes').add({
+                    title,
+                    description,
+                    timeLimit,
+                    targetClass,
+                    questions,
+                    createdBy: user ? user.uid : 'unknown',
+                    creatorName: user ? user.displayName || user.email : 'Unknown',
+                    tenantId: tenantId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isActive: true
+                });
+
+                showMessage('✅ Quiz created successfully!', 'success', 'quizCreateMessage');
+                setTimeout(() => {
+                    closeModal('createQuizModal');
+                    loadQuizzes();
+                }, 1000);
+            } catch (error) {
+                showMessage('Error creating quiz: ' + error.message, 'error', 'quizCreateMessage');
+                console.error('Quiz creation error:', error);
+            }
+        });
+
+        // Load quizzes
+        async function loadQuizzes() {
+            const container = document.getElementById('quizzesList');
+            container.innerHTML = '<p>Loading quizzes...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('quizzes')
+                    .where('tenantId', '==', tenantId)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                const quizzes = [];
+                snap.forEach(doc => quizzes.push({ id: doc.id, ...doc.data() }));
+
+                if (quizzes.length === 0) {
+                    container.innerHTML = '<p>No quizzes found. Create your first quiz!</p>';
+                    return;
+                }
+
+                const isCreator = isTeacherOrAdmin();
+                const studentId = getStudentIdForParent();
+
+                let html = '';
+                for (const q of quizzes) {
+                    const createdDate = q.createdAt ? new Date(q.createdAt.toDate()).toLocaleString() : 'N/A';
+                    const classInfo = q.targetClass || 'All Classes';
+                    const questionCount = q.questions ? q.questions.length : 0;
+
+                    // Check if the student has already taken this quiz
+                    let takenInfo = '';
+                    let canTake = false;
+                    if (studentId && q.isActive !== false) {
+                        const attemptSnap = await db.collection('quiz_attempts')
+                            .where('tenantId', '==', tenantId)
+                            .where('quizId', '==', q.id)
+                            .where('studentId', '==', studentId)
+                            .get();
+                        if (!attemptSnap.empty) {
+                            const attempt = attemptSnap.docs[0].data();
+                            takenInfo =
+                                `<span style="color:#27ae60;">✅ Taken on ${new Date(attempt.completedAt?.toDate()).toLocaleString() || 'N/A'}</span>`;
+                            if (attempt.score !== undefined) {
+                                takenInfo += ` &nbsp; Score: <strong>${attempt.score}%</strong>`;
+                            }
+                        } else {
+                            canTake = true;
+                        }
+                    } else if (studentId) {
+                        canTake = true;
+                    }
+
+                    html += `
+                        <div class="quiz-card">
+                            <div class="quiz-title">${escapeHtml(q.title)}</div>
+                            <div class="quiz-meta">
+                                <span>📚 ${escapeHtml(classInfo)}</span> &nbsp;|&nbsp;
+                                <span>📝 ${questionCount} questions</span> &nbsp;|&nbsp;
+                                <span>⏱️ ${q.timeLimit || 15} min</span> &nbsp;|&nbsp;
+                                <span>👤 ${escapeHtml(q.creatorName || 'Unknown')}</span> &nbsp;|&nbsp;
+                                <span>📅 ${createdDate}</span>
+                            </div>
+                            ${q.description ? `<div class="quiz-meta" style="color:#2c3e50;">${escapeHtml(q.description)}</div>` : ''}
+                            <div class="quiz-actions">
+                                ${isCreator ? `
+                                    <button class="delete-quiz-btn" data-id="${q.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
+                                    <button class="view-quiz-results-btn" data-id="${q.id}" style="background:#e8f0fe; color:#1a4b8a;">📊 Results</button>
+                                ` : ''}
+                                ${canTake ? `<button class="take-quiz-btn" data-id="${q.id}" style="background:#27ae60; color:#fff;">▶️ Take Quiz</button>` : ''}
+                                ${takenInfo ? `<span>${takenInfo}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = html;
+
+                // Delete quiz
+                container.querySelectorAll('.delete-quiz-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Delete this quiz and all attempts?')) {
+                            const id = this.dataset.id;
+                            await db.collection('quizzes').doc(id).delete();
+                            // Also delete attempts
+                            const attSnap = await db.collection('quiz_attempts').where('quizId', '==', id).get();
+                            const batch = db.batch();
+                            attSnap.forEach(d => batch.delete(d.ref));
+                            await batch.commit();
+                            loadQuizzes();
+                        }
+                    };
+                });
+
+                // Take quiz
+                container.querySelectorAll('.take-quiz-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        startQuiz(id);
+                    };
+                });
+
+                // View results
+                container.querySelectorAll('.view-quiz-results-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        viewQuizResults(id);
+                    };
+                });
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading quizzes: ' + escapeHtml(error.message) +
+                '</div>';
+                console.error('Load quizzes error:', error);
+            }
+        }
+
+        // Start quiz
+        async function startQuiz(quizId) {
+            const studentId = getStudentIdForParent();
+            if (!studentId) {
+                alert('You need to be logged in as a parent/student to take a quiz.');
+                return;
+            }
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const quizDoc = await db.collection('quizzes').doc(quizId).get();
+                if (!quizDoc.exists) {
+                    alert('Quiz not found.');
+                    return;
+                }
+                const quiz = quizDoc.data();
+                if (quiz.tenantId !== tenantId) {
+                    alert('This quiz does not belong to your tenant.');
+                    return;
+                }
+                if (quiz.isActive === false) {
+                    alert('This quiz is no longer active.');
+                    return;
+                }
+
+                // Check if already taken
+                const existingSnap = await db.collection('quiz_attempts')
+                    .where('tenantId', '==', tenantId)
+                    .where('quizId', '==', quizId)
+                    .where('studentId', '==', studentId)
+                    .get();
+                if (!existingSnap.empty) {
+                    alert('You have already taken this quiz.');
+                    return;
+                }
+
+                const questions = quiz.questions || [];
+                if (questions.length === 0) {
+                    alert('This quiz has no questions.');
+                    return;
+                }
+
+                // Shuffle questions? Keep as is.
+                currentQuizTaking = {
+                    quizId: quizId,
+                    questions: questions,
+                    currentIndex: 0,
+                    answers: new Array(questions.length).fill(null),
+                    timeLimit: quiz.timeLimit || 15,
+                    startTime: Date.now(),
+                    timerInterval: null,
+                    timeLeft: (quiz.timeLimit || 15) * 60 // seconds
+                };
+
+                document.getElementById('takeQuizTitle').textContent = '📝 ' + quiz.title;
+                document.getElementById('takeQuizMeta').textContent = `Questions: ${questions.length} | Time: ${quiz.timeLimit || 15} min`;
+                document.getElementById('takeQuizMessage').innerHTML = '';
+                openModal('takeQuizModal');
+
+                renderQuizQuestion();
+                startQuizTimer();
+            } catch (error) {
+                alert('Error starting quiz: ' + error.message);
+                console.error('Start quiz error:', error);
+            }
+        }
+
+        function renderQuizQuestion() {
+            const state = currentQuizTaking;
+            if (!state) return;
+            const container = document.getElementById('takeQuizQuestionContainer');
+            const q = state.questions[state.currentIndex];
+            const total = state.questions.length;
+            const idx = state.currentIndex;
+
+            document.getElementById('takeQuizProgress').textContent = `Question ${idx + 1} of ${total}`;
+
+            let html = `
+                <div class="question-item" style="background:#fff; border:1px solid #d6e2ed;">
+                    <div class="q-text" style="font-size:1rem; margin-bottom:8px;">${escapeHtml(q.text)}</div>
+                    <div class="q-options">
+            `;
+            q.options.forEach((opt, oi) => {
+                const checked = state.answers[idx] === oi ? 'checked' : '';
+                html += `
+                    <label style="display:block; padding:4px 0; cursor:pointer;">
+                        <input type="radio" name="take_q_${idx}" value="${oi}" ${checked} onchange="recordQuizAnswer(${idx}, ${oi})" />
+                        ${String.fromCharCode(65 + oi)}. ${escapeHtml(opt)}
+                    </label>
+                `;
+            });
+            html += `</div></div>`;
+            container.innerHTML = html;
+
+            // Update buttons
+            document.getElementById('takeQuizPrevBtn').style.display = idx === 0 ? 'none' : 'inline-block';
+            document.getElementById('takeQuizNextBtn').textContent = idx === total - 1 ? 'Finish Review' : 'Next →';
+        }
+
+        window.recordQuizAnswer = function(idx, val) {
+            if (currentQuizTaking) {
+                currentQuizTaking.answers[idx] = val;
+            }
+        };
+
+        document.getElementById('takeQuizPrevBtn').addEventListener('click', function() {
+            if (currentQuizTaking && currentQuizTaking.currentIndex > 0) {
+                currentQuizTaking.currentIndex--;
+                renderQuizQuestion();
+            }
+        });
+
+        document.getElementById('takeQuizNextBtn').addEventListener('click', function() {
+            if (currentQuizTaking) {
+                const idx = currentQuizTaking.currentIndex;
+                const total = currentQuizTaking.questions.length;
+                // Ensure answer is recorded
+                const radios = document.querySelectorAll(`input[name="take_q_${idx}"]`);
+                let answered = false;
+                radios.forEach(r => { if (r.checked) { currentQuizTaking.answers[idx] = parseInt(r.value);
+                        answered = true; } });
+                if (!answered) {
+                    // Allow proceeding without answering? We'll force an answer.
+                    alert('Please select an answer before proceeding.');
+                    return;
+                }
+                if (idx < total - 1) {
+                    currentQuizTaking.currentIndex++;
+                    renderQuizQuestion();
+                } else {
+                    // Finish
+                    submitQuiz();
+                }
+            }
+        });
+
+        document.getElementById('takeQuizSubmitBtn').addEventListener('click', function() {
+            if (confirm('Submit your quiz? You cannot change your answers after submission.')) {
+                submitQuiz();
+            }
+        });
+
+        function startQuizTimer() {
+            if (quizTimerInterval) clearInterval(quizTimerInterval);
+            const state = currentQuizTaking;
+            if (!state) return;
+
+            updateTimerDisplay();
+
+            quizTimerInterval = setInterval(() => {
+                state.timeLeft--;
+                updateTimerDisplay();
+                if (state.timeLeft <= 0) {
+                    clearInterval(quizTimerInterval);
+                    alert('⏰ Time is up! Your quiz will be submitted automatically.');
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const state = currentQuizTaking;
+            if (!state) return;
+            const mins = Math.floor(state.timeLeft / 60);
+            const secs = state.timeLeft % 60;
+            const display = document.getElementById('takeQuizTimer');
+            display.textContent = `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            if (state.timeLeft < 60) {
+                display.style.color = '#e74c3c';
+                display.style.background = '#fde8e8';
+            } else {
+                display.style.color = '#e74c3c';
+                display.style.background = '#fde8e8';
+            }
+        }
+
+        async function submitQuiz() {
+            const state = currentQuizTaking;
+            if (!state) return;
+
+            if (quizTimerInterval) {
+                clearInterval(quizTimerInterval);
+                quizTimerInterval = null;
+            }
+
+            const studentId = getStudentIdForParent();
+            if (!studentId) {
+                alert('Student ID not found.');
+                return;
+            }
+
+            const questions = state.questions;
+            const answers = state.answers;
+            let correctCount = 0;
+            const details = [];
+
+            questions.forEach((q, idx) => {
+                const chosen = answers[idx];
+                const isCorrect = chosen === q.correct;
+                if (isCorrect) correctCount++;
+                details.push({
+                    question: q.text,
+                    chosen: chosen !== null ? q.options[chosen] : 'Not answered',
+                    correct: q.options[q.correct],
+                    isCorrect
+                });
+            });
+
+            const total = questions.length;
+            const score = Math.round((correctCount / total) * 100);
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const user = auth.currentUser;
+                await db.collection('quiz_attempts').add({
+                    quizId: state.quizId,
+                    studentId: studentId,
+                    studentName: user ? user.displayName || user.email : 'Student',
+                    answers: answers,
+                    details: details,
+                    score: score,
+                    correctCount: correctCount,
+                    totalQuestions: total,
+                    timeTaken: Math.round((Date.now() - state.startTime) / 1000),
+                    completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    tenantId: tenantId
+                });
+
+                // Show result
+                closeModal('takeQuizModal');
+                showQuizResult(score, correctCount, total, details, state.quizId);
+                loadQuizzes();
+            } catch (error) {
+                alert('Error submitting quiz: ' + error.message);
+                console.error('Submit quiz error:', error);
+            }
+        }
+
+        function showQuizResult(score, correct, total, details, quizId) {
+            const container = document.getElementById('quizResultContent');
+            const passed = score >= 50;
+            container.innerHTML = `
+                <div class="quiz-result-score" style="color:${passed ? '#27ae60' : '#e74c3c'};">${score}%</div>
+                <div style="text-align:center; margin-bottom:12px;">
+                    ${passed ? '🎉 Passed!' : '📚 Keep learning!'}
+                    <br>${correct} out of ${total} correct
+                </div>
+                <div style="max-height:300px; overflow-y:auto;">
+                    ${details.map((d, i) => `
+                        <div class="quiz-result-detail" style="border-left:4px solid ${d.isCorrect ? '#27ae60' : '#e74c3c'};">
+                            <strong>Q${i+1}:</strong> ${escapeHtml(d.question)}<br>
+                            Your answer: ${escapeHtml(d.chosen)} ${d.isCorrect ? '✅' : '❌'} ${!d.isCorrect ? `(Correct: ${escapeHtml(d.correct)})` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            openModal('quizResultModal');
+        }
+
+        document.getElementById('closeQuizResultBtn').addEventListener('click', function() {
+            closeModal('quizResultModal');
+        });
+
+        // View quiz results (teacher)
+        async function viewQuizResults(quizId) {
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('quiz_attempts')
+                    .where('tenantId', '==', tenantId)
+                    .where('quizId', '==', quizId)
+                    .orderBy('completedAt', 'desc')
+                    .get();
+
+                const attempts = [];
+                snap.forEach(doc => attempts.push({ id: doc.id, ...doc.data() }));
+
+                if (attempts.length === 0) {
+                    alert('No attempts for this quiz yet.');
+                    return;
+                }
+
+                const quizDoc = await db.collection('quizzes').doc(quizId).get();
+                const quizTitle = quizDoc.exists ? quizDoc.data().title : 'Quiz';
+
+                let html = `
+                    <div class="card">
+                        <h4>📊 Results for "${escapeHtml(quizTitle)}"</h4>
+                        <p><strong>${attempts.length}</strong> attempts</p>
+                        <div class="table-wrapper">
+                            <table><thead><tr><th>Student</th><th>Score</th><th>Correct</th><th>Date</th></tr></thead><tbody>
+                `;
+                attempts.forEach(a => {
+                    const date = a.completedAt ? new Date(a.completedAt.toDate()).toLocaleString() : 'N/A';
+                    html += `<tr>
+                        <td>${escapeHtml(a.studentName || 'Unknown')}</td>
+                        <td>${a.score}%</td>
+                        <td>${a.correctCount}/${a.totalQuestions}</td>
+                        <td>${date}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table></div></div>';
+                // Show in a modal
+                const container = document.getElementById('quizResultContent');
+                container.innerHTML = html;
+                openModal('quizResultModal');
+
+            } catch (error) {
+                alert('Error loading results: ' + error.message);
+                console.error('View results error:', error);
+            }
+        }
+
+        // ==================================================================
+        //  ASSIGNMENT FUNCTIONS
+        // ==================================================================
+
+        // Create assignment
+        document.getElementById('createAssignmentBtn').addEventListener('click', function() {
+            if (!isTeacherOrAdmin()) {
+                alert('Only teachers and admins can create assignments.');
+                return;
+            }
+            document.getElementById('assignmentTitle').value = '';
+            document.getElementById('assignmentDescription').value = '';
+            document.getElementById('assignmentClass').value = '';
+            document.getElementById('assignmentDueDate').value = '';
+            document.getElementById('assignmentFileInput').value = '';
+            document.getElementById('assignmentCreateMessage').innerHTML = '';
+            openModal('createAssignmentModal');
+        });
+
+        document.getElementById('saveAssignmentBtn').addEventListener('click', async function() {
+            const title = document.getElementById('assignmentTitle').value.trim();
+            const description = document.getElementById('assignmentDescription').value.trim();
+            const dueDate = document.getElementById('assignmentDueDate').value;
+            const targetClass = document.getElementById('assignmentClass').value || '';
+            const fileInput = document.getElementById('assignmentFileInput');
+
+            if (!title || !description || !dueDate) {
+                showMessage('Please fill in all required fields.', 'error', 'assignmentCreateMessage');
+                return;
+            }
+
+            let attachmentURL = '';
+            let attachmentName = '';
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                try {
+                    const tenantId = getCurrentTenantId();
+                    const storagePath = `assignments/${Date.now()}_${file.name}`;
+                    const ref = storage.ref(storagePath);
+                    const snapshot = await ref.put(file);
+                    attachmentURL = await snapshot.ref.getDownloadURL();
+                    attachmentName = file.name;
+                } catch (e) {
+                    showMessage('Error uploading file: ' + e.message, 'error', 'assignmentCreateMessage');
+                    return;
+                }
+            }
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const user = auth.currentUser;
+                await db.collection('assignments').add({
+                    title,
+                    description,
+                    dueDate,
+                    targetClass,
+                    attachmentURL,
+                    attachmentName,
+                    createdBy: user ? user.uid : 'unknown',
+                    creatorName: user ? user.displayName || user.email : 'Unknown',
+                    tenantId: tenantId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isActive: true
+                });
+
+                showMessage('✅ Assignment created successfully!', 'success', 'assignmentCreateMessage');
+                setTimeout(() => {
+                    closeModal('createAssignmentModal');
+                    loadAssignments();
+                }, 1000);
+            } catch (error) {
+                showMessage('Error creating assignment: ' + error.message, 'error', 'assignmentCreateMessage');
+                console.error('Assignment creation error:', error);
+            }
+        });
+
+        // Load assignments
+        async function loadAssignments() {
+            const container = document.getElementById('assignmentsList');
+            container.innerHTML = '<p>Loading assignments...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('assignments')
+                    .where('tenantId', '==', tenantId)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                const assignments = [];
+                snap.forEach(doc => assignments.push({ id: doc.id, ...doc.data() }));
+
+                if (assignments.length === 0) {
+                    container.innerHTML = '<p>No assignments found. Create your first assignment!</p>';
+                    return;
+                }
+
+                const isCreator = isTeacherOrAdmin();
+                const studentId = getStudentIdForParent();
+
+                let html = '';
+                for (const a of assignments) {
+                    const createdDate = a.createdAt ? new Date(a.createdAt.toDate()).toLocaleString() : 'N/A';
+                    const dueDate = a.dueDate ? new Date(a.dueDate).toLocaleString() : 'No due date';
+                    const classInfo = a.targetClass || 'All Classes';
+                    const hasAttachment = a.attachmentURL ? true : false;
+
+                    // Check if student has submitted
+                    let submissionInfo = '';
+                    let canSubmit = false;
+                    if (studentId && a.isActive !== false) {
+                        const subSnap = await db.collection('submissions')
+                            .where('tenantId', '==', tenantId)
+                            .where('assignmentId', '==', a.id)
+                            .where('studentId', '==', studentId)
+                            .get();
+                        if (!subSnap.empty) {
+                            const sub = subSnap.docs[0].data();
+                            submissionInfo =
+                                `<span style="color:#27ae60;">✅ Submitted on ${new Date(sub.submittedAt?.toDate()).toLocaleString() || 'N/A'}</span>`;
+                            if (sub.grade !== undefined && sub.grade !== null) {
+                                submissionInfo += ` &nbsp; Grade: <strong>${sub.grade}%</strong>`;
+                            }
+                            if (sub.feedback) {
+                                submissionInfo += ` &nbsp; <span style="color:#1a4b8a;">💬 ${escapeHtml(sub.feedback)}</span>`;
+                            }
+                        } else {
+                            canSubmit = true;
+                        }
+                    } else if (studentId) {
+                        canSubmit = true;
+                    }
+
+                    html += `
+                        <div class="assignment-card">
+                            <div class="assignment-title">${escapeHtml(a.title)}</div>
+                            <div class="assignment-meta">
+                                <span>📚 ${escapeHtml(classInfo)}</span> &nbsp;|&nbsp;
+                                <span>📅 Due: ${dueDate}</span> &nbsp;|&nbsp;
+                                <span>👤 ${escapeHtml(a.creatorName || 'Unknown')}</span>
+                                ${hasAttachment ? ' &nbsp;|&nbsp; <span>📎 Attachment</span>' : ''}
+                            </div>
+                            ${a.description ? `<div class="assignment-meta" style="color:#2c3e50;">${escapeHtml(a.description)}</div>` : ''}
+                            <div class="assignment-actions">
+                                ${hasAttachment ? `<a href="${a.attachmentURL}" target="_blank" class="refresh-btn" style="text-decoration:none; font-size:0.75rem; padding:4px 12px;">📥 Download Attachment</a>` : ''}
+                                ${isCreator ? `
+                                    <button class="delete-assignment-btn" data-id="${a.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
+                                    <button class="view-submissions-btn" data-id="${a.id}" style="background:#e8f0fe; color:#1a4b8a;">📋 View Submissions</button>
+                                ` : ''}
+                                ${canSubmit ? `<button class="submit-assignment-btn" data-id="${a.id}" style="background:#27ae60; color:#fff;">📤 Submit</button>` : ''}
+                                ${submissionInfo ? `<span>${submissionInfo}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = html;
+
+                // Delete assignment
+                container.querySelectorAll('.delete-assignment-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Delete this assignment and all submissions?')) {
+                            const id = this.dataset.id;
+                            await db.collection('assignments').doc(id).delete();
+                            const subSnap = await db.collection('submissions').where('assignmentId', '==', id)
+                                .get();
+                            const batch = db.batch();
+                            subSnap.forEach(d => batch.delete(d.ref));
+                            await batch.commit();
+                            loadAssignments();
+                        }
+                    };
+                });
+
+                // View submissions
+                container.querySelectorAll('.view-submissions-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        viewSubmissions(id);
+                    };
+                });
+
+                // Submit assignment
+                container.querySelectorAll('.submit-assignment-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        openSubmitAssignment(id);
+                    };
+                });
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading assignments: ' + escapeHtml(error.message) +
+                '</div>';
+                console.error('Load assignments error:', error);
+            }
+        }
+
+        // View submissions for an assignment (teacher)
+        async function viewSubmissions(assignmentId) {
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('submissions')
+                    .where('tenantId', '==', tenantId)
+                    .where('assignmentId', '==', assignmentId)
+                    .orderBy('submittedAt', 'desc')
+                    .get();
+
+                const submissions = [];
+                snap.forEach(doc => submissions.push({ id: doc.id, ...doc.data() }));
+
+                if (submissions.length === 0) {
+                    alert('No submissions yet.');
+                    return;
+                }
+
+                const assignmentDoc = await db.collection('assignments').doc(assignmentId).get();
+                const assignmentTitle = assignmentDoc.exists ? assignmentDoc.data().title : 'Assignment';
+
+                let html = `
+                    <div class="card">
+                        <h4>📋 Submissions for "${escapeHtml(assignmentTitle)}"</h4>
+                        <p><strong>${submissions.length}</strong> submissions</p>
+                        <div class="table-wrapper">
+                            <table><thead><tr><th>Student</th><th>File</th><th>Submitted</th><th>Grade</th><th>Actions</th></tr></thead><tbody>
+                `;
+                submissions.forEach(s => {
+                    const date = s.submittedAt ? new Date(s.submittedAt.toDate()).toLocaleString() : 'N/A';
+                    const fileLink = s.fileURL ? `<a href="${s.fileURL}" target="_blank">📎 View</a>` : '—';
+                    const gradeDisplay = s.grade !== undefined && s.grade !== null ? `${s.grade}%` : '—';
+                    html += `<tr>
+                        <td>${escapeHtml(s.studentName || 'Unknown')}</td>
+                        <td>${fileLink}</td>
+                        <td>${date}</td>
+                        <td>${gradeDisplay}</td>
+                        <td><button class="grade-submission-btn" data-id="${s.id}" style="background:#e8f0fe; color:#1a4b8a;">📊 Grade</button></td>
+                    </tr>`;
+                });
+                html += '</tbody></table></div></div>';
+
+                const container = document.getElementById('quizResultContent');
+                container.innerHTML = html;
+                openModal('quizResultModal');
+
+                container.querySelectorAll('.grade-submission-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        openGradeSubmission(id);
+                    };
+                });
+
+            } catch (error) {
+                alert('Error loading submissions: ' + error.message);
+                console.error('View submissions error:', error);
+            }
+        }
+
+        // Open submit assignment modal
+        function openSubmitAssignment(assignmentId) {
+            const studentId = getStudentIdForParent();
+            if (!studentId) {
+                alert('You need to be logged in as a parent/student to submit.');
+                return;
+            }
+            // Store assignmentId in a data attribute
+            const modal = document.getElementById('viewAssignmentModal');
+            modal.dataset.assignmentId = assignmentId;
+            modal.dataset.mode = 'submit';
+
+            // Load assignment details
+            db.collection('assignments').doc(assignmentId).get().then(doc => {
+                if (!doc.exists) return;
+                const data = doc.data();
+                document.getElementById('viewAssignmentTitle').textContent = '📄 Submit: ' + data.title;
+                let content = `
+                    <div style="margin-bottom:10px;">
+                        <strong>Description:</strong> ${escapeHtml(data.description || '')}
+                    </div>
+                    <div><strong>Due Date:</strong> ${data.dueDate ? new Date(data.dueDate).toLocaleString() : 'N/A'}</div>
+                    ${data.attachmentURL ? `<div><a href="${data.attachmentURL}" target="_blank" class="refresh-btn" style="text-decoration:none; font-size:0.75rem; padding:4px 12px;">📥 Download Attachment</a></div>` : ''}
+                    <hr>
+                    <div style="margin-top:12px;">
+                        <label style="font-weight:600; font-size:0.85rem;">Upload Your Work *</label>
+                        <input type="file" id="submissionFileInput" />
+                    </div>
+                    <div style="margin-top:8px;">
+                        <label style="font-weight:600; font-size:0.85rem;">Comment (optional)</label>
+                        <textarea id="submissionComment" rows="3" placeholder="Add a note..."></textarea>
+                    </div>
+                    <button id="submitAssignmentWorkBtn" class="refresh-btn" style="margin-top:10px; width:100%; background:#27ae60;">Submit Work</button>
+                `;
+                document.getElementById('viewAssignmentContent').innerHTML = content;
+                document.getElementById('viewAssignmentActions').innerHTML = '';
+                document.getElementById('viewAssignmentMessage').innerHTML = '';
+
+                document.getElementById('submitAssignmentWorkBtn').onclick = function() {
+                    submitAssignmentWork(assignmentId);
+                };
+
+                openModal('viewAssignmentModal');
+            }).catch(err => {
+                alert('Error loading assignment: ' + err.message);
+            });
+        }
+
+        async function submitAssignmentWork(assignmentId) {
+            const studentId = getStudentIdForParent();
+            if (!studentId) {
+                showMessage('Student ID not found.', 'error', 'viewAssignmentMessage');
+                return;
+            }
+
+            const fileInput = document.getElementById('submissionFileInput');
+            const comment = document.getElementById('submissionComment').value.trim();
+
+            if (fileInput.files.length === 0) {
+                showMessage('Please select a file to upload.', 'error', 'viewAssignmentMessage');
+                return;
+            }
+
+            const file = fileInput.files[0];
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const user = auth.currentUser;
+
+                // Upload file
+                const storagePath = `submissions/${assignmentId}/${studentId}_${Date.now()}_${file.name}`;
+                const ref = storage.ref(storagePath);
+                const snapshot = await ref.put(file);
+                const fileURL = await snapshot.ref.getDownloadURL();
+
+                await db.collection('submissions').add({
+                    assignmentId: assignmentId,
+                    studentId: studentId,
+                    studentName: user ? user.displayName || user.email : 'Student',
+                    fileURL: fileURL,
+                    fileName: file.name,
+                    comment: comment || '',
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    tenantId: tenantId,
+                    grade: null,
+                    feedback: '',
+                    feedbackFileURL: ''
+                });
+
+                showMessage('✅ Assignment submitted successfully!', 'success', 'viewAssignmentMessage');
+                setTimeout(() => {
+                    closeModal('viewAssignmentModal');
+                    loadAssignments();
+                }, 1500);
+            } catch (error) {
+                showMessage('Error submitting assignment: ' + error.message, 'error', 'viewAssignmentMessage');
+                console.error('Submit assignment error:', error);
+            }
+        }
+
+        // Open grade submission modal
+        function openGradeSubmission(submissionId) {
+            document.getElementById('gradeSubmissionContent').innerHTML = '<p>Loading...</p>';
+            document.getElementById('gradeSubmissionScore').value = '';
+            document.getElementById('gradeSubmissionFeedback').value = '';
+            document.getElementById('gradeSubmissionFile').value = '';
+            document.getElementById('gradeSubmissionMessage').innerHTML = '';
+            document.getElementById('gradeSubmissionModal').dataset.submissionId = submissionId;
+
+            db.collection('submissions').doc(submissionId).get().then(doc => {
+                if (!doc.exists) return;
+                const data = doc.data();
+                document.getElementById('gradeSubmissionContent').innerHTML = `
+                    <p><strong>Student:</strong> ${escapeHtml(data.studentName || 'Unknown')}</p>
+                    <p><strong>File:</strong> ${data.fileURL ? `<a href="${data.fileURL}" target="_blank">📎 Download</a>` : '—'}</p>
+                    <p><strong>Comment:</strong> ${escapeHtml(data.comment || '')}</p>
+                    <p><strong>Submitted:</strong> ${data.submittedAt ? new Date(data.submittedAt.toDate()).toLocaleString() : 'N/A'}</p>
+                    ${data.grade !== undefined && data.grade !== null ? `<p><strong>Current Grade:</strong> ${data.grade}%</p>` : ''}
+                    ${data.feedback ? `<p><strong>Feedback:</strong> ${escapeHtml(data.feedback)}</p>` : ''}
+                    ${data.feedbackFileURL ? `<p><strong>Feedback File:</strong> <a href="${data.feedbackFileURL}" target="_blank">📎 Download</a></p>` : ''}
+                `;
+                if (data.grade !== undefined && data.grade !== null) {
+                    document.getElementById('gradeSubmissionScore').value = data.grade;
+                }
+                if (data.feedback) {
+                    document.getElementById('gradeSubmissionFeedback').value = data.feedback;
+                }
+                openModal('gradeSubmissionModal');
+            }).catch(err => {
+                document.getElementById('gradeSubmissionContent').innerHTML = '<p>Error loading submission.</p>';
+                console.error(err);
+            });
+        }
+
+        document.getElementById('submitGradeBtn').addEventListener('click', async function() {
+            const submissionId = document.getElementById('gradeSubmissionModal').dataset.submissionId;
+            const score = parseFloat(document.getElementById('gradeSubmissionScore').value);
+            const feedback = document.getElementById('gradeSubmissionFeedback').value.trim();
+            const fileInput = document.getElementById('gradeSubmissionFile');
+
+            if (isNaN(score) || score < 0 || score > 100) {
+                showMessage('Please enter a valid grade (0-100).', 'error', 'gradeSubmissionMessage');
+                return;
+            }
+
+            try {
+                const tenantId = getCurrentTenantId();
+                let feedbackFileURL = '';
+                let feedbackFileName = '';
+
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const storagePath = `feedback/${submissionId}_${Date.now()}_${file.name}`;
+                    const ref = storage.ref(storagePath);
+                    const snapshot = await ref.put(file);
+                    feedbackFileURL = await snapshot.ref.getDownloadURL();
+                    feedbackFileName = file.name;
+                }
+
+                await db.collection('submissions').doc(submissionId).update({
+                    grade: score,
+                    feedback: feedback || '',
+                    feedbackFileURL: feedbackFileURL,
+                    feedbackFileName: feedbackFileName,
+                    gradedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showMessage('✅ Grade submitted!', 'success', 'gradeSubmissionMessage');
+                setTimeout(() => {
+                    closeModal('gradeSubmissionModal');
+                    loadAssignments();
+                }, 1000);
+            } catch (error) {
+                showMessage('Error submitting grade: ' + error.message, 'error', 'gradeSubmissionMessage');
+                console.error('Grade submission error:', error);
+            }
+        });
+
+        // ==================================================================
+        //  E-LEARNING TABS
+        // ==================================================================
+        document.querySelectorAll('.elearning-tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.elearning-tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tab = this.dataset.etab;
+                document.querySelectorAll('.elearning-tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById(tab + 'Tab').classList.add('active');
+                if (tab === 'quizzes') loadQuizzes();
+                else if (tab === 'assignments') loadAssignments();
+            });
+        });
+
+        // Refresh buttons
+        document.getElementById('refreshQuizzesBtn').addEventListener('click', loadQuizzes);
+        document.getElementById('refreshAssignmentsBtn').addEventListener('click', loadAssignments);
+
+        // ==================================================================
+        //  IMPORT BUTTONS
         // ==================================================================
         document.getElementById('importBtn').onclick = function() {
             if (currentUserRole !== 'admin') {
@@ -7412,7 +9271,15 @@
         };
 
         // ==================================================================
-        //  LOGIN AND SETUP (updated with fee collections listeners & bursar load)
+        //  BULK ATTENDANCE EVENT LISTENERS
+        // ==================================================================
+        document.getElementById('bulkMarkPresent').addEventListener('click', function() { bulkMarkAttendance('present'); });
+        document.getElementById('bulkMarkAbsent').addEventListener('click', function() { bulkMarkAttendance('absent'); });
+        document.getElementById('bulkMarkLate').addEventListener('click', function() { bulkMarkAttendance('late'); });
+        document.getElementById('bulkMarkClear').addEventListener('click', function() { bulkMarkAttendance('clear'); });
+
+        // ==================================================================
+        //  LOGIN AND SETUP
         // ==================================================================
         async function loginAndSetup(email, password, skipAuth = false) {
             try {
@@ -7536,12 +9403,10 @@
                     loadRegistrationRequests('registrationRequestsAdminList');
                 }
 
-                // Attach library event listeners
                 document.getElementById('libraryRefreshBtn').addEventListener('click', showLibraryResources);
                 document.getElementById('libraryClassSelect').addEventListener('change', showLibraryResources);
                 document.getElementById('libraryDepartmentSelect').addEventListener('change', showLibraryResources);
 
-                // Documents: load when tab is clicked
                 const docTabBtn = document.querySelector('[data-tab="documents"]');
                 if (docTabBtn) {
                     docTabBtn.addEventListener('click', function() {
@@ -7553,7 +9418,6 @@
                     });
                 }
 
-                // Fee Collections: attach listeners
                 document.getElementById('refreshFeeCollectionsBtn').addEventListener('click', function() {
                     loadFeeCollections();
                 });
@@ -7566,6 +9430,46 @@
                 document.getElementById('feeCollectionYear').addEventListener('change', applyFeeFilters);
                 document.getElementById('feeCollectionTerm').addEventListener('change', applyFeeFilters);
                 document.getElementById('feeCollectionMonth').addEventListener('change', applyFeeFilters);
+
+                const reportCardTabBtn = document.querySelector('[data-tab="reportcard"]');
+                if (reportCardTabBtn) {
+                    reportCardTabBtn.addEventListener('click', function() {
+                        if (currentStudentDoc) {
+                            const yearSelect = document.getElementById('reportCardYear');
+                            if (yearSelect.options.length <= 1) {
+                                db.collection('exam_records').doc(currentStudentDoc.id).get().then(doc => {
+                                    if (doc.exists) {
+                                        const data = doc.data();
+                                        const years = data.years ? Object.keys(data.years) : [];
+                                        const currentVal = yearSelect.value;
+                                        yearSelect.innerHTML = '<option value="all">All Years</option>';
+                                        years.forEach(y => {
+                                            yearSelect.innerHTML +=
+                                                `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
+                                        });
+                                    }
+                                }).catch(() => {});
+                            }
+                            const container = document.getElementById('reportCardContainer');
+                            if (!container.querySelector('.report-card')) {
+                                generateReportCard();
+                            }
+                        } else {
+                            document.getElementById('reportCardContainer').innerHTML =
+                                '<p>Please load a student first.</p>';
+                        }
+                    });
+                }
+
+                // E-Learning module: load data when tab is shown
+                const eLearningBtn = document.getElementById('eLearningModuleBtn');
+                if (eLearningBtn) {
+                    eLearningBtn.addEventListener('click', function() {
+                        populateELearningDropdowns();
+                        loadQuizzes();
+                        loadAssignments();
+                    });
+                }
 
                 const firstModuleBtn = document.querySelector('.module-btn');
                 if (firstModuleBtn) firstModuleBtn.click();
@@ -7582,7 +9486,7 @@
         }
 
         // ==================================================================
-        //  ROLE-BASED UI (updated to load students for bursar and fee collections)
+        //  ROLE-BASED UI
         // ==================================================================
         function setupRoleUI(role, extra) {
             extra = extra || {};
@@ -7595,6 +9499,7 @@
             document.getElementById('bursarModule').style.display = 'none';
             document.getElementById('adminModule').style.display = 'none';
             document.getElementById('suggestionsModule').style.display = 'none';
+            document.getElementById('eLearningModule').style.display = 'none';
             document.getElementById('suggestionFab').style.display = 'flex';
 
             const adminSearchHandler = async function() {
@@ -7622,6 +9527,10 @@
                     if (docTab && docTab.classList.contains('active')) {
                         loadStudentDocuments(found.id);
                     }
+                    const reportTab = document.querySelector('[data-tab="reportcard"]');
+                    if (reportTab && reportTab.classList.contains('active')) {
+                        generateReportCard();
+                    }
                 } catch (error) {
                     showMessage('Error searching: ' + error.message, 'error', 'searchResults');
                 }
@@ -7635,17 +9544,21 @@
                     { id: 'attendanceModuleBtn', label: 'Attendance', moduleId: 'attendanceModule' },
                     { id: 'recordsModuleBtn', label: 'Student Records', moduleId: 'recordsModule' },
                     { id: 'teachersModuleBtn', label: 'Teachers', moduleId: 'teachersModule' },
-                    { id: 'adminModuleBtn', label: 'Admin', moduleId: 'adminModule' }
+                    { id: 'adminModuleBtn', label: 'Admin', moduleId: 'adminModule' },
+                    { id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
                 );
             } else if (role === 'bursar') {
                 modules.unshift({ id: 'bursarModuleBtn', label: 'Bursar', moduleId: 'bursarModule' });
             } else if (role === 'teacher') {
                 modules.unshift({ id: 'attendanceModuleBtn', label: 'Attendance', moduleId: 'attendanceModule' },
                     { id: 'recordsModuleBtn', label: 'Student Records', moduleId: 'recordsModule' },
-                    { id: 'teachersModuleBtn', label: 'My Profile', moduleId: 'teachersModule' }
+                    { id: 'teachersModuleBtn', label: 'My Profile', moduleId: 'teachersModule' },
+                    { id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
                 );
             } else if (role === 'parent') {
-                modules.unshift({ id: 'recordsModuleBtn', label: 'My Child\'s Records', moduleId: 'recordsModule' });
+                modules.unshift({ id: 'recordsModuleBtn', label: 'My Child\'s Records', moduleId: 'recordsModule' },
+                    { id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
+                );
             }
 
             modules.forEach(m => {
@@ -7665,7 +9578,6 @@
                     if (m.moduleId === 'teachersModule') { if (role === 'admin') loadAllTeachersForAdmin();
                         displayOwnTeacherProfile(); }
                     if (m.moduleId === 'bursarModule') {
-                        // Load students if not already loaded (for fee collections)
                         if (Object.keys(allStudents).length === 0) {
                             loadStudents().then(() => {
                                 loadBursarSummary();
@@ -7688,8 +9600,16 @@
                         loadSchoolLocation();
                         loadStaffCheckinHistory();
                         loadAdmissionRequests('admissionRequestsAdminList');
-                        loadRegistrationRequests('registrationRequestsAdminList'); }
+                        loadRegistrationRequests('registrationRequestsAdminList');
+                        populatePromotionDropdowns(); }
                     if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
+                    if (m.moduleId === 'eLearningModule') {
+                        populateELearningDropdowns();
+                        loadQuizzes();
+                        loadAssignments();
+                        // Activate first tab
+                        document.querySelector('.elearning-tab-btn.active')?.click();
+                    }
                     if (m.moduleId === 'recordsModule' && role === 'parent' && parentLinkedStudentId) {
                         setTimeout(initChatbot, 300);
                     }
@@ -7737,6 +9657,7 @@
                         'admissionRequestsAdminList');
                         else if (id === 'registrationrequests') loadRegistrationRequests(
                             'registrationRequestsAdminList');
+                        else if (id === 'promotion') populatePromotionDropdowns();
                     };
                 });
             } else if (role === 'bursar') {
@@ -7744,7 +9665,6 @@
                 document.getElementById('manualSection').style.display = 'none';
                 document.getElementById('adminTeacherSections').style.display = 'none';
                 document.getElementById('teacherOwnProfileCard').style.display = 'none';
-                // Fee collections will load when bursar module button is clicked
             } else if (role === 'teacher') {
                 teacherAssignedClass = extra.class || 'JSS1';
                 teacherOwnData = extra.teacherData || null;
@@ -7781,6 +9701,10 @@
                         const docTab = document.querySelector('[data-tab="documents"]');
                         if (docTab && docTab.classList.contains('active')) {
                             loadStudentDocuments(found.id);
+                        }
+                        const reportTab = document.querySelector('[data-tab="reportcard"]');
+                        if (reportTab && reportTab.classList.contains('active')) {
+                            generateReportCard();
                         }
                     } catch (error) {
                         showMessage('Error searching: ' + error.message, 'error', 'searchResults');
@@ -7831,6 +9755,10 @@
                         loadAttendanceHistory();
                         setTimeout(initChatbot, 300);
                         loadStudentDocuments(found.id);
+                        const reportTab = document.querySelector('[data-tab="reportcard"]');
+                        if (reportTab && reportTab.classList.contains('active')) {
+                            generateReportCard();
+                        }
                     } catch (error) {
                         showMessage('Error loading student: ' + error.message, 'error', 'searchResults');
                     }
@@ -8001,6 +9929,10 @@
                     if (docTab && docTab.classList.contains('active')) {
                         loadStudentDocuments(found.id);
                     }
+                    const reportTab = document.querySelector('[data-tab="reportcard"]');
+                    if (reportTab && reportTab.classList.contains('active')) {
+                        generateReportCard();
+                    }
                 } else if (currentUserRole === 'teacher') {
                     const q = document.getElementById('studentSearchInput').value.trim();
                     const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
@@ -8025,6 +9957,10 @@
                     const docTab = document.querySelector('[data-tab="documents"]');
                     if (docTab && docTab.classList.contains('active')) {
                         loadStudentDocuments(found.id);
+                    }
+                    const reportTab = document.querySelector('[data-tab="reportcard"]');
+                    if (reportTab && reportTab.classList.contains('active')) {
+                        generateReportCard();
                     }
                 } else if (currentUserRole === 'parent') {
                     if (parentLinkedStudentId) {
@@ -8177,6 +10113,7 @@
                     else if (id === 'admissionrequests') loadAdmissionRequests('admissionRequestsAdminList');
                     else if (id === 'registrationrequests') loadRegistrationRequests(
                         'registrationRequestsAdminList');
+                    else if (id === 'promotion') populatePromotionDropdowns();
                 };
             });
 
@@ -8206,6 +10143,29 @@
                             loadStudentDocuments(currentStudentDoc.id);
                         } else {
                             document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
+                        }
+                    }
+                    if (this.dataset.tab === 'reportcard') {
+                        if (currentStudentDoc) {
+                            const yearSelect = document.getElementById('reportCardYear');
+                            if (yearSelect.options.length <= 1) {
+                                db.collection('exam_records').doc(currentStudentDoc.id).get().then(doc => {
+                                    if (doc.exists) {
+                                        const data = doc.data();
+                                        const years = data.years ? Object.keys(data.years) : [];
+                                        const currentVal = yearSelect.value;
+                                        yearSelect.innerHTML = '<option value="all">All Years</option>';
+                                        years.forEach(y => {
+                                            yearSelect.innerHTML +=
+                                                `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
+                                        });
+                                    }
+                                }).catch(() => {});
+                            }
+                            generateReportCard();
+                        } else {
+                            document.getElementById('reportCardContainer').innerHTML =
+                                '<p>Please load a student first.</p>';
                         }
                     }
                 };
@@ -8247,6 +10207,13 @@
             document.getElementById('refreshRegistrationRequestsAdminBtn').onclick = function() {
                 loadRegistrationRequests('registrationRequestsAdminList');
             };
+
+            // Initialize E-Learning tabs after DOM ready
+            setTimeout(() => {
+                populateELearningDropdowns();
+                loadQuizzes();
+                loadAssignments();
+            }, 500);
 
             document.getElementById('loginModal').style.display = 'none';
 
