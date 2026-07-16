@@ -493,6 +493,78 @@
         }
         .doc-upload-area input[type="file"] { max-width: 250px; }
 
+        /* ===== FEE COLLECTIONS DASHBOARD ===== */
+        .fee-collection-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .fee-collection-summary .summary-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+            border: 1px solid #e6edf4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .fee-collection-summary .summary-card .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a4b8a;
+        }
+        .fee-collection-summary .summary-card .label {
+            font-size: 0.75rem;
+            color: #6c7a89;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .fee-collection-summary .summary-card .number.green { color: #27ae60; }
+        .fee-collection-summary .summary-card .number.orange { color: #f39c12; }
+        .fee-collection-summary .summary-card .number.red { color: #e74c3c; }
+
+        .fee-collection-chart {
+            margin: 20px 0;
+        }
+        .fee-collection-chart .chart-bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .fee-collection-chart .chart-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .fee-collection-chart .chart-bar-label {
+            min-width: 80px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1a3a5c;
+        }
+        .fee-collection-chart .chart-bar-bg {
+            flex: 1;
+            height: 24px;
+            background: #eef2f7;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .fee-collection-chart .chart-bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.6s ease;
+            background: linear-gradient(90deg, #2a6bb0, #1a4b8a);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            min-width: 30px;
+        }
+
         /* ===== MOBILE RESPONSIVE FIXES ===== */
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -558,6 +630,9 @@
             .stats-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; }
             .doc-item { flex-direction: column; align-items: stretch; gap: 8px; }
             .doc-item .doc-actions { justify-content: flex-start; }
+            .fee-collection-summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .fee-collection-summary .summary-card .number { font-size: 1.4rem; }
+            .fee-collection-chart .chart-bar-label { min-width: 60px; font-size: 0.7rem; }
         }
 
         @media (max-width: 480px) {
@@ -585,6 +660,9 @@
             .remark-input { width: 60px; font-size: 0.6rem; padding: 3px 4px; }
             .subject-row input { max-width: 80px; font-size: 0.7rem; }
             .doc-upload-area input[type="file"] { max-width: 100%; }
+            .fee-collection-summary { grid-template-columns: 1fr 1fr; }
+            .fee-collection-summary .summary-card .number { font-size: 1.2rem; }
+            .fee-collection-chart .chart-bar-label { min-width: 50px; font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -934,7 +1012,6 @@
                     <button class="tab-btn" data-tab="attendancehistory">Attendance History</button>
                     <button class="tab-btn" data-tab="aichat">AI Chat</button>
                     <button class="tab-btn" data-tab="library">📚 Library</button>
-                    <!-- NEW: Documents Tab -->
                     <button class="tab-btn" data-tab="documents">📄 Documents</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
@@ -1222,6 +1299,74 @@
                 <div id="bursarSummaryContainer" style="overflow-x:auto;"><p>Loading fee summary...</p></div>
             </div>
 
+            <!-- ===== FEE COLLECTIONS DASHBOARD ===== -->
+            <div class="card" id="feeCollectionsCard">
+                <h3>📊 Fee Collections Dashboard</h3>
+                <p style="color:#6c7a89; margin-bottom:12px;">
+                    Visualize all fee collections across students. Filter by year, term, or month.
+                </p>
+
+                <!-- Filters -->
+                <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:16px;">
+                    <label style="font-weight:600; font-size:0.85rem;">Year:</label>
+                    <select id="feeCollectionYear" style="max-width:120px;">
+                        <option value="all">All Years</option>
+                    </select>
+                    <label style="font-weight:600; font-size:0.85rem;">Term:</label>
+                    <select id="feeCollectionTerm" style="max-width:120px;">
+                        <option value="all">All Terms</option>
+                        <option value="term1">Term 1</option>
+                        <option value="term2">Term 2</option>
+                        <option value="term3">Term 3</option>
+                    </select>
+                    <label style="font-weight:600; font-size:0.85rem;">Month:</label>
+                    <select id="feeCollectionMonth" style="max-width:120px;">
+                        <option value="all">All Months</option>
+                        <option value="01">January</option><option value="02">February</option>
+                        <option value="03">March</option><option value="04">April</option>
+                        <option value="05">May</option><option value="06">June</option>
+                        <option value="07">July</option><option value="08">August</option>
+                        <option value="09">September</option><option value="10">October</option>
+                        <option value="11">November</option><option value="12">December</option>
+                    </select>
+                    <button id="refreshFeeCollectionsBtn" class="refresh-btn">Apply Filters</button>
+                    <button id="resetFeeCollectionsBtn" style="background:#fde8e8; color:#b71c1c;">Reset</button>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="fee-collection-summary" id="feeCollectionSummary">
+                    <div class="summary-card">
+                        <div class="number" id="fcTotalCollected">0</div>
+                        <div class="label">Total Collected</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="number green" id="fcTotalFees">0</div>
+                        <div class="label">Total Fees (All Students)</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="number orange" id="fcBalance">0</div>
+                        <div class="label">Outstanding Balance</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="number" id="fcTransactionCount">0</div>
+                        <div class="label">Number of Payments</div>
+                    </div>
+                </div>
+
+                <!-- Bar Chart -->
+                <div class="fee-collection-chart" id="feeCollectionChart">
+                    <h4 style="font-size:1rem; color:#0b2b5c; margin-bottom:8px;">Monthly Collections</h4>
+                    <div id="chartContainer"><p>Apply filters to see chart.</p></div>
+                </div>
+
+                <!-- History Table -->
+                <div style="margin-top:16px;">
+                    <h4 style="font-size:1rem; color:#0b2b5c; margin-bottom:8px;">Payment History</h4>
+                    <div id="feeCollectionTableContainer"><p>Loading data...</p></div>
+                </div>
+            </div>
+
+            <!-- Staff Payroll / Payment Voucher -->
             <div class="card">
                 <h3>Staff Payroll / Payment Voucher</h3>
                 <button id="showPayrollBtn" class="refresh-btn">View Payroll</button>
@@ -6870,87 +7015,86 @@
         }
 
         // ==================================================================
-        //  DOCUMENT EXCHANGE FUNCTIONS (NEW)
+        //  DOCUMENT EXCHANGE FUNCTIONS (unchanged)
         // ==================================================================
-      async function loadStudentDocuments(studentId) {
-    const container = document.getElementById('documentList');
-    if (!container) return;
-    container.innerHTML = '<p>Loading documents...</p>';
+        async function loadStudentDocuments(studentId) {
+            const container = document.getElementById('documentList');
+            if (!container) return;
+            container.innerHTML = '<p>Loading documents...</p>';
 
-    try {
-        const tenantId = getCurrentTenantId();
-        const snap = await db.collection('student_documents')
-            .where('tenantId', '==', tenantId)
-            .where('studentId', '==', studentId)
-            .orderBy('timestamp', 'desc')
-            .get();
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('student_documents')
+                    .where('tenantId', '==', tenantId)
+                    .where('studentId', '==', studentId)
+                    .orderBy('timestamp', 'desc')
+                    .get();
 
-        const docs = [];
-        snap.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+                const docs = [];
+                snap.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
 
-        // ===== FIX: Show upload area for admin or parent =====
-        const uploadArea = document.getElementById('documentUploadArea');
-        if (uploadArea) {
-            uploadArea.style.display = (currentUserRole === 'admin' || currentUserRole === 'parent') ? 'block' : 'none';
-        }
+                const uploadArea = document.getElementById('documentUploadArea');
+                if (uploadArea) {
+                    uploadArea.style.display = (currentUserRole === 'admin' || currentUserRole === 'parent') ? 'block' :
+                    'none';
+                }
 
-        if (docs.length === 0) {
-            container.innerHTML = '<p>No documents exchanged yet.</p>';
-            return;
-        }
+                if (docs.length === 0) {
+                    container.innerHTML = '<p>No documents exchanged yet.</p>';
+                    return;
+                }
 
-        let html = '';
-        for (const doc of docs) {
-            const uploadedBy = doc.uploadedBy === 'admin' ? 'Admin' : 'Parent';
-            const isAdmin = currentUserRole === 'admin';
-            const isParent = currentUserRole === 'parent';
-            const canDelete = isAdmin || (isParent && doc.uploadedBy === 'parent');
-            const timestamp = doc.timestamp ? new Date(doc.timestamp.toDate()).toLocaleString() : 'N/A';
+                let html = '';
+                for (const doc of docs) {
+                    const uploadedBy = doc.uploadedBy === 'admin' ? 'Admin' : 'Parent';
+                    const isAdmin = currentUserRole === 'admin';
+                    const isParent = currentUserRole === 'parent';
+                    const canDelete = isAdmin || (isParent && doc.uploadedBy === 'parent');
+                    const timestamp = doc.timestamp ? new Date(doc.timestamp.toDate()).toLocaleString() : 'N/A';
 
-            html += `
-                <div class="doc-item">
-                    <div class="doc-info">
-                        <div class="doc-name">${escapeHtml(doc.fileName)}</div>
-                        <div class="doc-meta">
-                            Uploaded by <strong>${escapeHtml(uploadedBy)}</strong> • ${escapeHtml(timestamp)}
-                            ${doc.description ? `• ${escapeHtml(doc.description)}` : ''}
-                            <br>Size: ${(doc.fileSize / 1024).toFixed(1)} KB
+                    html += `
+                        <div class="doc-item">
+                            <div class="doc-info">
+                                <div class="doc-name">${escapeHtml(doc.fileName)}</div>
+                                <div class="doc-meta">
+                                    Uploaded by <strong>${escapeHtml(uploadedBy)}</strong> • ${escapeHtml(timestamp)}
+                                    ${doc.description ? `• ${escapeHtml(doc.description)}` : ''}
+                                    <br>Size: ${(doc.fileSize / 1024).toFixed(1)} KB
+                                </div>
+                            </div>
+                            <div class="doc-actions">
+                                <a href="${doc.downloadURL}" target="_blank" class="refresh-btn" style="text-decoration:none; display:inline-block; padding:4px 12px; font-size:0.7rem;">📥 Download</a>
+                                ${canDelete ? `<button class="delete-doc-btn" data-id="${doc.id}" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:4px 12px;">🗑️ Delete</button>` : ''}
+                                ${isParent && doc.uploadedBy === 'admin' ? `<button class="reply-doc-btn" data-id="${doc.id}" style="background:#e8f0fe; color:#1a4b8a; font-size:0.7rem; padding:4px 12px;">📤 Reply</button>` : ''}
+                            </div>
                         </div>
-                    </div>
-                    <div class="doc-actions">
-                        <a href="${doc.downloadURL}" target="_blank" class="refresh-btn" style="text-decoration:none; display:inline-block; padding:4px 12px; font-size:0.7rem;">📥 Download</a>
-                        ${canDelete ? `<button class="delete-doc-btn" data-id="${doc.id}" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:4px 12px;">🗑️ Delete</button>` : ''}
-                        ${isParent && doc.uploadedBy === 'admin' ? `<button class="reply-doc-btn" data-id="${doc.id}" style="background:#e8f0fe; color:#1a4b8a; font-size:0.7rem; padding:4px 12px;">📤 Reply</button>` : ''}
-                    </div>
-                </div>
-            `;
+                    `;
+                }
+                container.innerHTML = html;
+
+                container.querySelectorAll('.delete-doc-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Delete this document?')) {
+                            await deleteDocument(this.dataset.id);
+                        }
+                    };
+                });
+                container.querySelectorAll('.reply-doc-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const fileInput = document.getElementById('docFileInput');
+                        if (fileInput) {
+                            fileInput.dataset.replyTo = this.dataset.id;
+                            fileInput.click();
+                        }
+                    };
+                });
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Failed to load documents: ' + escapeHtml(error.message) +
+                '</div>';
+                console.error('Load documents error:', error);
+            }
         }
-        container.innerHTML = html;
-
-        // Attach delete event listeners
-        container.querySelectorAll('.delete-doc-btn').forEach(btn => {
-            btn.onclick = async function() {
-                if (confirm('Delete this document?')) {
-                    await deleteDocument(this.dataset.id);
-                }
-            };
-        });
-        // Attach reply event listeners
-        container.querySelectorAll('.reply-doc-btn').forEach(btn => {
-            btn.onclick = function() {
-                const fileInput = document.getElementById('docFileInput');
-                if (fileInput) {
-                    fileInput.dataset.replyTo = this.dataset.id;
-                    fileInput.click();
-                }
-            };
-        });
-
-    } catch (error) {
-        container.innerHTML = '<div class="error">Failed to load documents: ' + escapeHtml(error.message) + '</div>';
-        console.error('Load documents error:', error);
-    }
-}
 
         document.getElementById('uploadDocBtn').addEventListener('click', async function() {
             const fileInput = document.getElementById('docFileInput');
@@ -6983,13 +7127,12 @@
             const role = currentUserRole;
             const uploaderName = role === 'admin' ? 'Admin' : 'Parent';
 
-            // Upload to Firebase Storage
-            const storagePath = `students/${currentStudentDoc.id}/documents/${Date.now()}_${file.name}`;
+            const storagePath =
+                `students/${currentStudentDoc.id}/documents/${Date.now()}_${file.name}`;
             const storageRef = storage.ref(storagePath);
             const snapshot = await storageRef.put(file);
             const downloadURL = await snapshot.ref.getDownloadURL();
 
-            // Save metadata in Firestore
             const docData = {
                 studentId: currentStudentDoc.id,
                 fileName: file.name,
@@ -7006,7 +7149,6 @@
 
             await db.collection('student_documents').add(docData);
             showMessage('Document uploaded successfully.', 'success', 'docUploadStatus');
-            // Reload documents
             if (currentStudentDoc) loadStudentDocuments(currentStudentDoc.id);
         }
 
@@ -7017,10 +7159,9 @@
                 if (!doc.exists) return;
 
                 const data = doc.data();
-                // Delete file from storage
                 if (data.downloadURL) {
                     const fileRef = storage.refFromURL(data.downloadURL);
-                    await fileRef.delete().catch(() => { /* ignore if file not found */ });
+                    await fileRef.delete().catch(() => { /* ignore */ });
                 }
 
                 await docRef.delete();
@@ -7030,6 +7171,203 @@
                 showMessage('Error deleting document: ' + error.message, 'error', 'docUploadStatus');
                 console.error('Delete document error:', error);
             }
+        }
+
+        // ==================================================================
+        //  FEE COLLECTIONS DASHBOARD (UPDATED WITH STUDENT NAME FIX)
+        // ==================================================================
+        let allFeeTransactions = [];
+        let totalFeesAllGlobal = 0;
+
+        async function loadFeeCollections() {
+            const container = document.getElementById('feeCollectionTableContainer');
+            const chartContainer = document.getElementById('chartContainer');
+            container.innerHTML = '<p>Loading fee data...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                // Fetch all fee_records for this tenant
+                const snap = await db.collection('fee_records').where('tenantId', '==', tenantId).get();
+
+                const transactions = [];
+                let totalFeesAll = 0;
+                const studentIds = [];
+
+                // Use for...of to handle async properly
+                for (const doc of snap.docs) {
+                    const data = doc.data();
+                    const studentId = doc.id;
+                    studentIds.push(studentId);
+
+                    // Get student name – try global map first, otherwise fetch from Firestore
+                    let studentName = studentId;
+                    if (globalStudentMap.has(studentId)) {
+                        studentName = globalStudentMap.get(studentId).name || studentId;
+                    } else {
+                        try {
+                            const studentDoc = await db.collection('students').doc(studentId).get();
+                            if (studentDoc.exists) {
+                                const studentData = studentDoc.data();
+                                studentName = studentData.name || studentId;
+                                // Cache it for next time
+                                globalStudentMap.set(studentId, { docId: studentId, ...studentData });
+                            }
+                        } catch (e) {
+                            console.warn('Could not fetch student name for', studentId);
+                        }
+                    }
+
+                    // Process term1, term2, term3
+                    ['term1', 'term2', 'term3'].forEach(term => {
+                        const termData = data[term] || { total: 0, transactions: [] };
+                        // Accumulate total fees
+                        totalFeesAll += termData.total || 0;
+                        if (Array.isArray(termData.transactions)) {
+                            termData.transactions.forEach(tr => {
+                                if (tr.amount && tr.date) {
+                                    transactions.push({
+                                        studentId: studentId,
+                                        studentName: studentName,
+                                        term: term,
+                                        amount: tr.amount,
+                                        type: tr.type || 'full',
+                                        note: tr.note || '',
+                                        date: tr.date,
+                                        year: tr.date.split('-')[0],
+                                        month: tr.date.split('-')[1]
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+
+                // Store total fees globally for later use
+                totalFeesAllGlobal = totalFeesAll;
+                allFeeTransactions = transactions;
+
+                // Populate year filter
+                const yearSelect = document.getElementById('feeCollectionYear');
+                const years = new Set();
+                transactions.forEach(t => { if (t.year) years.add(t.year); });
+                const currentYearVal = yearSelect.value;
+                yearSelect.innerHTML = '<option value="all">All Years</option>';
+                const sortedYears = Array.from(years).sort((a, b) => b - a);
+                sortedYears.forEach(y => {
+                    const selected = (y === currentYearVal) ? 'selected' : '';
+                    yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`;
+                });
+                if (currentYearVal && !years.has(currentYearVal)) {
+                    yearSelect.value = 'all';
+                }
+
+                // Apply filters and render
+                applyFeeFilters();
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading fee collections: ' + escapeHtml(error.message) +
+                    '</div>';
+                console.error('Fee collections error:', error);
+            }
+        }
+
+        function applyFeeFilters() {
+            const year = document.getElementById('feeCollectionYear').value;
+            const term = document.getElementById('feeCollectionTerm').value;
+            const month = document.getElementById('feeCollectionMonth').value;
+
+            let filtered = allFeeTransactions;
+
+            if (year !== 'all') {
+                filtered = filtered.filter(t => t.year === year);
+            }
+            if (term !== 'all') {
+                filtered = filtered.filter(t => t.term === term);
+            }
+            if (month !== 'all') {
+                filtered = filtered.filter(t => t.month === month);
+            }
+
+            // Update summary
+            const totalCollected = filtered.reduce((sum, t) => sum + t.amount, 0);
+            const transactionCount = filtered.length;
+            const totalFeesAll = totalFeesAllGlobal || 0;
+            const balance = totalFeesAll - totalCollected;
+
+            document.getElementById('fcTotalCollected').textContent = totalCollected.toLocaleString();
+            document.getElementById('fcTotalFees').textContent = totalFeesAll.toLocaleString();
+            document.getElementById('fcBalance').textContent = balance.toLocaleString();
+            document.getElementById('fcTransactionCount').textContent = transactionCount;
+
+            renderFeeChart(filtered);
+            renderFeeTable(filtered);
+        }
+
+        function renderFeeChart(transactions) {
+            const container = document.getElementById('chartContainer');
+            if (transactions.length === 0) {
+                container.innerHTML = '<p>No data for the selected filters.</p>';
+                return;
+            }
+
+            // Group by month (YYYY-MM)
+            const monthMap = {};
+            transactions.forEach(t => {
+                if (t.year && t.month) {
+                    const key = t.year + '-' + t.month;
+                    if (!monthMap[key]) monthMap[key] = 0;
+                    monthMap[key] += t.amount;
+                }
+            });
+
+            const sortedKeys = Object.keys(monthMap).sort();
+            if (sortedKeys.length === 0) {
+                container.innerHTML = '<p>No monthly data.</p>';
+                return;
+            }
+
+            const maxAmount = Math.max(...Object.values(monthMap));
+
+            let html = '<div class="chart-bar-container">';
+            sortedKeys.forEach(key => {
+                const amount = monthMap[key];
+                const pct = maxAmount > 0 ? (amount / maxAmount * 100) : 0;
+                const displayKey = key.replace('-', ' / ');
+                html += `<div class="chart-bar-item">
+                    <span class="chart-bar-label">${displayKey}</span>
+                    <div class="chart-bar-bg">
+                        <div class="chart-bar-fill" style="width:${pct}%;">${amount.toLocaleString()}</div>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderFeeTable(transactions) {
+            const container = document.getElementById('feeCollectionTableContainer');
+            if (transactions.length === 0) {
+                container.innerHTML = '<p>No payment records match the selected filters.</p>';
+                return;
+            }
+
+            // Sort by date descending
+            transactions.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+            let html =
+                '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Student</th><th>Term</th><th>Amount (Le)</th><th>Type</th><th>Note</th></tr></thead><tbody>';
+            transactions.forEach(t => {
+                const termLabel = getTermLabel(t.term);
+                html += `<tr>
+                    <td>${t.date}</td>
+                    <td>${escapeHtml(t.studentName)}</td>
+                    <td>${termLabel}</td>
+                    <td>${t.amount.toLocaleString()}</td>
+                    <td>${t.type}</td>
+                    <td>${escapeHtml(t.note || '')}</td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
         }
 
         // ==================================================================
@@ -7074,7 +7412,7 @@
         };
 
         // ==================================================================
-        //  LOGIN AND SETUP
+        //  LOGIN AND SETUP (updated with fee collections listeners & bursar load)
         // ==================================================================
         async function loginAndSetup(email, password, skipAuth = false) {
             try {
@@ -7215,6 +7553,20 @@
                     });
                 }
 
+                // Fee Collections: attach listeners
+                document.getElementById('refreshFeeCollectionsBtn').addEventListener('click', function() {
+                    loadFeeCollections();
+                });
+                document.getElementById('resetFeeCollectionsBtn').addEventListener('click', function() {
+                    document.getElementById('feeCollectionYear').value = 'all';
+                    document.getElementById('feeCollectionTerm').value = 'all';
+                    document.getElementById('feeCollectionMonth').value = 'all';
+                    loadFeeCollections();
+                });
+                document.getElementById('feeCollectionYear').addEventListener('change', applyFeeFilters);
+                document.getElementById('feeCollectionTerm').addEventListener('change', applyFeeFilters);
+                document.getElementById('feeCollectionMonth').addEventListener('change', applyFeeFilters);
+
                 const firstModuleBtn = document.querySelector('.module-btn');
                 if (firstModuleBtn) firstModuleBtn.click();
                 else {
@@ -7230,7 +7582,7 @@
         }
 
         // ==================================================================
-        //  ROLE-BASED UI
+        //  ROLE-BASED UI (updated to load students for bursar and fee collections)
         // ==================================================================
         function setupRoleUI(role, extra) {
             extra = extra || {};
@@ -7266,7 +7618,6 @@
                     if (currentUserRole === 'parent' && parentLinkedStudentId) {
                         initChatbot();
                     }
-                    // Load documents if the tab is active
                     const docTab = document.querySelector('[data-tab="documents"]');
                     if (docTab && docTab.classList.contains('active')) {
                         loadStudentDocuments(found.id);
@@ -7313,8 +7664,20 @@
                     if (m.moduleId === 'attendanceModule') renderAttendance();
                     if (m.moduleId === 'teachersModule') { if (role === 'admin') loadAllTeachersForAdmin();
                         displayOwnTeacherProfile(); }
-                    if (m.moduleId === 'bursarModule') { loadBursarSummary();
-                        populateFeeStatsYears().then(loadFeeStats); }
+                    if (m.moduleId === 'bursarModule') {
+                        // Load students if not already loaded (for fee collections)
+                        if (Object.keys(allStudents).length === 0) {
+                            loadStudents().then(() => {
+                                loadBursarSummary();
+                                populateFeeStatsYears().then(loadFeeStats);
+                                loadFeeCollections();
+                            });
+                        } else {
+                            loadBursarSummary();
+                            populateFeeStatsYears().then(loadFeeStats);
+                            loadFeeCollections();
+                        }
+                    }
                     if (m.moduleId === 'adminModule') { loadStaffList();
                         loadAssetsList();
                         loadInventoryList();
@@ -7381,6 +7744,7 @@
                 document.getElementById('manualSection').style.display = 'none';
                 document.getElementById('adminTeacherSections').style.display = 'none';
                 document.getElementById('teacherOwnProfileCard').style.display = 'none';
+                // Fee collections will load when bursar module button is clicked
             } else if (role === 'teacher') {
                 teacherAssignedClass = extra.class || 'JSS1';
                 teacherOwnData = extra.teacherData || null;
@@ -7466,7 +7830,6 @@
                         loadExamHistory();
                         loadAttendanceHistory();
                         setTimeout(initChatbot, 300);
-                        // Load documents
                         loadStudentDocuments(found.id);
                     } catch (error) {
                         showMessage('Error loading student: ' + error.message, 'error', 'searchResults');
