@@ -753,6 +753,25 @@
             margin: 4px 0;
         }
 
+        /* ===== ENTRANCE EXAM STYLES ===== */
+        .entrance-exam-assign-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin: 4px 0;
+            border: 1px solid #e6edf4;
+        }
+        .entrance-exam-assign-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #1a4b8a;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
         /* ===== MOBILE RESPONSIVE FIXES ===== */
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -829,6 +848,7 @@
             .quiz-card, .assignment-card { padding: 12px 14px; }
             .timer-display { font-size: 1rem; }
             .quiz-result-score { font-size: 2rem; }
+            .entrance-exam-assign-item { flex-wrap: wrap; padding: 4px 8px; }
         }
 
         @media (max-width: 480px) {
@@ -889,6 +909,7 @@
                 <div class="feature"><span>📢</span> School Notices</div>
                 <div class="feature"><span>📝</span> Quizzes</div>
                 <div class="feature"><span>📄</span> Assignments</div>
+                <div class="feature"><span>📋</span> Entrance Exams</div>
             </div>
             <div class="btn-group">
                 <button class="primary-btn" onclick="showSchoolsPage()">🏫 Find Schools Near You</button>
@@ -1228,6 +1249,7 @@
                     <button class="tab-btn" data-tab="library">📚 Library</button>
                     <button class="tab-btn" data-tab="documents">📄 Documents</button>
                     <button class="tab-btn" data-tab="reportcard">📋 Report Card</button>
+                    <button class="tab-btn" data-tab="entranceexam">📋 Entrance Exam</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
                     <div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">Edit Profile</button></div>
@@ -1365,6 +1387,20 @@
                         </div>
                         <div id="reportCardContainer">
                             <p>Select a year and term, then click "Generate Report Card".</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- ===== ENTRANCE EXAM TAB (Parent/Candidate) ===== -->
+                <div id="entranceexamTab" class="tab-content">
+                    <div class="card">
+                        <h3>📋 Entrance Exam</h3>
+                        <p style="color:#6c7a89; margin-bottom:12px;">
+                            If you have been assigned an entrance exam, you can take it here.
+                        </p>
+                        <div id="entranceExamContainer">
+                            <div id="entranceExamList"><p>Loading...</p></div>
+                            <div id="entranceExamTakeArea" style="display:none;"></div>
+                            <div id="entranceExamResultArea" style="display:none;"></div>
                         </div>
                     </div>
                 </div>
@@ -1629,6 +1665,7 @@
                 <button class="admin-tab-btn" data-tab="admissionrequests">📩 Admission Requests</button>
                 <button class="admin-tab-btn" data-tab="registrationrequests">📋 Registration Requests</button>
                 <button class="admin-tab-btn" data-tab="promotion">🎓 Promotion</button>
+                <button class="admin-tab-btn" data-tab="entranceexams">📋 Entrance Exams</button>
             </div>
             <div id="staffTab" class="admin-tab active">
                 <div class="card">
@@ -1829,6 +1866,20 @@
                     <div id="promotionMessage" style="margin-top:10px;"></div>
                 </div>
             </div>
+            <!-- ===== ENTRANCE EXAMS ADMIN TAB ===== -->
+            <div id="entranceexamsTab" class="admin-tab" style="display:none;">
+                <div class="card">
+                    <h3>📋 Entrance Exams</h3>
+                    <p style="color:#6c7a89; margin-bottom:12px;">
+                        Create and manage entrance exams for admission candidates. Assign exams to pending admission requests.
+                    </p>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                        <button id="createEntranceExamBtn" class="refresh-btn" style="background:#27ae60;">➕ Create Exam</button>
+                        <button id="refreshEntranceExamsBtn" class="refresh-btn">🔄 Refresh</button>
+                    </div>
+                    <div id="entranceExamsList"><p>Loading entrance exams...</p></div>
+                </div>
+            </div>
         </div>
 
         <!-- SUGGESTIONS MODULE -->
@@ -1840,7 +1891,7 @@
             </div>
         </div>
 
-        <!-- ===== E-LEARNING MODULE (NEW) ===== -->
+        <!-- ===== E-LEARNING MODULE ===== -->
         <div id="eLearningModule" style="display:none;">
             <div class="card">
                 <h3>📚 E-Learning</h3>
@@ -2097,7 +2148,7 @@
     <div id="bursarHistoryModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('bursarHistoryModal')">&times;</span><h3>Payment History</h3><div id="bursarHistoryContent"></div></div></div>
     <div id="bursarEditFeesModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('bursarEditFeesModal')">&times;</span><h3>Edit Term Fees</h3><label>Term 1: <input type="number" id="bursarEditTerm1" step="0.01" /></label><label>Term 2: <input type="number" id="bursarEditTerm2" step="0.01" /></label><label>Term 3: <input type="number" id="bursarEditTerm3" step="0.01" /></label><button id="saveBursarEditFeesBtn" class="refresh-btn">Save Changes</button><div id="bursarEditFeesMessage"></div></div></div>
 
-    <!-- ===== QUIZ MODALS (NEW) ===== -->
+    <!-- ===== QUIZ MODALS ===== -->
     <div id="createQuizModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('createQuizModal')">&times;</span>
@@ -2171,7 +2222,7 @@
         </div>
     </div>
 
-    <!-- ===== ASSIGNMENT MODALS (NEW) ===== -->
+    <!-- ===== ASSIGNMENT MODALS ===== -->
     <div id="createAssignmentModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('createAssignmentModal')">&times;</span>
@@ -2232,6 +2283,79 @@
             </div>
             <button id="submitGradeBtn" class="refresh-btn" style="margin-top:10px; width:100%; background:#27ae60;">Submit Grade</button>
             <div id="gradeSubmissionMessage" style="margin-top:8px;"></div>
+        </div>
+    </div>
+
+    <!-- ===== ENTRANCE EXAM MODALS (NEW) ===== -->
+    <div id="createEntranceExamModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('createEntranceExamModal')">&times;</span>
+            <h3>📋 Create Entrance Exam</h3>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Exam Title *</label>
+                <input type="text" id="entranceExamTitle" placeholder="e.g. Math Entrance 2026" />
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Description (optional)</label>
+                <textarea id="entranceExamDescription" rows="2" placeholder="Instructions..."></textarea>
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Time Limit (minutes)</label>
+                <input type="number" id="entranceExamTimeLimit" value="15" min="1" max="120" />
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="font-weight:600; font-size:0.85rem;">Questions (MCQ) *</label>
+                <div id="entranceExamQuestionsContainer">
+                    <div class="question-item" data-qidx="0">
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                            <input type="text" class="q-text-input" placeholder="Question text" style="flex:1; min-width:150px;" />
+                            <button class="remove-question-btn" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:2px 10px;">✕</button>
+                        </div>
+                        <div class="q-options">
+                            <label><input type="radio" name="eq_correct_0" value="0" checked /> A: <input type="text" class="q-opt-input" placeholder="Option A" style="width:120px;" /></label>
+                            <label><input type="radio" name="eq_correct_0" value="1" /> B: <input type="text" class="q-opt-input" placeholder="Option B" style="width:120px;" /></label>
+                            <label><input type="radio" name="eq_correct_0" value="2" /> C: <input type="text" class="q-opt-input" placeholder="Option C" style="width:120px;" /></label>
+                            <label><input type="radio" name="eq_correct_0" value="3" /> D: <input type="text" class="q-opt-input" placeholder="Option D" style="width:120px;" /></label>
+                        </div>
+                    </div>
+                </div>
+                <button id="addEntranceExamQuestionBtn" class="refresh-btn" style="margin-top:6px; font-size:0.75rem; padding:4px 14px;">+ Add Question</button>
+            </div>
+            <button id="saveEntranceExamBtn" class="refresh-btn" style="width:100%;">Save Exam</button>
+            <div id="entranceExamCreateMessage" style="margin-top:8px;"></div>
+        </div>
+    </div>
+
+    <div id="assignEntranceExamModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('assignEntranceExamModal')">&times;</span>
+            <h3>📌 Assign Exam to Admission Requests</h3>
+            <p style="color:#6c7a89; margin-bottom:12px;">
+                Select the admission requests you want to assign this exam to.
+            </p>
+            <div id="entranceExamAssignList"></div>
+            <button id="assignEntranceExamConfirmBtn" class="refresh-btn" style="width:100%; background:#27ae60;">Assign to Selected</button>
+            <div id="entranceExamAssignMessage"></div>
+        </div>
+    </div>
+
+    <!-- ===== TAKE ENTRANCE EXAM MODAL (reuse quiz modal but with different data) ===== -->
+    <div id="takeEntranceExamModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('takeEntranceExamModal')">&times;</span>
+            <h3 id="takeEntranceExamTitle">📋 Entrance Exam</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+                <span id="takeEntranceExamMeta" style="font-size:0.85rem; color:#6c7a89;"></span>
+                <span class="timer-display" id="takeEntranceExamTimer">⏱️ 00:00</span>
+            </div>
+            <div id="takeEntranceExamProgress" style="font-size:0.8rem; color:#6c7a89; margin-bottom:8px;">Question 1 of 1</div>
+            <div id="takeEntranceExamQuestionContainer"></div>
+            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                <button id="takeEntranceExamPrevBtn" class="refresh-btn" style="background:#eef2f7; color:#1a3a5c;">← Previous</button>
+                <button id="takeEntranceExamNextBtn" class="refresh-btn">Next →</button>
+                <button id="takeEntranceExamSubmitBtn" class="refresh-btn" style="background:#27ae60; margin-left:auto;">✅ Submit Exam</button>
+            </div>
+            <div id="takeEntranceExamMessage" style="margin-top:10px;"></div>
         </div>
     </div>
 
@@ -2298,8 +2422,11 @@
         let staffNameCache = {};
 
         // E-Learning state
-        let currentQuizTaking = null; // { quizId, questions, currentIndex, answers, timerInterval, timeLeft, startTime }
+        let currentQuizTaking = null;
         let quizTimerInterval = null;
+
+        // Entrance Exam state
+        let currentEntranceExamTaking = null; // similar to quiz
 
         // ===== Helper: ensure array =====
         function ensureArray(val) {
@@ -2945,12 +3072,14 @@
                 }
 
                 let html =
-                    '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Student</th><th>Parent</th><th>Phone</th><th>School</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                    '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Student</th><th>Parent</th><th>Phone</th><th>School</th><th>Class</th><th>Status</th><th>Exam</th><th>Actions</th></tr></thead><tbody>';
                 for (const req of requests) {
                     const date = req.createdAt ? new Date(req.createdAt.toDate()).toLocaleDateString() : 'N/A';
                     const statusBadge = req.status === 'approved' ? '<span style="color:#27ae60;">✅ Approved</span>' :
                         (req.status === 'rejected' ? '<span style="color:#e74c3c;">❌ Rejected</span>' :
                             '<span style="color:#f39c12;">⏳ Pending</span>');
+                    const examInfo = req.examScore !== undefined ? `📋 Score: ${req.examScore}%` :
+                        (req.examId ? '📋 Assigned' : '—');
 
                     html += `<tr>
                         <td>${date}</td>
@@ -2960,6 +3089,7 @@
                         <td>${escapeHtml(req.schoolName)}</td>
                         <td>${escapeHtml(req.classApplying)}</td>
                         <td>${statusBadge}</td>
+                        <td>${examInfo}</td>
                         <td>
                             ${req.status === 'pending' ? `
                                 <button class="approve-admission-btn" data-id="${req.id}" style="background:#27ae60; color:#fff;">Approve</button>
@@ -8206,7 +8336,7 @@
         }
 
         // ==================================================================
-        //  QUIZ FUNCTIONS
+        //  QUIZ FUNCTIONS (same as before, keep as is)
         // ==================================================================
 
         // Create a new quiz
@@ -8777,7 +8907,7 @@
         }
 
         // ==================================================================
-        //  ASSIGNMENT FUNCTIONS
+        //  ASSIGNMENT FUNCTIONS (same as before, keep as is)
         // ==================================================================
 
         // Create assignment
@@ -9230,6 +9360,688 @@
         document.getElementById('refreshAssignmentsBtn').addEventListener('click', loadAssignments);
 
         // ==================================================================
+        //  ENTRANCE EXAM FUNCTIONS (NEW)
+        // ==================================================================
+
+        // --- Create Entrance Exam ---
+        document.getElementById('createEntranceExamBtn').addEventListener('click', function() {
+            if (currentUserRole !== 'admin') {
+                alert('Only admin can create entrance exams.');
+                return;
+            }
+            document.getElementById('entranceExamTitle').value = '';
+            document.getElementById('entranceExamDescription').value = '';
+            document.getElementById('entranceExamTimeLimit').value = 15;
+            document.getElementById('entranceExamCreateMessage').innerHTML = '';
+            // Reset questions container
+            const container = document.getElementById('entranceExamQuestionsContainer');
+            container.innerHTML = `
+                <div class="question-item" data-qidx="0">
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                        <input type="text" class="q-text-input" placeholder="Question text" style="flex:1; min-width:150px;" />
+                        <button class="remove-question-btn" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:2px 10px;">✕</button>
+                    </div>
+                    <div class="q-options">
+                        <label><input type="radio" name="eq_correct_0" value="0" checked /> A: <input type="text" class="q-opt-input" placeholder="Option A" style="width:120px;" /></label>
+                        <label><input type="radio" name="eq_correct_0" value="1" /> B: <input type="text" class="q-opt-input" placeholder="Option B" style="width:120px;" /></label>
+                        <label><input type="radio" name="eq_correct_0" value="2" /> C: <input type="text" class="q-opt-input" placeholder="Option C" style="width:120px;" /></label>
+                        <label><input type="radio" name="eq_correct_0" value="3" /> D: <input type="text" class="q-opt-input" placeholder="Option D" style="width:120px;" /></label>
+                    </div>
+                </div>
+            `;
+            openModal('createEntranceExamModal');
+        });
+
+        document.getElementById('addEntranceExamQuestionBtn').addEventListener('click', function() {
+            const container = document.getElementById('entranceExamQuestionsContainer');
+            const idx = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'question-item';
+            div.dataset.qidx = idx;
+            div.innerHTML = `
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                    <input type="text" class="q-text-input" placeholder="Question text" style="flex:1; min-width:150px;" />
+                    <button class="remove-question-btn" style="background:#fde8e8; color:#b71c1c; font-size:0.7rem; padding:2px 10px;">✕</button>
+                </div>
+                <div class="q-options">
+                    <label><input type="radio" name="eq_correct_${idx}" value="0" checked /> A: <input type="text" class="q-opt-input" placeholder="Option A" style="width:120px;" /></label>
+                    <label><input type="radio" name="eq_correct_${idx}" value="1" /> B: <input type="text" class="q-opt-input" placeholder="Option B" style="width:120px;" /></label>
+                    <label><input type="radio" name="eq_correct_${idx}" value="2" /> C: <input type="text" class="q-opt-input" placeholder="Option C" style="width:120px;" /></label>
+                    <label><input type="radio" name="eq_correct_${idx}" value="3" /> D: <input type="text" class="q-opt-input" placeholder="Option D" style="width:120px;" /></label>
+                </div>
+            `;
+            container.appendChild(div);
+            updateEntranceExamRemoveButtons();
+        });
+
+        function updateEntranceExamRemoveButtons() {
+            const container = document.getElementById('entranceExamQuestionsContainer');
+            const btns = container.querySelectorAll('.remove-question-btn');
+            if (btns.length <= 1) {
+                btns.forEach(b => b.style.display = 'none');
+            } else {
+                btns.forEach(b => b.style.display = 'inline-block');
+            }
+        }
+
+        document.getElementById('entranceExamQuestionsContainer').addEventListener('click', function(e) {
+            const btn = e.target.closest('.remove-question-btn');
+            if (!btn) return;
+            const item = btn.closest('.question-item');
+            if (document.getElementById('entranceExamQuestionsContainer').children.length <= 1) {
+                alert('You need at least one question.');
+                return;
+            }
+            item.remove();
+            updateEntranceExamRemoveButtons();
+        });
+
+        document.getElementById('saveEntranceExamBtn').addEventListener('click', async function() {
+            const title = document.getElementById('entranceExamTitle').value.trim();
+            const description = document.getElementById('entranceExamDescription').value.trim();
+            const timeLimit = parseInt(document.getElementById('entranceExamTimeLimit').value) || 15;
+
+            if (!title) {
+                showMessage('Please enter an exam title.', 'error', 'entranceExamCreateMessage');
+                return;
+            }
+
+            const questionItems = document.querySelectorAll('#entranceExamQuestionsContainer .question-item');
+            const questions = [];
+            let valid = true;
+
+            questionItems.forEach((item, idx) => {
+                const text = item.querySelector('.q-text-input').value.trim();
+                const opts = item.querySelectorAll('.q-opt-input');
+                const options = [];
+                opts.forEach(o => options.push(o.value.trim()));
+                const correctRadio = item.querySelector(`input[name="eq_correct_${idx}"]:checked`);
+                const correct = correctRadio ? parseInt(correctRadio.value) : 0;
+
+                if (!text) { valid = false; return; }
+                if (options.some(o => !o)) { valid = false; return; }
+
+                questions.push({ text, options, correct });
+            });
+
+            if (!valid || questions.length === 0) {
+                showMessage('Please fill in all question fields and options.', 'error', 'entranceExamCreateMessage');
+                return;
+            }
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const user = auth.currentUser;
+
+                await db.collection('entrance_exams').add({
+                    title,
+                    description,
+                    timeLimit,
+                    questions,
+                    createdBy: user ? user.uid : 'unknown',
+                    creatorName: user ? user.displayName || user.email : 'Unknown',
+                    tenantId: tenantId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isActive: true
+                });
+
+                showMessage('✅ Entrance exam created successfully!', 'success', 'entranceExamCreateMessage');
+                setTimeout(() => {
+                    closeModal('createEntranceExamModal');
+                    loadEntranceExams();
+                }, 1000);
+            } catch (error) {
+                showMessage('Error creating entrance exam: ' + error.message, 'error', 'entranceExamCreateMessage');
+                console.error('Entrance exam creation error:', error);
+            }
+        });
+
+        // --- Load Entrance Exams (Admin) ---
+        async function loadEntranceExams() {
+            const container = document.getElementById('entranceExamsList');
+            container.innerHTML = '<p>Loading entrance exams...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('entrance_exams')
+                    .where('tenantId', '==', tenantId)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                const exams = [];
+                snap.forEach(doc => exams.push({ id: doc.id, ...doc.data() }));
+
+                if (exams.length === 0) {
+                    container.innerHTML = '<p>No entrance exams created yet.</p>';
+                    return;
+                }
+
+                let html = '';
+                for (const exam of exams) {
+                    const createdDate = exam.createdAt ? new Date(exam.createdAt.toDate()).toLocaleString() : 'N/A';
+                    const questionCount = exam.questions ? exam.questions.length : 0;
+                    const assignedCount = 0; // we'll count admissions later
+
+                    html += `
+                        <div class="quiz-card">
+                            <div class="quiz-title">📋 ${escapeHtml(exam.title)}</div>
+                            <div class="quiz-meta">
+                                <span>📝 ${questionCount} questions</span> &nbsp;|&nbsp;
+                                <span>⏱️ ${exam.timeLimit || 15} min</span> &nbsp;|&nbsp;
+                                <span>👤 ${escapeHtml(exam.creatorName || 'Unknown')}</span> &nbsp;|&nbsp;
+                                <span>📅 ${createdDate}</span>
+                            </div>
+                            ${exam.description ? `<div class="quiz-meta" style="color:#2c3e50;">${escapeHtml(exam.description)}</div>` : ''}
+                            <div class="quiz-actions">
+                                <button class="assign-exam-btn" data-id="${exam.id}" style="background:#e8f0fe; color:#1a4b8a;">📌 Assign to Admissions</button>
+                                <button class="view-exam-results-btn" data-id="${exam.id}" style="background:#e8f0fe; color:#1a4b8a;">📊 Results</button>
+                                <button class="delete-exam-btn" data-id="${exam.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = html;
+
+                // Assign exam
+                container.querySelectorAll('.assign-exam-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        openAssignEntranceExam(id);
+                    };
+                });
+
+                // View results
+                container.querySelectorAll('.view-exam-results-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.dataset.id;
+                        viewEntranceExamResults(id);
+                    };
+                });
+
+                // Delete exam
+                container.querySelectorAll('.delete-exam-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Delete this entrance exam and all attempts?')) {
+                            const id = this.dataset.id;
+                            await db.collection('entrance_exams').doc(id).delete();
+                            const attSnap = await db.collection('entrance_attempts').where('examId', '==', id).get();
+                            const batch = db.batch();
+                            attSnap.forEach(d => batch.delete(d.ref));
+                            await batch.commit();
+                            loadEntranceExams();
+                            loadAdmissionRequests('admissionRequestsList');
+                            loadAdmissionRequests('admissionRequestsAdminList');
+                        }
+                    };
+                });
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading entrance exams: ' + escapeHtml(error.message) +
+                '</div>';
+                console.error('Load entrance exams error:', error);
+            }
+        }
+
+        // --- Assign exam to admission requests ---
+        async function openAssignEntranceExam(examId) {
+            const container = document.getElementById('entranceExamAssignList');
+            container.innerHTML = '<p>Loading admission requests...</p>';
+            document.getElementById('entranceExamAssignMessage').innerHTML = '';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('admissions')
+                    .where('tenantId', '==', tenantId)
+                    .where('status', '==', 'pending')
+                    .get();
+
+                const requests = [];
+                snap.forEach(doc => requests.push({ id: doc.id, ...doc.data() }));
+
+                if (requests.length === 0) {
+                    container.innerHTML = '<p>No pending admission requests to assign.</p>';
+                    return;
+                }
+
+                let html = `<p>Select admission requests to assign this exam to:</p>`;
+                html +=
+                    '<div style="max-height:300px; overflow-y:auto; border:1px solid #e6edf4; border-radius:10px; padding:8px;">';
+                requests.forEach(req => {
+                    const assigned = req.examId === examId ? 'checked' : '';
+                    html += `
+                        <div class="entrance-exam-assign-item">
+                            <input type="checkbox" class="assign-exam-checkbox" data-id="${req.id}" ${assigned}>
+                            <span>${escapeHtml(req.studentName)} (${escapeHtml(req.parentName)})</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+
+                // Store examId for confirmation
+                document.getElementById('assignEntranceExamModal').dataset.examId = examId;
+                openModal('assignEntranceExamModal');
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading admission requests: ' + escapeHtml(error.message) +
+                '</div>';
+                console.error('Assign exam error:', error);
+            }
+        }
+
+        document.getElementById('assignEntranceExamConfirmBtn').addEventListener('click', async function() {
+            const examId = document.getElementById('assignEntranceExamModal').dataset.examId;
+            const checkboxes = document.querySelectorAll('.assign-exam-checkbox:checked');
+            const selected = Array.from(checkboxes).map(cb => cb.dataset.id);
+
+            if (selected.length === 0) {
+                showMessage('Please select at least one admission request.', 'error', 'entranceExamAssignMessage');
+                return;
+            }
+
+            try {
+                const batch = db.batch();
+                selected.forEach(id => {
+                    const ref = db.collection('admissions').doc(id);
+                    batch.update(ref, { examId: examId });
+                });
+                await batch.commit();
+
+                showMessage(`✅ Exam assigned to ${selected.length} admission request(s).`, 'success',
+                    'entranceExamAssignMessage');
+                setTimeout(() => {
+                    closeModal('assignEntranceExamModal');
+                    loadEntranceExams();
+                    loadAdmissionRequests('admissionRequestsList');
+                    loadAdmissionRequests('admissionRequestsAdminList');
+                }, 1500);
+            } catch (error) {
+                showMessage('Error assigning exam: ' + error.message, 'error', 'entranceExamAssignMessage');
+                console.error('Assign exam error:', error);
+            }
+        });
+
+        // --- View Entrance Exam Results (Admin) ---
+        async function viewEntranceExamResults(examId) {
+            try {
+                const tenantId = getCurrentTenantId();
+                const snap = await db.collection('entrance_attempts')
+                    .where('tenantId', '==', tenantId)
+                    .where('examId', '==', examId)
+                    .orderBy('completedAt', 'desc')
+                    .get();
+
+                const attempts = [];
+                snap.forEach(doc => attempts.push({ id: doc.id, ...doc.data() }));
+
+                if (attempts.length === 0) {
+                    alert('No attempts for this exam yet.');
+                    return;
+                }
+
+                const examDoc = await db.collection('entrance_exams').doc(examId).get();
+                const examTitle = examDoc.exists ? examDoc.data().title : 'Entrance Exam';
+
+                let html = `
+                    <div class="card">
+                        <h4>📊 Results for "${escapeHtml(examTitle)}"</h4>
+                        <p><strong>${attempts.length}</strong> attempts</p>
+                        <div class="table-wrapper">
+                            <table><thead><tr><th>Student</th><th>Score</th><th>Correct</th><th>Date</th></tr></thead><tbody>
+                `;
+                attempts.forEach(a => {
+                    const date = a.completedAt ? new Date(a.completedAt.toDate()).toLocaleString() : 'N/A';
+                    // Fetch student name from admission request?
+                    html += `<tr>
+                        <td>${escapeHtml(a.studentName || 'Unknown')}</td>
+                        <td>${a.score}%</td>
+                        <td>${a.correctCount}/${a.totalQuestions}</td>
+                        <td>${date}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table></div></div>';
+                // Show in quiz result modal (reuse)
+                const container = document.getElementById('quizResultContent');
+                container.innerHTML = html;
+                openModal('quizResultModal');
+
+            } catch (error) {
+                alert('Error loading results: ' + error.message);
+                console.error('View exam results error:', error);
+            }
+        }
+
+        // --- Parent / Candidate: View Entrance Exams ---
+        async function loadEntranceExamForParent() {
+            const container = document.getElementById('entranceExamList');
+            if (!currentStudentDoc) {
+                container.innerHTML = '<p>Please load a student first.</p>';
+                return;
+            }
+
+            const studentId = currentStudentDoc.id;
+            const tenantId = getCurrentTenantId();
+
+            try {
+                // Find admission request for this student (if any)
+                const admSnap = await db.collection('admissions')
+                    .where('tenantId', '==', tenantId)
+                    .where('studentName', '==', currentStudentDoc.name) // Simple match
+                    .limit(1)
+                    .get();
+
+                if (admSnap.empty) {
+                    container.innerHTML = '<p>No admission request found for this student.</p>';
+                    return;
+                }
+
+                const admission = admSnap.docs[0].data();
+                const examId = admission.examId;
+
+                if (!examId) {
+                    container.innerHTML = '<p>No entrance exam assigned to you.</p>';
+                    return;
+                }
+
+                // Check if already attempted
+                const attemptSnap = await db.collection('entrance_attempts')
+                    .where('tenantId', '==', tenantId)
+                    .where('examId', '==', examId)
+                    .where('studentId', '==', studentId)
+                    .get();
+
+                let alreadyTaken = false;
+                let score = null;
+                if (!attemptSnap.empty) {
+                    const attempt = attemptSnap.docs[0].data();
+                    alreadyTaken = true;
+                    score = attempt.score;
+                }
+
+                // Fetch exam details
+                const examDoc = await db.collection('entrance_exams').doc(examId).get();
+                if (!examDoc.exists) {
+                    container.innerHTML = '<p>Exam no longer exists.</p>';
+                    return;
+                }
+                const exam = examDoc.data();
+
+                let html = `
+                    <div class="quiz-card">
+                        <div class="quiz-title">📋 ${escapeHtml(exam.title)}</div>
+                        <div class="quiz-meta">
+                            <span>⏱️ ${exam.timeLimit || 15} min</span> &nbsp;|&nbsp;
+                            <span>📝 ${exam.questions ? exam.questions.length : 0} questions</span>
+                        </div>
+                        ${exam.description ? `<div class="quiz-meta" style="color:#2c3e50;">${escapeHtml(exam.description)}</div>` : ''}
+                `;
+
+                if (alreadyTaken) {
+                    html += `<div class="quiz-actions"><span style="color:#27ae60;">✅ Completed! Score: ${score}%</span></div>`;
+                } else {
+                    html += `
+                        <div class="quiz-actions">
+                            <button class="take-entrance-exam-btn" data-examid="${examId}" style="background:#27ae60; color:#fff;">▶️ Take Exam</button>
+                        </div>
+                    `;
+                }
+
+                html += '</div>';
+                container.innerHTML = html;
+
+                // Event listener for taking exam
+                container.querySelector('.take-entrance-exam-btn')?.addEventListener('click', function() {
+                    startEntranceExam(examId);
+                });
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading entrance exam: ' + escapeHtml(error.message) +
+                '</div>';
+                console.error('Load parent exam error:', error);
+            }
+        }
+
+        // --- Take Entrance Exam ---
+        async function startEntranceExam(examId) {
+            const studentId = getStudentIdForParent() || (currentStudentDoc ? currentStudentDoc.id : null);
+            if (!studentId) {
+                alert('Student ID not found.');
+                return;
+            }
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const examDoc = await db.collection('entrance_exams').doc(examId).get();
+                if (!examDoc.exists) {
+                    alert('Exam not found.');
+                    return;
+                }
+                const exam = examDoc.data();
+                if (exam.tenantId !== tenantId) {
+                    alert('This exam does not belong to your tenant.');
+                    return;
+                }
+
+                // Check if already attempted
+                const attemptSnap = await db.collection('entrance_attempts')
+                    .where('tenantId', '==', tenantId)
+                    .where('examId', '==', examId)
+                    .where('studentId', '==', studentId)
+                    .get();
+                if (!attemptSnap.empty) {
+                    alert('You have already taken this exam.');
+                    return;
+                }
+
+                const questions = exam.questions || [];
+                if (questions.length === 0) {
+                    alert('This exam has no questions.');
+                    return;
+                }
+
+                currentEntranceExamTaking = {
+                    examId: examId,
+                    questions: questions,
+                    currentIndex: 0,
+                    answers: new Array(questions.length).fill(null),
+                    timeLimit: exam.timeLimit || 15,
+                    startTime: Date.now(),
+                    timerInterval: null,
+                    timeLeft: (exam.timeLimit || 15) * 60
+                };
+
+                document.getElementById('takeEntranceExamTitle').textContent = '📋 ' + exam.title;
+                document.getElementById('takeEntranceExamMeta').textContent = `Questions: ${questions.length} | Time: ${exam.timeLimit || 15} min`;
+                document.getElementById('takeEntranceExamMessage').innerHTML = '';
+                openModal('takeEntranceExamModal');
+
+                renderEntranceExamQuestion();
+                startEntranceExamTimer();
+            } catch (error) {
+                alert('Error starting exam: ' + error.message);
+                console.error('Start entrance exam error:', error);
+            }
+        }
+
+        function renderEntranceExamQuestion() {
+            const state = currentEntranceExamTaking;
+            if (!state) return;
+            const container = document.getElementById('takeEntranceExamQuestionContainer');
+            const q = state.questions[state.currentIndex];
+            const total = state.questions.length;
+            const idx = state.currentIndex;
+
+            document.getElementById('takeEntranceExamProgress').textContent = `Question ${idx + 1} of ${total}`;
+
+            let html = `
+                <div class="question-item" style="background:#fff; border:1px solid #d6e2ed;">
+                    <div class="q-text" style="font-size:1rem; margin-bottom:8px;">${escapeHtml(q.text)}</div>
+                    <div class="q-options">
+            `;
+            q.options.forEach((opt, oi) => {
+                const checked = state.answers[idx] === oi ? 'checked' : '';
+                html += `
+                    <label style="display:block; padding:4px 0; cursor:pointer;">
+                        <input type="radio" name="te_q_${idx}" value="${oi}" ${checked} onchange="recordEntranceExamAnswer(${idx}, ${oi})" />
+                        ${String.fromCharCode(65 + oi)}. ${escapeHtml(opt)}
+                    </label>
+                `;
+            });
+            html += `</div></div>`;
+            container.innerHTML = html;
+
+            document.getElementById('takeEntranceExamPrevBtn').style.display = idx === 0 ? 'none' : 'inline-block';
+            document.getElementById('takeEntranceExamNextBtn').textContent = idx === total - 1 ? 'Finish Review' : 'Next →';
+        }
+
+        window.recordEntranceExamAnswer = function(idx, val) {
+            if (currentEntranceExamTaking) {
+                currentEntranceExamTaking.answers[idx] = val;
+            }
+        };
+
+        document.getElementById('takeEntranceExamPrevBtn').addEventListener('click', function() {
+            if (currentEntranceExamTaking && currentEntranceExamTaking.currentIndex > 0) {
+                currentEntranceExamTaking.currentIndex--;
+                renderEntranceExamQuestion();
+            }
+        });
+
+        document.getElementById('takeEntranceExamNextBtn').addEventListener('click', function() {
+            if (currentEntranceExamTaking) {
+                const idx = currentEntranceExamTaking.currentIndex;
+                const total = currentEntranceExamTaking.questions.length;
+                const radios = document.querySelectorAll(`input[name="te_q_${idx}"]`);
+                let answered = false;
+                radios.forEach(r => { if (r.checked) { currentEntranceExamTaking.answers[idx] = parseInt(r.value);
+                        answered = true; } });
+                if (!answered) {
+                    alert('Please select an answer.');
+                    return;
+                }
+                if (idx < total - 1) {
+                    currentEntranceExamTaking.currentIndex++;
+                    renderEntranceExamQuestion();
+                } else {
+                    submitEntranceExam();
+                }
+            }
+        });
+
+        document.getElementById('takeEntranceExamSubmitBtn').addEventListener('click', function() {
+            if (confirm('Submit your entrance exam? You cannot change your answers after submission.')) {
+                submitEntranceExam();
+            }
+        });
+
+        function startEntranceExamTimer() {
+            if (currentEntranceExamTaking.timerInterval) clearInterval(currentEntranceExamTaking.timerInterval);
+            const state = currentEntranceExamTaking;
+            updateEntranceExamTimerDisplay();
+
+            state.timerInterval = setInterval(() => {
+                state.timeLeft--;
+                updateEntranceExamTimerDisplay();
+                if (state.timeLeft <= 0) {
+                    clearInterval(state.timerInterval);
+                    alert('⏰ Time is up! Your exam will be submitted automatically.');
+                    submitEntranceExam();
+                }
+            }, 1000);
+        }
+
+        function updateEntranceExamTimerDisplay() {
+            const state = currentEntranceExamTaking;
+            if (!state) return;
+            const mins = Math.floor(state.timeLeft / 60);
+            const secs = state.timeLeft % 60;
+            document.getElementById('takeEntranceExamTimer').textContent =
+                `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        async function submitEntranceExam() {
+            const state = currentEntranceExamTaking;
+            if (!state) return;
+
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+            }
+
+            const studentId = getStudentIdForParent() || (currentStudentDoc ? currentStudentDoc.id : null);
+            if (!studentId) {
+                alert('Student ID not found.');
+                return;
+            }
+
+            const questions = state.questions;
+            const answers = state.answers;
+            let correctCount = 0;
+            const details = [];
+
+            questions.forEach((q, idx) => {
+                const chosen = answers[idx];
+                const isCorrect = chosen === q.correct;
+                if (isCorrect) correctCount++;
+                details.push({
+                    question: q.text,
+                    chosen: chosen !== null ? q.options[chosen] : 'Not answered',
+                    correct: q.options[q.correct],
+                    isCorrect
+                });
+            });
+
+            const total = questions.length;
+            const score = Math.round((correctCount / total) * 100);
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const user = auth.currentUser;
+                const studentName = currentStudentDoc ? currentStudentDoc.name : (user ? user.displayName || user.email :
+                    'Student');
+
+                // Save attempt
+                await db.collection('entrance_attempts').add({
+                    examId: state.examId,
+                    studentId: studentId,
+                    studentName: studentName,
+                    answers: answers,
+                    details: details,
+                    score: score,
+                    correctCount: correctCount,
+                    totalQuestions: total,
+                    timeTaken: Math.round((Date.now() - state.startTime) / 1000),
+                    completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    tenantId: tenantId
+                });
+
+                // Update admission request with score
+                const admSnap = await db.collection('admissions')
+                    .where('tenantId', '==', tenantId)
+                    .where('studentName', '==', studentName)
+                    .limit(1)
+                    .get();
+                if (!admSnap.empty) {
+                    await admSnap.docs[0].ref.update({ examScore: score });
+                }
+
+                closeModal('takeEntranceExamModal');
+                alert(`✅ Exam submitted! Your score: ${score}%`);
+                // Refresh parent view
+                loadEntranceExamForParent();
+                // Refresh admin lists
+                loadEntranceExams();
+                loadAdmissionRequests('admissionRequestsList');
+                loadAdmissionRequests('admissionRequestsAdminList');
+
+            } catch (error) {
+                alert('Error submitting exam: ' + error.message);
+                console.error('Submit entrance exam error:', error);
+            }
+        }
+
+        // ==================================================================
         //  IMPORT BUTTONS
         // ==================================================================
         document.getElementById('importBtn').onclick = function() {
@@ -9401,6 +10213,8 @@
                     document.getElementById('registrationRequestsCard').style.display = 'block';
                     loadRegistrationRequests('registrationRequestsList');
                     loadRegistrationRequests('registrationRequestsAdminList');
+                    // Load entrance exams
+                    loadEntranceExams();
                 }
 
                 document.getElementById('libraryRefreshBtn').addEventListener('click', showLibraryResources);
@@ -9456,6 +10270,19 @@
                             }
                         } else {
                             document.getElementById('reportCardContainer').innerHTML =
+                                '<p>Please load a student first.</p>';
+                        }
+                    });
+                }
+
+                // Entrance Exam tab for parent
+                const entranceExamTabBtn = document.querySelector('[data-tab="entranceexam"]');
+                if (entranceExamTabBtn) {
+                    entranceExamTabBtn.addEventListener('click', function() {
+                        if (currentStudentDoc) {
+                            loadEntranceExamForParent();
+                        } else {
+                            document.getElementById('entranceExamList').innerHTML =
                                 '<p>Please load a student first.</p>';
                         }
                     });
@@ -9531,6 +10358,10 @@
                     if (reportTab && reportTab.classList.contains('active')) {
                         generateReportCard();
                     }
+                    const entranceTab = document.querySelector('[data-tab="entranceexam"]');
+                    if (entranceTab && entranceTab.classList.contains('active')) {
+                        loadEntranceExamForParent();
+                    }
                 } catch (error) {
                     showMessage('Error searching: ' + error.message, 'error', 'searchResults');
                 }
@@ -9601,13 +10432,13 @@
                         loadStaffCheckinHistory();
                         loadAdmissionRequests('admissionRequestsAdminList');
                         loadRegistrationRequests('registrationRequestsAdminList');
-                        populatePromotionDropdowns(); }
+                        populatePromotionDropdowns();
+                        loadEntranceExams(); }
                     if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
                     if (m.moduleId === 'eLearningModule') {
                         populateELearningDropdowns();
                         loadQuizzes();
                         loadAssignments();
-                        // Activate first tab
                         document.querySelector('.elearning-tab-btn.active')?.click();
                     }
                     if (m.moduleId === 'recordsModule' && role === 'parent' && parentLinkedStudentId) {
@@ -9658,6 +10489,7 @@
                         else if (id === 'registrationrequests') loadRegistrationRequests(
                             'registrationRequestsAdminList');
                         else if (id === 'promotion') populatePromotionDropdowns();
+                        else if (id === 'entranceexams') loadEntranceExams();
                     };
                 });
             } else if (role === 'bursar') {
@@ -9705,6 +10537,10 @@
                         const reportTab = document.querySelector('[data-tab="reportcard"]');
                         if (reportTab && reportTab.classList.contains('active')) {
                             generateReportCard();
+                        }
+                        const entranceTab = document.querySelector('[data-tab="entranceexam"]');
+                        if (entranceTab && entranceTab.classList.contains('active')) {
+                            loadEntranceExamForParent();
                         }
                     } catch (error) {
                         showMessage('Error searching: ' + error.message, 'error', 'searchResults');
@@ -9758,6 +10594,10 @@
                         const reportTab = document.querySelector('[data-tab="reportcard"]');
                         if (reportTab && reportTab.classList.contains('active')) {
                             generateReportCard();
+                        }
+                        const entranceTab = document.querySelector('[data-tab="entranceexam"]');
+                        if (entranceTab && entranceTab.classList.contains('active')) {
+                            loadEntranceExamForParent();
                         }
                     } catch (error) {
                         showMessage('Error loading student: ' + error.message, 'error', 'searchResults');
@@ -9933,6 +10773,10 @@
                     if (reportTab && reportTab.classList.contains('active')) {
                         generateReportCard();
                     }
+                    const entranceTab = document.querySelector('[data-tab="entranceexam"]');
+                    if (entranceTab && entranceTab.classList.contains('active')) {
+                        loadEntranceExamForParent();
+                    }
                 } else if (currentUserRole === 'teacher') {
                     const q = document.getElementById('studentSearchInput').value.trim();
                     const found = globalStudentMap.get(q) || globalStudentMap.get(q.toLowerCase());
@@ -9961,6 +10805,10 @@
                     const reportTab = document.querySelector('[data-tab="reportcard"]');
                     if (reportTab && reportTab.classList.contains('active')) {
                         generateReportCard();
+                    }
+                    const entranceTab = document.querySelector('[data-tab="entranceexam"]');
+                    if (entranceTab && entranceTab.classList.contains('active')) {
+                        loadEntranceExamForParent();
                     }
                 } else if (currentUserRole === 'parent') {
                     if (parentLinkedStudentId) {
@@ -10114,6 +10962,7 @@
                     else if (id === 'registrationrequests') loadRegistrationRequests(
                         'registrationRequestsAdminList');
                     else if (id === 'promotion') populatePromotionDropdowns();
+                    else if (id === 'entranceexams') loadEntranceExams();
                 };
             });
 
@@ -10168,6 +11017,14 @@
                                 '<p>Please load a student first.</p>';
                         }
                     }
+                    if (this.dataset.tab === 'entranceexam') {
+                        if (currentStudentDoc) {
+                            loadEntranceExamForParent();
+                        } else {
+                            document.getElementById('entranceExamList').innerHTML =
+                                '<p>Please load a student first.</p>';
+                        }
+                    }
                 };
             });
 
@@ -10213,6 +11070,7 @@
                 populateELearningDropdowns();
                 loadQuizzes();
                 loadAssignments();
+                loadEntranceExams();
             }, 500);
 
             document.getElementById('loginModal').style.display = 'none';
