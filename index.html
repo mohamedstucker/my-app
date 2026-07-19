@@ -1075,47 +1075,93 @@
             text-align: center;
             max-width: 100%;
         }
-        .chat-message.ai .typing-indicator {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            background: #1a4b8a;
-            border-radius: 50%;
-            animation: typing 1s infinite;
-            margin-right: 4px;
-        }
-        @keyframes typing {
-            0%,
-            100% {
-                opacity: 0.3;
-                transform: scale(0.8);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
-        }
 
-        .quick-reply-container {
+        .staff-checkin-table th,
+        .staff-checkin-table td {
+            font-size: 0.75rem;
+            padding: 6px 8px;
+        }
+        .staff-checkin-table .status-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .status-badge.checked-in {
+            background: #d4edda;
+            color: #0b5e2e;
+        }
+        .status-badge.checked-out {
+            background: #f8d7da;
+            color: #842029;
+        }
+        .status-badge.partial {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .filter-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
         }
-        .quick-reply-btn {
-            background: #e8f0fe;
-            color: #1a4b8a;
-            border: 1px solid #b0c4de;
-            border-radius: 30px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
+        .filter-bar label {
             font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
+            font-size: 0.8rem;
+            color: #1a3a5c;
         }
-        .quick-reply-btn:hover {
-            background: #d0dff0;
-            transform: scale(1.02);
+        .filter-bar select,
+        .filter-bar input {
+            max-width: 160px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            border: 1.5px solid #dce4ec;
+            font-size: 0.8rem;
+            background: #fafcfe;
+        }
+        .filter-bar input[type="date"] {
+            max-width: 140px;
+        }
+        .filter-bar .filter-actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .staff-checkin-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .staff-checkin-summary .summary-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 14px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e6edf4;
+        }
+        .staff-checkin-summary .summary-card .num {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a4b8a;
+        }
+        .staff-checkin-summary .summary-card .label {
+            font-size: 0.65rem;
+            color: #6c7a89;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .staff-checkin-summary .summary-card .num.green {
+            color: #27ae60;
+        }
+        .staff-checkin-summary .summary-card .num.red {
+            color: #e74c3c;
+        }
+        .staff-checkin-summary .summary-card .num.orange {
+            color: #f39c12;
         }
 
         /* ===== STARTUP FLYER ===== */
@@ -2278,10 +2324,6 @@
                 flex-wrap: wrap;
                 padding: 4px 8px;
             }
-            .quick-reply-btn {
-                font-size: 0.7rem;
-                padding: 3px 10px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -2415,10 +2457,6 @@
             }
             .quiz-result-score {
                 font-size: 1.6rem;
-            }
-            .quick-reply-btn {
-                font-size: 0.65rem;
-                padding: 2px 8px;
             }
         }
     </style>
@@ -2718,17 +2756,9 @@
                 <span style="font-size:0.75rem; color:#6c7a89; margin-left:4px;" id="bulkStatus"></span>
             </div>
 
-            <!-- Date picker for attendance -->
-            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
-                <label style="font-weight:600; font-size:0.85rem;">Date:</label>
-                <input type="date" id="attendanceDatePicker" style="max-width:170px;" value="" />
-                <button id="loadAttendanceDateBtn" class="refresh-btn">Load</button>
-                <span style="font-size:0.8rem; color:#6c7a89;" id="attendanceDateInfo">Today</span>
-            </div>
-
             <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
                 <select id="classSelect"></select>
-                <button id="loadBtn" class="refresh-btn">Load Class</button>
+                <button id="loadBtn" class="refresh-btn">Load</button>
                 <button id="refreshBtn" class="refresh-btn">Refresh</button>
                 <button id="batchWhatsappBtn" class="refresh-btn">Send Reports</button>
                 <button id="classHistoryBtn" class="refresh-btn">Class History</button>
@@ -2796,12 +2826,7 @@
                     <button class="tab-btn" data-tab="entranceexam">📋 Entrance Exam</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
-                    <div class="card">
-                        <h3>Student Profile</h3>
-                        <div id="profileContent"></div>
-                        <button id="editProfileBtn" class="refresh-btn">Edit Profile</button>
-                        <button id="deleteStudentBtn" class="refresh-btn" style="background:#fde8e8; color:#b71c1c; display:none;">Delete Student</button>
-                    </div>
+                    <div class="card"><h3>Student Profile</h3><div id="profileContent"></div><button id="editProfileBtn" class="refresh-btn">Edit Profile</button></div>
                 </div>
                 <div id="examhistoryTab" class="tab-content">
                     <div class="card">
@@ -2828,7 +2853,7 @@
                 </div>
                 <div id="attendancehistoryTab" class="tab-content">
                     <div class="card">
-                        <h3>Attendance History (Full Edit/Delete)</h3>
+                        <h3>Attendance History (Read‑only)</h3>
                         <div class="attendance-filter-bar">
                             <label style="font-weight:600; font-size:0.85rem;">Year:</label>
                             <select id="attendanceYearFilter"><option value="all">All Years</option></select>
@@ -2847,7 +2872,7 @@
                     <div class="card">
                         <h3>🤖 AI Assistant</h3>
                         <p style="color:#6c7a89; margin-bottom:10px;">
-                            Ask me anything about your child's attendance, fees, or school notices. I can also summarize performance and provide insights.
+                            Ask me anything about your child's attendance, fees, or school notices.
                         </p>
                         <div id="chatMessages" style="height:320px; overflow-y:auto; border:1px solid #e6edf4; border-radius:12px; padding:12px; background:#fafcfe; margin-bottom:10px;">
                             <div style="color:#6c7a89; text-align:center; padding:30px 0;">
@@ -2861,14 +2886,6 @@
                             <button id="clearChatBtn" style="background:none; border:none; font-size:1.1rem; cursor:pointer; padding:6px 10px; border-radius:30px; background:#fde8e8; color:#b71c1c;" title="Clear Chat">🗑️</button>
                         </div>
                         <div id="chatStatus" style="margin-top:6px; font-size:0.75rem; color:#6c7a89;"></div>
-                        <div class="quick-reply-container" id="quickReplyContainer">
-                            <button class="quick-reply-btn" data-query="Show attendance summary">📊 Attendance</button>
-                            <button class="quick-reply-btn" data-query="Fee status">💰 Fees</button>
-                            <button class="quick-reply-btn" data-query="Exam results this term">📝 Exams</button>
-                            <button class="quick-reply-btn" data-query="Overall performance">🏆 Performance</button>
-                            <button class="quick-reply-btn" data-query="Latest notices">📢 Notices</button>
-                            <button class="quick-reply-btn" data-query="Help">❓ Help</button>
-                        </div>
                     </div>
                 </div>
                 <div id="libraryTab" class="tab-content">
@@ -5211,19 +5228,8 @@
         }
 
         // ==================================================================
-        //  ATTENDANCE FUNCTIONS (with date support)
+        //  ATTENDANCE FUNCTIONS
         // ==================================================================
-        let attendanceDate = new Date().toISOString().split('T')[0]; // default today
-
-        // Set date picker to today
-        document.addEventListener('DOMContentLoaded', function() {
-            const datePicker = document.getElementById('attendanceDatePicker');
-            if (datePicker) {
-                datePicker.value = attendanceDate;
-                document.getElementById('attendanceDateInfo').textContent = 'Today';
-            }
-        });
-
         async function loadStudents() {
             try {
                 const tenantId = getCurrentTenantId();
@@ -5274,16 +5280,15 @@
             sel.innerHTML = optionsHtml;
         }
 
-        // Save attendance for a specific date
-        async function saveAttendance(cls, sid, date, status, remark, audioRemark) {
+        async function saveAttendance(cls, sid, status, remark, audioRemark) {
             const tenantId = getCurrentTenantId();
-            const year = date.split('-')[0];
-            const term = getTermFromDate(date);
-            const docId = date + '_' + cls + '_' + sid;
-            await db.collection('attendance').doc(docId).set({
+            const today = new Date().toISOString().split('T')[0];
+            const year = today.split('-')[0];
+            const term = getTermFromDate(today);
+            await db.collection('attendance').doc(today + '_' + cls + '_' + sid).set({
                 studentId: sid,
                 class: cls,
-                date: date,
+                date: today,
                 year: year,
                 term: term,
                 status,
@@ -5294,14 +5299,7 @@
             }, { merge: true });
         }
 
-        // Delete attendance for a specific date and student
-        async function deleteAttendanceRecord(cls, sid, date) {
-            const tenantId = getCurrentTenantId();
-            const docId = date + '_' + cls + '_' + sid;
-            await db.collection('attendance').doc(docId).delete();
-        }
-
-        async function renderAttendanceForDate(date) {
+        async function renderAttendance() {
             try {
                 const tenantId = getCurrentTenantId();
                 let cls;
@@ -5312,17 +5310,16 @@
                 }
                 if (!cls || !allStudents[cls]) {
                     document.getElementById('studentList').innerHTML =
-                        '<p>Please select a class and click "Load Class" to view students.</p>';
+                        '<p>Please select a class and click "Load" to view students.</p>';
                     return;
                 }
                 const students = allStudents[cls];
-                const todayStr = new Date().toISOString().split('T')[0];
-                const displayDate = date === todayStr ? 'Today' : date;
-                const year = date.split('-')[0];
-                const term = getTermFromDate(date);
+                const today = new Date().toISOString().split('T')[0];
+                const year = today.split('-')[0];
+                const term = getTermFromDate(today);
                 const termLabel = getTermLabel(term);
 
-                document.getElementById('attendanceDateDisplay').textContent = 'Date: ' + displayDate;
+                document.getElementById('attendanceDateDisplay').textContent = 'Date: ' + today;
                 document.getElementById('attendanceYearDisplay').textContent = 'Year: ' + year;
                 document.getElementById('attendanceTermDisplay').textContent = 'Term: ' + termLabel;
 
@@ -5330,19 +5327,18 @@
                 (await db.collection('attendance')
                     .where('tenantId', '==', tenantId)
                     .where('class', '==', cls)
-                    .where('date', '==', date)
+                    .where('date', '==', today)
                     .get()
                 ).forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '',
-                    audioRemark: d.data().audioRemark || '', docId: d.id });
+                    audioRemark: d.data().audioRemark || '' });
 
                 let html =
-                    '<div class="table-wrapper"><table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark &amp; Voice</th><th>Actions</th><th>Delete</th></tr></thead><tbody>';
+                    '<div class="table-wrapper"><table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Remark &amp; Voice</th><th>Actions</th></tr></thead><tbody>';
                 for (const s of students) {
-                    const a = attMap[s.id] || { status: 'none', remark: '', audioRemark: '', docId: null };
+                    const a = attMap[s.id] || { status: 'none', remark: '', audioRemark: '' };
                     let statusText = a.status === 'present' ? 'Present' : (a.status === 'absent' ? 'Absent' : (a
                         .status === 'late' ? 'Late' : 'Not marked'));
                     const uniqueId = s.id + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-                    const isAdmin = currentUserRole === 'admin' || currentUserRole === 'teacher';
                     html += `<tr>
                         <td>${escapeHtml(s.id)}</td>
                         <td>${escapeHtml(s.name)}</td>
@@ -5360,37 +5356,30 @@
                             </div>
                         </td>
                         <td>
-                            <button class="present-btn" data-id="${s.id}" data-uid="${uniqueId}" data-date="${date}" data-cls="${cls}">Present</button>
-                            <button class="absent-btn" data-id="${s.id}" data-uid="${uniqueId}" data-date="${date}" data-cls="${cls}">Absent</button>
-                            <button class="late-btn" data-id="${s.id}" data-uid="${uniqueId}" data-date="${date}" data-cls="${cls}">Late</button>
+                            <button class="present-btn" data-id="${s.id}" data-uid="${uniqueId}">Present</button>
+                            <button class="absent-btn" data-id="${s.id}" data-uid="${uniqueId}">Absent</button>
+                            <button class="late-btn" data-id="${s.id}" data-uid="${uniqueId}">Late</button>
                             <button class="history-student-btn" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-class="${cls}">History</button>
-                        </td>
-                        <td>
-                            ${isAdmin ? `<button class="delete-attendance-btn" data-id="${s.id}" data-date="${date}" data-cls="${cls}" style="background:#fde8e8; color:#b71c1c;">🗑️</button>` : ''}
                         </td>
                     </tr>`;
                 }
                 html += '</tbody></table></div>';
                 document.getElementById('studentList').innerHTML = html;
 
-                // Initialize voice recorders
                 document.querySelectorAll('.voice-recorder').forEach(el => {
                     const id = el.id;
                     voiceRecorders[id] = new VoiceRecorder(id, null);
                 });
 
-                // Present, Absent, Late buttons
                 document.querySelectorAll('.present-btn').forEach(btn => {
                     btn.onclick = async function() {
                         const sid = this.dataset.id;
                         const uid = this.dataset.uid;
-                        const date = this.dataset.date;
-                        const cls = this.dataset.cls;
                         const remark = document.getElementById('remark_' + sid).value;
                         const recorder = voiceRecorders['voiceRecorder_' + uid];
                         const audioData = recorder ? recorder.getAudioData() : '';
-                        await saveAttendance(cls, sid, date, 'present', remark, audioData);
-                        renderAttendanceForDate(date);
+                        await saveAttendance(cls, sid, 'present', remark, audioData);
+                        renderAttendance();
                     };
                 });
 
@@ -5398,13 +5387,27 @@
                     btn.onclick = async function() {
                         const sid = this.dataset.id;
                         const uid = this.dataset.uid;
-                        const date = this.dataset.date;
-                        const cls = this.dataset.cls;
                         const remark = document.getElementById('remark_' + sid).value;
                         const recorder = voiceRecorders['voiceRecorder_' + uid];
                         const audioData = recorder ? recorder.getAudioData() : '';
-                        await saveAttendance(cls, sid, date, 'absent', remark, audioData);
-                        renderAttendanceForDate(date);
+                        await saveAttendance(cls, sid, 'absent', remark, audioData);
+
+                        const student = students.find(s => s.id === sid);
+                        if (!student) { renderAttendance(); return; }
+
+                        const phone = student.parentPhone || student.phone || '';
+                        if (phone && confirm('Send WhatsApp absence notification to ' + (student.parentName ||
+                                'Parent') + ' of ' + student.name + '?')) {
+                            const msg = 'Attendance Update - ' + cls +
+                                '\n\nStudent: ' + student.name + ' (' + student.id + ')' +
+                                '\nStatus: Absent' +
+                                '\nRemark: ' + remark +
+                                '\nDate: ' + new Date().toLocaleDateString() +
+                                '\nThank you.';
+                            const url = getValidWhatsAppUrl(phone, msg);
+                            if (url) window.open(url, '_blank');
+                        }
+                        renderAttendance();
                     };
                 });
 
@@ -5412,30 +5415,14 @@
                     btn.onclick = async function() {
                         const sid = this.dataset.id;
                         const uid = this.dataset.uid;
-                        const date = this.dataset.date;
-                        const cls = this.dataset.cls;
                         const remark = document.getElementById('remark_' + sid).value;
                         const recorder = voiceRecorders['voiceRecorder_' + uid];
                         const audioData = recorder ? recorder.getAudioData() : '';
-                        await saveAttendance(cls, sid, date, 'late', remark, audioData);
-                        renderAttendanceForDate(date);
+                        await saveAttendance(cls, sid, 'late', remark, audioData);
+                        renderAttendance();
                     };
                 });
 
-                // Delete attendance button
-                document.querySelectorAll('.delete-attendance-btn').forEach(btn => {
-                    btn.onclick = async function() {
-                        const sid = this.dataset.id;
-                        const date = this.dataset.date;
-                        const cls = this.dataset.cls;
-                        if (confirm(`Delete attendance for ${sid} on ${date}?`)) {
-                            await deleteAttendanceRecord(cls, sid, date);
-                            renderAttendanceForDate(date);
-                        }
-                    };
-                });
-
-                // History button (unchanged)
                 document.querySelectorAll('.history-student-btn').forEach(btn => {
                     btn.onclick = async function() {
                         const sid = this.dataset.id,
@@ -5460,7 +5447,6 @@
                         openModal('historyModal');
                     };
                 });
-
             } catch (error) {
                 document.getElementById('studentList').innerHTML = '<div class="error">Error rendering attendance: ' +
                     escapeHtml(error.message) + '</div>';
@@ -5468,7 +5454,7 @@
         }
 
         // ==================================================================
-        //  BULK ATTENDANCE MARKING (updated with date)
+        //  BULK ATTENDANCE MARKING
         // ==================================================================
         async function bulkMarkAttendance(status) {
             const cls = document.getElementById('classSelect').value;
@@ -5481,25 +5467,24 @@
                 showMessage('No students in this class.', 'error', 'bulkStatus');
                 return;
             }
-            const date = attendanceDate; // use current selected date
 
             const confirmMsg = status === 'clear' ?
-                `Clear all attendance marks for ${date} in this class?` :
-                `Mark ALL ${students.length} students as ${status.toUpperCase()} for ${date}?`;
+                'Clear all attendance marks for today in this class?' :
+                `Mark ALL ${students.length} students as ${status.toUpperCase()} for today?`;
             if (!confirm(confirmMsg)) return;
 
+            const today = new Date().toISOString().split('T')[0];
             let count = 0;
             const tenantId = getCurrentTenantId();
 
             for (const s of students) {
                 const statusVal = status === 'clear' ? 'none' : status;
-                const docId = date + '_' + cls + '_' + s.id;
-                await db.collection('attendance').doc(docId).set({
+                await db.collection('attendance').doc(today + '_' + cls + '_' + s.id).set({
                     studentId: s.id,
                     class: cls,
-                    date: date,
-                    year: date.split('-')[0],
-                    term: getTermFromDate(date),
+                    date: today,
+                    year: today.split('-')[0],
+                    term: getTermFromDate(today),
                     status: statusVal,
                     remark: status === 'clear' ? '' : 'Bulk marked',
                     audioRemark: '',
@@ -5509,13 +5494,13 @@
                 count++;
             }
 
-            showMessage(`✅ ${count} students marked as ${status === 'clear' ? 'cleared' : status.toUpperCase()} for ${date}.`,
+            showMessage(`✅ ${count} students marked as ${status === 'clear' ? 'cleared' : status.toUpperCase()}.`,
                 'success', 'bulkStatus');
-            renderAttendanceForDate(date);
+            renderAttendance();
         }
 
         // ==================================================================
-        //  SEND BATCH WHATSAPP (unchanged - uses today's date for summary)
+        //  SEND BATCH WHATSAPP
         // ==================================================================
         async function sendBatchWhatsApp() {
             let classVal;
@@ -5531,14 +5516,12 @@
                 return;
             }
             const today = new Date().toISOString().split('T')[0];
-            // We'll use the selected date for consistency, but the original used today. Keep as today.
-            const date = today; // keep as today for reports
             let attMap = {};
             try {
                 (await db.collection('attendance')
                     .where('tenantId', '==', getCurrentTenantId())
                     .where('class', '==', classVal)
-                    .where('date', '==', date)
+                    .where('date', '==', today)
                     .get()
                 ).forEach(d => attMap[d.data().studentId] = { status: d.data().status, remark: d.data().remark || '' });
             } catch (e) { alert('Error loading attendance data: ' + e.message); return; }
@@ -5663,7 +5646,7 @@
         }
 
         // ==================================================================
-        //  VIEW CLASS HISTORY (unchanged but uses date picker)
+        //  VIEW CLASS HISTORY
         // ==================================================================
         async function viewClassHistory() {
             try {
@@ -5812,7 +5795,7 @@
         }
 
         // ==================================================================
-        //  IMPORT STUDENTS (unchanged)
+        //  IMPORT STUDENTS
         // ==================================================================
         async function importExcelStudents(file) {
             return new Promise((resolve, reject) => {
@@ -5874,7 +5857,7 @@
         }
 
         // ==================================================================
-        //  ADD SINGLE STUDENT (unchanged)
+        //  ADD SINGLE STUDENT
         // ==================================================================
         async function addManualStudent() {
             if (currentUserRole !== 'admin') {
@@ -5956,110 +5939,14 @@
                 document.getElementById('newTempPassword').value = '';
 
                 await loadStudents();
-                renderAttendanceForDate(attendanceDate);
+                renderAttendance();
             } catch (error) {
                 showMessage('Error adding student: ' + error.message, 'error', 'manualMessage');
             }
         }
 
         // ==================================================================
-        //  DELETE STUDENT PERMANENTLY (with all associated data)
-        // ==================================================================
-        async function deleteStudent(studentId) {
-            if (currentUserRole !== 'admin') {
-                alert('Only admin can delete students.');
-                return;
-            }
-            if (!studentId) {
-                alert('No student selected.');
-                return;
-            }
-            // Confirm
-            if (!confirm(`⚠️ Are you sure you want to permanently delete student "${studentId}" and ALL their associated data (attendance, fees, exam records, documents)? This action cannot be undone!`)) {
-                return;
-            }
-
-            try {
-                const tenantId = getCurrentTenantId();
-                const batch = db.batch();
-
-                // 1. Delete student document
-                const studentRef = db.collection('students').doc(studentId);
-                batch.delete(studentRef);
-
-                // 2. Delete all attendance records for this student
-                const attSnap = await db.collection('attendance')
-                    .where('tenantId', '==', tenantId)
-                    .where('studentId', '==', studentId)
-                    .get();
-                attSnap.forEach(doc => batch.delete(doc.ref));
-
-                // 3. Delete fee records
-                const feeSnap = await db.collection('fee_records')
-                    .where('tenantId', '==', tenantId)
-                    .where('studentId', '==', studentId)
-                    .get();
-                feeSnap.forEach(doc => batch.delete(doc.ref));
-
-                // 4. Delete exam records
-                const examSnap = await db.collection('exam_records')
-                    .where('tenantId', '==', tenantId)
-                    .where('studentId', '==', studentId)
-                    .get();
-                examSnap.forEach(doc => batch.delete(doc.ref));
-
-                // 5. Delete student documents (from student_documents)
-                const docSnap = await db.collection('student_documents')
-                    .where('tenantId', '==', tenantId)
-                    .where('studentId', '==', studentId)
-                    .get();
-                docSnap.forEach(doc => batch.delete(doc.ref));
-
-                // 6. Delete risk predictions
-                const riskSnap = await db.collection('risk_predictions')
-                    .where('tenantId', '==', tenantId)
-                    .where('studentId', '==', studentId)
-                    .get();
-                riskSnap.forEach(doc => batch.delete(doc.ref));
-
-                // 7. Delete any user account linked to this student (if studentId in users)
-                const userSnap = await db.collection('users')
-                    .where('tenantId', '==', tenantId)
-                    .where('studentId', '==', studentId)
-                    .get();
-                userSnap.forEach(doc => {
-                    // Delete the user document (auth user remains, but we can't delete it from client)
-                    batch.delete(doc.ref);
-                });
-
-                // Commit the batch
-                await batch.commit();
-
-                // Remove from local map and reload
-                globalStudentMap.delete(studentId);
-                // Remove from allStudents by class
-                for (const cls in allStudents) {
-                    allStudents[cls] = allStudents[cls].filter(s => s.id !== studentId);
-                }
-                // If currentStudentDoc is this student, clear it
-                if (currentStudentDoc && currentStudentDoc.id === studentId) {
-                    currentStudentDoc = null;
-                    document.getElementById('studentRecordsPanel').style.display = 'none';
-                    document.getElementById('searchResults').innerHTML = '<div class="success">Student deleted successfully.</div>';
-                }
-                showMessage(`Student ${studentId} and all associated data have been permanently deleted.`, 'success', 'searchResults');
-                // Reload students
-                await loadStudents();
-                // Refresh UI
-                if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
-            } catch (error) {
-                console.error('Error deleting student:', error);
-                alert('Error deleting student: ' + error.message);
-            }
-        }
-
-        // ==================================================================
-        //  EXAM RECORDS (unchanged)
+        //  EXAM RECORDS
         // ==================================================================
         async function loadExamStudent() {
             try {
@@ -6254,7 +6141,7 @@
         }
 
         // ==================================================================
-        //  EXAM HISTORY (unchanged)
+        //  EXAM HISTORY
         // ==================================================================
         async function loadExamHistory() {
             if (!currentStudentDoc) {
@@ -6339,7 +6226,7 @@
         }
 
         // ==================================================================
-        //  PAYMENT HISTORY (unchanged)
+        //  PAYMENT HISTORY
         // ==================================================================
         async function loadPaymentHistory() {
             try {
@@ -6387,7 +6274,7 @@
         }
 
         // ==================================================================
-        //  ATTENDANCE HISTORY (with full edit/delete)
+        //  ATTENDANCE HISTORY
         // ==================================================================
         async function loadAttendanceHistory() {
             try {
@@ -6497,7 +6384,6 @@
 
             const user = auth.currentUser;
             const currentUid = user ? user.uid : null;
-            const isAdmin = currentUserRole === 'admin' || currentUserRole === 'teacher';
 
             filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
             html +=
@@ -6513,7 +6399,7 @@
                 if (rec.audioRemark) {
                     voiceHtml =
                         `<audio controls class="voice-audio" src="${escapeHtml(rec.audioRemark)}"></audio>`;
-                    if (isAdmin) {
+                    if (currentUserRole === 'admin' || currentUserRole === 'teacher') {
                         actionsHtml +=
                             `<button class="delete-voice-btn" data-docid="${escapeHtml(rec.docId || '')}" data-student="${currentStudentDoc.id}" data-date="${rec.date}" style="background:#fde8e8; color:#b71c1c;">Delete Voice</button>`;
                     }
@@ -6525,18 +6411,10 @@
                         ${rec.parentReplyVoice ? `<audio controls class="voice-audio" src="${escapeHtml(rec.parentReplyVoice)}"></audio>` : ''}
                         <div class="reply-meta">By ${escapeHtml(rec.repliedByName || 'Unknown')} on ${escapeHtml(rec.replyTimestamp || '')}</div>
                     </div>`;
-                    if (currentUid === rec.repliedByUid || isAdmin) {
+                    if (currentUid === rec.repliedByUid || currentUserRole === 'admin') {
                         actionsHtml +=
                             `<button class="delete-reply-btn" data-docid="${escapeHtml(rec.docId || '')}" data-student="${currentStudentDoc.id}" data-date="${rec.date}" style="background:#fde8e8; color:#b71c1c;">Delete Reply</button>`;
                     }
-                }
-
-                // Edit and Delete buttons for admin/teacher
-                if (isAdmin) {
-                    actionsHtml +=
-                        `<button class="edit-attendance-btn" data-docid="${escapeHtml(rec.docId || '')}" data-status="${rec.status}" data-remark="${escapeHtml(rec.remark || '')}" data-voice="${escapeHtml(rec.audioRemark || '')}" data-date="${rec.date}" data-studentid="${currentStudentDoc.id}" style="background:#e8f0fe; color:#1a4b8a;">✎ Edit</button>`;
-                    actionsHtml +=
-                        `<button class="delete-attendance-record-btn" data-docid="${escapeHtml(rec.docId || '')}" data-studentid="${currentStudentDoc.id}" data-date="${rec.date}" style="background:#fde8e8; color:#b71c1c;">🗑️ Delete</button>`;
                 }
 
                 if (rec.audioRemark) {
@@ -6556,35 +6434,6 @@
             html += '</tbody></table></div>';
 
             document.getElementById('attendanceHistoryContent').innerHTML = html;
-
-            // Event listeners for edit/delete
-            document.querySelectorAll('.edit-attendance-btn').forEach(btn => {
-                btn.onclick = function() {
-                    const docId = this.dataset.docid;
-                    const status = this.dataset.status;
-                    const remark = this.dataset.remark;
-                    const voice = this.dataset.voice;
-                    const date = this.dataset.date;
-                    const studentId = this.dataset.studentid;
-                    openEditAttendanceModal(docId, studentId, date, status, remark, voice);
-                };
-            });
-
-            document.querySelectorAll('.delete-attendance-record-btn').forEach(btn => {
-                btn.onclick = async function() {
-                    const docId = this.dataset.docid;
-                    const studentId = this.dataset.studentid;
-                    const date = this.dataset.date;
-                    if (!confirm(`Delete attendance record for ${studentId} on ${date}?`)) return;
-                    try {
-                        await db.collection('attendance').doc(docId).delete();
-                        showMessage('Attendance record deleted.', 'success', 'attendanceHistoryContent');
-                        loadAttendanceHistory();
-                    } catch (error) {
-                        showMessage('Error deleting record: ' + error.message, 'error', 'attendanceHistoryContent');
-                    }
-                };
-            });
 
             document.querySelectorAll('.reply-attendance-btn').forEach(btn => {
                 btn.onclick = function() {
@@ -6609,7 +6458,7 @@
 
             document.querySelectorAll('.delete-voice-btn').forEach(btn => {
                 btn.onclick = async function() {
-                    if (!confirm('Delete this voice note?')) return;
+                    if (!confirm('Are you sure you want to delete this voice note?')) return;
                     const docId = this.dataset.docid;
                     if (!docId) { showMessage('Missing document ID.', 'error', 'attendanceHistoryContent'); return; }
                     try {
@@ -6646,80 +6495,6 @@
             });
         }
 
-        // ===== Edit Attendance Modal =====
-        function openEditAttendanceModal(docId, studentId, date, currentStatus, currentRemark, currentVoice) {
-            // Create a simple modal or reuse a generic modal
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; justify-content:center; align-items:center;
-            `;
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                background:white; padding:24px; border-radius:16px; max-width:500px; width:95%; max-height:90vh; overflow-y:auto;
-            `;
-            modal.innerHTML = `
-                <h3>Edit Attendance</h3>
-                <p><strong>Student:</strong> ${escapeHtml(studentId)}</p>
-                <p><strong>Date:</strong> ${escapeHtml(date)}</p>
-                <div style="margin-bottom:10px;">
-                    <label style="font-weight:600; font-size:0.85rem;">Status</label>
-                    <select id="editAttendanceStatus" style="width:100%;">
-                        <option value="present" ${currentStatus === 'present' ? 'selected' : ''}>Present</option>
-                        <option value="absent" ${currentStatus === 'absent' ? 'selected' : ''}>Absent</option>
-                        <option value="late" ${currentStatus === 'late' ? 'selected' : ''}>Late</option>
-                        <option value="none" ${!currentStatus || currentStatus === 'none' ? 'selected' : ''}>Not marked</option>
-                    </select>
-                </div>
-                <div style="margin-bottom:10px;">
-                    <label style="font-weight:600; font-size:0.85rem;">Remark</label>
-                    <input type="text" id="editAttendanceRemark" value="${escapeHtml(currentRemark)}" style="width:100%;" />
-                </div>
-                <div style="margin-bottom:10px;">
-                    <label style="font-weight:600; font-size:0.85rem;">Voice Note (base64)</label>
-                    <textarea id="editAttendanceVoice" rows="3" style="width:100%;">${escapeHtml(currentVoice)}</textarea>
-                    <small style="color:#6c7a89;">Paste base64 voice data or leave blank.</small>
-                </div>
-                <div style="display:flex; gap:8px; justify-content:flex-end;">
-                    <button id="saveEditAttendanceBtn" class="refresh-btn">Save</button>
-                    <button id="cancelEditAttendanceBtn" style="background:#fde8e8; color:#b71c1c;">Cancel</button>
-                </div>
-                <div id="editAttendanceMessage" style="margin-top:8px;"></div>
-            `;
-            overlay.appendChild(modal);
-            document.body.appendChild(overlay);
-
-            document.getElementById('cancelEditAttendanceBtn').onclick = function() {
-                overlay.remove();
-            };
-            overlay.onclick = function(e) {
-                if (e.target === overlay) overlay.remove();
-            };
-
-            document.getElementById('saveEditAttendanceBtn').onclick = async function() {
-                const status = document.getElementById('editAttendanceStatus').value;
-                const remark = document.getElementById('editAttendanceRemark').value.trim();
-                const voice = document.getElementById('editAttendanceVoice').value.trim();
-                try {
-                    const tenantId = getCurrentTenantId();
-                    const updateData = {
-                        status: status,
-                        remark: remark,
-                        audioRemark: voice || '',
-                        tenantId: tenantId,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    await db.collection('attendance').doc(docId).update(updateData);
-                    showMessage('Attendance updated.', 'success', 'editAttendanceMessage');
-                    setTimeout(() => {
-                        overlay.remove();
-                        loadAttendanceHistory();
-                    }, 1000);
-                } catch (error) {
-                    showMessage('Error updating: ' + error.message, 'error', 'editAttendanceMessage');
-                }
-            };
-        }
-
         document.getElementById('submitReplyBtn').onclick = async function() {
             const docId = document.getElementById('replyAttendanceDocId').value;
             const text = document.getElementById('replyText').value.trim();
@@ -6752,7 +6527,7 @@
         };
 
         // ==================================================================
-        //  NOTICES (unchanged)
+        //  NOTICES
         // ==================================================================
         async function renderNotices() {
             try {
@@ -6813,7 +6588,7 @@
         }
 
         // ==================================================================
-        //  STUDENT PROFILE (added delete button logic)
+        //  STUDENT PROFILE
         // ==================================================================
         async function loadStudentProfile() {
             if (!currentStudentDoc) return;
@@ -6831,19 +6606,6 @@
                 <p><strong>Guardian:</strong> ${escapeHtml(currentStudentDoc.guardian || 'N/A')}</p>
                 <p><strong>Status:</strong> ${currentStudentDoc.status === 'active' ? 'Active' : 'Inactive'}</p>`;
             document.getElementById('profileContent').innerHTML = html;
-
-            // Show delete button only for admin
-            const deleteBtn = document.getElementById('deleteStudentBtn');
-            if (currentUserRole === 'admin') {
-                deleteBtn.style.display = 'inline-block';
-                deleteBtn.onclick = function() {
-                    if (currentStudentDoc) {
-                        deleteStudent(currentStudentDoc.id);
-                    }
-                };
-            } else {
-                deleteBtn.style.display = 'none';
-            }
         }
 
         function editProfile() {
@@ -6899,7 +6661,7 @@
         }
 
         // ==================================================================
-        //  BURSAR FUNCTIONS (unchanged)
+        //  BURSAR FUNCTIONS
         // ==================================================================
         async function loadBursarStudent() {
             const q = document.getElementById('bursarStudentSearch').value.trim();
@@ -7192,7 +6954,7 @@
         }
 
         // ==================================================================
-        //  LOCATION HELPERS (unchanged)
+        //  LOCATION HELPERS
         // ==================================================================
         async function getSchoolLocation() {
             const tenantId = getCurrentTenantId();
@@ -7217,19 +6979,13 @@
         }
 
         // ==================================================================
-        //  AI CHATBOT - ENHANCED VERSION (unchanged)
+        //  AI CHATBOT
         // ==================================================================
         let chatHistory = [];
         let chatbotStudentData = null;
         let chatbotAttendance = [];
         let chatbotFeeData = null;
         let chatbotNotices = [];
-        let chatbotExamData = null;
-        let chatbotContext = {
-            lastTerm: 'all',
-            lastYear: 'all',
-            lastLevel: 'all'
-        };
 
         async function loadChatbotData(studentId) {
             const tenantId = getCurrentTenantId();
@@ -7258,327 +7014,105 @@
                 .get();
             chatbotNotices = [];
             noticeSnap.forEach(doc => chatbotNotices.push(doc.data()));
-
-            const examDoc = await db.collection('exam_records').doc(studentId).get();
-            if (examDoc.exists) {
-                chatbotExamData = examDoc.data();
-            } else {
-                chatbotExamData = { years: {} };
-            }
         }
 
-        function parseTermYear(query) {
-            let term = 'all',
-                year = 'all',
-                level = 'all';
-            const lower = query.toLowerCase();
-            if (lower.includes('term 1') || lower.includes('first term') || lower.includes('term1')) term = 'term1';
-            else if (lower.includes('term 2') || lower.includes('second term') || lower.includes('term2')) term = 'term2';
-            else if (lower.includes('term 3') || lower.includes('third term') || lower.includes('term3')) term = 'term3';
-            else if (lower.includes('this term')) {
-                const today = new Date();
-                term = getTermFromDate(today.toISOString().split('T')[0]);
-            } else if (lower.includes('last term')) {
-                const today = new Date();
-                const current = getTermFromDate(today.toISOString().split('T')[0]);
-                const map = { 'term1': 'term3', 'term2': 'term1', 'term3': 'term2' };
-                term = map[current] || 'all';
-            }
-
-            const yearMatch = lower.match(/\b(20\d{2})\b/);
-            if (yearMatch) year = yearMatch[1];
-            else if (lower.includes('this year')) {
-                year = new Date().getFullYear().toString();
-            } else if (lower.includes('last year')) {
-                year = (new Date().getFullYear() - 1).toString();
-            }
-
-            if (lower.includes('nursery')) level = 'nursery';
-            else if (lower.includes('primary') || lower.includes('class')) level = 'primary';
-            else if (lower.includes('npse')) level = 'npse';
-            else if (lower.includes('bece')) level = 'bece';
-            else if (lower.includes('wasce')) level = 'wasce';
-            else if (lower.includes('jss')) level = 'jss';
-            else if (lower.includes('sss')) level = 'sss';
-
-            if (term === 'all' && chatbotContext.lastTerm !== 'all') term = chatbotContext.lastTerm;
-            if (year === 'all' && chatbotContext.lastYear !== 'all') year = chatbotContext.lastYear;
-            if (level === 'all' && chatbotContext.lastLevel !== 'all') level = chatbotContext.lastLevel;
-
-            return { term, year, level };
+        function getTodayAttendance() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayAtt = chatbotAttendance.find(a => a.date === today);
+            return todayAtt || null;
         }
 
-        function getAttendanceSummaryData(term, year) {
-            let filtered = chatbotAttendance;
-            if (year !== 'all') {
-                filtered = filtered.filter(r => r.year === year);
-            }
-            if (term !== 'all') {
-                filtered = filtered.filter(r => r.term === term);
-            }
-            const total = filtered.length;
-            let present = 0,
-                absent = 0,
-                late = 0;
-            filtered.forEach(r => {
-                if (r.status === 'present') present++;
-                else if (r.status === 'absent') absent++;
-                else if (r.status === 'late') late++;
-            });
-            return { total, present, absent, late };
+        function getAttendanceSummary() {
+            if (chatbotAttendance.length === 0) return 'No attendance records found.';
+            const present = chatbotAttendance.filter(a => a.status === 'present').length;
+            const absent = chatbotAttendance.filter(a => a.status === 'absent').length;
+            const late = chatbotAttendance.filter(a => a.status === 'late').length;
+            const total = chatbotAttendance.length;
+            return `Out of ${total} recorded days: ${present} present, ${absent} absent, ${late} late.`;
         }
 
-        function getExamResults(term, year, level) {
-            if (!chatbotExamData) return null;
-            const years = chatbotExamData.years || {};
-            if (year !== 'all' && !years[year]) return null;
-            const yearData = years[year] || {};
-            const levels = Object.keys(yearData);
-            let selectedLevel = level;
-            if (level !== 'all' && !yearData[level]) selectedLevel = levels.length > 0 ? levels[0] : null;
-            if (!selectedLevel) return null;
-            const levelData = yearData[selectedLevel] || {};
-            const terms = Object.keys(levelData);
-            let selectedTerm = term;
-            if (term !== 'all' && !levelData[term]) selectedTerm = terms.length > 0 ? terms[0] : null;
-            if (!selectedTerm) return null;
-            const termData = levelData[selectedTerm] || {};
-            const assessments = Object.keys(termData);
-            let allSubjects = [];
-            assessments.forEach(ass => {
-                const subjects = termData[ass] || [];
-                subjects.forEach(sub => {
-                    allSubjects.push({
-                        assessment: ass,
-                        subject: sub.name,
-                        score: sub.score
-                    });
-                });
-            });
-            return {
-                year: year !== 'all' ? year : Object.keys(years)[0],
-                level: selectedLevel,
-                term: selectedTerm,
-                subjects: allSubjects
-            };
-        }
-
-        function getPerformanceSummary() {
-            if (!chatbotExamData) return null;
-            const years = chatbotExamData.years || {};
-            let allScores = [];
-            for (const yr of Object.keys(years)) {
-                const yearData = years[yr];
-                for (const level of Object.keys(yearData)) {
-                    const levelData = yearData[level];
-                    for (const term of Object.keys(levelData)) {
-                        const termData = levelData[term];
-                        for (const ass of Object.keys(termData)) {
-                            const subjects = termData[ass] || [];
-                            subjects.forEach(sub => {
-                                if (sub.score !== '' && !isNaN(parseFloat(sub.score))) {
-                                    allScores.push({
-                                        year: yr,
-                                        level,
-                                        term,
-                                        assessment: ass,
-                                        subject: sub.name,
-                                        score: parseFloat(sub.score)
-                                    });
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-            if (allScores.length === 0) return null;
-            const total = allScores.length;
-            const sum = allScores.reduce((a, b) => a + b.score, 0);
-            const avg = sum / total;
-            const passCount = allScores.filter(s => s.score >= 50).length;
-            const passRate = (passCount / total * 100);
-            return { total, avg: Math.round(avg * 10) / 10, passCount, passRate: Math.round(passRate * 10) / 10 };
-        }
-
-        function getFeeSummaryData() {
-            if (!chatbotFeeData) return null;
+        function getFeeSummary() {
+            if (!chatbotFeeData) return 'No fee records found.';
             const terms = ['term1', 'term2', 'term3'];
             const termNames = { term1: 'Term 1', term2: 'Term 2', term3: 'Term 3' };
             let summary = [];
-            let totalBalance = 0;
             for (const t of terms) {
                 const term = chatbotFeeData[t] || { total: 0, paid: 0 };
                 const balance = term.total - term.paid;
-                totalBalance += balance;
-                summary.push({
-                    term: termNames[t],
-                    total: term.total,
-                    paid: term.paid,
-                    balance: balance,
-                    status: balance <= 0 ? 'Paid' : (term.paid > 0 ? 'Partial' : 'Unpaid')
-                });
+                summary.push(`${termNames[t]}: Paid Le ${term.paid.toLocaleString()}, Balance Le ${balance.toLocaleString()}`);
             }
-            return { summary, totalBalance };
+            return summary.join('\n');
+        }
+
+        function getNoticesSummary() {
+            if (chatbotNotices.length === 0) return 'No notices available.';
+            return chatbotNotices.map(n => `• ${n.title}: ${n.content}`).join('\n');
         }
 
         async function processChatbotMessage(message) {
-            const lower = message.toLowerCase().trim();
-            if (!lower) return "Please ask a question.";
+            const lower = message.toLowerCase();
 
             if (!chatbotStudentData) {
                 return "I'm still loading your child's information. Please try again in a moment.";
             }
 
-            let intent = 'general';
-            if (lower.includes('attendance') || lower.includes('present') || lower.includes('absent') ||
-                lower.includes('late') || lower.includes('today') || lower.includes('yesterday') ||
-                lower.includes('this week') || lower.includes('attendance rate')) {
-                intent = 'attendance';
-            } else if (lower.includes('exam') || lower.includes('test') || lower.includes('result') ||
-                lower.includes('score') || lower.includes('grade') || lower.includes('subject')) {
-                intent = 'exam';
-            } else if (lower.includes('fee') || lower.includes('payment') || lower.includes('balance') ||
-                lower.includes('money') || lower.includes('pay') || lower.includes('tuition')) {
-                intent = 'fee';
-            } else if (lower.includes('performance') || lower.includes('average') || lower.includes('overall') ||
-                lower.includes('progress')) {
-                intent = 'performance';
-            } else if (lower.includes('notice') || lower.includes('news') || lower.includes('announce') ||
-                lower.includes('update') || lower.includes('event')) {
-                intent = 'notice';
-            } else if (lower.includes('help') || lower.includes('what can you do') || lower.includes('capabilities') ||
-                lower.includes('?') && !lower.match(/attendance|exam|fee|performance|notice/)) {
-                intent = 'help';
-            }
-
-            const parsed = parseTermYear(message);
-            if (parsed.term !== 'all') chatbotContext.lastTerm = parsed.term;
-            if (parsed.year !== 'all') chatbotContext.lastYear = parsed.year;
-            if (parsed.level !== 'all') chatbotContext.lastLevel = parsed.level;
-
-            let response = '';
-
-            switch (intent) {
-                case 'attendance': {
-                    const { term, year } = parsed;
-                    const data = getAttendanceSummaryData(term, year);
-                    if (data.total === 0) {
-                        response = `No attendance records found ${year !== 'all' ? 'in year '+year : ''} ${term !== 'all' ? 'for '+getTermLabel(term) : ''}.`;
-                    } else {
-                        const pct = ((data.present / data.total) * 100).toFixed(1);
-                        response = `📊 Attendance Summary ${year !== 'all' ? 'Year '+year : ''} ${term !== 'all' ? getTermLabel(term) : ''}:\n` +
-                            `Total days: ${data.total}\nPresent: ${data.present} (${pct}%)\nAbsent: ${data.absent}\nLate: ${data.late}\n`;
-                        if (data.present > 0) {
-                            response += `Attendance rate: ${pct}% - ${parseFloat(pct) >= 80 ? '✅ Good' : '⚠️ Needs improvement'}`;
-                        }
-                    }
-                    break;
-                }
-                case 'exam': {
-                    const { term, year, level } = parsed;
-                    const result = getExamResults(term, year, level);
-                    if (!result || result.subjects.length === 0) {
-                        response =
-                            `No exam records found ${year !== 'all' ? 'for year '+year : ''} ${term !== 'all' ? 'and '+getTermLabel(term) : ''} ${level !== 'all' ? 'at '+level.toUpperCase() : ''}. Try adjusting your filter.`;
-                    } else {
-                        response = `📝 Exam Results for ${result.level.toUpperCase()} - ${getTermLabel(result.term)} ${result.year}:\n`;
-                        result.subjects.forEach(sub => {
-                            const pass = parseFloat(sub.score) >= 50 ? '✅' : '❌';
-                            response += `${sub.subject}: ${sub.score} ${pass}\n`;
-                        });
-                        const scores = result.subjects.map(s => parseFloat(s.score)).filter(s => !isNaN(s));
-                        if (scores.length > 0) {
-                            const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
-                            response += `\nAverage: ${avg.toFixed(1)}% - ${avg >= 50 ? '✅ Passing' : '❌ Failing'}`;
-                        }
-                    }
-                    break;
-                }
-                case 'fee': {
-                    const feeData = getFeeSummaryData();
-                    if (!feeData) {
-                        response = "No fee records found for this student.";
-                    } else {
-                        response = "💰 Fee Summary:\n";
-                        feeData.summary.forEach(f => {
-                            response += `${f.term}: Total Le ${f.total.toLocaleString()}, Paid Le ${f.paid.toLocaleString()}, Balance Le ${f.balance.toLocaleString()} (${f.status})\n`;
-                        });
-                        response += `\nOverall balance: Le ${feeData.totalBalance.toLocaleString()}`;
-                    }
-                    break;
-                }
-                case 'performance': {
-                    const perf = getPerformanceSummary();
-                    if (!perf) {
-                        response = "No exam performance data available.";
-                    } else {
-                        response = `🏆 Overall Performance Summary:\n` +
-                            `Total exams taken: ${perf.total}\n` +
-                            `Average score: ${perf.avg}%\n` +
-                            `Pass rate: ${perf.passRate}% (${perf.passCount} out of ${perf.total} passed)\n`;
-                        if (perf.avg >= 70) response += `🌟 Excellent performance!`;
-                        else if (perf.avg >= 50) response += `👍 Good effort, keep improving!`;
-                        else response += `📚 Needs more practice.`;
-                    }
-                    break;
-                }
-                case 'notice': {
-                    if (chatbotNotices.length === 0) {
-                        response = "No notices available.";
-                    } else {
-                        response = "📢 Latest Notices:\n";
-                        chatbotNotices.forEach(n => {
-                            response += `• ${n.title}: ${n.content}\n`;
-                        });
-                    }
-                    break;
-                }
-                case 'help':
-                default: {
-                    response = `🤖 I can help you with:
-• Attendance: Ask about today, this term, or a specific year.
-• Exams: Get results for a term/year/level (e.g., "NPSE results term 1 2025").
-• Fees: Check fee status and balance.
-• Performance: Get overall average and pass rate.
-• Notices: Latest school announcements.
-
-Just type your question naturally. I'll try my best to answer!`;
-                    break;
+            if (lower.includes('attendance') || lower.includes('present') || lower.includes('absent') || lower.includes(
+                    'late') || lower.includes('today')) {
+                const todayAtt = getTodayAttendance();
+                if (todayAtt) {
+                    return `Today (${todayAtt.date}), your child was marked as: **${todayAtt.status.toUpperCase()}**.\nRemark: ${todayAtt.remark || 'No remark'}`;
+                } else {
+                    return `No attendance recorded for today. Here's the summary:\n${getAttendanceSummary()}`;
                 }
             }
 
-            return response;
+            if (lower.includes('fee') || lower.includes('payment') || lower.includes('balance') || lower.includes(
+                    'money') || lower.includes('pay')) {
+                const summary = getFeeSummary();
+                return `Here's the fee summary:\n${summary}`;
+            }
+
+            if (lower.includes('notice') || lower.includes('news') || lower.includes('announce') || lower.includes(
+                    'update') || lower.includes('event')) {
+                const summary = getNoticesSummary();
+                return `Latest school notices:\n${summary}`;
+            }
+
+            if (lower.includes('exam') || lower.includes('grade') || lower.includes('score') || lower.includes(
+                    'result') || lower.includes('test')) {
+                return "I'm checking the exam records. Please ask a specific question like 'What were the exam results for Term 1?'";
+            }
+
+            if (lower.includes('class') || lower.includes('schedule') || lower.includes('time') || lower.includes(
+                    'subject')) {
+                const className = chatbotStudentData.class || 'Not assigned';
+                return `Your child is in ${className}. For the full timetable, please contact the school office.`;
+            }
+
+            if (lower.includes('child') || lower.includes('name') || lower.includes('student') || lower.includes(
+                    'about')) {
+                return `Your child is ${chatbotStudentData.name} (ID: ${chatbotStudentData.id}).\nClass: ${chatbotStudentData.class || 'Not assigned'}\nGender: ${chatbotStudentData.gender || 'Not provided'}`;
+            }
+
+            if (lower.includes('help') || lower.includes('what can you do') || lower.includes('capabilities')) {
+                return "I can answer questions about:\n• Today's attendance\n• Attendance summary\n• Fee status and balance\n• Latest school notices\n• Your child's basic information\nJust ask naturally!";
+            }
+
+            return "I'm not sure about that. You can ask me about:\n• Attendance (today or summary)\n• Fees and balances\n• School notices\n• Your child's class and information\n\nIf you need more detailed help, please contact the school office.";
         }
 
         // ==================================================================
-        //  CHAT UI FUNCTIONS (with typing)
+        //  CHAT UI FUNCTIONS
         // ==================================================================
         function addChatMessage(sender, text, isUser = false) {
             const container = document.getElementById('chatMessages');
             if (!container) return;
             const div = document.createElement('div');
             div.className = `chat-message ${isUser ? 'user' : (sender === 'System' ? 'system' : 'ai')}`;
-            const formatted = text.replace(/\n/g, '<br>');
-            div.innerHTML = `<strong>${sender}:</strong> ${formatted}`;
+            div.innerHTML = `<strong>${sender}:</strong> ${text}`;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
             chatHistory.push({ sender, text, isUser });
-        }
-
-        function showTyping() {
-            const container = document.getElementById('chatMessages');
-            if (!container) return;
-            const div = document.createElement('div');
-            div.className = 'chat-message ai';
-            div.id = 'typingIndicator';
-            div.innerHTML = '<strong>AI Assistant:</strong> <span class="typing-indicator"></span> Thinking...';
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function hideTyping() {
-            const el = document.getElementById('typingIndicator');
-            if (el) el.remove();
         }
 
         async function sendChatMessage() {
@@ -7589,7 +7123,6 @@ Just type your question naturally. I'll try my best to answer!`;
             addChatMessage('You', msg, true);
             input.value = '';
             document.getElementById('chatStatus').textContent = '⏳ Thinking...';
-            showTyping();
 
             try {
                 if (!linkedStudentId) {
@@ -7601,12 +7134,10 @@ Just type your question naturally. I'll try my best to answer!`;
                 }
 
                 const reply = await processChatbotMessage(msg);
-                hideTyping();
                 addChatMessage('AI Assistant', reply);
                 document.getElementById('chatStatus').textContent = '✅ Response sent';
             } catch (error) {
                 console.error('Chat error:', error);
-                hideTyping();
                 addChatMessage('System', 'Sorry, I could not process your request. Please try again.');
                 document.getElementById('chatStatus').textContent = '❌ Error occurred';
             }
@@ -7668,17 +7199,10 @@ Just type your question naturally. I'll try my best to answer!`;
             document.getElementById('clearChatBtn').onclick = clearChat;
             setupVoiceInput();
 
-            document.querySelectorAll('.quick-reply-btn').forEach(btn => {
-                btn.onclick = function() {
-                    document.getElementById('chatInput').value = this.dataset.query;
-                    sendChatMessage();
-                };
-            });
-
             if (linkedStudentId) {
                 setTimeout(() => {
                     addChatMessage('AI Assistant',
-                        '👋 Hello! I\'m your AI school assistant. I can help you with:\n• Attendance summaries\n• Exam results\n• Fee status\n• Overall performance\n• School notices\n\nJust ask naturally or use the quick buttons below!'
+                        '👋 Hello! I\'m your AI school assistant. You can ask me about:\n• Today\'s attendance\n• Fee status and balances\n• School notices\n• Your child\'s information\n\nJust type or speak your question!'
                         );
                     loadChatbotData(linkedStudentId).catch(console.warn);
                 }, 500);
@@ -7686,7 +7210,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  RISK PREDICTION FUNCTIONS (unchanged)
+        //  RISK PREDICTION FUNCTIONS
         // ==================================================================
         function computeRiskScore(attendanceRecords) {
             if (!attendanceRecords || attendanceRecords.length === 0) return 0;
@@ -7853,7 +7377,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  ADMIN/TEACHER FUNCTIONS (with improved deletion)
+        //  ADMIN/TEACHER FUNCTIONS
         // ==================================================================
         async function addTeacherAdmin() {
             if (currentUserRole !== 'admin') { showMessage('Only admin can add users.', 'error', 'teacherMessage');
@@ -7943,24 +7467,13 @@ Just type your question naturally. I'll try my best to answer!`;
             html += '</tbody></table></div>';
             document.getElementById('allTeachersList').innerHTML = html;
 
-            // Delete user: delete both user doc and teacher doc (if exists)
             document.querySelectorAll('.delete-user-btn').forEach(btn => {
                 btn.onclick = async function() {
+                    if (!confirm('Delete this user from Firestore? (Auth user will remain)')) return;
                     const uid = this.dataset.uid;
-                    if (!confirm(`⚠️ Permanently delete user ${uid} and associated teacher record? This cannot be undone!`)) return;
                     try {
-                        // Delete user doc
                         await db.collection('users').doc(uid).delete();
-                        // Also delete teacher doc if exists (uid might be teacher id)
-                        const teacherSnap = await db.collection('teachers').where('uid', '==', uid).get();
-                        const batch = db.batch();
-                        teacherSnap.forEach(doc => batch.delete(doc.ref));
-                        // Also delete any staff_attendance for this teacher
-                        const attSnap = await db.collection('staff_attendance').where('staffId', '==', uid).get();
-                        attSnap.forEach(doc => batch.delete(doc.ref));
-                        await batch.commit();
                         loadAllTeachersForAdmin();
-                        showMessage('User and associated data deleted.', 'success', 'allTeachersList');
                     } catch (e) {
                         alert('Error deleting user: ' + e.message);
                     }
@@ -7975,7 +7488,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  TEACHER REGISTER (unchanged)
+        //  TEACHER REGISTER
         // ==================================================================
         async function loadTeacherRegister() {
             const q = document.getElementById('teacherRegisterSearch').value.trim();
@@ -8142,7 +7655,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  ADMIN: STAFF, ASSETS, INVENTORY, FILES, SCHOOL LOCATION (unchanged)
+        //  ADMIN: STAFF, ASSETS, INVENTORY, FILES, SCHOOL LOCATION
         // ==================================================================
         async function addStaff() {
             if (currentUserRole !== 'admin') return;
@@ -8282,7 +7795,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  VISITOR FUNCTIONS (unchanged)
+        //  VISITOR FUNCTIONS
         // ==================================================================
         let visitorShowHistory = false;
 
@@ -8423,7 +7936,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  FILE STORAGE (unchanged)
+        //  FILE STORAGE
         // ==================================================================
         async function uploadFileToLocal() {
             const fileInput = document.getElementById('uploadFileInput');
@@ -8515,7 +8028,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  STAFF CHECK-IN / CHECK-OUT HISTORY (unchanged)
+        //  STAFF CHECK-IN / CHECK-OUT HISTORY
         // ==================================================================
         let allStaffCheckins = [];
         let staffCheckinFiltered = [];
@@ -8724,7 +8237,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  EXPORT / PRINT (unchanged)
+        //  EXPORT / PRINT
         // ==================================================================
         function getCurrentVisibleTable() {
             const activeModule = document.querySelector('.module-btn.active');
@@ -8811,7 +8324,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  ADMIN EXAM HISTORY (ALL YEARS) (unchanged)
+        //  ADMIN EXAM HISTORY (ALL YEARS)
         // ==================================================================
         async function loadExamHistoryAll() {
             const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
@@ -8902,7 +8415,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  SUGGESTIONS (unchanged)
+        //  SUGGESTIONS
         // ==================================================================
         document.getElementById('submitSuggestionBtn').onclick = async function() {
             const tenantId = getCurrentTenantId();
@@ -9061,7 +8574,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  STAFF PAYROLL / PAYMENT VOUCHER (unchanged)
+        //  STAFF PAYROLL / PAYMENT VOUCHER
         // ==================================================================
         async function loadStaffPayroll() {
             const container = document.getElementById('staffPayrollList');
@@ -9216,7 +8729,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  STAFF PAYMENT HISTORY (unchanged)
+        //  STAFF PAYMENT HISTORY
         // ==================================================================
         async function loadStaffPaymentHistory() {
             const container = document.getElementById('staffPaymentHistoryList');
@@ -9266,7 +8779,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  IMPORT TEACHERS (Excel) (unchanged)
+        //  IMPORT TEACHERS (Excel)
         // ==================================================================
         async function importTeachersExcel(file) {
             return new Promise((resolve) => {
@@ -9308,7 +8821,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  SUGGESTION FAB (unchanged)
+        //  SUGGESTION FAB
         // ==================================================================
         document.getElementById('suggestionFab').onclick = function() {
             document.getElementById('suggestionText').value = '';
@@ -9325,7 +8838,7 @@ Just type your question naturally. I'll try my best to answer!`;
         document.getElementById('refreshMySuggestionsBtn').onclick = function() { loadSuggestions('mySuggestionsList'); };
 
         // ==================================================================
-        //  LIBRARY FUNCTIONS (unchanged)
+        //  LIBRARY FUNCTIONS
         // ==================================================================
         function showLibraryResources() {
             const cls = document.getElementById('libraryClassSelect').value;
@@ -9365,7 +8878,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  DOCUMENT EXCHANGE FUNCTIONS (unchanged)
+        //  DOCUMENT EXCHANGE FUNCTIONS
         // ==================================================================
         async function loadStudentDocuments(studentId) {
             const container = document.getElementById('documentList');
@@ -9516,7 +9029,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  FEE COLLECTIONS DASHBOARD (unchanged)
+        //  FEE COLLECTIONS DASHBOARD
         // ==================================================================
         let feeCollectionData = [];
 
@@ -9635,7 +9148,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  STUDENT PROMOTION SYSTEM (unchanged)
+        //  STUDENT PROMOTION SYSTEM
         // ==================================================================
         function populatePromotionDropdowns() {
             const fromSelect = document.getElementById('promotionFromClass');
@@ -9734,7 +9247,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  REPORT CARD GENERATION (unchanged)
+        //  REPORT CARD GENERATION
         // ==================================================================
         async function generateReportCard() {
             if (!currentStudentDoc) {
@@ -9943,7 +9456,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  E-LEARNING MODULE: QUIZZES & ASSIGNMENTS (unchanged)
+        //  E-LEARNING MODULE: QUIZZES & ASSIGNMENTS
         // ==================================================================
         function populateELearningDropdowns() {
             const classSelects = ['quizClass', 'assignmentClass'];
@@ -10408,7 +9921,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  ENTRANCE EXAM FUNCTIONS (unchanged)
+        //  ENTRANCE EXAM FUNCTIONS
         // ==================================================================
         async function loadEntranceExams() {
             const container = document.getElementById('entranceExamsList');
@@ -10833,7 +10346,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  TEACHER OWN PROFILE FUNCTIONS (unchanged)
+        //  TEACHER OWN PROFILE FUNCTIONS
         // ==================================================================
         function displayOwnTeacherProfile() {
             const container = document.getElementById('ownTeacherProfile');
@@ -10911,7 +10424,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  SEARCH TEACHER (ADMIN) (unchanged)
+        //  SEARCH TEACHER (ADMIN)
         // ==================================================================
         async function searchTeacherAdmin() {
             if (currentUserRole !== 'admin') return;
@@ -10970,7 +10483,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  UPDATE TEACHER (ADMIN) (unchanged)
+        //  UPDATE TEACHER (ADMIN)
         // ==================================================================
         async function openEditTeacherModal(id) {
             const tenantId = getCurrentTenantId();
@@ -11043,7 +10556,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  IMPORT BUTTONS (unchanged)
+        //  IMPORT BUTTONS
         // ==================================================================
         document.getElementById('importBtn').onclick = function() {
             if (currentUserRole !== 'admin') {
@@ -11060,7 +10573,7 @@ Just type your question naturally. I'll try my best to answer!`;
             importExcelStudents(f)
                 .then(function(count) {
                     showMessage(`✅ Successfully imported ${count} student(s).`, 'success', 'importMessage');
-                    loadStudents().then(() => renderAttendanceForDate(attendanceDate));
+                    loadStudents().then(() => renderAttendance());
                     fileInput.value = '';
                 })
                 .catch(function(err) {
@@ -11113,7 +10626,7 @@ Just type your question naturally. I'll try my best to answer!`;
         };
 
         // ==================================================================
-        //  BULK ATTENDANCE EVENT LISTENERS (updated)
+        //  BULK ATTENDANCE EVENT LISTENERS
         // ==================================================================
         document.getElementById('bulkMarkPresent').addEventListener('click', function() { bulkMarkAttendance('present'); });
         document.getElementById('bulkMarkAbsent').addEventListener('click', function() { bulkMarkAttendance('absent'); });
@@ -11121,7 +10634,7 @@ Just type your question naturally. I'll try my best to answer!`;
         document.getElementById('bulkMarkClear').addEventListener('click', function() { bulkMarkAttendance('clear'); });
 
         // ==================================================================
-        //  QUIZ CREATION (unchanged)
+        //  QUIZ CREATION
         // ==================================================================
         let quizQuestionCount = 1;
 
@@ -11252,7 +10765,7 @@ Just type your question naturally. I'll try my best to answer!`;
         document.getElementById('refreshQuizzesBtn').onclick = function() { loadQuizzes(); };
 
         // ==================================================================
-        //  ASSIGNMENT CREATION (unchanged)
+        //  ASSIGNMENT CREATION
         // ==================================================================
         document.getElementById('createAssignmentBtn').onclick = function() {
             if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') {
@@ -11328,7 +10841,7 @@ Just type your question naturally. I'll try my best to answer!`;
         document.getElementById('refreshAssignmentsBtn').onclick = function() { loadAssignments(); };
 
         // ==================================================================
-        //  ENTRANCE EXAM CREATION (unchanged)
+        //  ENTRANCE EXAM CREATION
         // ==================================================================
         let entranceExamQuestionCount = 1;
 
@@ -11458,7 +10971,7 @@ Just type your question naturally. I'll try my best to answer!`;
         document.getElementById('refreshEntranceExamsBtn').onclick = function() { loadEntranceExams(); };
 
         // ==================================================================
-        //  E-LEARNING TAB SWITCHING (unchanged)
+        //  E-LEARNING TAB SWITCHING
         // ==================================================================
         document.querySelectorAll('.elearning-tab-btn').forEach(btn => {
             btn.onclick = function() {
@@ -11473,7 +10986,7 @@ Just type your question naturally. I'll try my best to answer!`;
         });
 
         // ==================================================================
-        //  LOGIN AND SETUP (updated to use new render function)
+        //  LOGIN AND SETUP
         // ==================================================================
         async function loginAndSetup(email, password, skipAuth = false) {
             try {
@@ -11679,14 +11192,6 @@ Just type your question naturally. I'll try my best to answer!`;
                     });
                 }
 
-                // Set date picker to today and load attendance
-                const datePicker = document.getElementById('attendanceDatePicker');
-                if (datePicker) {
-                    datePicker.value = attendanceDate;
-                    document.getElementById('attendanceDateInfo').textContent = 'Today';
-                }
-
-                // Click first module or load dashboard
                 const firstModuleBtn = document.querySelector('.module-btn');
                 if (firstModuleBtn) firstModuleBtn.click();
                 else {
@@ -11695,24 +11200,6 @@ Just type your question naturally. I'll try my best to answer!`;
                     loadDashboard();
                     loadStaffDashboard();
                 }
-
-                // Load attendance for the date
-                if (document.getElementById('attendanceModule').style.display !== 'none') {
-                    renderAttendanceForDate(attendanceDate);
-                }
-
-                // Date picker change event
-                document.getElementById('loadAttendanceDateBtn').addEventListener('click', function() {
-                    const date = document.getElementById('attendanceDatePicker').value;
-                    if (date) {
-                        attendanceDate = date;
-                        const today = new Date().toISOString().split('T')[0];
-                        document.getElementById('attendanceDateInfo').textContent = date === today ? 'Today' :
-                            date;
-                        renderAttendanceForDate(date);
-                    }
-                });
-
             } catch (e) {
                 document.getElementById('loginMessage').innerHTML = '<div class="error">' + escapeHtml(e.message) +
                     '</div>';
@@ -11720,7 +11207,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  ROLE-BASED UI (updated search handler to be more robust)
+        //  ROLE-BASED UI
         // ==================================================================
         function setupRoleUI(role, extra) {
             extra = extra || {};
@@ -11857,7 +11344,7 @@ Just type your question naturally. I'll try my best to answer!`;
                     document.getElementById(m.moduleId).style.display = 'block';
                     if (m.moduleId === 'dashboardModule') { loadDashboard();
                         loadStaffDashboard(); }
-                    if (m.moduleId === 'attendanceModule') renderAttendanceForDate(attendanceDate);
+                    if (m.moduleId === 'attendanceModule') renderAttendance();
                     if (m.moduleId === 'teachersModule') {
                         if (role === 'admin') loadAllTeachersForAdmin();
                         if (role === 'teacher' || role === 'admin') displayOwnTeacherProfile();
@@ -11979,7 +11466,7 @@ Just type your question naturally. I'll try my best to answer!`;
                             badge.style.display = 'inline-block';
                             badge.textContent = 'Assigned: ' + teacherAssignedClass;
                         }
-                        renderAttendanceForDate(attendanceDate);
+                        renderAttendance();
                     }
                 }, 500);
                 displayOwnTeacherProfile();
@@ -12015,7 +11502,7 @@ Just type your question naturally. I'll try my best to answer!`;
         }
 
         // ==================================================================
-        //  WINDOW ONLOAD (updated)
+        //  WINDOW ONLOAD
         // ==================================================================
         window.onload = function() {
             function updateOnlineStatus() {
@@ -12081,10 +11568,10 @@ Just type your question naturally. I'll try my best to answer!`;
                 addManualStudent(); };
             document.getElementById('loadBtn').onclick = function() { if (currentUserRole !== 'admin' &&
                     currentUserRole !== 'teacher') return;
-                renderAttendanceForDate(attendanceDate); };
+                renderAttendance(); };
             document.getElementById('refreshBtn').onclick = function() { if (currentUserRole !== 'admin' &&
                     currentUserRole !== 'teacher') return;
-                loadStudents().then(() => renderAttendanceForDate(attendanceDate)); };
+                loadStudents().then(renderAttendance); };
             document.getElementById('batchWhatsappBtn').onclick = function() {
                 if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert(
                         'You do not have permission to send reports.'); return; }
