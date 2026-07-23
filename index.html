@@ -3925,6 +3925,35 @@
         </div>
     </div>
 
+    <!-- ===== EDIT USER MODAL (Admin) ===== -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('editUserModal')">&times;</span>
+            <h3>✏️ Edit User Account</h3>
+            <input type="text" id="editUserUid" readonly placeholder="User ID" style="background:#f0f0f0;" />
+            <input type="text" id="editUserName" placeholder="Full Name *" />
+            <input type="email" id="editUserEmail" placeholder="Email *" />
+            <select id="editUserRole">
+                <option value="admin">Admin</option>
+                <option value="teacher">Teacher</option>
+                <option value="bursar">Bursar</option>
+                <option value="parent">Parent</option>
+                <option value="student">Student</option>
+            </select>
+            <input type="text" id="editUserStudentId" placeholder="Student ID (for parent/student)" />
+            <select id="editUserStatus">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <input type="password" id="editUserPassword" placeholder="New Password (leave blank to keep current)" />
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button id="saveUserEditBtn" class="refresh-btn">Save Changes</button>
+                <button onclick="closeModal('editUserModal')" style="background:#fde8e8; color:#b71c1c;">Cancel</button>
+            </div>
+            <div id="editUserMessage" style="margin-top:8px;"></div>
+        </div>
+    </div>
+
     <!-- ===== SCRIPTS ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js">
     </script>
@@ -5473,7 +5502,50 @@
                     voiceRecorders[id] = new VoiceRecorder(id, null);
                 });
 
-                // Present, Absent, Late buttons
+                // ===== ABSENT BUTTON WITH WHATSAPP CONFIRMATION =====
+                document.querySelectorAll('.absent-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        const sid = this.dataset.id;
+                        const uid = this.dataset.uid;
+                        const date = this.dataset.date;
+                        const cls = this.dataset.cls;
+                        const remark = document.getElementById('remark_' + sid).value;
+                        const recorder = voiceRecorders['voiceRecorder_' + uid];
+                        const audioData = recorder ? recorder.getAudioData() : '';
+
+                        // 1. Save attendance as ABSENT
+                        await saveAttendance(cls, sid, date, 'absent', remark, audioData);
+
+                        // 2. Ask if user wants to send WhatsApp alert
+                        const students = allStudents[cls] || [];
+                        const student = students.find(s => s.id === sid);
+                        if (student) {
+                            const phone = student.parentPhone || student.phone || '';
+                            if (phone) {
+                                // Build message
+                                const msg = `⚠️ Attendance Alert: Your child ${student.name} (${student.id}) was marked ABSENT on ${date}. Remark: ${remark || 'None'}. Please check.`;
+                                // Confirm before sending
+                                if (confirm(`Do you want to send a WhatsApp alert to the parent of ${student.name} (${student.id})?`)) {
+                                    const url = getValidWhatsAppUrl(phone, msg);
+                                    if (url) {
+                                        window.open(url, '_blank');
+                                    } else {
+                                        alert('Invalid phone number format.');
+                                    }
+                                }
+                            } else {
+                                // No phone number – inform user
+                                alert(`No phone number found for ${student.name}. Cannot send WhatsApp.`);
+                            }
+                        }
+
+                        // 3. Refresh the attendance view
+                        renderAttendanceForDate(date);
+                    };
+                });
+
+                // ==== (Optional) You can similarly add confirmation for Present and Late if desired ====
+                // Present button (no confirmation, just save)
                 document.querySelectorAll('.present-btn').forEach(btn => {
                     btn.onclick = async function() {
                         const sid = this.dataset.id;
@@ -5488,20 +5560,7 @@
                     };
                 });
 
-                document.querySelectorAll('.absent-btn').forEach(btn => {
-                    btn.onclick = async function() {
-                        const sid = this.dataset.id;
-                        const uid = this.dataset.uid;
-                        const date = this.dataset.date;
-                        const cls = this.dataset.cls;
-                        const remark = document.getElementById('remark_' + sid).value;
-                        const recorder = voiceRecorders['voiceRecorder_' + uid];
-                        const audioData = recorder ? recorder.getAudioData() : '';
-                        await saveAttendance(cls, sid, date, 'absent', remark, audioData);
-                        renderAttendanceForDate(date);
-                    };
-                });
-
+                // Late button (no confirmation, just save)
                 document.querySelectorAll('.late-btn').forEach(btn => {
                     btn.onclick = async function() {
                         const sid = this.dataset.id;
@@ -5609,7 +5668,7 @@
         }
 
         // ==================================================================
-        //  SEND BATCH WHATSAPP (unchanged - uses today's date for summary)
+        //  SEND BATCH WHATSAPP (FIXED: uses selected date)
         // ==================================================================
         async function sendBatchWhatsApp() {
             let classVal;
@@ -5624,9 +5683,14 @@
                 alert('No students found in class "' + classVal + '".');
                 return;
             }
-            const today = new Date().toISOString().split('T')[0];
-            // We'll use the selected date for consistency, but the original used today. Keep as today.
-            const date = today; // keep as today for reports
+
+            // Use the currently selected attendance date
+            const date = attendanceDate;
+            if (!date) {
+                alert('No date selected. Please load attendance for a date first.');
+                return;
+            }
+
             let attMap = {};
             try {
                 (await db.collection('attendance')
@@ -5655,7 +5719,7 @@
             modal.appendChild(title);
 
             const subTitle = document.createElement('p');
-            subTitle.textContent = new Date().toLocaleDateString();
+            subTitle.textContent = date;
             subTitle.style.color = '#6c7a89';
             subTitle.style.marginBottom = '12px';
             modal.appendChild(subTitle);
@@ -5679,7 +5743,7 @@
                 btn.onmouseout = function() { this.style.background = '#eef2f7'; };
                 btn.onclick = function() {
                     overlay.remove();
-                    processRecipients(opt.value, students, attMap, classVal);
+                    processRecipients(opt.value, students, attMap, classVal, date);
                 };
                 btnContainer.appendChild(btn);
             });
@@ -5688,7 +5752,7 @@
             const cancelBtn = document.createElement('button');
             cancelBtn.textContent = 'Cancel';
             cancelBtn.style.cssText =
-            'padding:8px 20px; border:none; border-radius:10px; cursor:pointer; font-weight:600; background:#fde8e8; color:#b71c1c;';
+                'padding:8px 20px; border:none; border-radius:10px; cursor:pointer; font-weight:600; background:#fde8e8; color:#b71c1c;';
             cancelBtn.onclick = function() { overlay.remove(); };
             modal.appendChild(cancelBtn);
 
@@ -5700,7 +5764,7 @@
             };
         }
 
-        async function processRecipients(choice, students, attMap, classVal) {
+        async function processRecipients(choice, students, attMap, classVal, date) {
             let recipients = [];
             if (choice === '1') recipients = students;
             else if (choice === '2') recipients = students.filter(s => attMap[s.id]?.status === 'absent');
@@ -5713,10 +5777,11 @@
             const present = students.filter(s => attMap[s.id]?.status === 'present');
             const absent = students.filter(s => attMap[s.id]?.status === 'absent');
             const late = students.filter(s => attMap[s.id]?.status === 'late');
-            const summary = 'Attendance Report - ' + classVal + ' (' + new Date().toLocaleDateString() +
-                ')\nPresent: ' + present.length +
-                '\nAbsent: ' + absent.length +
-                '\nLate: ' + late.length;
+
+            const summary = 'Attendance Report - ' + classVal + ' (' + date + ')\n' +
+                'Present: ' + present.length + '\n' +
+                'Absent: ' + absent.length + '\n' +
+                'Late: ' + late.length;
 
             const validRecipients = [];
             const invalidRecipients = [];
@@ -5753,7 +5818,7 @@
                 setTimeout(() => { window.open(url, '_blank'); }, i * 700);
             }
             alert('Opening WhatsApp for ' + validRecipients.length +
-            ' parent(s).\n\nIf your browser blocks popups, please allow them for this site.');
+                ' parent(s).\n\nIf your browser blocks popups, please allow them for this site.');
         }
 
         // ==================================================================
@@ -5795,7 +5860,7 @@
                 dateInput.type = 'date';
                 dateInput.value = new Date().toISOString().split('T')[0];
                 dateInput.style.cssText =
-                'padding:8px; width:100%; border:1.5px solid #dce4ec; border-radius:10px; font-size:0.95rem; margin-bottom:10px;';
+                    'padding:8px; width:100%; border:1.5px solid #dce4ec; border-radius:10px; font-size:0.95rem; margin-bottom:10px;';
 
                 const btnRow = document.createElement('div');
                 btnRow.style.cssText = 'display:flex; gap:8px; justify-content:center;';
@@ -5804,7 +5869,7 @@
                 confirmBtn.textContent = 'View History';
                 confirmBtn.className = 'refresh-btn';
                 confirmBtn.style.cssText =
-                'padding:8px 20px; border:none; border-radius:10px; cursor:pointer; font-weight:600;';
+                    'padding:8px 20px; border:none; border-radius:10px; cursor:pointer; font-weight:600;';
 
                 const cancelBtn = document.createElement('button');
                 cancelBtn.textContent = 'Cancel';
@@ -6264,7 +6329,7 @@
                 const btn = e.target.closest('.exam-level-btn');
                 if (!btn) return;
                 document.querySelectorAll('#examLevelButtons .exam-level-btn').forEach(b => b.classList.remove(
-                'active'));
+                    'active'));
                 btn.classList.add('active');
                 currentExamLevel = btn.dataset.examLevel;
                 if (examCurrentStudent) loadExamUIForStudent();
@@ -6896,7 +6961,7 @@
             } catch (error) {
                 console.error('Error loading notices:', error);
                 document.getElementById('globalNoticesList').innerHTML =
-                '<span class="error">Failed to load notices.</span>';
+                    '<span class="error">Failed to load notices.</span>';
             }
         }
 
@@ -7232,7 +7297,7 @@
                 const feeDoc = await db.collection('fee_records').doc(s.id).get();
                 let data = feeDoc.exists ? feeDoc.data() : {};
                 html +=
-                `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.class)}</td>`;
+                    `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.class)}</td>`;
                 for (const t of ['term1', 'term2', 'term3']) {
                     const term = data[t] || { total: 0, paid: 0 };
                     const balance = term.total - term.paid;
@@ -7613,7 +7678,7 @@
                         });
                         const scores = result.subjects.map(s => parseFloat(s.score)).filter(s => !isNaN(s));
                         if (scores.length > 0) {
-                            const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
+                            const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
                             response += `\nAverage: ${avg.toFixed(1)}% - ${avg >= 50 ? '✅ Passing' : '❌ Failing'}`;
                         }
                     }
@@ -7661,13 +7726,13 @@
                 case 'help':
                 default: {
                     response = `🤖 I can help you with:
-• Attendance: Ask about today, this term, or a specific year.
-• Exams: Get results for a term/year/level (e.g., "NPSE results term 1 2025").
-• Fees: Check fee status and balance.
-• Performance: Get overall average and pass rate.
-• Notices: Latest school announcements.
+        • Attendance: Ask about today, this term, or a specific year.
+        • Exams: Get results for a term/year/level (e.g., "NPSE results term 1 2025").
+        • Fees: Check fee status and balance.
+        • Performance: Get overall average and pass rate.
+        • Notices: Latest school announcements.
 
-Just type your question naturally. I'll try my best to answer!`;
+        Just type your question naturally. I'll try my best to answer!`;
                     break;
                 }
             }
@@ -7982,7 +8047,7 @@ Just type your question naturally. I'll try my best to answer!`;
         // ==================================================================
         async function addTeacherAdmin() {
             if (currentUserRole !== 'admin') { showMessage('Only admin can add users.', 'error', 'teacherMessage');
-            return; }
+                return; }
             const tenantId = getCurrentTenantId();
             const id = document.getElementById('teacherId').value.trim();
             const name = document.getElementById('teacherName').value.trim();
@@ -8095,12 +8160,95 @@ Just type your question naturally. I'll try my best to answer!`;
                 };
             });
 
+            // ===== EDIT USER BUTTON – now opens the new modal =====
             document.querySelectorAll('.edit-user-btn').forEach(btn => {
                 btn.onclick = function() {
-                    alert('Edit user functionality is not yet implemented. You can update the user document directly in Firestore.');
+                    const uid = this.dataset.uid;
+                    const role = this.dataset.role;
+                    openEditUserModal(uid, role);
                 };
             });
         }
+
+        // ==================================================================
+        //  EDIT USER MODAL FUNCTIONS (NEW)
+        // ==================================================================
+        async function openEditUserModal(uid, role) {
+            try {
+                const tenantId = getCurrentTenantId();
+                const doc = await db.collection('users').doc(uid).get();
+                if (!doc.exists) {
+                    alert('User document not found.');
+                    return;
+                }
+                const data = doc.data();
+                if (data.tenantId !== tenantId) {
+                    alert('You do not have permission to edit this user.');
+                    return;
+                }
+
+                document.getElementById('editUserUid').value = uid;
+                document.getElementById('editUserName').value = data.name || '';
+                document.getElementById('editUserEmail').value = data.email || '';
+                document.getElementById('editUserRole').value = data.role || '';
+                document.getElementById('editUserStudentId').value = data.studentId || '';
+                document.getElementById('editUserStatus').value = data.status || 'active';
+                document.getElementById('editUserPassword').value = '';
+                document.getElementById('editUserMessage').innerHTML = '';
+                openModal('editUserModal');
+            } catch (error) {
+                alert('Error loading user: ' + error.message);
+            }
+        }
+
+        document.getElementById('saveUserEditBtn').onclick = async function() {
+            const uid = document.getElementById('editUserUid').value.trim();
+            const name = document.getElementById('editUserName').value.trim();
+            const email = document.getElementById('editUserEmail').value.trim();
+            const role = document.getElementById('editUserRole').value;
+            const studentId = document.getElementById('editUserStudentId').value.trim();
+            const status = document.getElementById('editUserStatus').value;
+            const newPassword = document.getElementById('editUserPassword').value.trim();
+
+            if (!name || !email) {
+                showMessage('Name and Email are required.', 'error', 'editUserMessage');
+                return;
+            }
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const updateData = {
+                    name: name,
+                    email: email,
+                    role: role,
+                    studentId: studentId || '',
+                    status: status,
+                    tenantId: tenantId
+                };
+
+                await db.collection('users').doc(uid).update(updateData);
+
+                if (newPassword && newPassword.length >= 6) {
+                    try {
+                        // Note: Password update requires re-authentication for security.
+                        // We'll attempt to send a password reset email instead.
+                        await auth.sendPasswordResetEmail(email);
+                        alert('Password reset email sent to ' + email + '. Please check your inbox.');
+                    } catch (authError) {
+                        console.warn('Password reset email could not be sent:', authError.message);
+                        alert('Could not send password reset email. Please reset it manually via Firebase Console.');
+                    }
+                }
+
+                showMessage('User updated successfully.', 'success', 'editUserMessage');
+                setTimeout(() => {
+                    closeModal('editUserModal');
+                    loadAllTeachersForAdmin(); // refresh the list
+                }, 1200);
+            } catch (error) {
+                showMessage('Error updating user: ' + error.message, 'error', 'editUserMessage');
+            }
+        };
 
         // ==================================================================
         //  TEACHER REGISTER (unchanged)
@@ -8581,7 +8729,7 @@ Just type your question naturally. I'll try my best to answer!`;
 
             } catch (error) {
                 container.innerHTML = '<div class="error">Error loading visitors: ' + escapeHtml(error.message) +
-                '</div>';
+                    '</div>';
                 console.error('Visitor load error:', error);
             }
         }
@@ -9656,7 +9804,7 @@ Just type your question naturally. I'll try my best to answer!`;
 
             } catch (error) {
                 container.innerHTML = '<div class="error">Error loading documents: ' + escapeHtml(error.message) +
-                '</div>';
+                    '</div>';
             }
         }
 
@@ -9829,7 +9977,7 @@ Just type your question naturally. I'll try my best to answer!`;
 
             } catch (error) {
                 container.innerHTML = '<div class="error">Error loading fee collections: ' + escapeHtml(error.message) +
-                '</div>';
+                    '</div>';
                 console.error('Fee collection error:', error);
             }
         }
@@ -10141,7 +10289,7 @@ Just type your question naturally. I'll try my best to answer!`;
 
             } catch (error) {
                 container.innerHTML = '<div class="error">Error generating report card: ' + escapeHtml(error.message) +
-                '</div>';
+                    '</div>';
                 console.error('Report card error:', error);
             }
         }
@@ -10836,7 +10984,7 @@ Just type your question naturally. I'll try my best to answer!`;
                 renderAssignments();
             } catch (error) {
                 container.innerHTML = '<div class="error">Error loading assignments: ' + escapeHtml(error.message) +
-                '</div>';
+                    '</div>';
             }
         }
 
