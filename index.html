@@ -416,14 +416,16 @@
             box-shadow: 0 8px 24px rgba(26, 75, 138, 0.25);
         }
         .tabs,
-        .admin-tabs {
+        .admin-tabs,
+        .finance-tabs {
             display: flex;
             gap: 6px;
             margin-bottom: 16px;
             flex-wrap: wrap;
         }
         .tab-btn,
-        .admin-tab-btn {
+        .admin-tab-btn,
+        .finance-tab-btn {
             background: rgba(233, 236, 241, 0.7);
             backdrop-filter: blur(4px);
             padding: 7px 18px;
@@ -436,21 +438,25 @@
             flex: 0 1 auto;
         }
         .tab-btn.active,
-        .admin-tab-btn.active {
+        .admin-tab-btn.active,
+        .finance-tab-btn.active {
             background: linear-gradient(135deg, #1a4b8a, #2a6bb0);
             color: #fff;
             border-color: #1a4b8a;
             box-shadow: 0 4px 16px rgba(26, 75, 138, 0.2);
         }
         .tab-btn:hover,
-        .admin-tab-btn:hover {
+        .admin-tab-btn:hover,
+        .finance-tab-btn:hover {
             transform: translateY(-2px);
         }
-        .tab-content {
+        .tab-content,
+        .finance-tab-content {
             display: none;
             animation: fadeIn 0.25s ease;
         }
-        .tab-content.active {
+        .tab-content.active,
+        .finance-tab-content.active {
             display: block;
         }
         @keyframes fadeIn {
@@ -514,6 +520,16 @@
         }
         .fee-unpaid {
             background: #f8d7da !important;
+        }
+        /* Finance status colors */
+        .finance-income {
+            background: #d4edda !important;
+        }
+        .finance-expense {
+            background: #f8d7da !important;
+        }
+        .finance-neutral {
+            background: #fff3cd !important;
         }
 
         .notice-card {
@@ -851,6 +867,13 @@
         .chart-bar-fill.unpaid {
             background: linear-gradient(90deg, #e74c3c, #c0392b);
         }
+        .chart-bar-fill.income-fill {
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+        }
+        .chart-bar-fill.expense-fill {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        }
+
         .gender-ratio {
             display: flex;
             justify-content: space-around;
@@ -902,6 +925,82 @@
             color: #0b2b5c;
             margin-bottom: 10px;
             text-align: center;
+        }
+
+        /* Finance KPI cards */
+        .finance-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .finance-kpi-card {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 16px 18px;
+            text-align: center;
+            border: 1px solid #e6edf4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: 0.2s;
+        }
+        .finance-kpi-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+        .finance-kpi-card .kpi-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a4b8a;
+        }
+        .finance-kpi-card .kpi-number.income {
+            color: #27ae60;
+        }
+        .finance-kpi-card .kpi-number.expense {
+            color: #e74c3c;
+        }
+        .finance-kpi-card .kpi-number.profit {
+            color: #1a4b8a;
+        }
+        .finance-kpi-card .kpi-label {
+            font-size: 0.75rem;
+            color: #6c7a89;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Finance filter bar */
+        .finance-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 14px;
+            background: #f0f5fa;
+            border-radius: 12px;
+            margin-bottom: 14px;
+        }
+        .finance-filter-bar select,
+        .finance-filter-bar input {
+            max-width: 140px;
+        }
+        .finance-filter-bar label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1a3a5c;
+        }
+
+        /* Finance chart container */
+        .finance-chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .finance-chart-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 280px;
         }
 
         .attendance-summary {
@@ -2241,11 +2340,13 @@
                 text-align: center;
             }
             .tabs,
-            .admin-tabs {
+            .admin-tabs,
+            .finance-tabs {
                 gap: 4px;
             }
             .tab-btn,
-            .admin-tab-btn {
+            .admin-tab-btn,
+            .finance-tab-btn {
                 padding: 5px 12px;
                 font-size: 0.7rem;
                 flex: 1 1 auto;
@@ -2415,6 +2516,17 @@
             .settings-group .form-row textarea {
                 max-width: 100%;
             }
+            .finance-kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .finance-filter-bar select,
+            .finance-filter-bar input {
+                max-width: 100%;
+                min-width: 80px;
+            }
+            .finance-chart-container {
+                height: 200px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -2433,7 +2545,8 @@
                 border-radius: 30px;
             }
             .tab-btn,
-            .admin-tab-btn {
+            .admin-tab-btn,
+            .finance-tab-btn {
                 padding: 4px 10px;
                 font-size: 0.6rem;
                 border-radius: 30px;
@@ -2557,6 +2670,15 @@
                 min-width: auto;
                 font-size: 0.75rem;
             }
+            .finance-kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .finance-kpi-card .kpi-number {
+                font-size: 1.3rem;
+            }
+            .finance-chart-container {
+                height: 160px;
+            }
         }
     </style>
 </head>
@@ -2583,6 +2705,7 @@
                 <div class="feature"><span>📄</span> Assignments</div>
                 <div class="feature"><span>📋</span> Entrance Exams</div>
                 <div class="feature"><span>👨‍🎓</span> Student Role</div>
+                <div class="feature"><span>💰</span> Finance</div>
             </div>
             <div class="btn-group">
                 <button class="primary-btn" onclick="showSchoolsPage()">🏫 Find Schools Near You</button>
@@ -3363,6 +3486,204 @@
                     <div id="paymentHistoryContainer" style="display:none; margin-top:8px;">
                         <div id="staffPaymentHistoryList"></div>
                         <div id="paymentHistoryMessage"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== NEW FINANCE MANAGEMENT CARD ===== -->
+            <div class="card" id="financeCard">
+                <h3>💰 Finance Management</h3>
+                <p style="color:#6c7a89; margin-bottom:12px;">
+                    Track all income (fees, school materials, donations, etc.) and expenses (salaries, taxes, social security, utilities, etc.) in one place.
+                </p>
+
+                <div class="finance-tabs" id="financeTabs">
+                    <button class="finance-tab-btn active" data-ftab="financeDashboard">📊 Dashboard</button>
+                    <button class="finance-tab-btn" data-ftab="financeIncome">📈 Income</button>
+                    <button class="finance-tab-btn" data-ftab="financeExpenses">📉 Expenses</button>
+                    <button class="finance-tab-btn" data-ftab="financeReports">📋 Reports</button>
+                </div>
+
+                <!-- ===== FINANCE DASHBOARD TAB ===== -->
+                <div id="financeDashboardTab" class="finance-tab-content active">
+                    <div class="finance-kpi-grid" id="financeKpiGrid">
+                        <div class="finance-kpi-card">
+                            <div class="kpi-number income" id="finTotalIncome">0</div>
+                            <div class="kpi-label">Total Income (Le)</div>
+                        </div>
+                        <div class="finance-kpi-card">
+                            <div class="kpi-number expense" id="finTotalExpenses">0</div>
+                            <div class="kpi-label">Total Expenses (Le)</div>
+                        </div>
+                        <div class="finance-kpi-card">
+                            <div class="kpi-number profit" id="finNetProfit">0</div>
+                            <div class="kpi-label">Net Profit (Le)</div>
+                        </div>
+                        <div class="finance-kpi-card">
+                            <div class="kpi-number" id="finTransactionCount">0</div>
+                            <div class="kpi-label">Total Transactions</div>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin-bottom:16px;">
+                        <div class="dash-card">
+                            <h4>Income vs Expenses (Last 6 Months)</h4>
+                            <div class="finance-chart-container">
+                                <canvas id="financeTrendChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="dash-card">
+                            <h4>Income by Category</h4>
+                            <div class="finance-chart-container">
+                                <canvas id="incomeCategoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin-bottom:16px;">
+                        <div class="dash-card">
+                            <h4>Expenses by Category</h4>
+                            <div class="finance-chart-container">
+                                <canvas id="expenseCategoryChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="dash-card">
+                            <h4>Monthly Summary</h4>
+                            <div id="financeMonthlySummary" style="max-height:240px; overflow-y:auto;">
+                                <p>Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                        <button id="refreshFinanceDashboardBtn" class="refresh-btn">🔄 Refresh Dashboard</button>
+                        <button id="exportFinanceSummaryBtn" class="refresh-btn" style="background:#27ae60;">📥 Export Summary</button>
+                    </div>
+                    <div id="financeDashboardMessage" style="margin-top:8px;"></div>
+                </div>
+
+                <!-- ===== INCOME TAB ===== -->
+                <div id="financeIncomeTab" class="finance-tab-content">
+                    <div style="background:#f0fff4; padding:14px 18px; border-radius:12px; margin-bottom:14px; border-left:4px solid #27ae60;">
+                        <h4 style="margin:0; color:#1a7a3a;">➕ Record New Income</h4>
+                        <div class="form-row" style="margin-top:8px;">
+                            <input type="number" id="incomeAmount" placeholder="Amount (Le) *" step="0.01" style="max-width:160px;" />
+                            <select id="incomeCategory" style="max-width:180px;">
+                                <option value="School Fees">School Fees</option>
+                                <option value="School Materials">School Materials</option>
+                                <option value="Donations">Donations</option>
+                                <option value="Grants">Grants</option>
+                                <option value="Fundraising">Fundraising</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Interest">Interest</option>
+                                <option value="Other Income">Other Income</option>
+                            </select>
+                            <input type="date" id="incomeDate" style="max-width:150px;" value="" />
+                            <input type="text" id="incomeDescription" placeholder="Description (optional)" style="max-width:200px;" />
+                            <button id="recordIncomeBtn" class="refresh-btn" style="background:#27ae60;">Record Income</button>
+                        </div>
+                        <div id="incomeMessage" style="margin-top:6px;"></div>
+                    </div>
+
+                    <div class="finance-filter-bar">
+                        <label>Year:</label>
+                        <select id="incomeFilterYear"><option value="all">All Years</option></select>
+                        <label>Category:</label>
+                        <select id="incomeFilterCategory">
+                            <option value="all">All Categories</option>
+                            <option value="School Fees">School Fees</option>
+                            <option value="School Materials">School Materials</option>
+                            <option value="Donations">Donations</option>
+                            <option value="Grants">Grants</option>
+                            <option value="Fundraising">Fundraising</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Interest">Interest</option>
+                            <option value="Other Income">Other Income</option>
+                        </select>
+                        <button id="applyIncomeFiltersBtn" class="refresh-btn">Apply</button>
+                        <button id="resetIncomeFiltersBtn" style="background:#fde8e8; color:#b71c1c;">Reset</button>
+                        <button id="exportIncomeCSVBtn" class="refresh-btn" style="background:#27ae60;">📥 Export CSV</button>
+                    </div>
+
+                    <div id="incomeListContainer">
+                        <p>Loading income records...</p>
+                    </div>
+                </div>
+
+                <!-- ===== EXPENSES TAB ===== -->
+                <div id="financeExpensesTab" class="finance-tab-content">
+                    <div style="background:#fff0f0; padding:14px 18px; border-radius:12px; margin-bottom:14px; border-left:4px solid #e74c3c;">
+                        <h4 style="margin:0; color:#842029;">➕ Record New Expense</h4>
+                        <div class="form-row" style="margin-top:8px;">
+                            <input type="number" id="expenseAmount" placeholder="Amount (Le) *" step="0.01" style="max-width:160px;" />
+                            <select id="expenseCategory" style="max-width:180px;">
+                                <option value="Salaries">Salaries</option>
+                                <option value="Taxes">Taxes</option>
+                                <option value="Social Security">Social Security</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Supplies">Supplies</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Insurance">Insurance</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Training">Training</option>
+                                <option value="Other Expenses">Other Expenses</option>
+                            </select>
+                            <input type="date" id="expenseDate" style="max-width:150px;" value="" />
+                            <input type="text" id="expenseDescription" placeholder="Description (optional)" style="max-width:200px;" />
+                            <button id="recordExpenseBtn" class="refresh-btn" style="background:#e74c3c;">Record Expense</button>
+                        </div>
+                        <div id="expenseMessage" style="margin-top:6px;"></div>
+                    </div>
+
+                    <div class="finance-filter-bar">
+                        <label>Year:</label>
+                        <select id="expenseFilterYear"><option value="all">All Years</option></select>
+                        <label>Category:</label>
+                        <select id="expenseFilterCategory">
+                            <option value="all">All Categories</option>
+                            <option value="Salaries">Salaries</option>
+                            <option value="Taxes">Taxes</option>
+                            <option value="Social Security">Social Security</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Supplies">Supplies</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Insurance">Insurance</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Training">Training</option>
+                            <option value="Other Expenses">Other Expenses</option>
+                        </select>
+                        <button id="applyExpenseFiltersBtn" class="refresh-btn">Apply</button>
+                        <button id="resetExpenseFiltersBtn" style="background:#fde8e8; color:#b71c1c;">Reset</button>
+                        <button id="exportExpensesCSVBtn" class="refresh-btn" style="background:#e74c3c;">📥 Export CSV</button>
+                    </div>
+
+                    <div id="expenseListContainer">
+                        <p>Loading expense records...</p>
+                    </div>
+                </div>
+
+                <!-- ===== REPORTS TAB ===== -->
+                <div id="financeReportsTab" class="finance-tab-content">
+                    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:16px;">
+                        <label style="font-weight:600; font-size:0.85rem;">Year:</label>
+                        <select id="reportYearFilter" style="max-width:120px;"><option value="all">All Years</option></select>
+                        <label style="font-weight:600; font-size:0.85rem;">Month:</label>
+                        <select id="reportMonthFilter" style="max-width:120px;">
+                            <option value="all">All Months</option>
+                            <option value="01">January</option><option value="02">February</option>
+                            <option value="03">March</option><option value="04">April</option>
+                            <option value="05">May</option><option value="06">June</option>
+                            <option value="07">July</option><option value="08">August</option>
+                            <option value="09">September</option><option value="10">October</option>
+                            <option value="11">November</option><option value="12">December</option>
+                        </select>
+                        <button id="generateReportBtn" class="refresh-btn">Generate Report</button>
+                        <button id="exportReportCSVBtn" class="refresh-btn" style="background:#2c3e50;">📥 Export CSV</button>
+                        <button id="printReportBtn" class="refresh-btn" style="background:#2c3e50;">🖨️ Print</button>
+                    </div>
+
+                    <div id="financeReportContainer">
+                        <p>Select a year and/or month, then click "Generate Report".</p>
                     </div>
                 </div>
             </div>
@@ -4459,6 +4780,10 @@
 
         // ===== PROMOTION STATE =====
         let promotionStudents = [];
+
+        // ===== FINANCE STATE =====
+        let financeData = { income: [], expenses: [] };
+        let financeCharts = {};
 
         // ==================================================================
         //  HELPER: ensure array
@@ -12413,1224 +12738,1881 @@
         }
 
         // ==================================================================
-        //  LOGIN AND SETUP (updated with settings)
+        //  FINANCE MODULE FUNCTIONS
         // ==================================================================
-        async function loginAndSetup(email, password, skipAuth = false) {
+
+        // ----- Finance Tab Switching -----
+        document.querySelectorAll('.finance-tab-btn').forEach(btn => {
+            btn.onclick = function() {
+                const tab = this.dataset.ftab;
+                document.querySelectorAll('.finance-tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.finance-tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById(tab + 'Tab').classList.add('active');
+                if (tab === 'financeDashboard') loadFinanceDashboard();
+                if (tab === 'financeIncome') loadIncomeRecords();
+                if (tab === 'financeExpenses') loadExpenseRecords();
+                if (tab === 'financeReports') populateFinanceReportFilters();
+            };
+        });
+
+        // ----- Record Income -----
+        document.getElementById('recordIncomeBtn').onclick = async function() {
+            const amount = parseFloat(document.getElementById('incomeAmount').value);
+            const category = document.getElementById('incomeCategory').value;
+            const date = document.getElementById('incomeDate').value;
+            const description = document.getElementById('incomeDescription').value.trim();
+
+            if (!amount || amount <= 0) {
+                showMessage('Please enter a valid amount.', 'error', 'incomeMessage');
+                return;
+            }
+            if (!date) {
+                showMessage('Please select a date.', 'error', 'incomeMessage');
+                return;
+            }
+
             try {
-                if (!skipAuth) await auth.signInWithEmailAndPassword(email, password);
+                const tenantId = getCurrentTenantId();
                 const user = auth.currentUser;
-                if (!user) throw new Error('Not logged in');
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (!userDoc.exists) throw new Error('User role not found');
-                const userData = userDoc.data();
-                const role = userData.role;
-                const tenantId = userData.tenantId || 'default_tenant';
-                try { localStorage.setItem('tenantId', tenantId); } catch (_) { _tenantId = tenantId; }
-                await logLoginActivity(user, userData, tenantId);
-                currentUserRole = role;
+                await db.collection('income').add({
+                    amount: amount,
+                    category: category,
+                    date: date,
+                    description: description || '',
+                    year: date.split('-')[0],
+                    month: date.split('-')[1],
+                    recordedBy: user ? user.uid : 'anonymous',
+                    recordedByName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    tenantId: tenantId
+                });
 
-                document.getElementById('startupPage').style.display = 'none';
-                document.getElementById('schoolsPage').style.display = 'none';
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('mainHeader').style.display = 'flex';
-                document.getElementById('syncBar').style.display = 'block';
-                document.getElementById('globalNotices').style.display = 'block';
-                document.getElementById('mainApp').style.display = 'block';
-                document.getElementById('userInfo').innerText = role.toUpperCase() + ': ' + email;
-                document.getElementById('logoutBtn').style.display = 'inline-block';
+                showMessage('✅ Income recorded successfully!', 'success', 'incomeMessage');
+                document.getElementById('incomeAmount').value = '';
+                document.getElementById('incomeDescription').value = '';
+                // Set default date to today
+                document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
+                loadIncomeRecords();
+                loadFinanceDashboard();
+            } catch (error) {
+                showMessage('Error recording income: ' + error.message, 'error', 'incomeMessage');
+                console.error('Income error:', error);
+            }
+        };
 
-                // Load school settings
-                await loadSchoolSettings();
+        // ----- Record Expense -----
+        document.getElementById('recordExpenseBtn').onclick = async function() {
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const category = document.getElementById('expenseCategory').value;
+            const date = document.getElementById('expenseDate').value;
+            const description = document.getElementById('expenseDescription').value.trim();
 
-                await loadStudents();
-                renderNotices();
+            if (!amount || amount <= 0) {
+                showMessage('Please enter a valid amount.', 'error', 'expenseMessage');
+                return;
+            }
+            if (!date) {
+                showMessage('Please select a date.', 'error', 'expenseMessage');
+                return;
+            }
 
-                if (role === 'admin') {
-                    const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
-                        '==', user.uid).get();
-                    if (!teacherSnap.empty) teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherSnap.docs[0]
-                            .data() };
-                    setupRoleUI('admin');
-                } else if (role === 'bursar') {
-                    setupRoleUI('bursar');
-                } else if (role === 'teacher') {
-                    const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
-                        '==', user.uid).get();
-                    if (teacherSnap.empty) throw new Error('Teacher record not found for this account');
-                    const teacherData = teacherSnap.docs[0].data();
-                    teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherData };
-                    setupRoleUI('teacher', { class: teacherData.class, teacherData: teacherOwnData });
-                } else if (role === 'parent') {
-                    const studentId = userData.studentId;
-                    if (!studentId) throw new Error('No student linked to this parent account');
-                    linkedStudentId = studentId;
-                    setupRoleUI('parent', { studentId: studentId });
-                } else if (role === 'student') {
-                    const studentId = userData.studentId;
-                    if (!studentId) throw new Error('No student linked to this student account');
-                    linkedStudentId = studentId;
-                    setupRoleUI('student', { studentId: studentId });
-                } else { throw new Error('Invalid role'); }
+            try {
+                const tenantId = getCurrentTenantId();
+                const user = auth.currentUser;
+                await db.collection('expenses').add({
+                    amount: amount,
+                    category: category,
+                    date: date,
+                    description: description || '',
+                    year: date.split('-')[0],
+                    month: date.split('-')[1],
+                    recordedBy: user ? user.uid : 'anonymous',
+                    recordedByName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    tenantId: tenantId
+                });
 
-                setupExamControls();
-                initExamHistorySelectors();
-                initPaymentHistorySelectors();
+                showMessage('✅ Expense recorded successfully!', 'success', 'expenseMessage');
+                document.getElementById('expenseAmount').value = '';
+                document.getElementById('expenseDescription').value = '';
+                document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+                loadExpenseRecords();
+                loadFinanceDashboard();
+            } catch (error) {
+                showMessage('Error recording expense: ' + error.message, 'error', 'expenseMessage');
+                console.error('Expense error:', error);
+            }
+        };
 
-                if (!document.querySelector('#examTermButtons .term-btn.active')) {
-                    const defaultTerm = document.querySelector('#examTermButtons .term-btn');
-                    if (defaultTerm) defaultTerm.classList.add('active');
-                    currentTerm = defaultTerm ? defaultTerm.dataset.term : 'term1';
+        // ----- Load Income Records -----
+        async function loadIncomeRecords() {
+            const container = document.getElementById('incomeListContainer');
+            container.innerHTML = '<p>Loading income records...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const yearFilter = document.getElementById('incomeFilterYear').value;
+                const categoryFilter = document.getElementById('incomeFilterCategory').value;
+
+                let query = db.collection('income').where('tenantId', '==', tenantId).orderBy('date', 'desc');
+                const snap = await query.get();
+
+                let records = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    if (yearFilter !== 'all' && data.year !== yearFilter) return;
+                    if (categoryFilter !== 'all' && data.category !== categoryFilter) return;
+                    records.push(data);
+                });
+
+                if (records.length === 0) {
+                    container.innerHTML = '<p>No income records found. Record your first income above.</p>';
+                    return;
                 }
-                if (!document.querySelector('#examLevelButtons .exam-level-btn.active')) {
-                    const defaultLevel = document.querySelector('#examLevelButtons .exam-level-btn');
-                    if (defaultLevel) defaultLevel.classList.add('active');
-                    currentExamLevel = defaultLevel ? defaultLevel.dataset.examLevel : 'npse';
-                }
 
-                document.querySelectorAll('.att-term-btn').forEach(btn => {
-                    btn.onclick = function() {
-                        document.querySelectorAll('.att-term-btn').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                        currentAttendanceFilter.term = this.dataset.term;
-                        renderFilteredAttendanceHistory();
+                let total = records.reduce((sum, r) => sum + r.amount, 0);
+                let html = `<div style="margin-bottom:10px; font-weight:600; color:#27ae60;">Total Income: Le ${total.toLocaleString()} (${records.length} records)</div>`;
+                html +=
+                    '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount (Le)</th><th>Recorded By</th><th>Actions</th></tr></thead><tbody>';
+                records.forEach(r => {
+                    html += `<tr class="finance-income">
+                        <td>${escapeHtml(r.date)}</td>
+                        <td>${escapeHtml(r.category)}</td>
+                        <td>${escapeHtml(r.description || '')}</td>
+                        <td>${r.amount.toLocaleString()}</td>
+                        <td>${escapeHtml(r.recordedByName || 'Anonymous')}</td>
+                        <td>
+                            <button class="delete-income-btn" data-id="${r.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+
+                container.querySelectorAll('.delete-income-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Delete this income record?')) {
+                            await db.collection('income').doc(this.dataset.id).delete();
+                            loadIncomeRecords();
+                            loadFinanceDashboard();
+                        }
                     };
                 });
-                document.getElementById('attendanceYearFilter')?.addEventListener('change', function() {
-                    currentAttendanceFilter.year = this.value;
-                    renderFilteredAttendanceHistory();
-                });
-                document.getElementById('refreshAttendanceHistoryBtn')?.addEventListener('click', function() {
-                    if (currentStudentDoc) loadAttendanceHistory();
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading income: ' + escapeHtml(error.message) + '</div>';
+                console.error('Income load error:', error);
+            }
+        }
+
+        // ----- Load Expense Records -----
+        async function loadExpenseRecords() {
+            const container = document.getElementById('expenseListContainer');
+            container.innerHTML = '<p>Loading expense records...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const yearFilter = document.getElementById('expenseFilterYear').value;
+                const categoryFilter = document.getElementById('expenseFilterCategory').value;
+
+                let query = db.collection('expenses').where('tenantId', '==', tenantId).orderBy('date', 'desc');
+                const snap = await query.get();
+
+                let records = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    if (yearFilter !== 'all' && data.year !== yearFilter) return;
+                    if (categoryFilter !== 'all' && data.category !== categoryFilter) return;
+                    records.push(data);
                 });
 
-                document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
-                document.getElementById('dashboardYearFilter').onchange = loadDashboard;
-                document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
-                document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
-                document.getElementById('refreshExamHistoryBtn')?.addEventListener('click', function() {
-                    if (currentStudentDoc) loadExamHistory();
-                });
-                document.getElementById('examHistoryYear')?.addEventListener('change', function() {
-                    if (currentStudentDoc) loadExamHistory();
-                });
-                document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
+                if (records.length === 0) {
+                    container.innerHTML = '<p>No expense records found. Record your first expense above.</p>';
+                    return;
+                }
 
-                const predictBtn = document.getElementById('predictRiskBtn');
-                if (predictBtn) {
-                    predictBtn.onclick = function() {
-                        loadRiskPredictions(true);
+                let total = records.reduce((sum, r) => sum + r.amount, 0);
+                let html = `<div style="margin-bottom:10px; font-weight:600; color:#e74c3c;">Total Expenses: Le ${total.toLocaleString()} (${records.length} records)</div>`;
+                html +=
+                    '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount (Le)</th><th>Recorded By</th><th>Actions</th></tr></thead><tbody>';
+                records.forEach(r => {
+                    html += `<tr class="finance-expense">
+                        <td>${escapeHtml(r.date)}</td>
+                        <td>${escapeHtml(r.category)}</td>
+                        <td>${escapeHtml(r.description || '')}</td>
+                        <td>${r.amount.toLocaleString()}</td>
+                        <td>${escapeHtml(r.recordedByName || 'Anonymous')}</td>
+                        <td>
+                            <button class="delete-expense-btn" data-id="${r.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+
+                container.querySelectorAll('.delete-expense-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Delete this expense record?')) {
+                            await db.collection('expenses').doc(this.dataset.id).delete();
+                            loadExpenseRecords();
+                            loadFinanceDashboard();
+                        }
                     };
-                }
-                const sendAlertsBtn = document.getElementById('sendRiskAlertsBtn');
-                if (sendAlertsBtn) {
-                    sendAlertsBtn.onclick = sendRiskAlerts;
-                }
-
-                if (role === 'parent' || role === 'student') {
-                    setTimeout(() => {
-                        const chatTab = document.querySelector('[data-tab="aichat"]');
-                        if (chatTab) {
-                            chatTab.click();
-                            initChatbot();
-                        }
-                    }, 1000);
-                }
-
-                if (role === 'admin') {
-                    document.getElementById('admissionRequestsCard').style.display = 'block';
-                    loadAdmissionRequests('admissionRequestsList');
-                    loadAdmissionRequests('admissionRequestsAdminList');
-                    document.getElementById('registrationRequestsCard').style.display = 'block';
-                    loadRegistrationRequests('registrationRequestsList');
-                    loadRegistrationRequests('registrationRequestsAdminList');
-                    loadEntranceExams();
-                    // Setup settings tab
-                    setupSettingsTab();
-                }
-
-                document.getElementById('libraryRefreshBtn').addEventListener('click', showLibraryResources);
-                document.getElementById('libraryClassSelect').addEventListener('change', showLibraryResources);
-                document.getElementById('libraryDepartmentSelect').addEventListener('change', showLibraryResources);
-
-                const docTabBtn = document.querySelector('[data-tab="documents"]');
-                if (docTabBtn) {
-                    docTabBtn.addEventListener('click', function() {
-                        if (currentStudentDoc) {
-                            loadStudentDocuments(currentStudentDoc.id);
-                        } else {
-                            document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
-                        }
-                    });
-                }
-
-                document.getElementById('refreshFeeCollectionsBtn').addEventListener('click', function() {
-                    loadFeeCollections();
                 });
-                document.getElementById('resetFeeCollectionsBtn').addEventListener('click', function() {
-                    document.getElementById('feeCollectionYear').value = 'all';
-                    document.getElementById('feeCollectionTerm').value = 'all';
-                    document.getElementById('feeCollectionMonth').value = 'all';
-                    loadFeeCollections();
-                });
-                document.getElementById('feeCollectionYear').addEventListener('change', applyFeeFilters);
-                document.getElementById('feeCollectionTerm').addEventListener('change', applyFeeFilters);
-                document.getElementById('feeCollectionMonth').addEventListener('change', applyFeeFilters);
 
-                const reportCardTabBtn = document.querySelector('[data-tab="reportcard"]');
-                if (reportCardTabBtn) {
-                    reportCardTabBtn.addEventListener('click', function() {
-                        if (currentStudentDoc) {
-                            const yearSelect = document.getElementById('reportCardYear');
-                            if (yearSelect.options.length <= 1) {
-                                db.collection('exam_records').doc(currentStudentDoc.id).get().then(doc => {
-                                    if (doc.exists) {
-                                        const data = doc.data();
-                                        const years = data.years ? Object.keys(data.years) : [];
-                                        const currentVal = yearSelect.value;
-                                        yearSelect.innerHTML = '<option value="all">All Years</option>';
-                                        years.forEach(y => {
-                                            yearSelect.innerHTML +=
-                                                `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
-                                        });
-                                    }
-                                }).catch(() => {});
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading expenses: ' + escapeHtml(error.message) + '</div>';
+                console.error('Expense load error:', error);
+            }
+        }
+
+        // ----- Populate Finance Filter Years -----
+        async function populateFinanceFilterYears() {
+            const tenantId = getCurrentTenantId();
+            const years = new Set();
+
+            const incomeSnap = await db.collection('income').where('tenantId', '==', tenantId).get();
+            incomeSnap.forEach(d => { if (d.data().year) years.add(d.data().year); });
+
+            const expenseSnap = await db.collection('expenses').where('tenantId', '==', tenantId).get();
+            expenseSnap.forEach(d => { if (d.data().year) years.add(d.data().year); });
+
+            const selects = ['incomeFilterYear', 'expenseFilterYear', 'reportYearFilter'];
+            const currentValues = {};
+            selects.forEach(id => {
+                const sel = document.getElementById(id);
+                if (sel) currentValues[id] = sel.value;
+            });
+
+            selects.forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const current = currentValues[id] || 'all';
+                sel.innerHTML = '<option value="all">All Years</option>';
+                const sorted = Array.from(years).sort((a, b) => b - a);
+                sorted.forEach(y => {
+                    sel.innerHTML += `<option value="${y}" ${y === current ? 'selected' : ''}>${y}</option>`;
+                });
+                if (sel.value !== current) sel.value = current;
+            });
+        }
+
+        // ----- Load Finance Dashboard -----
+        async function loadFinanceDashboard() {
+            const container = document.getElementById('financeDashboardMessage');
+            container.innerHTML = '';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const today = new Date();
+                const sixMonthsAgo = new Date(today);
+                sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+
+                // Load income
+                const incomeSnap = await db.collection('income').where('tenantId', '==', tenantId).get();
+                const incomeRecords = [];
+                incomeSnap.forEach(d => incomeRecords.push({ id: d.id, ...d.data() }));
+
+                // Load expenses
+                const expenseSnap = await db.collection('expenses').where('tenantId', '==', tenantId).get();
+                const expenseRecords = [];
+                expenseSnap.forEach(d => expenseRecords.push({ id: d.id, ...d.data() }));
+
+                // Calculate totals
+                const totalIncome = incomeRecords.reduce((sum, r) => sum + r.amount, 0);
+                const totalExpenses = expenseRecords.reduce((sum, r) => sum + r.amount, 0);
+                const netProfit = totalIncome - totalExpenses;
+                const transactionCount = incomeRecords.length + expenseRecords.length;
+
+                // Update KPI cards
+                document.getElementById('finTotalIncome').textContent = totalIncome.toLocaleString();
+                document.getElementById('finTotalExpenses').textContent = totalExpenses.toLocaleString();
+                document.getElementById('finNetProfit').textContent = netProfit.toLocaleString();
+                document.getElementById('finTransactionCount').textContent = transactionCount;
+
+                // ---- Income vs Expenses Trend Chart ----
+                const months = [];
+                const monthLabels = [];
+                for (let i = 5; i >= 0; i--) {
+                    const d = new Date(today);
+                    d.setMonth(d.getMonth() - i);
+                    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                    months.push(key);
+                    monthLabels.push(d.toLocaleString('default', { month: 'short', year: 'numeric' }));
+                }
+
+                const incomeByMonth = {};
+                const expenseByMonth = {};
+                months.forEach(m => { incomeByMonth[m] = 0;
+                    expenseByMonth[m] = 0; });
+
+                incomeRecords.forEach(r => {
+                    const key = r.year + '-' + r.month;
+                    if (incomeByMonth.hasOwnProperty(key)) incomeByMonth[key] += r.amount;
+                });
+                expenseRecords.forEach(r => {
+                    const key = r.year + '-' + r.month;
+                    if (expenseByMonth.hasOwnProperty(key)) expenseByMonth[key] += r.amount;
+                });
+
+                const incomeData = months.map(m => incomeByMonth[m] || 0);
+                const expenseData = months.map(m => expenseByMonth[m] || 0);
+
+                const trendCtx = document.getElementById('financeTrendChart');
+                if (financeCharts.trend) { financeCharts.trend.destroy();
+                    financeCharts.trend = null; }
+                if (trendCtx) {
+                    financeCharts.trend = new Chart(trendCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: monthLabels,
+                            datasets: [
+                                { label: 'Income', data: incomeData, backgroundColor: 'rgba(39,174,96,0.7)',
+                                    borderColor: '#27ae60', borderWidth: 1 },
+                                { label: 'Expenses', data: expenseData, backgroundColor: 'rgba(231,76,60,0.7)',
+                                    borderColor: '#e74c3c', borderWidth: 1 }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom' } },
+                            scales: {
+                                y: { beginAtZero: true, ticks: { callback: function(value) { return 'Le ' + value
+                                            .toLocaleString(); } } }
                             }
-                            generateReportCard();
-                        } else {
-                            document.getElementById('reportCardContainer').innerHTML =
-                                '<p>Please load a student first.</p>';
                         }
                     });
                 }
 
-                const entranceExamTabBtn = document.querySelector('[data-tab="entranceexam"]');
-                if (entranceExamTabBtn) {
-                    entranceExamTabBtn.addEventListener('click', function() {
-                        if (currentStudentDoc) {
-                            loadEntranceExamForParent();
-                        } else {
-                            document.getElementById('entranceExamList').innerHTML =
-                                '<p>Please load a student first.</p>';
-                        }
-                    });
-                }
-
-                const eLearningBtn = document.getElementById('eLearningModuleBtn');
-                if (eLearningBtn) {
-                    eLearningBtn.addEventListener('click', function() {
-                        populateELearningDropdowns();
-                        loadQuizzes();
-                        loadAssignments();
-                    });
-                }
-
-                const datePicker = document.getElementById('attendanceDatePicker');
-                if (datePicker) {
-                    datePicker.value = attendanceDate;
-                    document.getElementById('attendanceDateInfo').textContent = 'Today';
-                }
-
-                const firstModuleBtn = document.querySelector('.module-btn');
-                if (firstModuleBtn) firstModuleBtn.click();
-                else {
-                    if (document.getElementById('dashboardModule')) document.getElementById('dashboardModule').style
-                        .display = 'block';
-                    loadDashboard();
-                    loadStaffDashboard();
-                }
-
-                if (document.getElementById('attendanceModule').style.display !== 'none') {
-                    renderAttendanceForDate(attendanceDate);
-                }
-
-                document.getElementById('loadAttendanceDateBtn').addEventListener('click', function() {
-                    const date = document.getElementById('attendanceDatePicker').value;
-                    if (date) {
-                        attendanceDate = date;
-                        const today = new Date().toISOString().split('T')[0];
-                        document.getElementById('attendanceDateInfo').textContent = date === today ? 'Today' :
-                            date;
-                        renderAttendanceForDate(date);
-                    }
+                // ---- Income by Category Chart ----
+                const incomeByCategory = {};
+                incomeRecords.forEach(r => {
+                    incomeByCategory[r.category] = (incomeByCategory[r.category] || 0) + r.amount;
                 });
+                const incomeCatLabels = Object.keys(incomeByCategory);
+                const incomeCatData = incomeCatLabels.map(c => incomeByCategory[c]);
+                const incomeColors = ['#27ae60', '#2ecc71', '#1abc9c', '#16a085', '#3498db', '#2980b9', '#9b59b6'];
 
-            } catch (e) {
-                document.getElementById('loginMessage').innerHTML = '<div class="error">' + escapeHtml(e.message) +
+                const incCatCtx = document.getElementById('incomeCategoryChart');
+                if (financeCharts.incomeCategory) { financeCharts.incomeCategory.destroy();
+                    financeCharts.incomeCategory = null; }
+                if (incCatCtx) {
+                    financeCharts.incomeCategory = new Chart(incCatCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: incomeCatLabels,
+                            datasets: [{ data: incomeCatData, backgroundColor: incomeColors.slice(0, incomeCatLabels
+                                    .length), borderWidth: 0 }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
+                            cutout: '60%'
+                        }
+                    });
+                }
+
+                // ---- Expenses by Category Chart ----
+                const expenseByCategory = {};
+                expenseRecords.forEach(r => {
+                    expenseByCategory[r.category] = (expenseByCategory[r.category] || 0) + r.amount;
+                });
+                const expCatLabels = Object.keys(expenseByCategory);
+                const expCatData = expCatLabels.map(c => expenseByCategory[c]);
+                const expColors = ['#e74c3c', '#c0392b', '#e67e22', '#d35400', '#f39c12', '#f1c40f', '#95a5a6'];
+
+                const expCatCtx = document.getElementById('expenseCategoryChart');
+                if (financeCharts.expenseCategory) { financeCharts.expenseCategory.destroy();
+                    financeCharts.expenseCategory = null; }
+                if (expCatCtx) {
+                    financeCharts.expenseCategory = new Chart(expCatCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: expCatLabels,
+                            datasets: [{ data: expCatData, backgroundColor: expColors.slice(0, expCatLabels
+                                    .length), borderWidth: 0 }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
+                            cutout: '60%'
+                        }
+                    });
+                }
+
+                // ---- Monthly Summary ----
+                const monthlySummary = document.getElementById('financeMonthlySummary');
+                const allMonths = new Set();
+                incomeRecords.forEach(r => allMonths.add(r.year + '-' + r.month));
+                expenseRecords.forEach(r => allMonths.add(r.year + '-' + r.month));
+                const sortedMonths = Array.from(allMonths).sort();
+
+                let summaryHtml = '<table style="font-size:0.8rem; width:100%;"><thead><tr><th>Month</th><th>Income</th><th>Expenses</th><th>Profit</th></tr></thead><tbody>';
+                let runningBalance = 0;
+                sortedMonths.forEach(m => {
+                    const inc = incomeRecords.filter(r => r.year + '-' + r.month === m).reduce((s, r) => s + r
+                        .amount, 0);
+                    const exp = expenseRecords.filter(r => r.year + '-' + r.month === m).reduce((s, r) => s + r
+                        .amount, 0);
+                    const profit = inc - exp;
+                    runningBalance += profit;
+                    const color = profit >= 0 ? '#27ae60' : '#e74c3c';
+                    const [year, month] = m.split('-');
+                    const label = new Date(parseInt(year), parseInt(month) - 1).toLocaleString('default', { month: 'short',
+                        year: 'numeric' });
+                    summaryHtml += `<tr>
+                        <td>${escapeHtml(label)}</td>
+                        <td style="color:#27ae60;">Le ${inc.toLocaleString()}</td>
+                        <td style="color:#e74c3c;">Le ${exp.toLocaleString()}</td>
+                        <td style="color:${color}; font-weight:600;">Le ${profit.toLocaleString()}</td>
+                    </tr>`;
+                });
+                summaryHtml +=
+                    `<tr style="font-weight:700; border-top:2px solid #1a4b8a;"><td>Total</td><td style="color:#27ae60;">Le ${totalIncome.toLocaleString()}</td><td style="color:#e74c3c;">Le ${totalExpenses.toLocaleString()}</td><td style="color:${netProfit >= 0 ? '#27ae60' : '#e74c3c'};">Le ${netProfit.toLocaleString()}</td></tr>`;
+                summaryHtml += '</tbody></table>';
+                monthlySummary.innerHTML = summaryHtml;
+
+            } catch (error) {
+                console.error('Finance dashboard error:', error);
+                container.innerHTML = '<div class="error">Error loading finance dashboard: ' + escapeHtml(error.message) +
                     '</div>';
             }
         }
 
-        // ==================================================================
-        //  ROLE-BASED UI (updated for settings)
-        // ==================================================================
-        function setupRoleUI(role, extra) {
-            extra = extra || {};
-            const moduleContainer = document.getElementById('moduleButtons');
-            moduleContainer.innerHTML = '';
-            document.getElementById('dashboardModule').style.display = 'none';
-            document.getElementById('attendanceModule').style.display = 'none';
-            document.getElementById('recordsModule').style.display = 'none';
-            document.getElementById('teachersModule').style.display = 'none';
-            document.getElementById('bursarModule').style.display = 'none';
-            document.getElementById('adminModule').style.display = 'none';
-            document.getElementById('suggestionsModule').style.display = 'none';
-            document.getElementById('eLearningModule').style.display = 'none';
-            document.getElementById('suggestionFab').style.display = 'flex';
-
-            const searchHandler = async function() {
-                try {
-                    const tenantId = getCurrentTenantId();
-                    const q = document.getElementById('studentSearchInput').value.trim();
-                    if (!q) {
-                        showMessage('Please enter a Student ID or Name.', 'error', 'searchResults');
-                        return;
-                    }
-
-                    let found = globalStudentMap.get(q);
-                    if (found) {
-                        loadStudentRecord(found);
-                        return;
-                    }
-
-                    const nameMap = window.globalNameMap || new Map();
-                    const matches = nameMap.get(q.toLowerCase()) || [];
-                    if (matches.length === 0) {
-                        showMessage('No student found with that ID or name.', 'error', 'searchResults');
-                        document.getElementById('studentRecordsPanel').style.display = 'none';
-                        return;
-                    }
-
-                    if (matches.length === 1) {
-                        loadStudentRecord(matches[0]);
-                        return;
-                    }
-
-                    let listHtml = `<div class="success">Found ${matches.length} students with name "${escapeHtml(q)}":</div><ul style="list-style:none; padding:0;">`;
-                    matches.forEach((s, idx) => {
-                        listHtml += `<li style="margin:4px 0; padding:6px 12px; background:#f8fafc; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                            <span><strong>${escapeHtml(s.name)}</strong> (ID: ${escapeHtml(s.id)}, Class: ${escapeHtml(s.class)})</span>
-                            <button class="load-student-btn" data-idx="${idx}" style="background:#1a4b8a; color:#fff; border:none; padding:4px 12px; border-radius:30px; cursor:pointer;">Select</button>
-                        </li>`;
-                    });
-                    listHtml += '</ul>';
-                    document.getElementById('searchResults').innerHTML = listHtml;
-                    document.getElementById('studentRecordsPanel').style.display = 'none';
-
-                    document.querySelectorAll('.load-student-btn').forEach(btn => {
-                        btn.onclick = function() {
-                            const idx = parseInt(this.dataset.idx);
-                            loadStudentRecord(matches[idx]);
-                        };
-                    });
-
-                } catch (error) {
-                    showMessage('Error searching: ' + error.message, 'error', 'searchResults');
-                }
-            };
-
-            function loadStudentRecord(student) {
-                currentStudentDoc = student;
-                document.getElementById('studentRecordsPanel').style.display = 'block';
-                document.getElementById('searchResults').innerHTML =
-                    `<div class="success">Found: ${escapeHtml(student.name)} (${student.id})</div>`;
-                loadStudentProfile();
-                loadPaymentHistory();
-                loadExamHistory();
-                loadAttendanceHistory();
-                if (currentUserRole === 'parent' || currentUserRole === 'student') {
-                    initChatbot();
-                }
-                const docTab = document.querySelector('[data-tab="documents"]');
-                if (docTab && docTab.classList.contains('active')) {
-                    loadStudentDocuments(student.id);
-                }
-                const reportTab = document.querySelector('[data-tab="reportcard"]');
-                if (reportTab && reportTab.classList.contains('active')) {
-                    generateReportCard();
-                }
-                const entranceTab = document.querySelector('[data-tab="entranceexam"]');
-                if (entranceTab && entranceTab.classList.contains('active')) {
-                    loadEntranceExamForParent();
-                }
-            }
-
-            let modules = [];
-            modules.push({ id: 'suggestionsModuleBtn', label: 'Suggestions', moduleId: 'suggestionsModule' });
-
-            if (role === 'admin') {
-                modules.unshift({ id: 'dashboardModuleBtn', label: 'Dashboard', moduleId: 'dashboardModule' },
-                    { id: 'attendanceModuleBtn', label: 'Attendance', moduleId: 'attendanceModule' },
-                    { id: 'recordsModuleBtn', label: 'Student Records', moduleId: 'recordsModule' },
-                    { id: 'teachersModuleBtn', label: 'Users', moduleId: 'teachersModule' },
-                    { id: 'adminModuleBtn', label: 'Admin', moduleId: 'adminModule' },
-                    { id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
-                );
-            } else if (role === 'bursar') {
-                modules.unshift({ id: 'bursarModuleBtn', label: 'Bursar', moduleId: 'bursarModule' });
-            } else if (role === 'teacher') {
-                modules.unshift({ id: 'attendanceModuleBtn', label: 'Attendance', moduleId: 'attendanceModule' },
-                    { id: 'recordsModuleBtn', label: 'Student Records', moduleId: 'recordsModule' },
-                    { id: 'teachersModuleBtn', label: 'My Profile', moduleId: 'teachersModule' },
-                    { id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
-                );
-            } else if (role === 'parent' || role === 'student') {
-                modules.unshift({ id: 'recordsModuleBtn', label: 'My Records', moduleId: 'recordsModule' },
-                    { id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
-                );
-            }
-
-            modules.forEach(m => {
-                const btn = document.createElement('button');
-                btn.id = m.id;
-                btn.className = 'module-btn';
-                btn.textContent = m.label;
-                btn.onclick = function() {
-                    document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    document.querySelectorAll('#mainApp > div[id$="Module"]').forEach(div => div.style
-                        .display = 'none');
-                    document.getElementById(m.moduleId).style.display = 'block';
-                    if (m.moduleId === 'dashboardModule') { loadDashboard();
-                        loadStaffDashboard(); }
-                    if (m.moduleId === 'attendanceModule') renderAttendanceForDate(attendanceDate);
-                    if (m.moduleId === 'teachersModule') {
-                        if (role === 'admin') loadAllTeachersForAdmin();
-                        if (role === 'teacher' || role === 'admin') displayOwnTeacherProfile();
-                    }
-                    if (m.moduleId === 'bursarModule') {
-                        if (Object.keys(allStudents).length === 0) {
-                            loadStudents().then(() => {
-                                loadBursarSummary();
-                                populateFeeStatsYears().then(loadFeeStats);
-                                loadFeeCollections();
-                            });
-                        } else {
-                            loadBursarSummary();
-                            populateFeeStatsYears().then(loadFeeStats);
-                            loadFeeCollections();
-                        }
-                    }
-                    if (m.moduleId === 'adminModule') {
-                        loadStaffList();
-                        loadAssetsList();
-                        loadInventoryList();
-                        loadVisitorsList();
-                        renderNotices();
-                        initFileDB().then(loadFilesList);
-                        loadLoginActivity();
-                        loadSchoolLocation();
-                        loadStaffCheckinHistory();
-                        loadAdmissionRequests('admissionRequestsAdminList');
-                        loadRegistrationRequests('registrationRequestsAdminList');
-                        populatePromotionDropdowns();
-                        loadEntranceExams();
-                        // Load settings when admin module is opened
-                        if (document.getElementById('schoolsettingsTab').style.display !== 'none') {
-                            loadSchoolSettings();
-                        }
-                    }
-                    if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
-                    if (m.moduleId === 'eLearningModule') {
-                        populateELearningDropdowns();
-                        loadQuizzes();
-                        loadAssignments();
-                        document.querySelector('.elearning-tab-btn.active')?.click();
-                    }
-                    if (m.moduleId === 'recordsModule' && (role === 'parent' || role === 'student')) {
-                        setTimeout(() => {
-                            const studentId = role === 'parent' ? linkedStudentId : linkedStudentId;
-                            if (studentId) {
-                                document.getElementById('studentSearchInput').value = studentId;
-                                searchHandler();
-                            }
-                        }, 300);
-                    }
-                };
-                moduleContainer.appendChild(btn);
-            });
-
-            document.getElementById('searchStudentBtn').onclick = searchHandler;
-
-            if (role === 'admin') {
-                document.getElementById('importSection').style.display = 'block';
-                document.getElementById('manualSection').style.display = 'block';
-                document.getElementById('adminTeacherSections').style.display = 'block';
-                document.getElementById('teacherOwnProfileCard').style.display = 'block';
-                loadStaffList();
-                loadAssetsList();
-                loadInventoryList();
-                loadVisitorsList();
-                renderNotices();
-                initFileDB().then(loadFilesList);
-                loadAllTeachersForAdmin();
-                displayOwnTeacherProfile();
-                document.getElementById('refreshLoginActivityBtn').onclick = loadLoginActivity;
-                document.getElementById('clearLoginActivityBtn').onclick = clearLoginActivity;
-                document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => {
-                    btn.onclick = function() {
-                        const id = this.dataset.tab;
-                        document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList
-                            .remove('active'));
-                        this.classList.add('active');
-                        document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display =
-                            'none');
-                        document.getElementById(id + 'Tab').style.display = 'block';
-                        if (id === 'staff') loadStaffList();
-                        else if (id === 'assets') loadAssetsList();
-                        else if (id === 'inventory') loadInventoryList();
-                        else if (id === 'visitors') loadVisitorsList();
-                        else if (id === 'noticeboard') renderNotices();
-                        else if (id === 'filestorage') initFileDB().then(loadFilesList);
-                        else if (id === 'examhistoryall') { /* handled on load */ } else if (id ===
-                            'suggestions') loadSuggestions('suggestionsList');
-                        else if (id === 'loginactivity') loadLoginActivity();
-                        else if (id === 'schoollocation') loadSchoolLocation();
-                        else if (id === 'staffcheckins') loadStaffCheckinHistory();
-                        else if (id === 'admissionrequests') loadAdmissionRequests(
-                            'admissionRequestsAdminList');
-                        else if (id === 'registrationrequests') loadRegistrationRequests(
-                            'registrationRequestsAdminList');
-                        else if (id === 'promotion') populatePromotionDropdowns();
-                        else if (id === 'entranceexams') loadEntranceExams();
-                        else if (id === 'schoolsettings') loadSchoolSettings();
-                    };
-                });
-                // Setup settings tab
-                setupSettingsTab();
-            } else if (role === 'bursar') {
-                document.getElementById('importSection').style.display = 'none';
-                document.getElementById('manualSection').style.display = 'none';
-                document.getElementById('adminTeacherSections').style.display = 'none';
-                document.getElementById('teacherOwnProfileCard').style.display = 'none';
-            } else if (role === 'teacher') {
-                teacherAssignedClass = extra.class || 'JSS1';
-                teacherOwnData = extra.teacherData || null;
-                document.getElementById('importSection').style.display = 'none';
-                document.getElementById('manualSection').style.display = 'none';
-                document.getElementById('adminTeacherSections').style.display = 'none';
-                document.getElementById('teacherOwnProfileCard').style.display = 'block';
-                document.getElementById('editOwnTeacherBtn').style.display = 'inline-block';
-                setTimeout(() => {
-                    const classSelect = document.getElementById('classSelect');
-                    if (classSelect) {
-                        updateClassDropdown();
-                        classSelect.disabled = true;
-                        classSelect.value = teacherAssignedClass;
-                        const badge = document.getElementById('teacherClassBadge');
-                        if (badge) {
-                            badge.style.display = 'inline-block';
-                            badge.textContent = 'Assigned: ' + teacherAssignedClass;
-                        }
-                        renderAttendanceForDate(attendanceDate);
-                    }
-                }, 500);
-                displayOwnTeacherProfile();
-                if (teacherOwnData) { document.getElementById('teacherRegisterSearch').value = teacherOwnData.id;
-                    loadTeacherRegisterForId(teacherOwnData.id); }
-            } else if (role === 'parent') {
-                linkedStudentId = extra.studentId || null;
-                if (!linkedStudentId) { alert('No student linked to this parent account.'); return; }
-                document.getElementById('importSection').style.display = 'none';
-                document.getElementById('manualSection').style.display = 'none';
-                document.getElementById('editProfileBtn').style.display = 'none';
-                const searchBox = document.querySelector('#recordsModule .search-box');
-                if (searchBox) searchBox.style.display = 'none';
-                setTimeout(() => {
-                    document.getElementById('studentSearchInput').value = linkedStudentId;
-                    searchHandler();
-                }, 500);
-                setTimeout(initChatbot, 1000);
-            } else if (role === 'student') {
-                linkedStudentId = extra.studentId || null;
-                if (!linkedStudentId) { alert('No student linked to this student account.'); return; }
-                document.getElementById('importSection').style.display = 'none';
-                document.getElementById('manualSection').style.display = 'none';
-                document.getElementById('editProfileBtn').style.display = 'none';
-                const searchBox = document.querySelector('#recordsModule .search-box');
-                if (searchBox) searchBox.style.display = 'none';
-                setTimeout(() => {
-                    document.getElementById('studentSearchInput').value = linkedStudentId;
-                    searchHandler();
-                }, 500);
-                setTimeout(initChatbot, 1000);
-            }
+        // ----- Finance Reports -----
+        function populateFinanceReportFilters() {
+            populateFinanceFilterYears();
         }
 
-        // ==================================================================
-        //  WINDOW ONLOAD
-        // ==================================================================
-        window.onload = function() {
-            function updateOnlineStatus() {
-                const badge = document.getElementById('onlineStatus'),
-                    bar = document.getElementById('syncBar');
-                if (navigator.onLine) {
-                    badge.innerHTML = 'Online';
-                    badge.className = 'online-badge online';
-                    bar.innerHTML = 'Connected to Firestore';
-                    bar.style.background = 'linear-gradient(135deg, #1a7a3a, #2e9b5e)';
-                } else {
-                    badge.innerHTML = 'Offline';
-                    badge.className = 'online-badge offline';
-                    bar.innerHTML = 'Offline mode – data cached';
-                    bar.style.background = 'linear-gradient(135deg, #b9770e, #d68910)';
+        document.getElementById('generateReportBtn').onclick = async function() {
+            const container = document.getElementById('financeReportContainer');
+            container.innerHTML = '<p>Generating report...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const year = document.getElementById('reportYearFilter').value;
+                const month = document.getElementById('reportMonthFilter').value;
+
+                let incomeQuery = db.collection('income').where('tenantId', '==', tenantId);
+                let expenseQuery = db.collection('expenses').where('tenantId', '==', tenantId);
+
+                if (year !== 'all') {
+                    incomeQuery = incomeQuery.where('year', '==', year);
+                    expenseQuery = expenseQuery.where('year', '==', year);
                 }
-            }
-            updateOnlineStatus();
-            window.addEventListener('online', updateOnlineStatus);
-            window.addEventListener('offline', updateOnlineStatus);
+                if (month !== 'all') {
+                    incomeQuery = incomeQuery.where('month', '==', month);
+                    expenseQuery = expenseQuery.where('month', '==', month);
+                }
 
-            ensureDemoUsers().then(() => {
-                console.log('✅ Demo users ready.');
-                loadSchools();
-            }).catch(console.warn);
+                const [incomeSnap, expenseSnap] = await Promise.all([incomeQuery.get(), expenseQuery.get()]);
 
-            showStartupPage();
+                const incomeRecords = [];
+                incomeSnap.forEach(d => incomeRecords.push({ id: d.id, ...d.data() }));
 
-            document.getElementById('demoAdminBtn').onclick = function() { loginAndSetup('admin@school.com',
-                'admin123'); };
-            document.getElementById('demoBursarBtn').onclick = function() { loginAndSetup('bursar@school.com',
-                'bursar123'); };
-            document.getElementById('demoTeacherBtn').onclick = function() { loginAndSetup('teacher@school.com',
-                'teacher123'); };
-            document.getElementById('demoParentBtn').onclick = function() { loginAndSetup('parent@school.com',
-                'parent123'); };
-            document.getElementById('demoStudentBtn').onclick = function() { loginAndSetup('student@school.com',
-                'student123'); };
-            document.getElementById('loginBtn').onclick = function() {
-                loginAndSetup(document.getElementById('loginEmail').value, document.getElementById('loginPassword')
-                    .value);
-            };
-            document.getElementById('logoutBtn').onclick = function() {
-                auth.signOut().then(function() {
-                    try { localStorage.removeItem('tenantId'); } catch (_) {}
-                    _tenantId = 'default_tenant';
-                    showStartupPage();
-                });
-            };
+                const expenseRecords = [];
+                expenseSnap.forEach(d => expenseRecords.push({ id: d.id, ...d.data() }));
 
-            const signupToggle = document.getElementById('signupToggle');
-            const signupBack = document.getElementById('signupBack');
-            const signupFields = document.getElementById('signupFields');
-            signupToggle.onclick = function() { signupFields.classList.toggle('active');
-                this.style.display = 'none';
-                signupBack.style.display = 'inline-block'; };
-            signupBack.onclick = function() { signupFields.classList.remove('active');
-                signupToggle.style.display = 'inline-block';
-                this.style.display = 'none'; };
-            document.getElementById('signupBtn').onclick = signUpAndCreateTenant;
+                const totalIncome = incomeRecords.reduce((s, r) => s + r.amount, 0);
+                const totalExpenses = expenseRecords.reduce((s, r) => s + r.amount, 0);
+                const netProfit = totalIncome - totalExpenses;
 
-            document.getElementById('addStudentBtn').onclick = function() { if (currentUserRole !== 'admin') return;
-                addManualStudent(); };
-            document.getElementById('loadBtn').onclick = function() { if (currentUserRole !== 'admin' &&
-                    currentUserRole !== 'teacher') return;
-                renderAttendanceForDate(attendanceDate); };
-            document.getElementById('refreshBtn').onclick = function() { if (currentUserRole !== 'admin' &&
-                    currentUserRole !== 'teacher') return;
-                loadStudents().then(() => renderAttendanceForDate(attendanceDate)); };
-            document.getElementById('batchWhatsappBtn').onclick = function() {
-                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert(
-                        'You do not have permission to send reports.'); return; }
-                sendBatchWhatsApp();
-            };
-            document.getElementById('classHistoryBtn').onclick = function() {
-                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert(
-                        'You do not have permission to view class history.'); return; }
-                viewClassHistory();
-            };
+                const title = year !== 'all' ? `Year ${year}` : 'All Years';
+                const monthLabel = month !== 'all' ? new Date(parseInt(year || new Date().getFullYear()), parseInt(month) - 1)
+                    .toLocaleString('default', { month: 'long' }) : 'All Months';
 
-            document.getElementById('clearSearchBtn').onclick = function() {
-                document.getElementById('studentSearchInput').value = '';
-                document.getElementById('searchResults').innerHTML = '';
-                document.getElementById('studentRecordsPanel').style.display = 'none';
-            };
+                let html = `<h4>📊 Financial Report — ${title} ${month !== 'all' ? '- ' + monthLabel : ''}</h4>`;
 
-            document.getElementById('editProfileBtn').onclick = function() {
-                if (currentUserRole !== 'admin') { alert('Only admin can edit student profiles'); return; }
-                editProfile();
-            };
-            document.getElementById('saveProfileBtn').onclick = saveProfile;
+                html += `<div class="finance-kpi-grid" style="margin-bottom:16px;">
+                    <div class="finance-kpi-card"><div class="kpi-number income">Le ${totalIncome.toLocaleString()}</div><div class="kpi-label">Total Income</div></div>
+                    <div class="finance-kpi-card"><div class="kpi-number expense">Le ${totalExpenses.toLocaleString()}</div><div class="kpi-label">Total Expenses</div></div>
+                    <div class="finance-kpi-card"><div class="kpi-number profit">Le ${netProfit.toLocaleString()}</div><div class="kpi-label">Net ${netProfit >= 0 ? 'Profit' : 'Loss'}</div></div>
+                    <div class="finance-kpi-card"><div class="kpi-number">${incomeRecords.length + expenseRecords.length}</div><div class="kpi-label">Transactions</div></div>
+                </div>`;
 
-            document.getElementById('searchTeacherBtn').onclick = function() {
-                if (currentUserRole !== 'admin') { alert('Only admin can search teachers.'); return; }
-                searchTeacherAdmin();
-            };
-            document.getElementById('clearTeacherSearchBtn').onclick = function() {
-                document.getElementById('teacherSearchInput').value = '';
-                document.getElementById('teacherSearchResults').innerHTML = '';
-                if (currentUserRole === 'admin') loadAllTeachersForAdmin();
-            };
-            document.getElementById('addTeacherBtn').onclick = function() { if (currentUserRole !== 'admin') return;
-                addTeacherAdmin(); };
-            document.getElementById('printTeachersTable').onclick = function() {
-                if (currentUserRole !== 'admin') return;
-                const tbl = document.getElementById('allTeachersList');
-                if (tbl && tbl.children.length) printTable(tbl, 'Users');
-                else alert('No users table');
-            };
-            document.getElementById('exportTeachersCSVBtn').onclick = function() {
-                if (currentUserRole !== 'admin') return;
-                const tbl = document.getElementById('allTeachersList');
-                if (tbl && tbl.children.length) exportTableToCSV(tbl, 'users');
-                else alert('No users table');
-            };
-            document.getElementById('searchTeacherRegisterBtn').onclick = function() {
-                if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('Access denied.'); return; }
-                loadTeacherRegister();
-            };
+                // Income breakdown
+                const incomeByCat = {};
+                incomeRecords.forEach(r => { incomeByCat[r.category] = (incomeByCat[r.category] || 0) + r.amount; });
+                const expenseByCat = {};
+                expenseRecords.forEach(r => { expenseByCat[r.category] = (expenseByCat[r.category] || 0) + r.amount; });
 
-            document.getElementById('searchBursarStudentBtn').onclick = function() {
-                if (currentUserRole !== 'bursar') { showMessage('Access denied. Only bursar can access this.',
-                        'error', 'bursarPaymentMessage'); return; }
-                loadBursarStudent();
-            };
-            document.getElementById('saveBursarFeesBtn').onclick = function() { if (currentUserRole !== 'bursar') return;
-                saveBursarTermFees(); };
-            document.getElementById('submitBursarPaymentBtn').onclick = function() { if (currentUserRole !== 'bursar')
-                    return;
-                recordBursarPayment(); };
-            document.getElementById('refreshBursarBtn').onclick = function() { if (currentUserRole === 'bursar')
-                    loadBursarSummary(); };
-            document.getElementById('exportBursarCSV').onclick = function() { if (currentUserRole === 'bursar')
-                    exportBursarToCSV(); };
-            document.getElementById('bursarClassFilter').onchange = function() { if (currentUserRole === 'bursar')
-                    loadBursarSummary(); };
-            document.getElementById('refreshFeeStatsBtn').onclick = function() { if (currentUserRole === 'bursar')
-                    loadFeeStats(); };
-            document.getElementById('feeStatsYear').onchange = function() { if (currentUserRole === 'bursar')
-                    loadFeeStats(); };
-            document.getElementById('feeStatsTerm').onchange = function() { if (currentUserRole === 'bursar')
-                    loadFeeStats(); };
+                html += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px;">
+                    <div><h5 style="color:#27ae60;">Income by Category</h5><ul style="list-style:none; padding:0;">`;
+                for (const [cat, amt] of Object.entries(incomeByCat).sort((a, b) => b[1] - a[1])) {
+                    html += `<li style="padding:4px 0; border-bottom:1px solid #f0f0f0;"><strong>${escapeHtml(cat)}</strong>: Le ${amt.toLocaleString()}</li>`;
+                }
+                if (Object.keys(incomeByCat).length === 0) html += '<li>No income records.</li>';
+                html += `</ul></div>`;
 
-            document.getElementById('addStaffBtn').onclick = addStaff;
-            document.getElementById('addAssetBtn').onclick = addAsset;
-            document.getElementById('addInventoryBtn').onclick = addInventory;
-            document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
-            document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
-            document.getElementById('postNoticeBtn').onclick = postNotice;
-            document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
-            document.getElementById('refreshFilesBtn').onclick = function() { initFileDB().then(loadFilesList); };
-            document.getElementById('printAnyTableBtn').onclick = function() {
-                const tbl = getCurrentVisibleTable();
-                if (tbl) printTable(tbl, 'School Data');
-                else alert('No table visible');
-            };
-            document.getElementById('exportAnyTableCSV').onclick = function() {
-                const tbl = getCurrentVisibleTable();
-                if (tbl) exportTableToCSV(tbl, 'exported_data');
-                else alert('No table visible');
-            };
-            document.getElementById('printNoticesBtn').onclick = function() {
-                const div = document.getElementById('globalNoticesList');
-                if (div) printTable(div, 'Notices');
-                else alert('No notices to print');
-            };
-            document.getElementById('exportStudentsCSV').onclick = exportAllStudentsCSV;
-            document.getElementById('exportTeachersCSVAdmin').onclick = exportAllTeachersCSV;
-            document.getElementById('printAttendanceTable').onclick = function() {
-                const tbl = document.querySelector('#studentList table');
-                if (tbl) printTable(tbl, 'Attendance');
-                else alert('No attendance table');
-            };
-            document.getElementById('exportAttendanceCSV').onclick = function() {
-                const tbl = document.querySelector('#studentList table');
-                if (tbl) exportTableToCSV(tbl, 'attendance');
-                else alert('No attendance table');
-            };
+                html += `<div><h5 style="color:#e74c3c;">Expenses by Category</h5><ul style="list-style:none; padding:0;">`;
+                for (const [cat, amt] of Object.entries(expenseByCat).sort((a, b) => b[1] - a[1])) {
+                    html += `<li style="padding:4px 0; border-bottom:1px solid #f0f0f0;"><strong>${escapeHtml(cat)}</strong>: Le ${amt.toLocaleString()}</li>`;
+                }
+                if (Object.keys(expenseByCat).length === 0) html += '<li>No expense records.</li>';
+                html += `</ul></div></div>`;
 
-            document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
-            document.getElementById('saveExamRecordsBtn').onclick = saveExamRecords;
-            document.getElementById('loadExamHistoryAllBtn').onclick = loadExamHistoryAll;
-            document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
-            document.getElementById('examHistoryAllYear').onchange = function() {
-                const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
-                if (studentId && this.value) {
-                    const tenantId = getCurrentTenantId();
-                    db.collection('students').doc(studentId).get().then(doc => {
-                        if (doc.exists && doc.data().tenantId === tenantId) {
-                            displayExamHistoryAll(studentId, this.value);
-                        } else {
-                            document.getElementById('examHistoryAllContent').innerHTML =
-                                '<p class="error">Student not found or does not belong to your tenant.</p>';
-                        }
-                    }).catch(() => {
-                        document.getElementById('examHistoryAllContent').innerHTML =
-                            '<p class="error">Error verifying student.</p>';
+                // Transaction list
+                const allTrans = [...incomeRecords.map(r => ({ ...r, type: 'Income' })), ...expenseRecords.map(r => ({ ...r,
+                    type: 'Expense' }))];
+                allTrans.sort((a, b) => b.date.localeCompare(a.date));
+
+                if (allTrans.length > 0) {
+                    html +=
+                        `<h5 style="margin-top:16px;">📋 Transaction Details (${allTrans.length})</h5><div class="table-wrapper"><table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Amount (Le)</th></tr></thead><tbody>`;
+                    allTrans.slice(0, 50).forEach(t => {
+                        const cls = t.type === 'Income' ? 'finance-income' : 'finance-expense';
+                        html += `<tr class="${cls}">
+                            <td>${escapeHtml(t.date)}</td>
+                            <td>${escapeHtml(t.type)}</td>
+                            <td>${escapeHtml(t.category)}</td>
+                            <td>${escapeHtml(t.description || '')}</td>
+                            <td>${t.amount.toLocaleString()}</td>
+                        </tr>`;
                     });
+                    if (allTrans.length > 50) html +=
+                        `<tr><td colspan="5"><em>Showing first 50 of ${allTrans.length} transactions.</em></td></tr>`;
+                    html += '</tbody></table></div>';
                 }
-            };
 
-            document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
-            document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(function(btn) {
-                btn.onclick = function() {
-                    const id = this.dataset.tab;
-                    document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove(
-                        'active'));
-                    this.classList.add('active');
-                    document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display =
-                        'none');
-                    document.getElementById(id + 'Tab').style.display = 'block';
-                    if (id === 'staff') loadStaffList();
-                    else if (id === 'assets') loadAssetsList();
-                    else if (id === 'inventory') loadInventoryList();
-                    else if (id === 'visitors') loadVisitorsList();
-                    else if (id === 'noticeboard') renderNotices();
-                    else if (id === 'filestorage') initFileDB().then(loadFilesList);
-                    else if (id === 'examhistoryall') { /* handled on load */ } else if (id === 'suggestions')
-                        loadSuggestions('suggestionsList');
-                    else if (id === 'loginactivity') loadLoginActivity();
-                    else if (id === 'schoollocation') loadSchoolLocation();
-                    else if (id === 'staffcheckins') loadStaffCheckinHistory();
-                    else if (id === 'admissionrequests') loadAdmissionRequests('admissionRequestsAdminList');
-                    else if (id === 'registrationrequests') loadRegistrationRequests(
-                        'registrationRequestsAdminList');
-                    else if (id === 'promotion') populatePromotionDropdowns();
-                    else if (id === 'entranceexams') loadEntranceExams();
-                    else if (id === 'schoolsettings') loadSchoolSettings();
-                };
-            });
+                container.innerHTML = html;
 
-            document.getElementById('applyStaffCheckinFilters').onclick = applyStaffCheckinFilters;
-            document.getElementById('resetStaffCheckinFilters').onclick = resetStaffCheckinFilters;
-            document.getElementById('refreshStaffCheckinsBtn').onclick = loadStaffCheckinHistory;
-            document.getElementById('exportStaffCheckinsCSV').onclick = exportStaffCheckinsCSV;
-            document.getElementById('printStaffCheckinsTable').onclick = printStaffCheckinsTable;
-
-            document.querySelectorAll('.tab-btn').forEach(function(btn) {
-                btn.onclick = function() {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                    document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
-                    if (this.dataset.tab === 'examhistory' && currentStudentDoc) loadExamHistory();
-                    if (this.dataset.tab === 'paymenthistory' && currentStudentDoc) loadPaymentHistory();
-                    if (this.dataset.tab === 'attendancehistory' && currentStudentDoc) loadAttendanceHistory();
-                    if (this.dataset.tab === 'aichat' && (currentUserRole === 'parent' || currentUserRole ===
-                            'student') && linkedStudentId) {
-                        setTimeout(initChatbot, 200);
-                    }
-                    if (this.dataset.tab === 'library') {
-                        showLibraryResources();
-                    }
-                    if (this.dataset.tab === 'documents') {
-                        if (currentStudentDoc) {
-                            loadStudentDocuments(currentStudentDoc.id);
-                        } else {
-                            document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
-                        }
-                    }
-                    if (this.dataset.tab === 'reportcard') {
-                        if (currentStudentDoc) {
-                            const yearSelect = document.getElementById('reportCardYear');
-                            if (yearSelect.options.length <= 1) {
-                                db.collection('exam_records').doc(currentStudentDoc.id).get().then(doc => {
-                                    if (doc.exists) {
-                                        const data = doc.data();
-                                        const years = data.years ? Object.keys(data.years) : [];
-                                        const currentVal = yearSelect.value;
-                                        yearSelect.innerHTML = '<option value="all">All Years</option>';
-                                        years.forEach(y => {
-                                            yearSelect.innerHTML +=
-                                                `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
-                                        });
-                                    }
-                                }).catch(() => {});
-                            }
-                            generateReportCard();
-                        } else {
-                            document.getElementById('reportCardContainer').innerHTML =
-                                '<p>Please load a student first.</p>';
-                        }
-                    }
-                    if (this.dataset.tab === 'entranceexam') {
-                        if (currentStudentDoc) {
-                            loadEntranceExamForParent();
-                        } else {
-                            document.getElementById('entranceExamList').innerHTML =
-                                '<p>Please load a student first.</p>';
-                        }
-                    }
-                };
-            });
-
-            document.getElementById('showPayrollBtn').onclick = function() {
-                const container = document.getElementById('payrollContainer');
-                if (container.style.display === 'none') {
-                    container.style.display = 'block';
-                    loadStaffPayroll();
-                    this.textContent = 'Hide Payroll';
-                } else {
-                    container.style.display = 'none';
-                    this.textContent = 'View Payroll';
-                }
-            };
-            document.getElementById('showPaymentHistoryBtn').onclick = function() {
-                const container = document.getElementById('paymentHistoryContainer');
-                if (container.style.display === 'none') {
-                    container.style.display = 'block';
-                    loadStaffPaymentHistory();
-                    this.textContent = 'Hide Payment History';
-                } else {
-                    container.style.display = 'none';
-                    this.textContent = 'View Payment History';
-                }
-            };
-
-            document.getElementById('refreshAdmissionRequestsBtn').onclick = function() {
-                loadAdmissionRequests('admissionRequestsList');
-            };
-            document.getElementById('refreshAdmissionRequestsAdminBtn').onclick = function() {
-                loadAdmissionRequests('admissionRequestsAdminList');
-            };
-
-            document.getElementById('refreshRegistrationRequestsBtn').onclick = function() {
-                loadRegistrationRequests('registrationRequestsList');
-            };
-            document.getElementById('refreshRegistrationRequestsAdminBtn').onclick = function() {
-                loadRegistrationRequests('registrationRequestsAdminList');
-            };
-
-            setTimeout(() => {
-                populateELearningDropdowns();
-                loadQuizzes();
-                loadAssignments();
-                loadEntranceExams();
-            }, 500);
-
-            document.getElementById('loginModal').style.display = 'none';
-
-            setTimeout(() => {
-                if (currentUserRole === 'parent' || currentUserRole === 'student') {
-                    if (linkedStudentId) {
-                        loadChatbotData(linkedStudentId).catch(console.warn);
-                    }
-                }
-            }, 2000);
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error generating report: ' + escapeHtml(error.message) + '</div>';
+                console.error('Report error:', error);
+            }
         };
 
-        // ==================================================================
-        //  ENTRANCE EXAMS ADMIN FUNCTIONS
-        // ==================================================================
-        async function loadEntranceExams() {
-            const container = document.getElementById('entranceExamsList');
-            if (!container) return;
-            container.innerHTML = '<p>Loading entrance exams...</p>';
-            try {
-                const tenantId = getCurrentTenantId();
-                const snap = await db.collection('entrance_exams')
-                    .where('tenantId', '==', tenantId)
-                    .orderBy('createdAt', 'desc')
-                    .get();
-                const exams = [];
-                snap.forEach(d => exams.push({ id: d.id, ...d.data() }));
-                if (exams.length === 0) {
-                    container.innerHTML = '<p>No entrance exams created yet. Click "Create Exam" to start.</p>';
-                    return;
-                }
-                let html = '<div class="table-wrapper"><table><thead><tr><th>Title</th><th>Questions</th><th>Time Limit</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody>';
-                for (const exam of exams) {
-                    const assignedCount = exam.assignedTo ? exam.assignedTo.length : 0;
-                    html += `<tr>
-                        <td>${escapeHtml(exam.title)}</td>
-                        <td>${exam.questions ? exam.questions.length : 0}</td>
-                        <td>${exam.timeLimit || 15} min</td>
-                        <td>${assignedCount} admission(s)</td>
-                        <td>
-                            <button class="assign-exam-btn" data-id="${exam.id}" style="background:#e8f0fe; color:#1a4b8a;">Assign</button>
-                            <button class="delete-exam-btn" data-id="${exam.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
-                        </td>
-                    </tr>`;
-                }
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
+        document.getElementById('exportReportCSVBtn').onclick = function() {
+            const table = document.querySelector('#financeReportContainer table');
+            if (!table) { alert('No data to export. Generate a report first.'); return; }
+            exportTableToCSV(table, 'finance_report');
+        };
 
-                container.querySelectorAll('.assign-exam-btn').forEach(btn => {
-                    btn.onclick = function() {
-                        const examId = this.dataset.id;
-                        openAssignEntranceExamModal(examId);
-                    };
-                });
-                container.querySelectorAll('.delete-exam-btn').forEach(btn => {
-                    btn.onclick = async function() {
-                        if (confirm('Delete this entrance exam? All submissions will be removed.')) {
-                            const examId = this.dataset.id;
-                            await db.collection('entrance_exams').doc(examId).delete();
-                            loadEntranceExams();
-                        }
-                    };
-                });
-            } catch (error) {
-                container.innerHTML = '<div class="error">Error loading entrance exams: ' + escapeHtml(error.message) + '</div>';
-                console.error('Error loading entrance exams:', error);
-            }
-        }
+        document.getElementById('printReportBtn').onclick = function() {
+            const content = document.getElementById('financeReportContainer');
+            if (!content || !content.innerHTML) { alert('No report to print. Generate a report first.'); return; }
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html><head><title>Financial Report</title>
+                <style>body{font-family:system-ui,sans-serif;padding:20px;}
+                table{border-collapse:collapse;width:100%;font-size:0.8rem;}
+                th,td{border:1px solid #ccc;padding:6px 10px;text-align:left;}
+                th{background:#f0f2f5;}
+                .finance-income{background:#d4edda;}
+                .finance-expense{background:#f8d7da;}
+                .finance-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
+                .finance-kpi-card{background:#f8fafc;border-radius:12px;padding:14px 16px;text-align:center;border:1px solid #e6edf4;}
+                .kpi-number{font-size:1.5rem;font-weight:700;color:#1a4b8a;}
+                .kpi-number.income{color:#27ae60;}
+                .kpi-number.expense{color:#e74c3c;}
+                .kpi-number.profit{color:#1a4b8a;}
+                .kpi-label{font-size:0.7rem;color:#6c7a89;text-transform:uppercase;}
+</style>
+</head><body>
+${content.innerHTML}
+<script>
+    window.onload = function() { window.print(); }
+<\/script>
+</body></html>
+`);
+win.document.close();
+};
 
-        async function openAssignEntranceExamModal(examId) {
-            const container = document.getElementById('entranceExamAssignList');
-            container.innerHTML = '<p>Loading admission requests...</p>';
-            openModal('assignEntranceExamModal');
-            try {
-                const tenantId = getCurrentTenantId();
-                const snap = await db.collection('admissions')
-                    .where('tenantId', '==', tenantId)
-                    .where('status', '==', 'pending')
-                    .get();
-                const requests = [];
-                snap.forEach(d => requests.push({ id: d.id, ...d.data() }));
-                if (requests.length === 0) {
-                    container.innerHTML = '<p>No pending admission requests found.</p>';
-                    return;
-                }
-                let html = '';
-                requests.forEach((req, idx) => {
-                    html += `<div class="entrance-exam-assign-item">
-                        <input type="checkbox" class="assign-checkbox" data-idx="${idx}" />
-                        <span><strong>${escapeHtml(req.studentName)}</strong> (${escapeHtml(req.schoolName)}) - ${escapeHtml(req.classApplying)}</span>
-                    </div>`;
-                });
-                html += `<div style="margin-top:12px;">
-                    <button id="assignSelectedEntranceExamBtn" class="refresh-btn" style="background:#27ae60;">Assign to Selected</button>
-                </div>`;
-                container.innerHTML = html;
+// ----- Export Income CSV -----
+document.getElementById('exportIncomeCSVBtn').onclick = function() {
+const table = document.querySelector('#incomeListContainer table');
+if (!table) { alert('No income data to export.'); return; }
+exportTableToCSV(table, 'income_records');
+};
 
-                container.dataset.examId = examId;
+// ----- Export Expenses CSV -----
+document.getElementById('exportExpensesCSVBtn').onclick = function() {
+const table = document.querySelector('#expenseListContainer table');
+if (!table) { alert('No expense data to export.'); return; }
+exportTableToCSV(table, 'expense_records');
+};
 
-                document.getElementById('assignSelectedEntranceExamBtn').onclick = async function() {
-                    const examId = container.dataset.examId;
-                    const checked = container.querySelectorAll('.assign-checkbox:checked');
-                    if (checked.length === 0) {
-                        alert('Please select at least one admission request.');
-                        return;
-                    }
-                    const selectedIds = [];
-                    checked.forEach(cb => {
-                        const idx = parseInt(cb.dataset.idx);
-                        selectedIds.push(requests[idx].id);
-                    });
-                    const batch = db.batch();
-                    selectedIds.forEach(id => {
-                        const ref = db.collection('admissions').doc(id);
-                        batch.update(ref, { examId: examId });
-                    });
-                    const examRef = db.collection('entrance_exams').doc(examId);
-                    const examDoc = await examRef.get();
-                    let assigned = examDoc.exists ? examDoc.data().assignedTo || [] : [];
-                    const studentNames = selectedIds.map(id => {
-                        const req = requests.find(r => r.id === id);
-                        return req ? req.studentName : '';
-                    }).filter(Boolean);
-                    assigned = [...new Set([...assigned, ...studentNames])];
-                    batch.update(examRef, { assignedTo: assigned });
+// ----- Export Finance Summary -----
+document.getElementById('exportFinanceSummaryBtn').onclick = function() {
+const summaryTable = document.querySelector('#financeMonthlySummary table');
+if (!summaryTable) { alert('No summary data to export.'); return; }
+exportTableToCSV(summaryTable, 'finance_summary');
+};
 
-                    await batch.commit();
-                    alert(`Assigned exam to ${selectedIds.length} admission request(s).`);
-                    closeModal('assignEntranceExamModal');
-                    loadEntranceExams();
-                };
+// ----- Income/Expense Filter Apply/Reset -----
+document.getElementById('applyIncomeFiltersBtn').onclick = function() { loadIncomeRecords(); };
+document.getElementById('resetIncomeFiltersBtn').onclick = function() {
+document.getElementById('incomeFilterYear').value = 'all';
+document.getElementById('incomeFilterCategory').value = 'all';
+loadIncomeRecords();
+};
+document.getElementById('applyExpenseFiltersBtn').onclick = function() { loadExpenseRecords(); };
+document.getElementById('resetExpenseFiltersBtn').onclick = function() {
+document.getElementById('expenseFilterYear').value = 'all';
+document.getElementById('expenseFilterCategory').value = 'all';
+loadExpenseRecords();
+};
 
-            } catch (error) {
-                container.innerHTML = '<div class="error">Error loading admission requests: ' + escapeHtml(error.message) + '</div>';
-                console.error('Error:', error);
-            }
-        }
+// ----- Set default dates for finance forms -----
+document.addEventListener('DOMContentLoaded', function() {
+const today = new Date().toISOString().split('T')[0];
+const incomeDate = document.getElementById('incomeDate');
+const expenseDate = document.getElementById('expenseDate');
+if (incomeDate) incomeDate.value = today;
+if (expenseDate) expenseDate.value = today;
+});
 
-        // ==================================================================
-        //  QUIZ / ENTRANCE EXAM START FUNCTIONS
-        // ==================================================================
-        function startQuiz(quiz) {
-            const user = auth.currentUser;
-            if (!user) { alert('Please log in to take this quiz.'); return; }
+// ----- Refresh Finance Dashboard -----
+document.getElementById('refreshFinanceDashboardBtn').onclick = function() {
+loadFinanceDashboard();
+showMessage('Dashboard refreshed.', 'success', 'financeDashboardMessage');
+};
 
-            db.collection('quiz_submissions')
-                .where('quizId', '==', quiz.id)
-                .where('userId', '==', user.uid)
-                .get()
-                .then(snap => {
-                    if (!snap.empty) {
-                        alert('You have already submitted this quiz. You cannot take it again.');
-                        return;
-                    }
-                    currentQuizTaking = {
-                        quizId: quiz.id,
-                        questions: quiz.questions || [],
-                        answers: new Array(quiz.questions ? quiz.questions.length : 0).fill(null),
-                        currentIndex: 0,
-                        startTime: Date.now(),
-                        timeLimit: quiz.timeLimit || 15
-                    };
-                    document.getElementById('takeQuizTitle').textContent = '📝 ' + quiz.title;
-                    document.getElementById('takeQuizMeta').textContent =
-                        `⏱️ ${quiz.timeLimit || 15} min • ${quiz.questions ? quiz.questions.length : 0} questions`;
-                    document.getElementById('takeQuizMessage').innerHTML = '';
-                    window.renderQuizQuestion();
-                    openModal('takeQuizModal');
+// ==================================================================
+//  LOGIN AND SETUP (updated with finance module)
+// ==================================================================
+async function loginAndSetup(email, password, skipAuth = false) {
+try {
+if (!skipAuth) await auth.signInWithEmailAndPassword(email, password);
+const user = auth.currentUser;
+if (!user) throw new Error('Not logged in');
+const userDoc = await db.collection('users').doc(user.uid).get();
+if (!userDoc.exists) throw new Error('User role not found');
+const userData = userDoc.data();
+const role = userData.role;
+const tenantId = userData.tenantId || 'default_tenant';
+try { localStorage.setItem('tenantId', tenantId); } catch (_) { _tenantId = tenantId; }
+await logLoginActivity(user, userData, tenantId);
+currentUserRole = role;
 
-                    if (quizTimerInterval) clearInterval(quizTimerInterval);
-                    let timeLeft = (quiz.timeLimit || 15) * 60;
-                    const timerEl = document.getElementById('takeQuizTimer');
-                    quizTimerInterval = setInterval(() => {
-                        timeLeft--;
-                        const mins = Math.floor(timeLeft / 60);
-                        const secs = timeLeft % 60;
-                        timerEl.textContent = `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-                        if (timeLeft <= 0) {
-                            clearInterval(quizTimerInterval);
-                            alert('⏰ Time is up! Submitting your quiz...');
-                            window.submitQuiz();
-                        }
-                    }, 1000);
-                })
-                .catch(err => {
-                    alert('Error checking submissions: ' + err.message);
-                });
-        }
+document.getElementById('startupPage').style.display = 'none';
+document.getElementById('schoolsPage').style.display = 'none';
+document.getElementById('loginModal').style.display = 'none';
+document.getElementById('mainHeader').style.display = 'flex';
+document.getElementById('syncBar').style.display = 'block';
+document.getElementById('globalNotices').style.display = 'block';
+document.getElementById('mainApp').style.display = 'block';
+document.getElementById('userInfo').innerText = role.toUpperCase() + ': ' + email;
+document.getElementById('logoutBtn').style.display = 'inline-block';
 
-        function startEntranceExam(exam) {
-            const user = auth.currentUser;
-            if (!user) { alert('Please log in to take this exam.'); return; }
+// Load school settings
+await loadSchoolSettings();
 
-            db.collection('entrance_exam_submissions')
-                .where('examId', '==', exam.id)
-                .where('studentId', '==', currentStudentDoc ? currentStudentDoc.id : '')
-                .get()
-                .then(snap => {
-                    if (!snap.empty) {
-                        alert('You have already submitted this exam. You cannot take it again.');
-                        return;
-                    }
-                    currentEntranceExamTaking = {
-                        examId: exam.id,
-                        questions: exam.questions || [],
-                        answers: new Array(exam.questions ? exam.questions.length : 0).fill(null),
-                        currentIndex: 0,
-                        startTime: Date.now(),
-                        timeLimit: exam.timeLimit || 15,
-                        studentId: currentStudentDoc ? currentStudentDoc.id : '',
-                        studentName: currentStudentDoc ? currentStudentDoc.name : ''
-                    };
-                    document.getElementById('takeEntranceExamTitle').textContent = '📋 ' + exam.title;
-                    document.getElementById('takeEntranceExamMeta').textContent =
-                        `⏱️ ${exam.timeLimit || 15} min • ${exam.questions ? exam.questions.length : 0} questions`;
-                    document.getElementById('takeEntranceExamMessage').innerHTML = '';
-                    window.renderEntranceExamQuestion();
-                    openModal('takeEntranceExamModal');
+await loadStudents();
+renderNotices();
 
-                    if (quizTimerInterval) clearInterval(quizTimerInterval);
-                    let timeLeft = (exam.timeLimit || 15) * 60;
-                    const timerEl = document.getElementById('takeEntranceExamTimer');
-                    quizTimerInterval = setInterval(() => {
-                        timeLeft--;
-                        const mins = Math.floor(timeLeft / 60);
-                        const secs = timeLeft % 60;
-                        timerEl.textContent = `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-                        if (timeLeft <= 0) {
-                            clearInterval(quizTimerInterval);
-                            alert('⏰ Time is up! Submitting your exam...');
-                            window.submitEntranceExam();
-                        }
-                    }, 1000);
-                })
-                .catch(err => {
-                    alert('Error checking submissions: ' + err.message);
-                });
-        }
+if (role === 'admin') {
+const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
+'==', user.uid).get();
+if (!teacherSnap.empty) teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherSnap.docs[0]
+.data() };
+setupRoleUI('admin');
+} else if (role === 'bursar') {
+setupRoleUI('bursar');
+} else if (role === 'teacher') {
+const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
+'==', user.uid).get();
+if (teacherSnap.empty) throw new Error('Teacher record not found for this account');
+const teacherData = teacherSnap.docs[0].data();
+teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherData };
+setupRoleUI('teacher', { class: teacherData.class, teacherData: teacherOwnData });
+} else if (role === 'parent') {
+const studentId = userData.studentId;
+if (!studentId) throw new Error('No student linked to this parent account');
+linkedStudentId = studentId;
+setupRoleUI('parent', { studentId: studentId });
+} else if (role === 'student') {
+const studentId = userData.studentId;
+if (!studentId) throw new Error('No student linked to this student account');
+linkedStudentId = studentId;
+setupRoleUI('student', { studentId: studentId });
+} else { throw new Error('Invalid role'); }
 
-        function showQuizResult(submission) {
-            const container = document.getElementById('quizResultContent');
-            const html = `
-                <div class="quiz-result-score">${submission.score}%</div>
-                <div style="text-align:center; margin-bottom:12px;">
-                    ${submission.correct} out of ${submission.total} correct (MCQ only)
-                </div>
-                <div style="margin-bottom:12px;">
-                    <strong>Time taken:</strong> ${Math.floor(submission.timeTaken / 60)}m ${submission.timeTaken % 60}s
-                </div>
-                <h4>Detailed Results</h4>
-                ${submission.results.map((r, i) => `
-                    <div class="quiz-result-detail">
-                        <strong>Q${i+1}:</strong> ${escapeHtml(r.question)}<br>
-                        <strong>Your answer:</strong> ${escapeHtml(r.userAnswer)}<br>
-                        <strong>Correct answer:</strong> ${escapeHtml(r.correctAnswer)}<br>
-                        <strong>Result:</strong> ${r.isCorrect ? '✅ Correct' : '❌ Incorrect (auto-graded MCQ)'}
-                        ${r.type === 'short' ? ' <span style="color:#f39c12;">(Short answer — teacher review required)</span>' : ''}
-                    </div>
-                `).join('')}
-            `;
-            container.innerHTML = html;
-            openModal('quizResultModal');
-        }
+setupExamControls();
+initExamHistorySelectors();
+initPaymentHistorySelectors();
 
-        // Navigation for quiz/exam
-        document.getElementById('takeQuizPrevBtn').addEventListener('click', function() {
-            if (currentQuizTaking && currentQuizTaking.currentIndex > 0) {
-                currentQuizTaking.currentIndex--;
-                window.renderQuizQuestion();
-            }
-        });
-        document.getElementById('takeQuizNextBtn').addEventListener('click', function() {
-            if (currentQuizTaking) {
-                if (currentQuizTaking.currentIndex < currentQuizTaking.questions.length - 1) {
-                    currentQuizTaking.currentIndex++;
-                    window.renderQuizQuestion();
-                } else {
-                    if (confirm('You are at the last question. Submit your quiz now?')) {
-                        window.submitQuiz();
-                    }
-                }
-            }
-        });
-        document.getElementById('takeQuizSubmitBtn').addEventListener('click', function() {
-            if (confirm('Are you sure you want to submit your quiz? This action cannot be undone.')) {
-                window.submitQuiz();
-            }
-        });
+if (!document.querySelector('#examTermButtons .term-btn.active')) {
+const defaultTerm = document.querySelector('#examTermButtons .term-btn');
+if (defaultTerm) defaultTerm.classList.add('active');
+currentTerm = defaultTerm ? defaultTerm.dataset.term : 'term1';
+}
+if (!document.querySelector('#examLevelButtons .exam-level-btn.active')) {
+const defaultLevel = document.querySelector('#examLevelButtons .exam-level-btn');
+if (defaultLevel) defaultLevel.classList.add('active');
+currentExamLevel = defaultLevel ? defaultLevel.dataset.examLevel : 'npse';
+}
 
-        document.getElementById('takeEntranceExamPrevBtn').addEventListener('click', function() {
-            if (currentEntranceExamTaking && currentEntranceExamTaking.currentIndex > 0) {
-                currentEntranceExamTaking.currentIndex--;
-                window.renderEntranceExamQuestion();
-            }
-        });
-        document.getElementById('takeEntranceExamNextBtn').addEventListener('click', function() {
-            if (currentEntranceExamTaking) {
-                if (currentEntranceExamTaking.currentIndex < currentEntranceExamTaking.questions.length - 1) {
-                    currentEntranceExamTaking.currentIndex++;
-                    window.renderEntranceExamQuestion();
-                } else {
-                    if (confirm('You are at the last question. Submit your exam now?')) {
-                        window.submitEntranceExam();
-                    }
-                }
-            }
-        });
-        document.getElementById('takeEntranceExamSubmitBtn').addEventListener('click', function() {
-            if (confirm('Are you sure you want to submit your exam? This action cannot be undone.')) {
-                window.submitEntranceExam();
-            }
-        });
+document.querySelectorAll('.att-term-btn').forEach(btn => {
+btn.onclick = function() {
+document.querySelectorAll('.att-term-btn').forEach(b => b.classList.remove('active'));
+this.classList.add('active');
+currentAttendanceFilter.term = this.dataset.term;
+renderFilteredAttendanceHistory();
+};
+});
+document.getElementById('attendanceYearFilter')?.addEventListener('change', function() {
+currentAttendanceFilter.year = this.value;
+renderFilteredAttendanceHistory();
+});
+document.getElementById('refreshAttendanceHistoryBtn')?.addEventListener('click', function() {
+if (currentStudentDoc) loadAttendanceHistory();
+});
 
-        // Close quiz result
-        document.getElementById('closeQuizResultBtn').addEventListener('click', function() {
-            closeModal('quizResultModal');
-        });
+document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
+document.getElementById('dashboardYearFilter').onchange = loadDashboard;
+document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
+document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
+document.getElementById('refreshExamHistoryBtn')?.addEventListener('click', function() {
+if (currentStudentDoc) loadExamHistory();
+});
+document.getElementById('examHistoryYear')?.addEventListener('change', function() {
+if (currentStudentDoc) loadExamHistory();
+});
+document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
 
-        // ==================================================================
-        //  CREATE ASSIGNMENT BUTTON
-        // ==================================================================
-        document.getElementById('createAssignmentBtn').addEventListener('click', function() {
-            if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') {
-                alert('Only teachers and admins can create assignments.');
-                return;
-            }
-            document.getElementById('assignmentTitle').value = '';
-            document.getElementById('assignmentClass').value = '';
-            document.getElementById('assignmentDueDate').value = '';
-            document.getElementById('assignmentDescription').value = '';
-            document.getElementById('assignmentFileInput').value = '';
-            document.getElementById('assignmentCreateMessage').innerHTML = '';
-            openModal('createAssignmentModal');
-        });
+const predictBtn = document.getElementById('predictRiskBtn');
+if (predictBtn) {
+predictBtn.onclick = function() {
+loadRiskPredictions(true);
+};
+}
+const sendAlertsBtn = document.getElementById('sendRiskAlertsBtn');
+if (sendAlertsBtn) {
+sendAlertsBtn.onclick = sendRiskAlerts;
+}
 
-        document.getElementById('refreshAssignmentsBtn').addEventListener('click', function() { loadAssignments(); });
-    </script>
+if (role === 'parent' || role === 'student') {
+setTimeout(() => {
+const chatTab = document.querySelector('[data-tab="aichat"]');
+if (chatTab) {
+chatTab.click();
+initChatbot();
+}
+}, 1000);
+}
+
+if (role === 'admin') {
+document.getElementById('admissionRequestsCard').style.display = 'block';
+loadAdmissionRequests('admissionRequestsList');
+loadAdmissionRequests('admissionRequestsAdminList');
+document.getElementById('registrationRequestsCard').style.display = 'block';
+loadRegistrationRequests('registrationRequestsList');
+loadRegistrationRequests('registrationRequestsAdminList');
+loadEntranceExams();
+// Setup settings tab
+setupSettingsTab();
+}
+
+document.getElementById('libraryRefreshBtn').addEventListener('click', showLibraryResources);
+document.getElementById('libraryClassSelect').addEventListener('change', showLibraryResources);
+document.getElementById('libraryDepartmentSelect').addEventListener('change', showLibraryResources);
+
+const docTabBtn = document.querySelector('[data-tab="documents"]');
+if (docTabBtn) {
+docTabBtn.addEventListener('click', function() {
+if (currentStudentDoc) {
+loadStudentDocuments(currentStudentDoc.id);
+} else {
+document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
+}
+});
+}
+
+document.getElementById('refreshFeeCollectionsBtn').addEventListener('click', function() {
+loadFeeCollections();
+});
+document.getElementById('resetFeeCollectionsBtn').addEventListener('click', function() {
+document.getElementById('feeCollectionYear').value = 'all';
+document.getElementById('feeCollectionTerm').value = 'all';
+document.getElementById('feeCollectionMonth').value = 'all';
+loadFeeCollections();
+});
+document.getElementById('feeCollectionYear').addEventListener('change', applyFeeFilters);
+document.getElementById('feeCollectionTerm').addEventListener('change', applyFeeFilters);
+document.getElementById('feeCollectionMonth').addEventListener('change', applyFeeFilters);
+
+const reportCardTabBtn = document.querySelector('[data-tab="reportcard"]');
+if (reportCardTabBtn) {
+reportCardTabBtn.addEventListener('click', function() {
+if (currentStudentDoc) {
+const yearSelect = document.getElementById('reportCardYear');
+if (yearSelect.options.length <= 1) {
+db.collection('exam_records').doc(currentStudentDoc.id).get().then(doc => {
+if (doc.exists) {
+const data = doc.data();
+const years = data.years ? Object.keys(data.years) : [];
+const currentVal = yearSelect.value;
+yearSelect.innerHTML = '<option value="all">All Years</option>';
+years.forEach(y => {
+yearSelect.innerHTML +=
+`<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
+});
+}
+}).catch(() => {});
+}
+generateReportCard();
+} else {
+document.getElementById('reportCardContainer').innerHTML =
+'<p>Please load a student first.</p>';
+}
+});
+}
+
+const entranceExamTabBtn = document.querySelector('[data-tab="entranceexam"]');
+if (entranceExamTabBtn) {
+entranceExamTabBtn.addEventListener('click', function() {
+if (currentStudentDoc) {
+loadEntranceExamForParent();
+} else {
+document.getElementById('entranceExamList').innerHTML =
+'<p>Please load a student first.</p>';
+}
+});
+}
+
+const eLearningBtn = document.getElementById('eLearningModuleBtn');
+if (eLearningBtn) {
+eLearningBtn.addEventListener('click', function() {
+populateELearningDropdowns();
+loadQuizzes();
+loadAssignments();
+});
+}
+
+const datePicker = document.getElementById('attendanceDatePicker');
+if (datePicker) {
+datePicker.value = attendanceDate;
+document.getElementById('attendanceDateInfo').textContent = 'Today';
+}
+
+// --- Load finance data for bursar ---
+if (role === 'bursar') {
+setTimeout(() => {
+populateFinanceFilterYears();
+loadFinanceDashboard();
+loadIncomeRecords();
+loadExpenseRecords();
+}, 500);
+}
+
+const firstModuleBtn = document.querySelector('.module-btn');
+if (firstModuleBtn) firstModuleBtn.click();
+else {
+if (document.getElementById('dashboardModule')) document.getElementById('dashboardModule').style
+.display = 'block';
+loadDashboard();
+loadStaffDashboard();
+}
+
+if (document.getElementById('attendanceModule').style.display !== 'none') {
+renderAttendanceForDate(attendanceDate);
+}
+
+document.getElementById('loadAttendanceDateBtn').addEventListener('click', function() {
+const date = document.getElementById('attendanceDatePicker').value;
+if (date) {
+attendanceDate = date;
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('attendanceDateInfo').textContent = date === today ? 'Today' :
+date;
+renderAttendanceForDate(date);
+}
+});
+
+} catch (e) {
+document.getElementById('loginMessage').innerHTML = '<div class="error">' + escapeHtml(e.message) +
+'</div>';
+}
+}
+
+// ==================================================================
+//  ROLE-BASED UI (updated for finance)
+// ==================================================================
+function setupRoleUI(role, extra) {
+extra = extra || {};
+const moduleContainer = document.getElementById('moduleButtons');
+moduleContainer.innerHTML = '';
+document.getElementById('dashboardModule').style.display = 'none';
+document.getElementById('attendanceModule').style.display = 'none';
+document.getElementById('recordsModule').style.display = 'none';
+document.getElementById('teachersModule').style.display = 'none';
+document.getElementById('bursarModule').style.display = 'none';
+document.getElementById('adminModule').style.display = 'none';
+document.getElementById('suggestionsModule').style.display = 'none';
+document.getElementById('eLearningModule').style.display = 'none';
+document.getElementById('suggestionFab').style.display = 'flex';
+
+const searchHandler = async function() {
+try {
+const tenantId = getCurrentTenantId();
+const q = document.getElementById('studentSearchInput').value.trim();
+if (!q) {
+showMessage('Please enter a Student ID or Name.', 'error', 'searchResults');
+return;
+}
+
+let found = globalStudentMap.get(q);
+if (found) {
+loadStudentRecord(found);
+return;
+}
+
+const nameMap = window.globalNameMap || new Map();
+const matches = nameMap.get(q.toLowerCase()) || [];
+if (matches.length === 0) {
+showMessage('No student found with that ID or name.', 'error', 'searchResults');
+document.getElementById('studentRecordsPanel').style.display = 'none';
+return;
+}
+
+if (matches.length === 1) {
+loadStudentRecord(matches[0]);
+return;
+}
+
+let listHtml = `<div class="success">Found ${matches.length} students with name "${escapeHtml(q)}":</div><ul style="list-style:none; padding:0;">`;
+matches.forEach((s, idx) => {
+listHtml += `<li style="margin:4px 0; padding:6px 12px; background:#f8fafc; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+<span><strong>${escapeHtml(s.name)}</strong> (ID: ${escapeHtml(s.id)}, Class: ${escapeHtml(s.class)})</span>
+<button class="load-student-btn" data-idx="${idx}" style="background:#1a4b8a; color:#fff; border:none; padding:4px 12px; border-radius:30px; cursor:pointer;">Select</button>
+</li>`;
+});
+listHtml += '</ul>';
+document.getElementById('searchResults').innerHTML = listHtml;
+document.getElementById('studentRecordsPanel').style.display = 'none';
+
+document.querySelectorAll('.load-student-btn').forEach(btn => {
+btn.onclick = function() {
+const idx = parseInt(this.dataset.idx);
+loadStudentRecord(matches[idx]);
+};
+});
+
+} catch (error) {
+showMessage('Error searching: ' + error.message, 'error', 'searchResults');
+}
+};
+
+function loadStudentRecord(student) {
+currentStudentDoc = student;
+document.getElementById('studentRecordsPanel').style.display = 'block';
+document.getElementById('searchResults').innerHTML =
+`<div class="success">Found: ${escapeHtml(student.name)} (${student.id})</div>`;
+loadStudentProfile();
+loadPaymentHistory();
+loadExamHistory();
+loadAttendanceHistory();
+if (currentUserRole === 'parent' || currentUserRole === 'student') {
+initChatbot();
+}
+const docTab = document.querySelector('[data-tab="documents"]');
+if (docTab && docTab.classList.contains('active')) {
+loadStudentDocuments(student.id);
+}
+const reportTab = document.querySelector('[data-tab="reportcard"]');
+if (reportTab && reportTab.classList.contains('active')) {
+generateReportCard();
+}
+const entranceTab = document.querySelector('[data-tab="entranceexam"]');
+if (entranceTab && entranceTab.classList.contains('active')) {
+loadEntranceExamForParent();
+}
+}
+
+let modules = [];
+modules.push({ id: 'suggestionsModuleBtn', label: 'Suggestions', moduleId: 'suggestionsModule' });
+
+if (role === 'admin') {
+modules.unshift({ id: 'dashboardModuleBtn', label: 'Dashboard', moduleId: 'dashboardModule' },
+{ id: 'attendanceModuleBtn', label: 'Attendance', moduleId: 'attendanceModule' },
+{ id: 'recordsModuleBtn', label: 'Student Records', moduleId: 'recordsModule' },
+{ id: 'teachersModuleBtn', label: 'Users', moduleId: 'teachersModule' },
+{ id: 'adminModuleBtn', label: 'Admin', moduleId: 'adminModule' },
+{ id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
+);
+} else if (role === 'bursar') {
+modules.unshift({ id: 'bursarModuleBtn', label: 'Bursar', moduleId: 'bursarModule' });
+} else if (role === 'teacher') {
+modules.unshift({ id: 'attendanceModuleBtn', label: 'Attendance', moduleId: 'attendanceModule' },
+{ id: 'recordsModuleBtn', label: 'Student Records', moduleId: 'recordsModule' },
+{ id: 'teachersModuleBtn', label: 'My Profile', moduleId: 'teachersModule' },
+{ id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
+);
+} else if (role === 'parent' || role === 'student') {
+modules.unshift({ id: 'recordsModuleBtn', label: 'My Records', moduleId: 'recordsModule' },
+{ id: 'eLearningModuleBtn', label: '📚 E-Learning', moduleId: 'eLearningModule' }
+);
+}
+
+modules.forEach(m => {
+const btn = document.createElement('button');
+btn.id = m.id;
+btn.className = 'module-btn';
+btn.textContent = m.label;
+btn.onclick = function() {
+document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
+this.classList.add('active');
+document.querySelectorAll('#mainApp > div[id$="Module"]').forEach(div => div.style
+.display = 'none');
+document.getElementById(m.moduleId).style.display = 'block';
+if (m.moduleId === 'dashboardModule') { loadDashboard();
+loadStaffDashboard(); }
+if (m.moduleId === 'attendanceModule') renderAttendanceForDate(attendanceDate);
+if (m.moduleId === 'teachersModule') {
+if (role === 'admin') loadAllTeachersForAdmin();
+if (role === 'teacher' || role === 'admin') displayOwnTeacherProfile();
+}
+if (m.moduleId === 'bursarModule') {
+if (Object.keys(allStudents).length === 0) {
+loadStudents().then(() => {
+loadBursarSummary();
+populateFeeStatsYears().then(loadFeeStats);
+loadFeeCollections();
+});
+} else {
+loadBursarSummary();
+populateFeeStatsYears().then(loadFeeStats);
+loadFeeCollections();
+}
+// Load finance data
+populateFinanceFilterYears();
+loadFinanceDashboard();
+loadIncomeRecords();
+loadExpenseRecords();
+}
+if (m.moduleId === 'adminModule') {
+loadStaffList();
+loadAssetsList();
+loadInventoryList();
+loadVisitorsList();
+renderNotices();
+initFileDB().then(loadFilesList);
+loadLoginActivity();
+loadSchoolLocation();
+loadStaffCheckinHistory();
+loadAdmissionRequests('admissionRequestsAdminList');
+loadRegistrationRequests('registrationRequestsAdminList');
+populatePromotionDropdowns();
+loadEntranceExams();
+// Load settings when admin module is opened
+if (document.getElementById('schoolsettingsTab').style.display !== 'none') {
+loadSchoolSettings();
+}
+}
+if (m.moduleId === 'suggestionsModule') { loadSuggestions('mySuggestionsList'); }
+if (m.moduleId === 'eLearningModule') {
+populateELearningDropdowns();
+loadQuizzes();
+loadAssignments();
+document.querySelector('.elearning-tab-btn.active')?.click();
+}
+if (m.moduleId === 'recordsModule' && (role === 'parent' || role === 'student')) {
+setTimeout(() => {
+const studentId = role === 'parent' ? linkedStudentId : linkedStudentId;
+if (studentId) {
+document.getElementById('studentSearchInput').value = studentId;
+searchHandler();
+}
+}, 300);
+}
+};
+moduleContainer.appendChild(btn);
+});
+
+document.getElementById('searchStudentBtn').onclick = searchHandler;
+
+if (role === 'admin') {
+document.getElementById('importSection').style.display = 'block';
+document.getElementById('manualSection').style.display = 'block';
+document.getElementById('adminTeacherSections').style.display = 'block';
+document.getElementById('teacherOwnProfileCard').style.display = 'block';
+loadStaffList();
+loadAssetsList();
+loadInventoryList();
+loadVisitorsList();
+renderNotices();
+initFileDB().then(loadFilesList);
+loadAllTeachersForAdmin();
+displayOwnTeacherProfile();
+document.getElementById('refreshLoginActivityBtn').onclick = loadLoginActivity;
+document.getElementById('clearLoginActivityBtn').onclick = clearLoginActivity;
+document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(btn => {
+btn.onclick = function() {
+const id = this.dataset.tab;
+document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList
+.remove('active'));
+this.classList.add('active');
+document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display =
+'none');
+document.getElementById(id + 'Tab').style.display = 'block';
+if (id === 'staff') loadStaffList();
+else if (id === 'assets') loadAssetsList();
+else if (id === 'inventory') loadInventoryList();
+else if (id === 'visitors') loadVisitorsList();
+else if (id === 'noticeboard') renderNotices();
+else if (id === 'filestorage') initFileDB().then(loadFilesList);
+else if (id === 'examhistoryall') { /* handled on load */ } else if (id ===
+'suggestions') loadSuggestions('suggestionsList');
+else if (id === 'loginactivity') loadLoginActivity();
+else if (id === 'schoollocation') loadSchoolLocation();
+else if (id === 'staffcheckins') loadStaffCheckinHistory();
+else if (id === 'admissionrequests') loadAdmissionRequests(
+'admissionRequestsAdminList');
+else if (id === 'registrationrequests') loadRegistrationRequests(
+'registrationRequestsAdminList');
+else if (id === 'promotion') populatePromotionDropdowns();
+else if (id === 'entranceexams') loadEntranceExams();
+else if (id === 'schoolsettings') loadSchoolSettings();
+};
+});
+// Setup settings tab
+setupSettingsTab();
+} else if (role === 'bursar') {
+document.getElementById('importSection').style.display = 'none';
+document.getElementById('manualSection').style.display = 'none';
+document.getElementById('adminTeacherSections').style.display = 'none';
+document.getElementById('teacherOwnProfileCard').style.display = 'none';
+// Show finance tab by default
+setTimeout(() => {
+const financeTab = document.querySelector('.finance-tab-btn[data-ftab="financeDashboard"]');
+if (financeTab) financeTab.click();
+}, 300);
+} else if (role === 'teacher') {
+teacherAssignedClass = extra.class || 'JSS1';
+teacherOwnData = extra.teacherData || null;
+document.getElementById('importSection').style.display = 'none';
+document.getElementById('manualSection').style.display = 'none';
+document.getElementById('adminTeacherSections').style.display = 'none';
+document.getElementById('teacherOwnProfileCard').style.display = 'block';
+document.getElementById('editOwnTeacherBtn').style.display = 'inline-block';
+setTimeout(() => {
+const classSelect = document.getElementById('classSelect');
+if (classSelect) {
+updateClassDropdown();
+classSelect.disabled = true;
+classSelect.value = teacherAssignedClass;
+const badge = document.getElementById('teacherClassBadge');
+if (badge) {
+badge.style.display = 'inline-block';
+badge.textContent = 'Assigned: ' + teacherAssignedClass;
+}
+renderAttendanceForDate(attendanceDate);
+}
+}, 500);
+displayOwnTeacherProfile();
+if (teacherOwnData) { document.getElementById('teacherRegisterSearch').value = teacherOwnData.id;
+loadTeacherRegisterForId(teacherOwnData.id); }
+} else if (role === 'parent') {
+linkedStudentId = extra.studentId || null;
+if (!linkedStudentId) { alert('No student linked to this parent account.'); return; }
+document.getElementById('importSection').style.display = 'none';
+document.getElementById('manualSection').style.display = 'none';
+document.getElementById('editProfileBtn').style.display = 'none';
+const searchBox = document.querySelector('#recordsModule .search-box');
+if (searchBox) searchBox.style.display = 'none';
+setTimeout(() => {
+document.getElementById('studentSearchInput').value = linkedStudentId;
+searchHandler();
+}, 500);
+setTimeout(initChatbot, 1000);
+} else if (role === 'student') {
+linkedStudentId = extra.studentId || null;
+if (!linkedStudentId) { alert('No student linked to this student account.'); return; }
+document.getElementById('importSection').style.display = 'none';
+document.getElementById('manualSection').style.display = 'none';
+document.getElementById('editProfileBtn').style.display = 'none';
+const searchBox = document.querySelector('#recordsModule .search-box');
+if (searchBox) searchBox.style.display = 'none';
+setTimeout(() => {
+document.getElementById('studentSearchInput').value = linkedStudentId;
+searchHandler();
+}, 500);
+setTimeout(initChatbot, 1000);
+}
+}
+
+// ==================================================================
+//  WINDOW ONLOAD
+// ==================================================================
+window.onload = function() {
+function updateOnlineStatus() {
+const badge = document.getElementById('onlineStatus'),
+bar = document.getElementById('syncBar');
+if (navigator.onLine) {
+badge.innerHTML = 'Online';
+badge.className = 'online-badge online';
+bar.innerHTML = 'Connected to Firestore';
+bar.style.background = 'linear-gradient(135deg, #1a7a3a, #2e9b5e)';
+} else {
+badge.innerHTML = 'Offline';
+badge.className = 'online-badge offline';
+bar.innerHTML = 'Offline mode – data cached';
+bar.style.background = 'linear-gradient(135deg, #b9770e, #d68910)';
+}
+}
+updateOnlineStatus();
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+ensureDemoUsers().then(() => {
+console.log('✅ Demo users ready.');
+loadSchools();
+}).catch(console.warn);
+
+showStartupPage();
+
+document.getElementById('demoAdminBtn').onclick = function() { loginAndSetup('admin@school.com',
+'admin123'); };
+document.getElementById('demoBursarBtn').onclick = function() { loginAndSetup('bursar@school.com',
+'bursar123'); };
+document.getElementById('demoTeacherBtn').onclick = function() { loginAndSetup('teacher@school.com',
+'teacher123'); };
+document.getElementById('demoParentBtn').onclick = function() { loginAndSetup('parent@school.com',
+'parent123'); };
+document.getElementById('demoStudentBtn').onclick = function() { loginAndSetup('student@school.com',
+'student123'); };
+document.getElementById('loginBtn').onclick = function() {
+loginAndSetup(document.getElementById('loginEmail').value, document.getElementById('loginPassword')
+.value);
+};
+document.getElementById('logoutBtn').onclick = function() {
+auth.signOut().then(function() {
+try { localStorage.removeItem('tenantId'); } catch (_) {}
+_tenantId = 'default_tenant';
+showStartupPage();
+});
+};
+
+const signupToggle = document.getElementById('signupToggle');
+const signupBack = document.getElementById('signupBack');
+const signupFields = document.getElementById('signupFields');
+signupToggle.onclick = function() { signupFields.classList.toggle('active');
+this.style.display = 'none';
+signupBack.style.display = 'inline-block'; };
+signupBack.onclick = function() { signupFields.classList.remove('active');
+signupToggle.style.display = 'inline-block';
+this.style.display = 'none'; };
+document.getElementById('signupBtn').onclick = signUpAndCreateTenant;
+
+document.getElementById('addStudentBtn').onclick = function() { if (currentUserRole !== 'admin') return;
+addManualStudent(); };
+document.getElementById('loadBtn').onclick = function() { if (currentUserRole !== 'admin' &&
+currentUserRole !== 'teacher') return;
+renderAttendanceForDate(attendanceDate); };
+document.getElementById('refreshBtn').onclick = function() { if (currentUserRole !== 'admin' &&
+currentUserRole !== 'teacher') return;
+loadStudents().then(() => renderAttendanceForDate(attendanceDate)); };
+document.getElementById('batchWhatsappBtn').onclick = function() {
+if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert(
+'You do not have permission to send reports.'); return; }
+sendBatchWhatsApp();
+};
+document.getElementById('classHistoryBtn').onclick = function() {
+if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert(
+'You do not have permission to view class history.'); return; }
+viewClassHistory();
+};
+
+document.getElementById('clearSearchBtn').onclick = function() {
+document.getElementById('studentSearchInput').value = '';
+document.getElementById('searchResults').innerHTML = '';
+document.getElementById('studentRecordsPanel').style.display = 'none';
+};
+
+document.getElementById('editProfileBtn').onclick = function() {
+if (currentUserRole !== 'admin') { alert('Only admin can edit student profiles'); return; }
+editProfile();
+};
+document.getElementById('saveProfileBtn').onclick = saveProfile;
+
+document.getElementById('searchTeacherBtn').onclick = function() {
+if (currentUserRole !== 'admin') { alert('Only admin can search teachers.'); return; }
+searchTeacherAdmin();
+};
+document.getElementById('clearTeacherSearchBtn').onclick = function() {
+document.getElementById('teacherSearchInput').value = '';
+document.getElementById('teacherSearchResults').innerHTML = '';
+if (currentUserRole === 'admin') loadAllTeachersForAdmin();
+};
+document.getElementById('addTeacherBtn').onclick = function() { if (currentUserRole !== 'admin') return;
+addTeacherAdmin(); };
+document.getElementById('printTeachersTable').onclick = function() {
+if (currentUserRole !== 'admin') return;
+const tbl = document.getElementById('allTeachersList');
+if (tbl && tbl.children.length) printTable(tbl, 'Users');
+else alert('No users table');
+};
+document.getElementById('exportTeachersCSVBtn').onclick = function() {
+if (currentUserRole !== 'admin') return;
+const tbl = document.getElementById('allTeachersList');
+if (tbl && tbl.children.length) exportTableToCSV(tbl, 'users');
+else alert('No users table');
+};
+document.getElementById('searchTeacherRegisterBtn').onclick = function() {
+if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') { alert('Access denied.'); return; }
+loadTeacherRegister();
+};
+
+document.getElementById('searchBursarStudentBtn').onclick = function() {
+if (currentUserRole !== 'bursar') { showMessage('Access denied. Only bursar can access this.',
+'error', 'bursarPaymentMessage'); return; }
+loadBursarStudent();
+};
+document.getElementById('saveBursarFeesBtn').onclick = function() { if (currentUserRole !== 'bursar') return;
+saveBursarTermFees(); };
+document.getElementById('submitBursarPaymentBtn').onclick = function() { if (currentUserRole !== 'bursar')
+return;
+recordBursarPayment(); };
+document.getElementById('refreshBursarBtn').onclick = function() { if (currentUserRole === 'bursar')
+loadBursarSummary(); };
+document.getElementById('exportBursarCSV').onclick = function() { if (currentUserRole === 'bursar')
+exportBursarToCSV(); };
+document.getElementById('bursarClassFilter').onchange = function() { if (currentUserRole === 'bursar')
+loadBursarSummary(); };
+document.getElementById('refreshFeeStatsBtn').onclick = function() { if (currentUserRole === 'bursar')
+loadFeeStats(); };
+document.getElementById('feeStatsYear').onchange = function() { if (currentUserRole === 'bursar')
+loadFeeStats(); };
+document.getElementById('feeStatsTerm').onchange = function() { if (currentUserRole === 'bursar')
+loadFeeStats(); };
+
+document.getElementById('addStaffBtn').onclick = addStaff;
+document.getElementById('addAssetBtn').onclick = addAsset;
+document.getElementById('addInventoryBtn').onclick = addInventory;
+document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
+document.getElementById('checkoutAllBtn').onclick = checkoutAllVisitors;
+document.getElementById('postNoticeBtn').onclick = postNotice;
+document.getElementById('uploadFileBtn').onclick = uploadFileToLocal;
+document.getElementById('refreshFilesBtn').onclick = function() { initFileDB().then(loadFilesList); };
+document.getElementById('printAnyTableBtn').onclick = function() {
+const tbl = getCurrentVisibleTable();
+if (tbl) printTable(tbl, 'School Data');
+else alert('No table visible');
+};
+document.getElementById('exportAnyTableCSV').onclick = function() {
+const tbl = getCurrentVisibleTable();
+if (tbl) exportTableToCSV(tbl, 'exported_data');
+else alert('No table visible');
+};
+document.getElementById('printNoticesBtn').onclick = function() {
+const div = document.getElementById('globalNoticesList');
+if (div) printTable(div, 'Notices');
+else alert('No notices to print');
+};
+document.getElementById('exportStudentsCSV').onclick = exportAllStudentsCSV;
+document.getElementById('exportTeachersCSVAdmin').onclick = exportAllTeachersCSV;
+document.getElementById('printAttendanceTable').onclick = function() {
+const tbl = document.querySelector('#studentList table');
+if (tbl) printTable(tbl, 'Attendance');
+else alert('No attendance table');
+};
+document.getElementById('exportAttendanceCSV').onclick = function() {
+const tbl = document.querySelector('#studentList table');
+if (tbl) exportTableToCSV(tbl, 'attendance');
+else alert('No attendance table');
+};
+
+document.getElementById('searchExamStudentBtn').onclick = loadExamStudent;
+document.getElementById('saveExamRecordsBtn').onclick = saveExamRecords;
+document.getElementById('loadExamHistoryAllBtn').onclick = loadExamHistoryAll;
+document.getElementById('refreshExamHistoryAllBtn').onclick = loadExamHistoryAll;
+document.getElementById('examHistoryAllYear').onchange = function() {
+const studentId = document.getElementById('examHistoryAllStudentId').value.trim();
+if (studentId && this.value) {
+const tenantId = getCurrentTenantId();
+db.collection('students').doc(studentId).get().then(doc => {
+if (doc.exists && doc.data().tenantId === tenantId) {
+displayExamHistoryAll(studentId, this.value);
+} else {
+document.getElementById('examHistoryAllContent').innerHTML =
+'<p class="error">Student not found or does not belong to your tenant.</p>';
+}
+}).catch(() => {
+document.getElementById('examHistoryAllContent').innerHTML =
+'<p class="error">Error verifying student.</p>';
+});
+}
+};
+
+document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
+document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(function(btn) {
+btn.onclick = function() {
+const id = this.dataset.tab;
+document.querySelectorAll('#adminTabs .admin-tab-btn').forEach(b => b.classList.remove(
+'active'));
+this.classList.add('active');
+document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display =
+'none');
+document.getElementById(id + 'Tab').style.display = 'block';
+if (id === 'staff') loadStaffList();
+else if (id === 'assets') loadAssetsList();
+else if (id === 'inventory') loadInventoryList();
+else if (id === 'visitors') loadVisitorsList();
+else if (id === 'noticeboard') renderNotices();
+else if (id === 'filestorage') initFileDB().then(loadFilesList);
+else if (id === 'examhistoryall') { /* handled on load */ } else if (id === 'suggestions')
+loadSuggestions('suggestionsList');
+else if (id === 'loginactivity') loadLoginActivity();
+else if (id === 'schoollocation') loadSchoolLocation();
+else if (id === 'staffcheckins') loadStaffCheckinHistory();
+else if (id === 'admissionrequests') loadAdmissionRequests('admissionRequestsAdminList');
+else if (id === 'registrationrequests') loadRegistrationRequests(
+'registrationRequestsAdminList');
+else if (id === 'promotion') populatePromotionDropdowns();
+else if (id === 'entranceexams') loadEntranceExams();
+else if (id === 'schoolsettings') loadSchoolSettings();
+};
+});
+
+document.getElementById('applyStaffCheckinFilters').onclick = applyStaffCheckinFilters;
+document.getElementById('resetStaffCheckinFilters').onclick = resetStaffCheckinFilters;
+document.getElementById('refreshStaffCheckinsBtn').onclick = loadStaffCheckinHistory;
+document.getElementById('exportStaffCheckinsCSV').onclick = exportStaffCheckinsCSV;
+document.getElementById('printStaffCheckinsTable').onclick = printStaffCheckinsTable;
+
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+btn.onclick = function() {
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+this.classList.add('active');
+document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
+if (this.dataset.tab === 'examhistory' && currentStudentDoc) loadExamHistory();
+if (this.dataset.tab === 'paymenthistory' && currentStudentDoc) loadPaymentHistory();
+if (this.dataset.tab === 'attendancehistory' && currentStudentDoc) loadAttendanceHistory();
+if (this.dataset.tab === 'aichat' && (currentUserRole === 'parent' || currentUserRole ===
+'student') && linkedStudentId) {
+setTimeout(initChatbot, 200);
+}
+if (this.dataset.tab === 'library') {
+showLibraryResources();
+}
+if (this.dataset.tab === 'documents') {
+if (currentStudentDoc) {
+loadStudentDocuments(currentStudentDoc.id);
+} else {
+document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
+}
+}
+if (this.dataset.tab === 'reportcard') {
+if (currentStudentDoc) {
+const yearSelect = document.getElementById('reportCardYear');
+if (yearSelect.options.length <= 1) {
+db.collection('exam_records').doc(currentStudentDoc.id).get().then(doc => {
+if (doc.exists) {
+const data = doc.data();
+const years = data.years ? Object.keys(data.years) : [];
+const currentVal = yearSelect.value;
+yearSelect.innerHTML = '<option value="all">All Years</option>';
+years.forEach(y => {
+yearSelect.innerHTML +=
+`<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
+});
+}
+}).catch(() => {});
+}
+generateReportCard();
+} else {
+document.getElementById('reportCardContainer').innerHTML =
+'<p>Please load a student first.</p>';
+}
+}
+if (this.dataset.tab === 'entranceexam') {
+if (currentStudentDoc) {
+loadEntranceExamForParent();
+} else {
+document.getElementById('entranceExamList').innerHTML =
+'<p>Please load a student first.</p>';
+}
+}
+};
+});
+
+document.getElementById('showPayrollBtn').onclick = function() {
+const container = document.getElementById('payrollContainer');
+if (container.style.display === 'none') {
+container.style.display = 'block';
+loadStaffPayroll();
+this.textContent = 'Hide Payroll';
+} else {
+container.style.display = 'none';
+this.textContent = 'View Payroll';
+}
+};
+document.getElementById('showPaymentHistoryBtn').onclick = function() {
+const container = document.getElementById('paymentHistoryContainer');
+if (container.style.display === 'none') {
+container.style.display = 'block';
+loadStaffPaymentHistory();
+this.textContent = 'Hide Payment History';
+} else {
+container.style.display = 'none';
+this.textContent = 'View Payment History';
+}
+};
+
+document.getElementById('refreshAdmissionRequestsBtn').onclick = function() {
+loadAdmissionRequests('admissionRequestsList');
+};
+document.getElementById('refreshAdmissionRequestsAdminBtn').onclick = function() {
+loadAdmissionRequests('admissionRequestsAdminList');
+};
+
+document.getElementById('refreshRegistrationRequestsBtn').onclick = function() {
+loadRegistrationRequests('registrationRequestsList');
+};
+document.getElementById('refreshRegistrationRequestsAdminBtn').onclick = function() {
+loadRegistrationRequests('registrationRequestsAdminList');
+};
+
+setTimeout(() => {
+populateELearningDropdowns();
+loadQuizzes();
+loadAssignments();
+loadEntranceExams();
+}, 500);
+
+document.getElementById('loginModal').style.display = 'none';
+
+setTimeout(() => {
+if (currentUserRole === 'parent' || currentUserRole === 'student') {
+if (linkedStudentId) {
+loadChatbotData(linkedStudentId).catch(console.warn);
+}
+}
+}, 2000);
+};
+
+// ==================================================================
+//  ENTRANCE EXAMS ADMIN FUNCTIONS
+// ==================================================================
+async function loadEntranceExams() {
+const container = document.getElementById('entranceExamsList');
+if (!container) return;
+container.innerHTML = '<p>Loading entrance exams...</p>';
+try {
+const tenantId = getCurrentTenantId();
+const snap = await db.collection('entrance_exams')
+.where('tenantId', '==', tenantId)
+.orderBy('createdAt', 'desc')
+.get();
+const exams = [];
+snap.forEach(d => exams.push({ id: d.id, ...d.data() }));
+if (exams.length === 0) {
+container.innerHTML = '<p>No entrance exams created yet. Click "Create Exam" to start.</p>';
+return;
+}
+let html = '<div class="table-wrapper"><table><thead><tr><th>Title</th><th>Questions</th><th>Time Limit</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody>';
+for (const exam of exams) {
+const assignedCount = exam.assignedTo ? exam.assignedTo.length : 0;
+html += `<tr>
+<td>${escapeHtml(exam.title)}</td>
+<td>${exam.questions ? exam.questions.length : 0}</td>
+<td>${exam.timeLimit || 15} min</td>
+<td>${assignedCount} admission(s)</td>
+<td>
+<button class="assign-exam-btn" data-id="${exam.id}" style="background:#e8f0fe; color:#1a4b8a;">Assign</button>
+<button class="delete-exam-btn" data-id="${exam.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
+</td>
+</tr>`;
+}
+html += '</tbody></table></div>';
+container.innerHTML = html;
+
+container.querySelectorAll('.assign-exam-btn').forEach(btn => {
+btn.onclick = function() {
+const examId = this.dataset.id;
+openAssignEntranceExamModal(examId);
+};
+});
+container.querySelectorAll('.delete-exam-btn').forEach(btn => {
+btn.onclick = async function() {
+if (confirm('Delete this entrance exam? All submissions will be removed.')) {
+const examId = this.dataset.id;
+await db.collection('entrance_exams').doc(examId).delete();
+loadEntranceExams();
+}
+};
+});
+} catch (error) {
+container.innerHTML = '<div class="error">Error loading entrance exams: ' + escapeHtml(error.message) + '</div>';
+console.error('Error loading entrance exams:', error);
+}
+}
+
+async function openAssignEntranceExamModal(examId) {
+const container = document.getElementById('entranceExamAssignList');
+container.innerHTML = '<p>Loading admission requests...</p>';
+openModal('assignEntranceExamModal');
+try {
+const tenantId = getCurrentTenantId();
+const snap = await db.collection('admissions')
+.where('tenantId', '==', tenantId)
+.where('status', '==', 'pending')
+.get();
+const requests = [];
+snap.forEach(d => requests.push({ id: d.id, ...d.data() }));
+if (requests.length === 0) {
+container.innerHTML = '<p>No pending admission requests found.</p>';
+return;
+}
+let html = '';
+requests.forEach((req, idx) => {
+html += `<div class="entrance-exam-assign-item">
+<input type="checkbox" class="assign-checkbox" data-idx="${idx}" />
+<span><strong>${escapeHtml(req.studentName)}</strong> (${escapeHtml(req.schoolName)}) - ${escapeHtml(req.classApplying)}</span>
+</div>`;
+});
+html += `<div style="margin-top:12px;">
+<button id="assignSelectedEntranceExamBtn" class="refresh-btn" style="background:#27ae60;">Assign to Selected</button>
+</div>`;
+container.innerHTML = html;
+
+container.dataset.examId = examId;
+
+document.getElementById('assignSelectedEntranceExamBtn').onclick = async function() {
+const examId = container.dataset.examId;
+const checked = container.querySelectorAll('.assign-checkbox:checked');
+if (checked.length === 0) {
+alert('Please select at least one admission request.');
+return;
+}
+const selectedIds = [];
+checked.forEach(cb => {
+const idx = parseInt(cb.dataset.idx);
+selectedIds.push(requests[idx].id);
+});
+const batch = db.batch();
+selectedIds.forEach(id => {
+const ref = db.collection('admissions').doc(id);
+batch.update(ref, { examId: examId });
+});
+const examRef = db.collection('entrance_exams').doc(examId);
+const examDoc = await examRef.get();
+let assigned = examDoc.exists ? examDoc.data().assignedTo || [] : [];
+const studentNames = selectedIds.map(id => {
+const req = requests.find(r => r.id === id);
+return req ? req.studentName : '';
+}).filter(Boolean);
+assigned = [...new Set([...assigned, ...studentNames])];
+batch.update(examRef, { assignedTo: assigned });
+
+await batch.commit();
+alert(`Assigned exam to ${selectedIds.length} admission request(s).`);
+closeModal('assignEntranceExamModal');
+loadEntranceExams();
+};
+
+} catch (error) {
+container.innerHTML = '<div class="error">Error loading admission requests: ' + escapeHtml(error.message) + '</div>';
+console.error('Error:', error);
+}
+}
+
+// ==================================================================
+//  QUIZ / ENTRANCE EXAM START FUNCTIONS
+// ==================================================================
+function startQuiz(quiz) {
+const user = auth.currentUser;
+if (!user) { alert('Please log in to take this quiz.'); return; }
+
+db.collection('quiz_submissions')
+.where('quizId', '==', quiz.id)
+.where('userId', '==', user.uid)
+.get()
+.then(snap => {
+if (!snap.empty) {
+alert('You have already submitted this quiz. You cannot take it again.');
+return;
+}
+currentQuizTaking = {
+quizId: quiz.id,
+questions: quiz.questions || [],
+answers: new Array(quiz.questions ? quiz.questions.length : 0).fill(null),
+currentIndex: 0,
+startTime: Date.now(),
+timeLimit: quiz.timeLimit || 15
+};
+document.getElementById('takeQuizTitle').textContent = '📝 ' + quiz.title;
+document.getElementById('takeQuizMeta').textContent =
+`⏱️ ${quiz.timeLimit || 15} min • ${quiz.questions ? quiz.questions.length : 0} questions`;
+document.getElementById('takeQuizMessage').innerHTML = '';
+window.renderQuizQuestion();
+openModal('takeQuizModal');
+
+if (quizTimerInterval) clearInterval(quizTimerInterval);
+let timeLeft = (quiz.timeLimit || 15) * 60;
+const timerEl = document.getElementById('takeQuizTimer');
+quizTimerInterval = setInterval(() => {
+timeLeft--;
+const mins = Math.floor(timeLeft / 60);
+const secs = timeLeft % 60;
+timerEl.textContent = `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+if (timeLeft <= 0) {
+clearInterval(quizTimerInterval);
+alert('⏰ Time is up! Submitting your quiz...');
+window.submitQuiz();
+}
+}, 1000);
+})
+.catch(err => {
+alert('Error checking submissions: ' + err.message);
+});
+}
+
+function startEntranceExam(exam) {
+const user = auth.currentUser;
+if (!user) { alert('Please log in to take this exam.'); return; }
+
+db.collection('entrance_exam_submissions')
+.where('examId', '==', exam.id)
+.where('studentId', '==', currentStudentDoc ? currentStudentDoc.id : '')
+.get()
+.then(snap => {
+if (!snap.empty) {
+alert('You have already submitted this exam. You cannot take it again.');
+return;
+}
+currentEntranceExamTaking = {
+examId: exam.id,
+questions: exam.questions || [],
+answers: new Array(exam.questions ? exam.questions.length : 0).fill(null),
+currentIndex: 0,
+startTime: Date.now(),
+timeLimit: exam.timeLimit || 15,
+studentId: currentStudentDoc ? currentStudentDoc.id : '',
+studentName: currentStudentDoc ? currentStudentDoc.name : ''
+};
+document.getElementById('takeEntranceExamTitle').textContent = '📋 ' + exam.title;
+document.getElementById('takeEntranceExamMeta').textContent =
+`⏱️ ${exam.timeLimit || 15} min • ${exam.questions ? exam.questions.length : 0} questions`;
+document.getElementById('takeEntranceExamMessage').innerHTML = '';
+window.renderEntranceExamQuestion();
+openModal('takeEntranceExamModal');
+
+if (quizTimerInterval) clearInterval(quizTimerInterval);
+let timeLeft = (exam.timeLimit || 15) * 60;
+const timerEl = document.getElementById('takeEntranceExamTimer');
+quizTimerInterval = setInterval(() => {
+timeLeft--;
+const mins = Math.floor(timeLeft / 60);
+const secs = timeLeft % 60;
+timerEl.textContent = `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+if (timeLeft <= 0) {
+clearInterval(quizTimerInterval);
+alert('⏰ Time is up! Submitting your exam...');
+window.submitEntranceExam();
+}
+}, 1000);
+})
+.catch(err => {
+alert('Error checking submissions: ' + err.message);
+});
+}
+
+function showQuizResult(submission) {
+const container = document.getElementById('quizResultContent');
+const html = `
+<div class="quiz-result-score">${submission.score}%</div>
+<div style="text-align:center; margin-bottom:12px;">
+${submission.correct} out of ${submission.total} correct (MCQ only)
+</div>
+<div style="margin-bottom:12px;">
+<strong>Time taken:</strong> ${Math.floor(submission.timeTaken / 60)}m ${submission.timeTaken % 60}s
+</div>
+<h4>Detailed Results</h4>
+${submission.results.map((r, i) => `
+<div class="quiz-result-detail">
+<strong>Q${i+1}:</strong> ${escapeHtml(r.question)}<br>
+<strong>Your answer:</strong> ${escapeHtml(r.userAnswer)}<br>
+<strong>Correct answer:</strong> ${escapeHtml(r.correctAnswer)}<br>
+<strong>Result:</strong> ${r.isCorrect ? '✅ Correct' : '❌ Incorrect (auto-graded MCQ)'}
+${r.type === 'short' ? ' <span style="color:#f39c12;">(Short answer — teacher review required)</span>' : ''}
+</div>
+`).join('')}
+`;
+container.innerHTML = html;
+openModal('quizResultModal');
+}
+
+// Navigation for quiz/exam
+document.getElementById('takeQuizPrevBtn').addEventListener('click', function() {
+if (currentQuizTaking && currentQuizTaking.currentIndex > 0) {
+currentQuizTaking.currentIndex--;
+window.renderQuizQuestion();
+}
+});
+document.getElementById('takeQuizNextBtn').addEventListener('click', function() {
+if (currentQuizTaking) {
+if (currentQuizTaking.currentIndex < currentQuizTaking.questions.length - 1) {
+currentQuizTaking.currentIndex++;
+window.renderQuizQuestion();
+} else {
+if (confirm('You are at the last question. Submit your quiz now?')) {
+window.submitQuiz();
+}
+}
+}
+});
+document.getElementById('takeQuizSubmitBtn').addEventListener('click', function() {
+if (confirm('Are you sure you want to submit your quiz? This action cannot be undone.')) {
+window.submitQuiz();
+}
+});
+
+document.getElementById('takeEntranceExamPrevBtn').addEventListener('click', function() {
+if (currentEntranceExamTaking && currentEntranceExamTaking.currentIndex > 0) {
+currentEntranceExamTaking.currentIndex--;
+window.renderEntranceExamQuestion();
+}
+});
+document.getElementById('takeEntranceExamNextBtn').addEventListener('click', function() {
+if (currentEntranceExamTaking) {
+if (currentEntranceExamTaking.currentIndex < currentEntranceExamTaking.questions.length - 1) {
+currentEntranceExamTaking.currentIndex++;
+window.renderEntranceExamQuestion();
+} else {
+if (confirm('You are at the last question. Submit your exam now?')) {
+window.submitEntranceExam();
+}
+}
+}
+});
+document.getElementById('takeEntranceExamSubmitBtn').addEventListener('click', function() {
+if (confirm('Are you sure you want to submit your exam? This action cannot be undone.')) {
+window.submitEntranceExam();
+}
+});
+
+// Close quiz result
+document.getElementById('closeQuizResultBtn').addEventListener('click', function() {
+closeModal('quizResultModal');
+});
+
+// ==================================================================
+//  CREATE ASSIGNMENT BUTTON
+// ==================================================================
+document.getElementById('createAssignmentBtn').addEventListener('click', function() {
+if (currentUserRole !== 'admin' && currentUserRole !== 'teacher') {
+alert('Only teachers and admins can create assignments.');
+return;
+}
+document.getElementById('assignmentTitle').value = '';
+document.getElementById('assignmentClass').value = '';
+document.getElementById('assignmentDueDate').value = '';
+document.getElementById('assignmentDescription').value = '';
+document.getElementById('assignmentFileInput').value = '';
+document.getElementById('assignmentCreateMessage').innerHTML = '';
+openModal('createAssignmentModal');
+});
+
+document.getElementById('refreshAssignmentsBtn').addEventListener('click', function() { loadAssignments(); });
+</script>
 </body>
 </html>
