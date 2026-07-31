@@ -4537,7 +4537,15 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
-
+      <!-- ===== SERVICE WORKER REGISTRATION ===== -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/my-app/sw.js')
+          .then(() => console.log('✅ Service Worker registered'))
+          .catch(err => console.log('❌ Service Worker error:', err));
+      }
+    </script>
+    
     <script>
         // ==================================================================
         //  FIREBASE INIT
