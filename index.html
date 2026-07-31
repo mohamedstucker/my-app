@@ -2504,8 +2504,8 @@
                 padding: 4px 8px;
             }
             .quick-reply-btn {
-                font-size: 0.7rem;
-                padding: 3px 10px;
+                font-size: 0.65rem;
+                padding: 2px 8px;
             }
             .settings-group .form-row {
                 flex-direction: column;
@@ -14614,5 +14614,15 @@ openModal('createAssignmentModal');
 
 document.getElementById('refreshAssignmentsBtn').addEventListener('click', function() { loadAssignments(); });
 </script>
+
+<!-- ===== SERVICE WORKER REGISTRATION ===== -->
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/my-app/sw.js')
+            .then(() => console.log('✅ Service Worker registered'))
+            .catch(err => console.log('❌ Service Worker error:', err));
+    }
+</script>
+
 </body>
 </html>
