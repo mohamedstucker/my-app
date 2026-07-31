@@ -6,7 +6,7 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
-        /* ===== ALL ORIGINAL STYLES (with mobile fixes) ===== */
+        /* ===== ALL ORIGINAL STYLES (with mobile fixes for finance charts) ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -807,6 +807,28 @@
             text-align: center;
         }
 
+        /* ---- Mobile fixes for finance charts and grids ---- */
+        .finance-chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .finance-chart-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 280px;
+        }
+        #financeMonthlySummary {
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        #financeMonthlySummary table {
+            font-size: 0.8rem;
+            width: 100%;
+        }
+
         @media (max-width: 768px) {
             #chartsCard .chart-container {
                 height: 240px;
@@ -817,6 +839,33 @@
             }
             #chartsCard canvas {
                 max-height: 240px;
+            }
+            .finance-chart-container {
+                height: 200px;
+            }
+            .finance-chart-container canvas {
+                max-height: 200px;
+            }
+            #financeMonthlySummary {
+                max-height: 180px;
+            }
+            #financeMonthlySummary table {
+                font-size: 0.7rem;
+            }
+            .finance-kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .finance-chart-container {
+                height: 160px;
+            }
+            .finance-chart-container canvas {
+                max-height: 160px;
+            }
+            .finance-kpi-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -987,20 +1036,6 @@
             font-weight: 600;
             font-size: 0.8rem;
             color: #1a3a5c;
-        }
-
-        /* Finance chart container */
-        .finance-chart-container {
-            position: relative;
-            height: 280px;
-            width: 100%;
-            margin: 10px 0;
-        }
-        .finance-chart-container canvas {
-            display: block;
-            width: 100% !important;
-            height: 100% !important;
-            max-height: 280px;
         }
 
         .attendance-summary {
@@ -2182,7 +2217,7 @@
             object-fit: contain;
         }
 
-        /* ===== MOBILE RESPONSIVE FIXES ===== */
+        /* ===== MOBILE RESPONSIVE FIXES (already above) ===== */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -2524,9 +2559,7 @@
                 max-width: 100%;
                 min-width: 80px;
             }
-            .finance-chart-container {
-                height: 200px;
-            }
+            /* chart container already fixed above */
         }
 
         @media (max-width: 480px) {
@@ -2676,9 +2709,7 @@
             .finance-kpi-card .kpi-number {
                 font-size: 1.3rem;
             }
-            .finance-chart-container {
-                height: 160px;
-            }
+            /* chart container already fixed above */
         }
     </style>
 </head>
@@ -2889,7 +2920,7 @@
                 <div id="dashboardContent"><p>Loading dashboard data...</p></div>
             </div>
 
-            <!-- ===== CHARTS CARD — FIXED SIZING ===== -->
+            <!-- ===== CHARTS CARD ===== -->
             <div class="card" id="chartsCard" style="display:none;">
                 <h3>📊 Interactive Dashboard</h3>
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:20px;" id="kpiContainer">
@@ -3289,7 +3320,6 @@
                         <input id="teacherPhone" placeholder="Phone" />
                     </div>
                     <div class="form-row">
-                        <!-- DEPARTMENT FIELD NOW TEXT INPUT (fix #5) -->
                         <input id="teacherDepartment" placeholder="Department *" />
                         <input id="teacherSubjects" placeholder="Subjects (comma)" />
                         <select id="teacherClass">
@@ -3340,7 +3370,6 @@
                 <h3>My Teacher Profile</h3>
                 <div id="ownTeacherProfile"></div>
                 <button id="editOwnTeacherBtn" class="refresh-btn" style="display:none;">Edit My Profile</button>
-                <!-- NEW: Delete button for teacher profile (admin only) -->
                 <button id="deleteOwnTeacherBtn" class="refresh-btn" style="display:none; background:#fde8e8; color:#b71c1c;">Delete Teacher</button>
             </div>
             <div class="card">
@@ -3490,7 +3519,7 @@
                 </div>
             </div>
 
-            <!-- ===== NEW FINANCE MANAGEMENT CARD ===== -->
+            <!-- ===== FINANCE MANAGEMENT CARD ===== -->
             <div class="card" id="financeCard">
                 <h3>💰 Finance Management</h3>
                 <p style="color:#6c7a89; margin-bottom:12px;">
@@ -3708,7 +3737,6 @@
                 <button class="admin-tab-btn" data-tab="registrationrequests">📋 Registration Requests</button>
                 <button class="admin-tab-btn" data-tab="promotion">🎓 Promotion</button>
                 <button class="admin-tab-btn" data-tab="entranceexams">📋 Entrance Exams</button>
-                <!-- NEW: School Settings Tab -->
                 <button class="admin-tab-btn" data-tab="schoolsettings">⚙️ School Settings</button>
             </div>
             <div id="staffTab" class="admin-tab active">
@@ -4537,15 +4565,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
-      <!-- ===== SERVICE WORKER REGISTRATION ===== -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/my-app/sw.js')
-          .then(() => console.log('✅ Service Worker registered'))
-          .catch(err => console.log('❌ Service Worker error:', err));
-      }
-    </script>
-    
+
     <script>
         // ==================================================================
         //  FIREBASE INIT
@@ -4563,7 +4583,7 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // ===== ADD 'Others' TO ALL_CLASSES (fix #3, #6) =====
+        // ===== ADD 'Others' TO ALL_CLASSES =====
         const ALL_CLASSES = [
             'Pre-Nursery',
             'Nursery1', 'Nursery2', 'Nursery3',
@@ -7837,6 +7857,7 @@
             }
         };
 
+        // ----- UPDATED recordBursarPayment with income integration -----
         async function recordBursarPayment() {
             if (!bursarCurrentStudent) { showMessage('Load a student first.', 'error', 'bursarPaymentMessage'); return; }
             const tenantId = getCurrentTenantId();
@@ -7857,10 +7878,30 @@
             data[term].transactions.push(transaction);
             data[term].paid += amount;
             await docRef.set(data);
-            showMessage('Payment recorded for ' + getTermLabel(term), 'success', 'bursarPaymentMessage');
+
+            // --- NEW: Record income in finance module ---
+            const user = auth.currentUser;
+            const incomeData = {
+                amount: amount,
+                category: 'School Fees',
+                date: new Date().toISOString().split('T')[0],
+                description: `Fee payment for ${bursarCurrentStudent.name} (${bursarCurrentStudent.id}) - ${note || term}`,
+                year: new Date().getFullYear().toString(),
+                month: String(new Date().getMonth() + 1).padStart(2, '0'),
+                recordedBy: user ? user.uid : 'anonymous',
+                recordedByName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
+                tenantId: tenantId,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            await db.collection('income').add(incomeData);
+
+            showMessage('Payment recorded for ' + getTermLabel(term) + ' (income logged)', 'success', 'bursarPaymentMessage');
             document.getElementById('paymentAmount').value = '';
             document.getElementById('paymentNote').value = '';
             await loadBursarFeeStatus(bursarCurrentStudent.id);
+            if (document.getElementById('financeDashboardTab').classList.contains('active')) {
+                loadFinanceDashboard();
+            }
         }
 
         async function saveBursarTermFees() {
@@ -9994,7 +10035,7 @@
         };
 
         // ==================================================================
-        //  STAFF PAYROLL / PAYMENT VOUCHER
+        //  STAFF PAYROLL / PAYMENT VOUCHER (updated with expense integration)
         // ==================================================================
         async function loadStaffPayroll() {
             const container = document.getElementById('staffPayrollList');
@@ -10047,6 +10088,7 @@
             openModal('staffPaymentModal');
         }
 
+        // UPDATED submitPayrollBtn with expense integration
         document.getElementById('submitPayrollBtn').onclick = async function() {
             const staffId = document.getElementById('payrollStaffId').value.trim();
             const staffName = document.getElementById('payrollStaffName').value.trim();
@@ -10086,7 +10128,24 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 const docRef = await db.collection('staff_payments').add(paymentData);
-                showMessage('Payment recorded successfully!', 'success', 'payrollModalMessage');
+
+                // --- NEW: Record as expense in finance module ---
+                const user = auth.currentUser;
+                const expenseData = {
+                    amount: amount,
+                    category: 'Salaries',
+                    date: new Date().toISOString().split('T')[0],
+                    description: `Salary payment for ${staffName} (${staffId}) - ${note || month}`,
+                    year: year,
+                    month: monthNum,
+                    recordedBy: user ? user.uid : 'anonymous',
+                    recordedByName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
+                    tenantId: tenantId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await db.collection('expenses').add(expenseData);
+
+                showMessage('Payment recorded successfully! (expense logged)', 'success', 'payrollModalMessage');
 
                 const voucherHtml = `
                     <p><strong>Voucher No:</strong> ${docRef.id}</p>
@@ -10101,6 +10160,10 @@
                 document.getElementById('voucherContent').innerHTML = voucherHtml;
                 document.getElementById('voucherDisplay').style.display = 'block';
                 window._voucherHtml = voucherHtml;
+
+                if (document.getElementById('financeDashboardTab').classList.contains('active')) {
+                    loadFinanceDashboard();
+                }
             } catch (error) {
                 showMessage('Error recording payment: ' + error.message, 'error', 'payrollModalMessage');
             }
@@ -10675,7 +10738,7 @@
         };
 
         // ==================================================================
-        //  REPORT CARD GENERATION — FIXED to use school settings (fix #2)
+        //  REPORT CARD GENERATION
         // ==================================================================
         async function generateReportCard() {
             if (!currentStudentDoc) {
@@ -10692,7 +10755,6 @@
                 const tenantId = getCurrentTenantId();
                 const student = currentStudentDoc;
 
-                // Load school settings for header/footer
                 await loadSchoolSettingsSilent();
 
                 const examDoc = await db.collection('exam_records').doc(student.id).get();
@@ -10761,7 +10823,6 @@
                     termFees[t] = { total: data.total, paid: data.paid, balance: data.total - data.paid };
                 }
 
-                // Use school settings for header and footer (fix #2)
                 const headerMsg = schoolSettings.reportHeader || '';
                 const footerMsg = schoolSettings.reportFooter || '';
                 const schoolName = schoolSettings.schoolName || 'EduSL School';
@@ -10893,7 +10954,6 @@
             }
         }
 
-        // Silent load school settings for report card
         async function loadSchoolSettingsSilent() {
             try {
                 const tenantId = getCurrentTenantId();
@@ -12473,10 +12533,9 @@
         }
 
         // ==================================================================
-        //  SCHOOL SETTINGS FUNCTIONS (FIX #1, #5 — logo display, department field)
+        //  SCHOOL SETTINGS FUNCTIONS
         // ==================================================================
 
-        // Load school settings from Firestore
         async function loadSchoolSettings() {
             const container = document.getElementById('settingsMessage');
             container.innerHTML = '<p style="color:#6c7a89;">Loading settings...</p>';
@@ -12488,10 +12547,8 @@
 
                 if (doc.exists) {
                     const data = doc.data();
-                    // Update global settings object
                     Object.assign(schoolSettings, data);
 
-                    // Populate form fields
                     document.getElementById('settingsSchoolName').value = data.schoolName || '';
                     document.getElementById('settingsSchoolTagline').value = data.schoolTagline || '';
                     document.getElementById('settingsSchoolLogo').value = data.schoolLogo || '';
@@ -12511,17 +12568,14 @@
                     document.getElementById('settingsWhatsAppEnabled').value = data.whatsAppEnabled !== undefined ? String(data.whatsAppEnabled) : 'true';
                     document.getElementById('settingsWhatsAppMessage').value = data.whatsAppMessage || 'Attendance Alert: Your child {{name}} ({{id}}) was marked {{status}} on {{date}}. Remark: {{remark}}';
 
-                    // Update color previews
                     updateColorPreviews();
                     updateLogoPreview();
 
                     container.innerHTML = '<div class="success">✅ Settings loaded successfully.</div>';
                 } else {
-                    // No settings exist yet - show defaults
                     container.innerHTML = '<div style="color:#6c7a89;">No saved settings found. Use default values or configure your school settings.</div>';
                 }
 
-                // Update header with school name
                 updateHeaderSchoolName();
 
             } catch (error) {
@@ -12530,7 +12584,6 @@
             }
         }
 
-        // Save school settings to Firestore
         async function saveSchoolSettings() {
             const container = document.getElementById('settingsMessage');
             container.innerHTML = '<p>Saving settings...</p>';
@@ -12560,21 +12613,17 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // Update global settings object
                 Object.assign(schoolSettings, data);
 
-                // Save to Firestore
                 const docRef = db.collection('school_settings').doc(tenantId);
                 await docRef.set(data, { merge: true });
 
-                // Update UI
                 updateColorPreviews();
                 updateLogoPreview();
                 updateHeaderSchoolName();
 
                 container.innerHTML = '<div class="success">✅ School settings saved successfully!</div>';
 
-                // Apply settings to UI (e.g., colors)
                 applySettingsToUI(data);
 
             } catch (error) {
@@ -12583,7 +12632,6 @@
             }
         }
 
-        // Reset school settings to defaults
         async function resetSchoolSettings() {
             if (!confirm('Reset all school settings to default values?')) return;
 
@@ -12610,7 +12658,6 @@
 
             Object.assign(schoolSettings, defaults);
 
-            // Populate form fields with defaults
             document.getElementById('settingsSchoolName').value = defaults.schoolName;
             document.getElementById('settingsSchoolTagline').value = defaults.schoolTagline;
             document.getElementById('settingsSchoolLogo').value = defaults.schoolLogo;
@@ -12634,7 +12681,6 @@
             updateLogoPreview();
             updateHeaderSchoolName();
 
-            // Save defaults to Firestore
             try {
                 const tenantId = getCurrentTenantId();
                 await db.collection('school_settings').doc(tenantId).set({
@@ -12649,7 +12695,6 @@
             }
         }
 
-        // Update color previews
         function updateColorPreviews() {
             const primaryColor = document.getElementById('settingsPrimaryColor').value;
             const accentColor = document.getElementById('settingsAccentColor').value;
@@ -12657,7 +12702,6 @@
             document.getElementById('settingsAccentColorPreview').style.backgroundColor = accentColor;
         }
 
-        // Update logo preview (fix #1)
         function updateLogoPreview() {
             const logoUrl = document.getElementById('settingsSchoolLogo').value;
             const preview = document.getElementById('settingsLogoPreview');
@@ -12668,7 +12712,6 @@
             }
         }
 
-        // Update header with school name
         function updateHeaderSchoolName() {
             const name = schoolSettings.schoolName || 'School Management';
             const tagline = schoolSettings.schoolTagline || 'Empowering Sierra Leone\'s Education';
@@ -12676,16 +12719,13 @@
             if (displayName) {
                 displayName.textContent = name;
             }
-            // Also update the sync bar if it exists
             const syncBar = document.getElementById('syncBar');
             if (syncBar && schoolSettings.schoolName) {
                 syncBar.innerHTML = `🏫 ${escapeHtml(schoolSettings.schoolName)} — ${escapeHtml(tagline)}`;
             }
         }
 
-        // Apply settings to UI (colors, etc.)
         function applySettingsToUI(data) {
-            // Apply primary color to buttons and headers
             if (data.primaryColor) {
                 const style = document.createElement('style');
                 style.id = 'dynamic-school-style';
@@ -12708,14 +12748,12 @@
                     .teacher-class-badge { background: ${data.primaryColor} !important; }
                     .chat-message.user { background: ${data.primaryColor} !important; }
                 `;
-                // Remove existing dynamic style
                 const existing = document.getElementById('dynamic-school-style');
                 if (existing) existing.remove();
                 document.head.appendChild(style);
             }
         }
 
-        // Helper to darken/lighten a color
         function adjustColor(hex, amount) {
             let r = parseInt(hex.slice(1, 3), 16);
             let g = parseInt(hex.slice(3, 5), 16);
@@ -12726,27 +12764,17 @@
             return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
 
-        // Setup settings tab activation
         function setupSettingsTab() {
-            // Color pickers update preview
             document.getElementById('settingsPrimaryColor').addEventListener('input', updateColorPreviews);
             document.getElementById('settingsAccentColor').addEventListener('input', updateColorPreviews);
-
-            // Logo URL preview
             document.getElementById('settingsSchoolLogo').addEventListener('input', updateLogoPreview);
-
-            // Save button
             document.getElementById('saveSchoolSettingsBtn').addEventListener('click', saveSchoolSettings);
-
-            // Reset button
             document.getElementById('resetSchoolSettingsBtn').addEventListener('click', resetSchoolSettings);
-
-            // Load button
             document.getElementById('loadSchoolSettingsBtn').addEventListener('click', loadSchoolSettings);
         }
 
         // ==================================================================
-        //  FINANCE MODULE FUNCTIONS
+        //  FINANCE MODULE FUNCTIONS (with migration for past records)
         // ==================================================================
 
         // ----- Finance Tab Switching -----
@@ -12799,7 +12827,6 @@
                 showMessage('✅ Income recorded successfully!', 'success', 'incomeMessage');
                 document.getElementById('incomeAmount').value = '';
                 document.getElementById('incomeDescription').value = '';
-                // Set default date to today
                 document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
                 loadIncomeRecords();
                 loadFinanceDashboard();
@@ -13383,6 +13410,103 @@ showMessage('Dashboard refreshed.', 'success', 'financeDashboardMessage');
 };
 
 // ==================================================================
+//  MIGRATION SCRIPT: Backup past fees and salaries into finance
+// ==================================================================
+async function migratePastFinanceRecords() {
+    const tenantId = getCurrentTenantId();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Check if migration already done for this tenant
+    const migRef = db.collection('settings').doc('finance_migration_' + tenantId);
+    const migDoc = await migRef.get();
+    if (migDoc.exists && migDoc.data().done === true) {
+        console.log('Finance migration already done for tenant:', tenantId);
+        return;
+    }
+
+    let incomeCount = 0,
+        expenseCount = 0;
+    const batch = db.batch();
+
+    // ---- Migrate fee payments to income ----
+    const feeSnap = await db.collection('fee_records').where('tenantId', '==', tenantId).get();
+    for (const doc of feeSnap.docs) {
+        const data = doc.data();
+        const studentId = data.studentId;
+        // Get student name
+        let studentName = studentId;
+        try {
+            const studentDoc = await db.collection('students').doc(studentId).get();
+            if (studentDoc.exists) studentName = studentDoc.data().name || studentId;
+        } catch (_) {}
+
+        const terms = ['term1', 'term2', 'term3'];
+        for (const term of terms) {
+            const termData = data[term] || { transactions: [] };
+            for (let idx = 0; idx < termData.transactions.length; idx++) {
+                const tr = termData.transactions[idx];
+                if (!tr.date) continue;
+                const [year, month] = tr.date.split('-');
+                // Create income record with migrationId to avoid duplicates
+                const incomeRef = db.collection('income').doc(); // auto-id
+                const incomeData = {
+                    amount: tr.amount,
+                    category: 'School Fees',
+                    date: tr.date,
+                    description: `Fee payment for ${studentName} (${studentId}) - ${term} - ${tr.note || ''}`,
+                    year: year,
+                    month: month,
+                    recordedBy: 'migration',
+                    recordedByName: 'System Migration',
+                    tenantId: tenantId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    migrationId: `fee_${studentId}_${term}_${idx}`
+                };
+                batch.set(incomeRef, incomeData);
+                incomeCount++;
+            }
+        }
+    }
+
+    // ---- Migrate staff payments to expenses ----
+    const paySnap = await db.collection('staff_payments').where('tenantId', '==', tenantId).get();
+    for (const doc of paySnap.docs) {
+        const data = doc.data();
+        if (!data.date) continue;
+        const [year, month] = data.date.split('-');
+        const expenseRef = db.collection('expenses').doc(); // auto-id
+        const expenseData = {
+            amount: data.amount,
+            category: 'Salaries',
+            date: data.date,
+            description: `Salary payment for ${data.staffName} (${data.staffId}) - ${data.note || data.month || ''}`,
+            year: year || data.year || new Date().getFullYear().toString(),
+            month: month || data.month?.split('-')[1] || String(new Date().getMonth() + 1).padStart(2, '0'),
+            recordedBy: 'migration',
+            recordedByName: 'System Migration',
+            tenantId: tenantId,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            migrationId: `salary_${data.staffId}_${data.date}_${data.amount}`
+        };
+        batch.set(expenseRef, expenseData);
+        expenseCount++;
+    }
+
+    // Commit all writes
+    await batch.commit();
+
+    // Mark migration as done
+    await migRef.set({ done: true, migratedAt: firebase.firestore.FieldValue.serverTimestamp() });
+
+    console.log(`Finance migration completed: ${incomeCount} income records, ${expenseCount} expense records created.`);
+    showMessage(`✅ Finance migration completed: ${incomeCount} income, ${expenseCount} expense records backed up.`, 'success', 'financeDashboardMessage');
+}
+
+// ---- Trigger migration on login for admin/bursar ----
+// We'll call it after login in setupRoleUI for bursar and admin
+
+// ==================================================================
 //  LOGIN AND SETUP (updated with finance module)
 // ==================================================================
 async function loginAndSetup(email, password, skipAuth = false) {
@@ -13421,8 +13545,16 @@ const teacherSnap = await db.collection('teachers').where('tenantId', '==', tena
 if (!teacherSnap.empty) teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherSnap.docs[0]
 .data() };
 setupRoleUI('admin');
+// Run migration for admin
+setTimeout(() => {
+migratePastFinanceRecords().catch(e => console.warn('Migration error:', e));
+}, 3000);
 } else if (role === 'bursar') {
 setupRoleUI('bursar');
+// Run migration for bursar
+setTimeout(() => {
+migratePastFinanceRecords().catch(e => console.warn('Migration error:', e));
+}, 3000);
 } else if (role === 'teacher') {
 const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
 '==', user.uid).get();
@@ -13514,7 +13646,6 @@ document.getElementById('registrationRequestsCard').style.display = 'block';
 loadRegistrationRequests('registrationRequestsList');
 loadRegistrationRequests('registrationRequestsAdminList');
 loadEntranceExams();
-// Setup settings tab
 setupSettingsTab();
 }
 
@@ -13789,7 +13920,6 @@ loadBursarSummary();
 populateFeeStatsYears().then(loadFeeStats);
 loadFeeCollections();
 }
-// Load finance data
 populateFinanceFilterYears();
 loadFinanceDashboard();
 loadIncomeRecords();
@@ -13809,7 +13939,6 @@ loadAdmissionRequests('admissionRequestsAdminList');
 loadRegistrationRequests('registrationRequestsAdminList');
 populatePromotionDropdowns();
 loadEntranceExams();
-// Load settings when admin module is opened
 if (document.getElementById('schoolsettingsTab').style.display !== 'none') {
 loadSchoolSettings();
 }
@@ -13880,14 +14009,12 @@ else if (id === 'entranceexams') loadEntranceExams();
 else if (id === 'schoolsettings') loadSchoolSettings();
 };
 });
-// Setup settings tab
 setupSettingsTab();
 } else if (role === 'bursar') {
 document.getElementById('importSection').style.display = 'none';
 document.getElementById('manualSection').style.display = 'none';
 document.getElementById('adminTeacherSections').style.display = 'none';
 document.getElementById('teacherOwnProfileCard').style.display = 'none';
-// Show finance tab by default
 setTimeout(() => {
 const financeTab = document.querySelector('.finance-tab-btn[data-ftab="financeDashboard"]');
 if (financeTab) financeTab.click();
