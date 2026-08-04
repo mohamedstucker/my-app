@@ -6,7 +6,7 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
-        /* ===== ALL ORIGINAL STYLES (with mobile fixes for finance charts) ===== */
+        /* ===== ALL ORIGINAL STYLES ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -1634,6 +1634,52 @@
             font-size: 0.85rem;
         }
 
+        /* ===== PASSWORD TOGGLE STYLES ===== */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .password-wrapper input {
+            width: 100%;
+            max-width: 100%;
+            padding-right: 46px;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px 6px;
+            margin: 0;
+            color: #6c7a89;
+            border-radius: 8px;
+            transition: 0.2s;
+            box-shadow: none;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            width: 36px;
+        }
+        .password-toggle:hover {
+            background: rgba(0, 0, 0, 0.05);
+            transform: none;
+            color: #1a4b8a;
+        }
+        .password-toggle:active {
+            transform: scale(0.9);
+        }
+        .password-toggle .eye-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
         /* ===== VISITOR TOGGLE ===== */
         .visitor-toggle-row {
             display: flex;
@@ -2217,7 +2263,7 @@
             object-fit: contain;
         }
 
-        /* ===== MOBILE RESPONSIVE FIXES (already above) ===== */
+        /* ===== MOBILE RESPONSIVE FIXES ===== */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -2559,7 +2605,18 @@
                 max-width: 100%;
                 min-width: 80px;
             }
-            /* chart container already fixed above */
+            .password-wrapper input {
+                padding-right: 40px;
+            }
+            .password-toggle {
+                right: 8px;
+                height: 32px;
+                width: 32px;
+                font-size: 1rem;
+            }
+            .password-toggle .eye-icon {
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -2709,7 +2766,18 @@
             .finance-kpi-card .kpi-number {
                 font-size: 1.3rem;
             }
-            /* chart container already fixed above */
+            .password-wrapper input {
+                padding-right: 36px;
+            }
+            .password-toggle {
+                right: 6px;
+                height: 28px;
+                width: 28px;
+                font-size: 0.9rem;
+            }
+            .password-toggle .eye-icon {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -3025,7 +3093,12 @@
                 <div class="form-row">
                     <input id="newParentEmail" type="email" placeholder="Parent Email" />
                     <select id="newGender"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
-                    <input id="newTempPassword" type="password" placeholder="Temporary Password" />
+                    <div class="password-wrapper">
+                        <input id="newTempPassword" type="password" placeholder="Temporary Password" />
+                        <button type="button" class="password-toggle" data-target="newTempPassword" aria-label="Toggle password visibility">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
                 </div>
                 <button id="addStudentBtn" class="refresh-btn">Add Student</button>
                 <div id="manualMessage"></div>
@@ -3338,7 +3411,12 @@
                     <div class="form-row">
                         <input id="teacherSalary" type="number" placeholder="Salary (Le)" />
                         <select id="teacherStatus"><option>active</option><option>inactive</option></select>
-                        <input id="teacherPassword" type="password" placeholder="Temporary Password *" />
+                        <div class="password-wrapper">
+                            <input id="teacherPassword" type="password" placeholder="Temporary Password *" />
+                            <button type="button" class="password-toggle" data-target="teacherPassword" aria-label="Toggle password visibility">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
                     </div>
                     <button id="addTeacherBtn" class="refresh-btn">Add User</button>
                     <div id="teacherMessage"></div>
@@ -4054,6 +4132,29 @@
                             <label>Default WhatsApp Message</label>
                             <textarea id="settingsWhatsAppMessage" rows="2" placeholder="Default message template for attendance alerts..."></textarea>
                         </div>
+                        <div class="form-row">
+                            <label>Enable Email Notifications</label>
+                            <select id="settingsEmailEnabled">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label>Admin Email for Notifications</label>
+                            <input type="email" id="settingsAdminEmail" placeholder="admin@school.com" />
+                            <span class="hint">Email address where notifications will be sent</span>
+                        </div>
+                        <div class="form-row">
+                            <label>Email Notification Events</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px; max-width:400px;">
+                                <label style="font-weight:400; font-size:0.8rem;"><input type="checkbox" id="notifAttendance" checked /> Attendance</label>
+                                <label style="font-weight:400; font-size:0.8rem;"><input type="checkbox" id="notifFees" checked /> Fee Payments</label>
+                                <label style="font-weight:400; font-size:0.8rem;"><input type="checkbox" id="notifExams" checked /> Exams</label>
+                                <label style="font-weight:400; font-size:0.8rem;"><input type="checkbox" id="notifStaff" checked /> Staff Payroll</label>
+                                <label style="font-weight:400; font-size:0.8rem;"><input type="checkbox" id="notifAdmissions" checked /> Admissions</label>
+                                <label style="font-weight:400; font-size:0.8rem;"><input type="checkbox" id="notifSuggestions" checked /> Suggestions</label>
+                            </div>
+                        </div>
                     </div>
 
                     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
@@ -4115,7 +4216,12 @@
         <div class="modal-content">
             <h3>Login</h3>
             <input id="loginEmail" placeholder="Email" />
-            <input id="loginPassword" type="password" placeholder="Password" />
+            <div class="password-wrapper">
+                <input id="loginPassword" type="password" placeholder="Password" />
+                <button type="button" class="password-toggle" data-target="loginPassword" aria-label="Toggle password visibility">
+                    <span class="eye-icon">👁️</span>
+                </button>
+            </div>
             <button id="loginBtn" class="refresh-btn" style="width:100%;">Login</button>
             <hr />
             <div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center;">
@@ -4134,8 +4240,18 @@
                 <input type="text" id="signupSchoolPhone" placeholder="School Phone" />
                 <input type="text" id="signupAdminName" placeholder="Your Full Name *" />
                 <input type="email" id="signupEmail" placeholder="Admin Email *" />
-                <input type="password" id="signupPassword" placeholder="Password *" />
-                <input type="password" id="signupConfirm" placeholder="Confirm Password *" />
+                <div class="password-wrapper">
+                    <input type="password" id="signupPassword" placeholder="Password *" />
+                    <button type="button" class="password-toggle" data-target="signupPassword" aria-label="Toggle password visibility">
+                        <span class="eye-icon">👁️</span>
+                    </button>
+                </div>
+                <div class="password-wrapper">
+                    <input type="password" id="signupConfirm" placeholder="Confirm Password *" />
+                    <button type="button" class="password-toggle" data-target="signupConfirm" aria-label="Toggle password visibility">
+                        <span class="eye-icon">👁️</span>
+                    </button>
+                </div>
                 <input type="text" id="signupKey" placeholder="Registration Key *" />
                 <button id="signupBtn" class="refresh-btn" style="width:100%;">Create School Account</button>
                 <div id="signupMessage"></div>
@@ -4279,7 +4395,7 @@
     </div>
 
     <!-- ===== OTHER MODALS ===== -->
-    <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name" /><input type="date" id="editProfileDob" /><select id="editProfileClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option><option>Others</option></select><input id="editProfileDepartment" placeholder="Department" /><input id="editProfileAddress" placeholder="Address" /><input id="editProfileParentPhone" placeholder="Parent Phone" /><input id="editProfileParentName" placeholder="Parent Name" /><input id="editProfileGuardian" placeholder="Guardian" /><input id="editProfileParentEmail" type="email" placeholder="Parent Email" /><select id="editProfileGender"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select><input id="editProfileTempPassword" type="password" placeholder="Temporary Password" /><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
+    <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name" /><input type="date" id="editProfileDob" /><select id="editProfileClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option><option>Others</option></select><input id="editProfileDepartment" placeholder="Department" /><input id="editProfileAddress" placeholder="Address" /><input id="editProfileParentPhone" placeholder="Parent Phone" /><input id="editProfileParentName" placeholder="Parent Name" /><input id="editProfileGuardian" placeholder="Guardian" /><input id="editProfileParentEmail" type="email" placeholder="Parent Email" /><select id="editProfileGender"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select><div class="password-wrapper"><input id="editProfileTempPassword" type="password" placeholder="Temporary Password" /><button type="button" class="password-toggle" data-target="editProfileTempPassword" aria-label="Toggle password visibility"><span class="eye-icon">👁️</span></button></div><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
 
     <div id="editTeacherModal" class="modal">
         <div class="modal-content">
@@ -4301,7 +4417,12 @@
             </select>
             <input type="text" id="editTeacherQualification" placeholder="Qualification" />
             <input type="text" id="editTeacherNIN" placeholder="NIN" />
-            <input type="password" id="editTeacherPassword" placeholder="New Password (leave blank to keep current)" />
+            <div class="password-wrapper">
+                <input type="password" id="editTeacherPassword" placeholder="New Password (leave blank to keep current)" />
+                <button type="button" class="password-toggle" data-target="editTeacherPassword" aria-label="Toggle password visibility">
+                    <span class="eye-icon">👁️</span>
+                </button>
+            </div>
             <select id="editTeacherStatus"><option>active</option><option>inactive</option></select>
             <button id="saveTeacherBtn" class="refresh-btn">Save Changes</button>
             <div id="editTeacherMessage" style="margin-top:8px;"></div>
@@ -4543,7 +4664,12 @@
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
             </select>
-            <input type="password" id="editUserPassword" placeholder="New Password (leave blank to keep current)" />
+            <div class="password-wrapper">
+                <input type="password" id="editUserPassword" placeholder="New Password (leave blank to keep current)" />
+                <button type="button" class="password-toggle" data-target="editUserPassword" aria-label="Toggle password visibility">
+                    <span class="eye-icon">👁️</span>
+                </button>
+            </div>
             <div style="display:flex; gap:8px; margin-top:10px;">
                 <button id="saveUserEditBtn" class="refresh-btn">Save Changes</button>
                 <button onclick="closeModal('editUserModal')" style="background:#fde8e8; color:#b71c1c;">Cancel</button>
@@ -4566,7 +4692,413 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
 
+    <!-- ===== EMAILJS SDK ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
+
     <script>
+        // ==================================================================
+        //  EMAIL NOTIFICATION SYSTEM
+        // ==================================================================
+
+        // Initialize EmailJS with your public key
+        // Replace with your actual EmailJS public key
+        const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';
+        const EMAILJS_SERVICE_ID = 'service_edusl';
+        const EMAILJS_TEMPLATE_ID = 'template_edusl_notification';
+
+        let emailEnabled = true;
+        let adminEmail = '';
+        let notifSettings = {
+            attendance: true,
+            fees: true,
+            exams: true,
+            staff: true,
+            admissions: true,
+            suggestions: true
+        };
+
+        // Initialize EmailJS
+        (function initEmailJS() {
+            try {
+                if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+                    emailjs.init(EMAILJS_PUBLIC_KEY);
+                    console.log('✅ EmailJS initialized');
+                } else {
+                    console.warn('⚠️ EmailJS not configured. Set your public key.');
+                }
+            } catch (e) {
+                console.warn('EmailJS init error:', e);
+            }
+        })();
+
+        // Load email settings from school settings
+        async function loadEmailSettings() {
+            try {
+                const tenantId = getCurrentTenantId();
+                const docRef = db.collection('school_settings').doc(tenantId);
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    emailEnabled = data.emailEnabled !== undefined ? data.emailEnabled : true;
+                    adminEmail = data.adminEmail || '';
+                    notifSettings.attendance = data.notifAttendance !== undefined ? data.notifAttendance : true;
+                    notifSettings.fees = data.notifFees !== undefined ? data.notifFees : true;
+                    notifSettings.exams = data.notifExams !== undefined ? data.notifExams : true;
+                    notifSettings.staff = data.notifStaff !== undefined ? data.notifStaff : true;
+                    notifSettings.admissions = data.notifAdmissions !== undefined ? data.notifAdmissions : true;
+                    notifSettings.suggestions = data.notifSuggestions !== undefined ? data.notifSuggestions : true;
+                }
+            } catch (e) {
+                console.warn('Could not load email settings:', e);
+            }
+        }
+
+        // Send email notification using EmailJS
+        async function sendEmailNotification(subject, message, recipientEmail = null) {
+            if (!emailEnabled) {
+                console.log('📧 Email notifications disabled.');
+                return;
+            }
+
+            const to = recipientEmail || adminEmail;
+            if (!to) {
+                console.warn('📧 No recipient email configured.');
+                return;
+            }
+
+            // Check if EmailJS is configured
+            if (EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY') {
+                console.warn('📧 EmailJS not configured. Notification not sent.');
+                // Store in Firestore as a fallback
+                try {
+                    const tenantId = getCurrentTenantId();
+                    await db.collection('email_logs').add({
+                        to: to,
+                        subject: subject,
+                        message: message,
+                        tenantId: tenantId,
+                        sent: false,
+                        reason: 'EmailJS not configured',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (e) { /* ignore */ }
+                return;
+            }
+
+            try {
+                const templateParams = {
+                    to_email: to,
+                    subject: subject,
+                    message: message,
+                    from_name: 'EduSL School Management',
+                    reply_to: adminEmail || 'noreply@edusl.com',
+                    school_name: schoolSettings.schoolName || 'EduSL School'
+                };
+
+                const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+                console.log('📧 Email sent successfully:', result.text);
+
+                // Log successful email
+                try {
+                    const tenantId = getCurrentTenantId();
+                    await db.collection('email_logs').add({
+                        to: to,
+                        subject: subject,
+                        message: message.substring(0, 500),
+                        tenantId: tenantId,
+                        sent: true,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (e) { /* ignore */ }
+
+                return result;
+            } catch (error) {
+                console.error('📧 Email send error:', error);
+                // Log failed email
+                try {
+                    const tenantId = getCurrentTenantId();
+                    await db.collection('email_logs').add({
+                        to: to,
+                        subject: subject,
+                        message: message.substring(0, 500),
+                        tenantId: tenantId,
+                        sent: false,
+                        error: error.message,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (e) { /* ignore */ }
+                return null;
+            }
+        }
+
+        // ----- Notification helper functions -----
+
+        // Attendance alert
+        async function notifyAttendance(studentName, studentId, status, date, remark) {
+            if (!notifSettings.attendance) return;
+            const subject = `📊 Attendance Alert: ${studentName} (${studentId})`;
+            const message = `Dear Admin,
+
+        This is to inform you that student ${studentName} (ID: ${studentId}) was marked as "${status.toUpperCase()}" on ${date}.
+
+        Remark: ${remark || 'None'}
+
+        Please review this attendance record.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Fee payment notification
+        async function notifyFeePayment(studentName, studentId, amount, term, note) {
+            if (!notifSettings.fees) return;
+            const subject = `💰 Fee Payment: ${studentName} (${studentId})`;
+            const message = `Dear Admin,
+
+        A fee payment has been recorded for:
+
+        Student: ${studentName} (ID: ${studentId})
+        Amount: Le ${amount.toLocaleString()}
+        Term: ${term}
+        Note: ${note || 'None'}
+
+        Please verify this transaction.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Exam submission notification
+        async function notifyExamSubmission(studentName, studentId, examType, score) {
+            if (!notifSettings.exams) return;
+            const subject = `📝 Exam Submission: ${studentName} (${studentId})`;
+            const message = `Dear Admin,
+
+        A student has submitted an exam:
+
+        Student: ${studentName} (ID: ${studentId})
+        Exam Type: ${examType}
+        Score: ${score}%
+
+        Please review the submission.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Staff payment notification
+        async function notifyStaffPayment(staffName, staffId, amount, month, note) {
+            if (!notifSettings.staff) return;
+            const subject = `💰 Staff Payment: ${staffName} (${staffId})`;
+            const message = `Dear Admin,
+
+        A staff payment has been recorded:
+
+        Staff: ${staffName} (ID: ${staffId})
+        Amount: Le ${amount.toLocaleString()}
+        Month: ${month}
+        Note: ${note || 'None'}
+
+        Please verify this transaction.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Admission request notification
+        async function notifyAdmissionRequest(studentName, schoolName, classApplying, parentPhone) {
+            if (!notifSettings.admissions) return;
+            const subject = `📋 New Admission Request: ${studentName}`;
+            const message = `Dear Admin,
+
+        A new admission request has been submitted:
+
+        Student: ${studentName}
+        School: ${schoolName}
+        Class: ${classApplying}
+        Parent Phone: ${parentPhone}
+
+        Please review this request.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Suggestion notification
+        async function notifySuggestion(userName, suggestionText, hasVoice) {
+            if (!notifSettings.suggestions) return;
+            const subject = `💡 New Suggestion from ${userName || 'Anonymous'}`;
+            const message = `Dear Admin,
+
+        A new suggestion has been submitted:
+
+        From: ${userName || 'Anonymous'}
+        ${hasVoice ? 'Contains a voice note. Please listen to it.' : ''}
+
+        Suggestion:
+        ${suggestionText || '(Text not provided)'}
+
+        Please review and respond.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Registration request notification
+        async function notifyRegistrationRequest(schoolName, adminName, email, phone) {
+            const subject = `📋 School Registration Request: ${schoolName}`;
+            const message = `Dear Admin,
+
+        A new school registration request has been submitted:
+
+        School: ${schoolName}
+        Admin: ${adminName}
+        Email: ${email}
+        Phone: ${phone}
+
+        Please review this request.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Quiz submission notification
+        async function notifyQuizSubmission(userName, quizTitle, score) {
+            if (!notifSettings.exams) return;
+            const subject = `📝 Quiz Submission: ${userName}`;
+            const message = `Dear Admin,
+
+        A quiz has been submitted:
+
+        User: ${userName}
+        Quiz: ${quizTitle}
+        Score: ${score}%
+
+        Please review the submission.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Assignment submission notification
+        async function notifyAssignmentSubmission(userName, assignmentTitle) {
+            if (!notifSettings.exams) return;
+            const subject = `📄 Assignment Submission: ${userName}`;
+            const message = `Dear Admin,
+
+        An assignment has been submitted:
+
+        User: ${userName}
+        Assignment: ${assignmentTitle}
+
+        Please review the submission.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Login alert for suspicious activity
+        async function notifyLoginAlert(email, role, ip) {
+            const subject = `🔐 Login Alert: ${email}`;
+            const message = `Dear Admin,
+
+        A user has logged into the system:
+
+        Email: ${email}
+        Role: ${role}
+        Time: ${new Date().toLocaleString()}
+        User Agent: ${navigator.userAgent}
+
+        If this was not you or an authorized user, please take action immediately.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // Document upload notification
+        async function notifyDocumentUpload(studentName, studentId, fileName, uploadedBy) {
+            const subject = `📄 Document Uploaded: ${studentName} (${studentId})`;
+            const message = `Dear Admin,
+
+        A document has been uploaded:
+
+        Student: ${studentName} (ID: ${studentId})
+        File: ${fileName}
+        Uploaded by: ${uploadedBy}
+        Time: ${new Date().toLocaleString()}
+
+        Please review the document.
+
+        ---
+        This is an automated notification from EduSL School Management System.
+        `;
+            await sendEmailNotification(subject, message);
+        }
+
+        // ==================================================================
+        //  PASSWORD TOGGLE FUNCTIONALITY
+        // ==================================================================
+
+        function initPasswordToggles() {
+            document.querySelectorAll('.password-toggle').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.dataset.target;
+                    const input = document.getElementById(targetId);
+                    if (!input) return;
+
+                    const isPassword = input.type === 'password';
+                    input.type = isPassword ? 'text' : 'password';
+                    const icon = this.querySelector('.eye-icon');
+                    if (icon) {
+                        icon.textContent = isPassword ? '🙈' : '👁️';
+                    }
+                    this.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+                });
+            });
+
+            // Also support dynamically added password fields
+            const observer = new MutationObserver(function() {
+                document.querySelectorAll('.password-toggle:not([data-initialized])').forEach(btn => {
+                    btn.setAttribute('data-initialized', 'true');
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetId = this.dataset.target;
+                        const input = document.getElementById(targetId);
+                        if (!input) return;
+                        const isPassword = input.type === 'password';
+                        input.type = isPassword ? 'text' : 'password';
+                        const icon = this.querySelector('.eye-icon');
+                        if (icon) {
+                            icon.textContent = isPassword ? '🙈' : '👁️';
+                        }
+                    });
+                });
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+
         // ==================================================================
         //  FIREBASE INIT
         // ==================================================================
@@ -4641,7 +5173,15 @@
             reportFooter: '',
             passingScore: 50,
             whatsAppEnabled: true,
-            whatsAppMessage: 'Attendance Alert: Your child {{name}} ({{id}}) was marked {{status}} on {{date}}. Remark: {{remark}}'
+            whatsAppMessage: 'Attendance Alert: Your child {{name}} ({{id}}) was marked {{status}} on {{date}}. Remark: {{remark}}',
+            emailEnabled: true,
+            adminEmail: '',
+            notifAttendance: true,
+            notifFees: true,
+            notifExams: true,
+            notifStaff: true,
+            notifAdmissions: true,
+            notifSuggestions: true
         };
 
         // ===== LIBRARY DATA =====
@@ -5031,6 +5571,10 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     userAgent: navigator.userAgent
                 });
+                // Send email notification for login (only for admin login)
+                if (userData.role === 'admin' || userData.role === 'bursar') {
+                    await notifyLoginAlert(user.email, userData.role, navigator.userAgent);
+                }
             } catch (error) {
                 console.warn('Failed to log login activity:', error);
             }
@@ -5380,7 +5924,7 @@
         }
 
         // ==================================================================
-        //  ADMISSION REQUEST FUNCTIONS
+        //  ADMISSION REQUEST FUNCTIONS (with email notification)
         // ==================================================================
         function openAdmissionModal(schoolId, schoolName) {
             document.getElementById('admissionSchoolId').value = schoolId;
@@ -5431,6 +5975,9 @@
                     tenantId: tenantId,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
+                // Send email notification
+                await notifyAdmissionRequest(studentName, schoolName, classApplying, parentPhone);
 
                 showMessage('✅ Admission request submitted successfully! The school will contact you soon.', 'success',
                     'admissionMessage');
@@ -5533,7 +6080,7 @@
         }
 
         // ==================================================================
-        //  REGISTRATION REQUEST FUNCTIONS
+        //  REGISTRATION REQUEST FUNCTIONS (with email notification)
         // ==================================================================
         function openRegistrationRequest() {
             document.getElementById('regSchoolName').value = '';
@@ -5575,6 +6122,9 @@
                     tenantId: tenantId,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
+                // Send email notification
+                await notifyRegistrationRequest(schoolName, adminName, email, phone);
 
                 showMessage('✅ Registration request submitted successfully! We will review and contact you shortly.',
                     'success', 'registrationMessage');
@@ -5987,7 +6537,7 @@
         }
 
         // ==================================================================
-        //  ATTENDANCE FUNCTIONS (with date support)
+        //  ATTENDANCE FUNCTIONS (with date support + email notifications)
         // ==================================================================
         let attendanceDate = new Date().toISOString().split('T')[0];
 
@@ -6073,6 +6623,17 @@
                 tenantId: tenantId,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
+
+            // Send email notification for absent/late
+            if (status === 'absent' || status === 'late') {
+                try {
+                    const studentDoc = await db.collection('students').doc(sid).get();
+                    if (studentDoc.exists) {
+                        const student = studentDoc.data();
+                        await notifyAttendance(student.name || sid, sid, status, date, remark);
+                    }
+                } catch (e) { console.warn('Attendance notification error:', e); }
+            }
         }
 
         async function deleteAttendanceRecord(cls, sid, date) {
@@ -6677,7 +7238,7 @@
         }
 
         // ==================================================================
-        //  ADD SINGLE STUDENT
+        //  ADD SINGLE STUDENT (with email notification)
         // ==================================================================
         async function addManualStudent() {
             if (currentUserRole !== 'admin') {
@@ -6731,6 +7292,11 @@
                                 name: parentName || 'Parent', studentId: id, tenantId: tenantId });
                             showMessage('Student added. Parent account created for ' + parentEmail, 'success',
                                 'manualMessage');
+                            // Send email notification to parent
+                            await sendEmailNotification(
+                                `Welcome to EduSL - ${schoolSettings.schoolName || 'School'}`,
+                                `Dear ${parentName || 'Parent'},\n\nYour child ${name} (ID: ${id}) has been registered at ${schoolSettings.schoolName || 'our school'}.\n\nYou can log in to the EduSL system using:\nEmail: ${parentEmail}\nTemporary Password: ${tempPassword}\n\nPlease change your password after your first login.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                            );
                         } else {
                             showMessage('Student added. Parent email ' + parentEmail + ' already has an account.',
                                 'success', 'manualMessage');
@@ -7046,6 +7612,9 @@
                 await examDocRef.set(data);
                 showMessage('Exam records saved for ' + currentTerm + '!', 'success', 'examMessage');
                 if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
+
+                // Send email notification
+                await notifyExamSubmission(examCurrentStudent.name, examCurrentStudent.id, `${currentExamLevel} ${currentTerm} ${currentAssessment}`, 'Saved');
             } catch (error) {
                 showMessage('Error saving exam records: ' + error.message, 'error', 'examMessage');
             }
@@ -7693,7 +8262,7 @@
         }
 
         // ==================================================================
-        //  BURSAR FUNCTIONS
+        //  BURSAR FUNCTIONS (with email notification)
         // ==================================================================
         async function loadBursarStudent() {
             const q = document.getElementById('bursarStudentSearch').value.trim();
@@ -7857,7 +8426,7 @@
             }
         };
 
-        // ----- UPDATED recordBursarPayment with income integration -----
+        // ----- UPDATED recordBursarPayment with income integration and email notification -----
         async function recordBursarPayment() {
             if (!bursarCurrentStudent) { showMessage('Load a student first.', 'error', 'bursarPaymentMessage'); return; }
             const tenantId = getCurrentTenantId();
@@ -7894,6 +8463,9 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             await db.collection('income').add(incomeData);
+
+            // Send email notification
+            await notifyFeePayment(bursarCurrentStudent.name, bursarCurrentStudent.id, amount, getTermLabel(term), note);
 
             showMessage('Payment recorded for ' + getTermLabel(term) + ' (income logged)', 'success', 'bursarPaymentMessage');
             document.getElementById('paymentAmount').value = '';
@@ -8687,7 +9259,7 @@
         }
 
         // ==================================================================
-        //  ADMIN/TEACHER FUNCTIONS
+        //  ADMIN/TEACHER FUNCTIONS (with email notification for new users)
         // ==================================================================
         async function addTeacherAdmin() {
             if (currentUserRole !== 'admin') { showMessage('Only admin can add users.', 'error', 'teacherMessage');
@@ -8739,7 +9311,13 @@
                     await db.collection('teachers').doc(id).set(teacherData);
                 }
 
-                showMessage('User added successfully.', 'success', 'teacherMessage');
+                // Send email notification to new user
+                await sendEmailNotification(
+                    `Welcome to EduSL - ${schoolSettings.schoolName || 'School'}`,
+                    `Dear ${name},\n\nYour account has been created on ${schoolSettings.schoolName || 'EduSL School Management'}.\n\nLogin credentials:\nEmail: ${email}\nTemporary Password: ${password}\nRole: ${role}\n\nPlease change your password after your first login.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                );
+
+                showMessage('User added successfully. Email notification sent.', 'success', 'teacherMessage');
                 loadAllTeachersForAdmin();
             } catch (error) {
                 showMessage('Error: ' + error.message, 'error', 'teacherMessage');
@@ -8870,6 +9448,11 @@
                     try {
                         await auth.sendPasswordResetEmail(email);
                         alert('Password reset email sent to ' + email + '. Please check your inbox.');
+                        // Send email notification
+                        await sendEmailNotification(
+                            `Password Reset - ${schoolSettings.schoolName || 'EduSL'}`,
+                            `Dear ${name},\n\nYour password for ${schoolSettings.schoolName || 'EduSL'} has been reset.\n\nPlease check your email for the reset link.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                        );
                     } catch (authError) {
                         console.warn('Password reset email could not be sent:', authError.message);
                         alert('Could not send password reset email. Please reset it manually via Firebase Console.');
@@ -9876,7 +10459,7 @@
         };
 
         // ==================================================================
-        //  SUGGESTIONS
+        //  SUGGESTIONS (with email notification)
         // ==================================================================
         document.getElementById('submitSuggestionBtn').onclick = async function() {
             const tenantId = getCurrentTenantId();
@@ -9900,9 +10483,14 @@
                 uid: user ? user.uid : null,
                 tenantId: tenantId
             });
+
+            // Send email notification
+            await notifySuggestion(user ? user.displayName || user.email : 'Anonymous', text, !!voiceData);
+
             document.getElementById('suggestionText').value = '';
             if (voiceRecorders['voiceRecorder_suggestion']) voiceRecorders['voiceRecorder_suggestion'].clear();
-            showMessage('Thank you! Your suggestion has been submitted.', 'success', 'suggestionMessage');
+            showMessage('Thank you! Your suggestion has been submitted. A notification has been sent to the admin.',
+                'success', 'suggestionMessage');
             setTimeout(() => closeModal('suggestionModal'), 1500);
             loadSuggestions('suggestionsList');
             loadSuggestions('mySuggestionsList');
@@ -9985,6 +10573,15 @@
                             await db.collection('suggestions').doc(this.dataset.id).update({ status: 'resolved' });
                             loadSuggestions('suggestionsList');
                             loadSuggestions('mySuggestionsList');
+                            // Send email notification
+                            const sugDoc = await db.collection('suggestions').doc(this.dataset.id).get();
+                            if (sugDoc.exists) {
+                                const data = sugDoc.data();
+                                await sendEmailNotification(
+                                    `Suggestion Resolved - ${schoolSettings.schoolName || 'EduSL'}`,
+                                    `Dear ${data.userName || 'User'},\n\nYour suggestion has been marked as resolved.\n\nSuggestion: ${data.text || 'N/A'}\n\nThank you for your contribution.\n\n${schoolSettings.schoolName || 'EduSL Team'}`
+                                );
+                            }
                         }
                     };
                 });
@@ -10032,10 +10629,20 @@
             showMessage('Reply sent.', 'success', 'replySuggestionMessage');
             loadSuggestions('suggestionsList');
             loadSuggestions('mySuggestionsList');
+
+            // Send email notification
+            const sugDoc = await db.collection('suggestions').doc(id).get();
+            if (sugDoc.exists) {
+                const data = sugDoc.data();
+                await sendEmailNotification(
+                    `Reply to Your Suggestion - ${schoolSettings.schoolName || 'EduSL'}`,
+                    `Dear ${data.userName || 'User'},\n\nAn admin has replied to your suggestion:\n\nSuggestion: ${data.text || 'N/A'}\n\nReply: ${reply}\n\nThank you for your contribution.\n\n${schoolSettings.schoolName || 'EduSL Team'}`
+                );
+            }
         };
 
         // ==================================================================
-        //  STAFF PAYROLL / PAYMENT VOUCHER (updated with expense integration)
+        //  STAFF PAYROLL / PAYMENT VOUCHER (updated with expense integration + email)
         // ==================================================================
         async function loadStaffPayroll() {
             const container = document.getElementById('staffPayrollList');
@@ -10088,7 +10695,7 @@
             openModal('staffPaymentModal');
         }
 
-        // UPDATED submitPayrollBtn with expense integration
+        // UPDATED submitPayrollBtn with expense integration + email
         document.getElementById('submitPayrollBtn').onclick = async function() {
             const staffId = document.getElementById('payrollStaffId').value.trim();
             const staffName = document.getElementById('payrollStaffName').value.trim();
@@ -10144,6 +10751,9 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 await db.collection('expenses').add(expenseData);
+
+                // Send email notification
+                await notifyStaffPayment(staffName, staffId, amount, month, note);
 
                 showMessage('Payment recorded successfully! (expense logged)', 'success', 'payrollModalMessage');
 
@@ -10369,7 +10979,7 @@
         }
 
         // ==================================================================
-        //  DOCUMENT EXCHANGE FUNCTIONS
+        //  DOCUMENT EXCHANGE FUNCTIONS (with email notification)
         // ==================================================================
         async function loadStudentDocuments(studentId) {
             const container = document.getElementById('documentList');
@@ -10508,7 +11118,16 @@
                         tenantId: tenantId,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    document.getElementById('docUploadStatus').textContent = '✅ Uploaded successfully.';
+
+                    // Send email notification
+                    await notifyDocumentUpload(
+                        currentStudentDoc.name,
+                        currentStudentDoc.id,
+                        file.name,
+                        user ? user.email || user.uid : 'Admin'
+                    );
+
+                    document.getElementById('docUploadStatus').textContent = '✅ Uploaded successfully. Email notification sent.';
                     document.getElementById('docFileInput').value = '';
                     document.getElementById('docDescription').value = '';
                     if (currentStudentDoc) loadStudentDocuments(currentStudentDoc.id);
@@ -10723,6 +11342,14 @@
                         tenantId: tenantId
                     });
                 }
+
+                // Send email notification
+                const studentNames = selected.map(s => s.name).join(', ');
+                await sendEmailNotification(
+                    `🎓 Student Promotion - ${schoolSettings.schoolName || 'EduSL'}`,
+                    `Dear Admin,\n\n${selected.length} student(s) have been promoted from ${fromClass} to ${toClass}.\n\nStudents: ${studentNames}\n\nPlease verify the promotion records.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                );
+
                 showMessage(`✅ ${selected.length} student(s) promoted from ${fromClass} to ${toClass}.`, 'success',
                     'promotionMessage');
                 await loadStudents();
@@ -10960,7 +11587,16 @@
                 const docRef = db.collection('school_settings').doc(tenantId);
                 const doc = await docRef.get();
                 if (doc.exists) {
-                    Object.assign(schoolSettings, doc.data());
+                    const data = doc.data();
+                    Object.assign(schoolSettings, data);
+                    emailEnabled = data.emailEnabled !== undefined ? data.emailEnabled : true;
+                    adminEmail = data.adminEmail || '';
+                    notifSettings.attendance = data.notifAttendance !== undefined ? data.notifAttendance : true;
+                    notifSettings.fees = data.notifFees !== undefined ? data.notifFees : true;
+                    notifSettings.exams = data.notifExams !== undefined ? data.notifExams : true;
+                    notifSettings.staff = data.notifStaff !== undefined ? data.notifStaff : true;
+                    notifSettings.admissions = data.notifAdmissions !== undefined ? data.notifAdmissions : true;
+                    notifSettings.suggestions = data.notifSuggestions !== undefined ? data.notifSuggestions : true;
                 }
             } catch (e) {
                 console.warn('Could not load school settings silently:', e);
@@ -10968,7 +11604,7 @@
         }
 
         // ==================================================================
-        //  E-LEARNING MODULE: QUIZZES & ASSIGNMENTS (with short answer support)
+        //  E-LEARNING MODULE: QUIZZES & ASSIGNMENTS (with email notification)
         // ==================================================================
         function populateELearningDropdowns() {
             const classSelects = ['quizClass', 'assignmentClass'];
@@ -11074,7 +11710,7 @@
         }
 
         // ==================================================================
-        //  SAVE ASSIGNMENT
+        //  SAVE ASSIGNMENT (with email notification)
         // ==================================================================
         document.getElementById('saveAssignmentBtn').onclick = async function() {
             const title = document.getElementById('assignmentTitle').value.trim();
@@ -11135,7 +11771,13 @@
 
                 await db.collection('assignments').add(assignmentData);
 
-                showMessage('✅ Assignment created successfully!', 'success', 'assignmentCreateMessage');
+                // Send email notification
+                await sendEmailNotification(
+                    `📄 New Assignment Created - ${schoolSettings.schoolName || 'EduSL'}`,
+                    `Dear Admin,\n\nA new assignment has been created:\n\nTitle: ${title}\nClass: ${classVal || 'All Classes'}\nDue Date: ${dueDate}\nDescription: ${description}\n\nPlease review and notify students.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                );
+
+                showMessage('✅ Assignment created successfully! Email notification sent.', 'success', 'assignmentCreateMessage');
                 document.getElementById('assignmentTitle').value = '';
                 document.getElementById('assignmentClass').value = '';
                 document.getElementById('assignmentDueDate').value = '';
@@ -11154,7 +11796,7 @@
         };
 
         // ==================================================================
-        //  QUIZ SAVE
+        //  QUIZ SAVE (with email notification)
         // ==================================================================
         document.getElementById('saveQuizBtn').onclick = async function() {
             const title = document.getElementById('quizTitle').value.trim();
@@ -11218,7 +11860,13 @@
                     tenantId: tenantId
                 });
 
-                showMessage('✅ Quiz created successfully!', 'success', 'quizCreateMessage');
+                // Send email notification
+                await sendEmailNotification(
+                    `📝 New Quiz Created - ${schoolSettings.schoolName || 'EduSL'}`,
+                    `Dear Admin,\n\nA new quiz has been created:\n\nTitle: ${title}\nClass: ${classVal || 'All Classes'}\nTime Limit: ${timeLimit} min\nDescription: ${description || 'None'}\nQuestions: ${questions.length}\n\nPlease review and notify students.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                );
+
+                showMessage('✅ Quiz created successfully! Email notification sent.', 'success', 'quizCreateMessage');
                 setTimeout(() => {
                     closeModal('createQuizModal');
                     loadQuizzes();
@@ -11368,7 +12016,7 @@
             renderQuestionContainer('takeEntranceExamQuestionContainer', currentEntranceExamTaking, 'entrance');
         };
 
-        // ----- Submit Quiz -----
+        // ----- Submit Quiz (with email notification) -----
         window.submitQuiz = async function() {
             if (quizTimerInterval) clearInterval(quizTimerInterval);
 
@@ -11417,6 +12065,9 @@
             };
 
             await db.collection('quiz_submissions').add(submission);
+
+            // Send email notification
+            await notifyQuizSubmission(submission.userName, data.quizTitle || 'Quiz', score);
 
             closeModal('takeQuizModal');
             showQuizResult(submission);
@@ -11489,6 +12140,9 @@
                     examSubmitted: true
                 });
             });
+
+            // Send email notification
+            await notifyExamSubmission(data.studentName, data.studentId, 'Entrance Exam', score);
 
             closeModal('takeEntranceExamModal');
             alert(`✅ Exam submitted! Your MCQ score: ${score}% (${correct}/${data.questions.filter(q => q.type === 'mcq').length}). Short answers will be graded by the teacher.`);
@@ -11850,7 +12504,12 @@
                             tenantId: tenantId
                         };
                         await db.collection('assignment_submissions').add(submission);
-                        document.getElementById('assignmentSubmitStatus').innerHTML = '<div class="success">✅ Work submitted successfully!</div>';
+
+                        // Send email notification
+                        const assignment = assignments.find(a => a.id === assignmentId);
+                        await notifyAssignmentSubmission(submission.userName, assignment ? assignment.title : assignmentId);
+
+                        document.getElementById('assignmentSubmitStatus').innerHTML = '<div class="success">✅ Work submitted successfully! Email notification sent.</div>';
                         closeModal('viewAssignmentModal');
                     } catch (error) {
                         document.getElementById('assignmentSubmitStatus').innerHTML = '<div class="error">Error: ' +
@@ -12533,7 +13192,7 @@
         }
 
         // ==================================================================
-        //  SCHOOL SETTINGS FUNCTIONS
+        //  SCHOOL SETTINGS FUNCTIONS (updated with email settings)
         // ==================================================================
 
         async function loadSchoolSettings() {
@@ -12548,6 +13207,14 @@
                 if (doc.exists) {
                     const data = doc.data();
                     Object.assign(schoolSettings, data);
+                    emailEnabled = data.emailEnabled !== undefined ? data.emailEnabled : true;
+                    adminEmail = data.adminEmail || '';
+                    notifSettings.attendance = data.notifAttendance !== undefined ? data.notifAttendance : true;
+                    notifSettings.fees = data.notifFees !== undefined ? data.notifFees : true;
+                    notifSettings.exams = data.notifExams !== undefined ? data.notifExams : true;
+                    notifSettings.staff = data.notifStaff !== undefined ? data.notifStaff : true;
+                    notifSettings.admissions = data.notifAdmissions !== undefined ? data.notifAdmissions : true;
+                    notifSettings.suggestions = data.notifSuggestions !== undefined ? data.notifSuggestions : true;
 
                     document.getElementById('settingsSchoolName').value = data.schoolName || '';
                     document.getElementById('settingsSchoolTagline').value = data.schoolTagline || '';
@@ -12567,6 +13234,14 @@
                     document.getElementById('settingsPassingScore').value = data.passingScore || 50;
                     document.getElementById('settingsWhatsAppEnabled').value = data.whatsAppEnabled !== undefined ? String(data.whatsAppEnabled) : 'true';
                     document.getElementById('settingsWhatsAppMessage').value = data.whatsAppMessage || 'Attendance Alert: Your child {{name}} ({{id}}) was marked {{status}} on {{date}}. Remark: {{remark}}';
+                    document.getElementById('settingsEmailEnabled').value = data.emailEnabled !== undefined ? String(data.emailEnabled) : 'true';
+                    document.getElementById('settingsAdminEmail').value = data.adminEmail || '';
+                    document.getElementById('notifAttendance').checked = data.notifAttendance !== undefined ? data.notifAttendance : true;
+                    document.getElementById('notifFees').checked = data.notifFees !== undefined ? data.notifFees : true;
+                    document.getElementById('notifExams').checked = data.notifExams !== undefined ? data.notifExams : true;
+                    document.getElementById('notifStaff').checked = data.notifStaff !== undefined ? data.notifStaff : true;
+                    document.getElementById('notifAdmissions').checked = data.notifAdmissions !== undefined ? data.notifAdmissions : true;
+                    document.getElementById('notifSuggestions').checked = data.notifSuggestions !== undefined ? data.notifSuggestions : true;
 
                     updateColorPreviews();
                     updateLogoPreview();
@@ -12609,11 +13284,27 @@
                     passingScore: parseInt(document.getElementById('settingsPassingScore').value) || 50,
                     whatsAppEnabled: document.getElementById('settingsWhatsAppEnabled').value === 'true',
                     whatsAppMessage: document.getElementById('settingsWhatsAppMessage').value.trim(),
+                    emailEnabled: document.getElementById('settingsEmailEnabled').value === 'true',
+                    adminEmail: document.getElementById('settingsAdminEmail').value.trim(),
+                    notifAttendance: document.getElementById('notifAttendance').checked,
+                    notifFees: document.getElementById('notifFees').checked,
+                    notifExams: document.getElementById('notifExams').checked,
+                    notifStaff: document.getElementById('notifStaff').checked,
+                    notifAdmissions: document.getElementById('notifAdmissions').checked,
+                    notifSuggestions: document.getElementById('notifSuggestions').checked,
                     tenantId: tenantId,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
                 Object.assign(schoolSettings, data);
+                emailEnabled = data.emailEnabled;
+                adminEmail = data.adminEmail;
+                notifSettings.attendance = data.notifAttendance;
+                notifSettings.fees = data.notifFees;
+                notifSettings.exams = data.notifExams;
+                notifSettings.staff = data.notifStaff;
+                notifSettings.admissions = data.notifAdmissions;
+                notifSettings.suggestions = data.notifSuggestions;
 
                 const docRef = db.collection('school_settings').doc(tenantId);
                 await docRef.set(data, { merge: true });
@@ -12653,10 +13344,26 @@
                 reportFooter: '',
                 passingScore: 50,
                 whatsAppEnabled: true,
-                whatsAppMessage: 'Attendance Alert: Your child {{name}} ({{id}}) was marked {{status}} on {{date}}. Remark: {{remark}}'
+                whatsAppMessage: 'Attendance Alert: Your child {{name}} ({{id}}) was marked {{status}} on {{date}}. Remark: {{remark}}',
+                emailEnabled: true,
+                adminEmail: '',
+                notifAttendance: true,
+                notifFees: true,
+                notifExams: true,
+                notifStaff: true,
+                notifAdmissions: true,
+                notifSuggestions: true
             };
 
             Object.assign(schoolSettings, defaults);
+            emailEnabled = defaults.emailEnabled;
+            adminEmail = defaults.adminEmail;
+            notifSettings.attendance = defaults.notifAttendance;
+            notifSettings.fees = defaults.notifFees;
+            notifSettings.exams = defaults.notifExams;
+            notifSettings.staff = defaults.notifStaff;
+            notifSettings.admissions = defaults.notifAdmissions;
+            notifSettings.suggestions = defaults.notifSuggestions;
 
             document.getElementById('settingsSchoolName').value = defaults.schoolName;
             document.getElementById('settingsSchoolTagline').value = defaults.schoolTagline;
@@ -12676,6 +13383,14 @@
             document.getElementById('settingsPassingScore').value = defaults.passingScore;
             document.getElementById('settingsWhatsAppEnabled').value = 'true';
             document.getElementById('settingsWhatsAppMessage').value = defaults.whatsAppMessage;
+            document.getElementById('settingsEmailEnabled').value = 'true';
+            document.getElementById('settingsAdminEmail').value = defaults.adminEmail;
+            document.getElementById('notifAttendance').checked = defaults.notifAttendance;
+            document.getElementById('notifFees').checked = defaults.notifFees;
+            document.getElementById('notifExams').checked = defaults.notifExams;
+            document.getElementById('notifStaff').checked = defaults.notifStaff;
+            document.getElementById('notifAdmissions').checked = defaults.notifAdmissions;
+            document.getElementById('notifSuggestions').checked = defaults.notifSuggestions;
 
             updateColorPreviews();
             updateLogoPreview();
@@ -13413,94 +14128,94 @@ showMessage('Dashboard refreshed.', 'success', 'financeDashboardMessage');
 //  MIGRATION SCRIPT: Backup past fees and salaries into finance
 // ==================================================================
 async function migratePastFinanceRecords() {
-    const tenantId = getCurrentTenantId();
-    const user = auth.currentUser;
-    if (!user) return;
+const tenantId = getCurrentTenantId();
+const user = auth.currentUser;
+if (!user) return;
 
-    // Check if migration already done for this tenant
-    const migRef = db.collection('settings').doc('finance_migration_' + tenantId);
-    const migDoc = await migRef.get();
-    if (migDoc.exists && migDoc.data().done === true) {
-        console.log('Finance migration already done for tenant:', tenantId);
-        return;
-    }
+// Check if migration already done for this tenant
+const migRef = db.collection('settings').doc('finance_migration_' + tenantId);
+const migDoc = await migRef.get();
+if (migDoc.exists && migDoc.data().done === true) {
+console.log('Finance migration already done for tenant:', tenantId);
+return;
+}
 
-    let incomeCount = 0,
-        expenseCount = 0;
-    const batch = db.batch();
+let incomeCount = 0,
+expenseCount = 0;
+const batch = db.batch();
 
-    // ---- Migrate fee payments to income ----
-    const feeSnap = await db.collection('fee_records').where('tenantId', '==', tenantId).get();
-    for (const doc of feeSnap.docs) {
-        const data = doc.data();
-        const studentId = data.studentId;
-        // Get student name
-        let studentName = studentId;
-        try {
-            const studentDoc = await db.collection('students').doc(studentId).get();
-            if (studentDoc.exists) studentName = studentDoc.data().name || studentId;
-        } catch (_) {}
+// ---- Migrate fee payments to income ----
+const feeSnap = await db.collection('fee_records').where('tenantId', '==', tenantId).get();
+for (const doc of feeSnap.docs) {
+const data = doc.data();
+const studentId = data.studentId;
+// Get student name
+let studentName = studentId;
+try {
+const studentDoc = await db.collection('students').doc(studentId).get();
+if (studentDoc.exists) studentName = studentDoc.data().name || studentId;
+} catch (_) {}
 
-        const terms = ['term1', 'term2', 'term3'];
-        for (const term of terms) {
-            const termData = data[term] || { transactions: [] };
-            for (let idx = 0; idx < termData.transactions.length; idx++) {
-                const tr = termData.transactions[idx];
-                if (!tr.date) continue;
-                const [year, month] = tr.date.split('-');
-                // Create income record with migrationId to avoid duplicates
-                const incomeRef = db.collection('income').doc(); // auto-id
-                const incomeData = {
-                    amount: tr.amount,
-                    category: 'School Fees',
-                    date: tr.date,
-                    description: `Fee payment for ${studentName} (${studentId}) - ${term} - ${tr.note || ''}`,
-                    year: year,
-                    month: month,
-                    recordedBy: 'migration',
-                    recordedByName: 'System Migration',
-                    tenantId: tenantId,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    migrationId: `fee_${studentId}_${term}_${idx}`
-                };
-                batch.set(incomeRef, incomeData);
-                incomeCount++;
-            }
-        }
-    }
+const terms = ['term1', 'term2', 'term3'];
+for (const term of terms) {
+const termData = data[term] || { transactions: [] };
+for (let idx = 0; idx < termData.transactions.length; idx++) {
+const tr = termData.transactions[idx];
+if (!tr.date) continue;
+const [year, month] = tr.date.split('-');
+// Create income record with migrationId to avoid duplicates
+const incomeRef = db.collection('income').doc(); // auto-id
+const incomeData = {
+amount: tr.amount,
+category: 'School Fees',
+date: tr.date,
+description: `Fee payment for ${studentName} (${studentId}) - ${term} - ${tr.note || ''}`,
+year: year,
+month: month,
+recordedBy: 'migration',
+recordedByName: 'System Migration',
+tenantId: tenantId,
+createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+migrationId: `fee_${studentId}_${term}_${idx}`
+};
+batch.set(incomeRef, incomeData);
+incomeCount++;
+}
+}
+}
 
-    // ---- Migrate staff payments to expenses ----
-    const paySnap = await db.collection('staff_payments').where('tenantId', '==', tenantId).get();
-    for (const doc of paySnap.docs) {
-        const data = doc.data();
-        if (!data.date) continue;
-        const [year, month] = data.date.split('-');
-        const expenseRef = db.collection('expenses').doc(); // auto-id
-        const expenseData = {
-            amount: data.amount,
-            category: 'Salaries',
-            date: data.date,
-            description: `Salary payment for ${data.staffName} (${data.staffId}) - ${data.note || data.month || ''}`,
-            year: year || data.year || new Date().getFullYear().toString(),
-            month: month || data.month?.split('-')[1] || String(new Date().getMonth() + 1).padStart(2, '0'),
-            recordedBy: 'migration',
-            recordedByName: 'System Migration',
-            tenantId: tenantId,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            migrationId: `salary_${data.staffId}_${data.date}_${data.amount}`
-        };
-        batch.set(expenseRef, expenseData);
-        expenseCount++;
-    }
+// ---- Migrate staff payments to expenses ----
+const paySnap = await db.collection('staff_payments').where('tenantId', '==', tenantId).get();
+for (const doc of paySnap.docs) {
+const data = doc.data();
+if (!data.date) continue;
+const [year, month] = data.date.split('-');
+const expenseRef = db.collection('expenses').doc(); // auto-id
+const expenseData = {
+amount: data.amount,
+category: 'Salaries',
+date: data.date,
+description: `Salary payment for ${data.staffName} (${data.staffId}) - ${data.note || data.month || ''}`,
+year: year || data.year || new Date().getFullYear().toString(),
+month: month || data.month?.split('-')[1] || String(new Date().getMonth() + 1).padStart(2, '0'),
+recordedBy: 'migration',
+recordedByName: 'System Migration',
+tenantId: tenantId,
+createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+migrationId: `salary_${data.staffId}_${data.date}_${data.amount}`
+};
+batch.set(expenseRef, expenseData);
+expenseCount++;
+}
 
-    // Commit all writes
-    await batch.commit();
+// Commit all writes
+await batch.commit();
 
-    // Mark migration as done
-    await migRef.set({ done: true, migratedAt: firebase.firestore.FieldValue.serverTimestamp() });
+// Mark migration as done
+await migRef.set({ done: true, migratedAt: firebase.firestore.FieldValue.serverTimestamp() });
 
-    console.log(`Finance migration completed: ${incomeCount} income records, ${expenseCount} expense records created.`);
-    showMessage(`✅ Finance migration completed: ${incomeCount} income, ${expenseCount} expense records backed up.`, 'success', 'financeDashboardMessage');
+console.log(`Finance migration completed: ${incomeCount} income records, ${expenseCount} expense records created.`);
+showMessage(`✅ Finance migration completed: ${incomeCount} income, ${expenseCount} expense records backed up.`, 'success', 'financeDashboardMessage');
 }
 
 // ---- Trigger migration on login for admin/bursar ----
@@ -13533,7 +14248,8 @@ document.getElementById('mainApp').style.display = 'block';
 document.getElementById('userInfo').innerText = role.toUpperCase() + ': ' + email;
 document.getElementById('logoutBtn').style.display = 'inline-block';
 
-// Load school settings
+// Load school settings (including email settings)
+await loadSchoolSettingsSilent();
 await loadSchoolSettings();
 
 await loadStudents();
@@ -13764,6 +14480,9 @@ date;
 renderAttendanceForDate(date);
 }
 });
+
+// Initialize password toggle for dynamically added fields
+initPasswordToggles();
 
 } catch (e) {
 document.getElementById('loginMessage').innerHTML = '<div class="error">' + escapeHtml(e.message) +
@@ -14077,6 +14796,9 @@ setTimeout(initChatbot, 1000);
 //  WINDOW ONLOAD
 // ==================================================================
 window.onload = function() {
+// Initialize password toggles
+initPasswordToggles();
+
 function updateOnlineStatus() {
 const badge = document.getElementById('onlineStatus'),
 bar = document.getElementById('syncBar');
@@ -14748,6 +15470,54 @@ openModal('createAssignmentModal');
 });
 
 document.getElementById('refreshAssignmentsBtn').addEventListener('click', function() { loadAssignments(); });
+
+// ==================================================================
+//  PASSWORD TOGGLE INIT
+// ==================================================================
+
+function initPasswordToggles() {
+document.querySelectorAll('.password-toggle').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.preventDefault();
+const targetId = this.dataset.target;
+const input = document.getElementById(targetId);
+if (!input) return;
+
+const isPassword = input.type === 'password';
+input.type = isPassword ? 'text' : 'password';
+const icon = this.querySelector('.eye-icon');
+if (icon) {
+icon.textContent = isPassword ? '🙈' : '👁️';
+}
+this.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+});
+});
+
+// Also support dynamically added password fields
+const observer = new MutationObserver(function() {
+document.querySelectorAll('.password-toggle:not([data-initialized])').forEach(btn => {
+btn.setAttribute('data-initialized', 'true');
+btn.addEventListener('click', function(e) {
+e.preventDefault();
+const targetId = this.dataset.target;
+const input = document.getElementById(targetId);
+if (!input) return;
+const isPassword = input.type === 'password';
+input.type = isPassword ? 'text' : 'password';
+const icon = this.querySelector('.eye-icon');
+if (icon) {
+icon.textContent = isPassword ? '🙈' : '👁️';
+}
+});
+});
+});
+observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', function() {
+initPasswordToggles();
+});
 </script>
 
 <!-- ===== SERVICE WORKER REGISTRATION ===== -->
