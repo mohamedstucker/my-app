@@ -2263,6 +2263,48 @@
             object-fit: contain;
         }
 
+        /* ===== STAFF FILTER BAR STYLES ===== */
+        .staff-filter-section {
+            margin-top: 20px;
+            border-top: 1px solid #e6edf4;
+            padding-top: 16px;
+        }
+        .staff-filter-section h4 {
+            font-size: 0.95rem;
+            color: #0b2b5c;
+            margin-bottom: 10px;
+        }
+        .staff-filter-section .form-row {
+            margin-bottom: 8px;
+        }
+        .staff-filter-section .form-row label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1a3a5c;
+            margin-right: 4px;
+        }
+        .staff-filter-section .form-row input,
+        .staff-filter-section .form-row select {
+            max-width: 200px;
+        }
+        .staff-filter-section .form-row input[type="text"] {
+            flex: 1;
+            max-width: 300px;
+        }
+        @media (max-width: 768px) {
+            .staff-filter-section .form-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .staff-filter-section .form-row input,
+            .staff-filter-section .form-row select {
+                max-width: 100%;
+            }
+            .staff-filter-section .form-row input[type="text"] {
+                max-width: 100%;
+            }
+        }
+
         /* ===== MOBILE RESPONSIVE FIXES ===== */
         @media (max-width: 768px) {
             body {
@@ -3817,44 +3859,101 @@
                 <button class="admin-tab-btn" data-tab="entranceexams">📋 Entrance Exams</button>
                 <button class="admin-tab-btn" data-tab="schoolsettings">⚙️ School Settings</button>
             </div>
+
+            <!-- ===== STAFF TAB (Updated with new fields + Search/Filter) ===== -->
             <div id="staffTab" class="admin-tab active">
                 <div class="card">
                     <h3>Add Staff Member</h3>
-                    <input id="staffId" placeholder="Staff ID" />
-                    <input id="staffName" placeholder="Full Name" />
-                    <select id="staffType">
-                        <option>Teacher</option>
-                        <option>Admin</option>
-                        <option>Cleaner</option>
-                        <option>Security</option>
-                        <option>Driver</option>
-                        <option>Librarian</option>
-                        <option>Counselor</option>
-                        <option>Accountant</option>
-                        <option>Nurse</option>
-                        <option>IT Support</option>
-                        <option>Cook</option>
-                        <option>Groundskeeper</option>
-                    </select>
-                    <input id="staffPhone" placeholder="Phone Number" />
-                    <input id="staffEmail" placeholder="Email Address" />
-                    <input id="staffDepartment" placeholder="Department" />
-                    <select id="staffStatus">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                    <!-- Row 1: ID, Name, Phone -->
+                    <div class="form-row">
+                        <input id="staffId" placeholder="Staff ID *" />
+                        <input id="staffName" placeholder="Full Name *" />
+                        <input id="staffPhone" placeholder="Phone Number" />
+                    </div>
+                    <!-- Row 2: Email, Department, Type -->
+                    <div class="form-row">
+                        <input id="staffEmail" placeholder="Email Address" />
+                        <input id="staffDepartment" placeholder="Department" />
+                        <select id="staffType">
+                            <option>Teacher</option>
+                            <option>Admin</option>
+                            <option>Bursar</option>
+                            <option>Cleaner</option>
+                            <option>Security</option>
+                            <option>Driver</option>
+                            <option>Librarian</option>
+                            <option>Counselor</option>
+                            <option>Accountant</option>
+                            <option>Nurse</option>
+                            <option>IT Support</option>
+                            <option>Cook</option>
+                            <option>Groundskeeper</option>
+                             
+                        </select>
+                    </div>
+                    <!-- Row 3: Qualification, NIN, Social Security -->
+                    <div class="form-row">
+                        <input id="staffQualification" placeholder="Qualification" />
+                        <input id="staffNIN" placeholder="NIN" />
+                        <input id="staffSocialSecurity" placeholder="Social Security" />
+                    </div>
+                    <!-- Row 4: DOB, Date of Entry, Status -->
+                    <div class="form-row">
+                        <label style="font-weight:600; font-size:0.85rem; margin-right:4px;">DOB:</label>
+                        <input id="staffDob" type="date" style="max-width:160px;" />
+                        <label style="font-weight:600; font-size:0.85rem; margin-right:4px; margin-left:6px;">Date of Entry:</label>
+                        <input id="staffDateOfEntry" type="date" style="max-width:160px;" />
+                        <select id="staffStatus">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
                     <button id="addStaffBtn" class="refresh-btn">Register</button>
                     <div id="staffMessage"></div>
+
+                    <!-- ===== SEARCH & FILTER SECTION ===== -->
+                    <div class="staff-filter-section">
+                        <h4>🔍 Search & Filter Staff</h4>
+                        <div class="form-row">
+                            <input id="staffSearchInput" placeholder="Search by Name or ID" style="flex:1; max-width:300px;" />
+                            <button id="staffSearchBtn" class="refresh-btn">Search</button>
+                            <button id="staffResetBtn" style="background:#fde8e8; color:#b71c1c;">Reset</button>
+                        </div>
+                        <div class="form-row">
+                            <label>Year:</label>
+                            <select id="staffYearFilter" style="max-width:120px;">
+                                <option value="all">All Years</option>
+                            </select>
+                            <label style="margin-left:8px;">Term:</label>
+                            <select id="staffTermFilter" style="max-width:120px;">
+                                <option value="all">All Terms</option>
+                                <option value="term1">Term 1</option>
+                                <option value="term2">Term 2</option>
+                                <option value="term3">Term 3</option>
+                            </select>
+                            <label style="margin-left:8px;">Status:</label>
+                            <select id="staffStatusFilter" style="max-width:120px;">
+                                <option value="all">All</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            <button id="staffApplyFiltersBtn" class="refresh-btn">Apply Filters</button>
+                        </div>
+                        <div id="staffFilterInfo" style="font-size:0.8rem; color:#6c7a89; margin-top:4px;"></div>
+                    </div>
+
                     <div id="staffListContainer"></div>
                 </div>
             </div>
-            <div id="assetsTab" class="admin-tab">
+
+            <!-- ===== OTHER ADMIN TABS (unchanged) ===== -->
+            <div id="assetsTab" class="admin-tab" style="display:none;">
                 <div class="card"><h3>Add Asset</h3><input id="assetName" placeholder="Asset Name" /><input id="assetLocation" placeholder="Location" /><select id="assetStatus"><option>Good</option><option>Fair</option><option>Poor</option></select><button id="addAssetBtn" class="refresh-btn">Add Asset</button><div id="assetMessage"></div><div id="assetsListContainer"></div></div>
             </div>
-            <div id="inventoryTab" class="admin-tab">
+            <div id="inventoryTab" class="admin-tab" style="display:none;">
                 <div class="card"><h3>Add Inventory Item</h3><input id="itemName" placeholder="Item Name" /><input id="itemQuantity" type="number" placeholder="Quantity" /><input id="itemUnit" placeholder="Unit (pcs, kg, etc)" /><button id="addInventoryBtn" class="refresh-btn">Add Item</button><div id="inventoryMessage"></div><div id="inventoryListContainer"></div></div>
             </div>
-            <div id="visitorsTab" class="admin-tab">
+            <div id="visitorsTab" class="admin-tab" style="display:none;">
                 <div class="card">
                     <h3>🚪 Visitor Management</h3>
                     <div class="form-row">
@@ -3873,13 +3972,13 @@
                     <div id="visitorsListContainer"><p>Loading visitors...</p></div>
                 </div>
             </div>
-            <div id="noticeboardTab" class="admin-tab">
+            <div id="noticeboardTab" class="admin-tab" style="display:none;">
                 <div class="card"><h3>Post New Notice</h3><input id="noticeTitle" placeholder="Title" style="width:100%;" /><textarea id="noticeContent" rows="3" placeholder="Message" style="width:100%;"></textarea><button id="postNoticeBtn" class="refresh-btn">Post Notice</button><div id="noticeMessage"></div><div id="noticesList"></div></div>
             </div>
-            <div id="filestorageTab" class="admin-tab">
+            <div id="filestorageTab" class="admin-tab" style="display:none;">
                 <div class="card"><h3>Upload File (stored in browser)</h3><input type="file" id="uploadFileInput" /><button id="uploadFileBtn" class="refresh-btn">Upload to Local Storage</button><div id="uploadMessage"></div><button id="refreshFilesBtn" class="refresh-btn">Refresh</button><div id="filesListContainer"></div></div>
             </div>
-            <div id="exportTab" class="admin-tab">
+            <div id="exportTab" class="admin-tab" style="display:none;">
                 <div class="card">
                     <h3>Print / Export Any Table</h3>
                     <button id="printAnyTableBtn" class="refresh-btn">Print Current Table</button>
@@ -3890,7 +3989,7 @@
                     <button id="printNoticesBtn" class="refresh-btn">Print All Notices</button>
                 </div>
             </div>
-            <div id="examhistoryallTab" class="admin-tab">
+            <div id="examhistoryallTab" class="admin-tab" style="display:none;">
                 <div class="card">
                     <h3>Exam History (All Years)</h3>
                     <div class="search-box">
@@ -3902,14 +4001,14 @@
                     <div id="examHistoryAllContent"><p>Enter a student ID and select a year to view exam history.</p></div>
                 </div>
             </div>
-            <div id="suggestionsTab" class="admin-tab">
+            <div id="suggestionsTab" class="admin-tab" style="display:none;">
                 <div class="card">
                     <h3>All Suggestions</h3>
                     <button id="refreshSuggestionsBtn" class="refresh-btn">Refresh</button>
                     <div id="suggestionsList"><p>Loading suggestions...</p></div>
                 </div>
             </div>
-            <div id="loginactivityTab" class="admin-tab">
+            <div id="loginactivityTab" class="admin-tab" style="display:none;">
                 <div class="card">
                     <h3>User Login Activity</h3>
                     <button id="refreshLoginActivityBtn" class="refresh-btn">Refresh</button>
@@ -4649,7 +4748,8 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('editUserModal')">&times;</span>
             <h3>✏️ Edit User Account</h3>
-            <input type="text" id="editUserUid" readonly placeholder="User ID" style="background:#f0f0f0;" />
+            <input type="text" id="editUserUid" readonly placeholder="User UID" style="background:#f0f0f0;" />
+            <input type="text" id="editUserIdNumber" placeholder="ID Number *" />
             <input type="text" id="editUserName" placeholder="Full Name *" />
             <input type="email" id="editUserEmail" placeholder="Email *" />
             <select id="editUserRole">
@@ -4721,7 +4821,7 @@
         // Initialize EmailJS
         (function initEmailJS() {
             try {
-                if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+                if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== '2_zNx9GwIGvYwAn69Y') {
                     emailjs.init(EMAILJS_PUBLIC_KEY);
                     console.log('✅ EmailJS initialized');
                 } else {
@@ -5153,6 +5253,16 @@
         let quizTimerInterval = null;
 
         let currentEntranceExamTaking = null;
+
+        // ===== STAFF FILTER STATE =====
+        let allStaffRecords = [];
+        let staffFilteredRecords = [];
+        let staffFilterState = {
+            search: '',
+            year: 'all',
+            term: 'all',
+            status: 'all'
+        };
 
         // ===== SCHOOL SETTINGS STATE =====
         let schoolSettings = {
@@ -9262,36 +9372,56 @@
         //  ADMIN/TEACHER FUNCTIONS (with email notification for new users)
         // ==================================================================
         async function addTeacherAdmin() {
-            if (currentUserRole !== 'admin') { showMessage('Only admin can add users.', 'error', 'teacherMessage');
-                return; }
+            if (currentUserRole !== 'admin') {
+                showMessage('Only admin can add users.', 'error', 'teacherMessage');
+                return;
+            }
             const tenantId = getCurrentTenantId();
-            const id = document.getElementById('teacherId').value.trim();
+            const idNumber = document.getElementById('teacherId').value.trim();
             const name = document.getElementById('teacherName').value.trim();
             const email = document.getElementById('teacherEmail').value.trim();
             const password = document.getElementById('teacherPassword').value;
             const role = document.getElementById('teacherRole').value;
-            if (!id || !name || !email || !password) { showMessage('ID, Name, Email, Password required.', 'error',
-                    'teacherMessage'); return; }
+
+            if (!idNumber || !name || !email || !password) {
+                showMessage('ID, Name, Email, Password required.', 'error', 'teacherMessage');
+                return;
+            }
+
+            // --- UNIQUENESS CHECK ---
+            const existingUser = await db.collection('users')
+                .where('tenantId', '==', tenantId)
+                .where('idNumber', '==', idNumber)
+                .get();
+            if (!existingUser.empty) {
+                showMessage('ID number already exists. Please choose a unique ID.', 'error', 'teacherMessage');
+                return;
+            }
+            const existingStudent = await db.collection('students')
+                .where('tenantId', '==', tenantId)
+                .where('id', '==', idNumber)
+                .get();
+            if (!existingStudent.empty) {
+                showMessage('ID number is already used by a student. Choose another.', 'error', 'teacherMessage');
+                return;
+            }
 
             try {
                 const userCred = await auth.createUserWithEmailAndPassword(email, password);
-                const extraData = {};
-                if (role === 'student') {
-                    extraData.studentId = id;
-                } else if (role === 'parent') {
-                    extraData.studentId = id;
-                }
-                await db.collection('users').doc(userCred.user.uid).set({
+                const uid = userCred.user.uid;
+
+                const userData = {
                     role: role,
                     email: email,
                     name: name,
                     tenantId: tenantId,
-                    ...extraData
-                });
+                    idNumber: idNumber,
+                    status: 'active'
+                };
 
                 if (role === 'teacher') {
                     const teacherData = {
-                        id: id,
+                        id: idNumber,
                         name: name,
                         email: email,
                         role: role,
@@ -9305,16 +9435,17 @@
                         nin: document.getElementById('teacherNIN').value.trim(),
                         salary: parseFloat(document.getElementById('teacherSalary').value) || 0,
                         status: document.getElementById('teacherStatus').value,
-                        uid: userCred.user.uid,
+                        uid: uid,
                         tenantId: tenantId
                     };
-                    await db.collection('teachers').doc(id).set(teacherData);
+                    await db.collection('teachers').doc(idNumber).set(teacherData);
                 }
 
-                // Send email notification to new user
+                await db.collection('users').doc(uid).set(userData);
+
                 await sendEmailNotification(
                     `Welcome to EduSL - ${schoolSettings.schoolName || 'School'}`,
-                    `Dear ${name},\n\nYour account has been created on ${schoolSettings.schoolName || 'EduSL School Management'}.\n\nLogin credentials:\nEmail: ${email}\nTemporary Password: ${password}\nRole: ${role}\n\nPlease change your password after your first login.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                    `Dear ${name},\n\nYour account has been created on ${schoolSettings.schoolName || 'EduSL School Management'}.\n\nLogin credentials:\nEmail: ${email}\nTemporary Password: ${password}\nRole: ${role}\nID Number: ${idNumber}\n\nPlease change your password after your first login.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
                 );
 
                 showMessage('User added successfully. Email notification sent.', 'success', 'teacherMessage');
@@ -9337,11 +9468,12 @@
             }
 
             let html =
-                '<div class="table-wrapper"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                '<div class="table-wrapper"><table><thead><tr><th>ID Number</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
             for (const u of users) {
                 const status = u.status || 'active';
+                const displayId = u.idNumber || u.uid || u.studentId || '';
                 html += `<tr>
-                    <td>${escapeHtml(u.uid || u.studentId || '')}</td>
+                    <td>${escapeHtml(displayId)}</td>
                     <td>${escapeHtml(u.name)}</td>
                     <td>${escapeHtml(u.email)}</td>
                     <td>${escapeHtml(u.role)}</td>
@@ -9354,36 +9486,6 @@
             }
             html += '</tbody></table></div>';
             document.getElementById('allTeachersList').innerHTML = html;
-
-            document.querySelectorAll('.delete-user-btn').forEach(btn => {
-                btn.onclick = async function() {
-                    const uid = this.dataset.uid;
-                    if (!confirm(`⚠️ Permanently delete user ${uid} and associated teacher record? This cannot be undone!`)) return;
-                    try {
-                        await db.collection('users').doc(uid).delete();
-                        const teacherSnap = await db.collection('teachers').where('uid', '==', uid).get();
-                        const batch = db.batch();
-                        teacherSnap.forEach(doc => batch.delete(doc.ref));
-                        const attSnap = await db.collection('staff_attendance').where('staffId', '==', uid).get();
-                        attSnap.forEach(doc => batch.delete(doc.ref));
-                        const paySnap = await db.collection('staff_payments').where('staffId', '==', uid).get();
-                        paySnap.forEach(doc => batch.delete(doc.ref));
-                        await batch.commit();
-                        loadAllTeachersForAdmin();
-                        showMessage('User and associated data deleted.', 'success', 'allTeachersList');
-                    } catch (e) {
-                        alert('Error deleting user: ' + e.message);
-                    }
-                };
-            });
-
-            document.querySelectorAll('.edit-user-btn').forEach(btn => {
-                btn.onclick = function() {
-                    const uid = this.dataset.uid;
-                    const role = this.dataset.role;
-                    openEditUserModal(uid, role);
-                };
-            });
         }
 
         // ==================================================================
@@ -9404,6 +9506,7 @@
                 }
 
                 document.getElementById('editUserUid').value = uid;
+                document.getElementById('editUserIdNumber').value = data.idNumber || '';
                 document.getElementById('editUserName').value = data.name || '';
                 document.getElementById('editUserEmail').value = data.email || '';
                 document.getElementById('editUserRole').value = data.role || '';
@@ -9411,6 +9514,7 @@
                 document.getElementById('editUserStatus').value = data.status || 'active';
                 document.getElementById('editUserPassword').value = '';
                 document.getElementById('editUserMessage').innerHTML = '';
+                document.getElementById('editUserIdNumber').value = data.idNumber || '';
                 openModal('editUserModal');
             } catch (error) {
                 alert('Error loading user: ' + error.message);
@@ -9419,6 +9523,7 @@
 
         document.getElementById('saveUserEditBtn').onclick = async function() {
             const uid = document.getElementById('editUserUid').value.trim();
+            const idNumber = document.getElementById('editUserIdNumber').value.trim();
             const name = document.getElementById('editUserName').value.trim();
             const email = document.getElementById('editUserEmail').value.trim();
             const role = document.getElementById('editUserRole').value;
@@ -9426,14 +9531,25 @@
             const status = document.getElementById('editUserStatus').value;
             const newPassword = document.getElementById('editUserPassword').value.trim();
 
-            if (!name || !email) {
-                showMessage('Name and Email are required.', 'error', 'editUserMessage');
+            if (!name || !email || !idNumber) {
+                showMessage('Name, Email and ID Number are required.', 'error', 'editUserMessage');
                 return;
             }
 
             try {
                 const tenantId = getCurrentTenantId();
+
+                const existing = await db.collection('users')
+                    .where('tenantId', '==', tenantId)
+                    .where('idNumber', '==', idNumber)
+                    .get();
+                if (!existing.empty && existing.docs[0].id !== uid) {
+                    showMessage('ID number already exists. Choose a unique one.', 'error', 'editUserMessage');
+                    return;
+                }
+
                 const updateData = {
+                    idNumber: idNumber,
                     name: name,
                     email: email,
                     role: role,
@@ -9444,18 +9560,32 @@
 
                 await db.collection('users').doc(uid).update(updateData);
 
+                if (role === 'teacher') {
+                    const teacherSnap = await db.collection('teachers').where('uid', '==', uid).get();
+                    if (!teacherSnap.empty) {
+                        const teacherDoc = teacherSnap.docs[0];
+                        if (teacherDoc.id !== idNumber) {
+                            const teacherData = teacherDoc.data();
+                            teacherData.id = idNumber;
+                            await db.collection('teachers').doc(idNumber).set(teacherData);
+                            await db.collection('teachers').doc(teacherDoc.id).delete();
+                        } else {
+                            await db.collection('teachers').doc(idNumber).update({ name, email });
+                        }
+                    }
+                }
+
                 if (newPassword && newPassword.length >= 6) {
                     try {
                         await auth.sendPasswordResetEmail(email);
-                        alert('Password reset email sent to ' + email + '. Please check your inbox.');
-                        // Send email notification
+                        alert('Password reset email sent to ' + email);
                         await sendEmailNotification(
                             `Password Reset - ${schoolSettings.schoolName || 'EduSL'}`,
-                            `Dear ${name},\n\nYour password for ${schoolSettings.schoolName || 'EduSL'} has been reset.\n\nPlease check your email for the reset link.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                            `Dear ${name},\n\nYour password has been reset.\n\nCheck your email for the reset link.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
                         );
                     } catch (authError) {
-                        console.warn('Password reset email could not be sent:', authError.message);
-                        alert('Could not send password reset email. Please reset it manually via Firebase Console.');
+                        console.warn('Password reset error:', authError.message);
+                        alert('Could not send password reset email.');
                     }
                 }
 
@@ -9701,9 +9831,13 @@
         // ==================================================================
         //  ADMIN: STAFF, ASSETS, INVENTORY, FILES, SCHOOL LOCATION
         // ==================================================================
+
+        // ----- UPDATED addStaff with new fields -----
         async function addStaff() {
             if (currentUserRole !== 'admin') return;
             const tenantId = getCurrentTenantId();
+
+            // Grab all fields
             const id = document.getElementById('staffId').value.trim();
             const name = document.getElementById('staffName').value.trim();
             const type = document.getElementById('staffType').value;
@@ -9712,9 +9846,24 @@
             const department = document.getElementById('staffDepartment').value.trim();
             const status = document.getElementById('staffStatus').value;
 
+            // NEW fields
+            const qualification = document.getElementById('staffQualification').value.trim();
+            const nin = document.getElementById('staffNIN').value.trim();
+            const socialSecurity = document.getElementById('staffSocialSecurity').value.trim();
+            const dob = document.getElementById('staffDob').value;
+            const dateOfEntry = document.getElementById('staffDateOfEntry').value;
+
             if (!id || !name) {
                 showMessage('ID and Name are required.', 'error', 'staffMessage');
                 return;
+            }
+
+            // Determine year and term from dateOfEntry
+            let year = '';
+            let term = '';
+            if (dateOfEntry) {
+                year = dateOfEntry.split('-')[0];
+                term = getTermFromDate(dateOfEntry);
             }
 
             await db.collection('staff').doc(id).set({
@@ -9725,27 +9874,127 @@
                 email,
                 department,
                 status,
+                qualification,
+                nin,
+                socialSecurity,
+                dob,
+                dateOfEntry,
+                year,
+                term,
                 tenantId,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            showMessage('Staff added successfully.', 'success', 'staffMessage');
+            showMessage('Staff added successfully with all details.', 'success', 'staffMessage');
+
+            // Clear form
             document.getElementById('staffId').value = '';
             document.getElementById('staffName').value = '';
             document.getElementById('staffPhone').value = '';
             document.getElementById('staffEmail').value = '';
             document.getElementById('staffDepartment').value = '';
-            loadStaffList();
+            document.getElementById('staffQualification').value = '';
+            document.getElementById('staffNIN').value = '';
+            document.getElementById('staffSocialSecurity').value = '';
+            document.getElementById('staffDob').value = '';
+            document.getElementById('staffDateOfEntry').value = '';
+
+            // Refresh list with filters applied
+            applyStaffFiltersAndRender();
         }
 
-        async function loadStaffList() {
-            if (currentUserRole !== 'admin') return;
+        // ----- loadStaffList with search/filter support -----
+        async function loadStaffListInternal() {
             const tenantId = getCurrentTenantId();
             const snap = await db.collection('staff').where('tenantId', '==', tenantId).get();
-            let html =
-                '<div class="table-wrapper"><table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Phone</th><th>Email</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+            allStaffRecords = [];
             snap.forEach(d => {
                 const data = d.data();
+                // Ensure year/term are populated if dateOfEntry exists
+                if (data.dateOfEntry && !data.year) {
+                    data.year = data.dateOfEntry.split('-')[0];
+                    data.term = getTermFromDate(data.dateOfEntry);
+                }
+                allStaffRecords.push({ docId: d.id, ...data });
+            });
+            // Populate year filter dropdown
+            populateStaffYearFilter();
+            // Apply current filters and render
+            applyStaffFiltersAndRender();
+        }
+
+        function populateStaffYearFilter() {
+            const sel = document.getElementById('staffYearFilter');
+            const currentVal = sel.value;
+            const years = new Set();
+            allStaffRecords.forEach(r => {
+                if (r.year) years.add(r.year);
+            });
+            sel.innerHTML = '<option value="all">All Years</option>';
+            const sorted = Array.from(years).sort((a, b) => b - a);
+            sorted.forEach(y => {
+                sel.innerHTML += `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
+            });
+            // If current value not in list, reset to 'all'
+            if (currentVal !== 'all' && !sorted.includes(currentVal)) {
+                sel.value = 'all';
+                staffFilterState.year = 'all';
+            }
+        }
+
+        function applyStaffFiltersAndRender() {
+            const search = document.getElementById('staffSearchInput').value.trim().toLowerCase();
+            const year = document.getElementById('staffYearFilter').value;
+            const term = document.getElementById('staffTermFilter').value;
+            const status = document.getElementById('staffStatusFilter').value;
+
+            staffFilterState.search = search;
+            staffFilterState.year = year;
+            staffFilterState.term = term;
+            staffFilterState.status = status;
+
+            let filtered = allStaffRecords;
+
+            // Search
+            if (search) {
+                filtered = filtered.filter(r =>
+                    (r.name && r.name.toLowerCase().includes(search)) ||
+                    (r.id && r.id.toLowerCase().includes(search))
+                );
+            }
+
+            // Year filter
+            if (year !== 'all') {
+                filtered = filtered.filter(r => r.year === year);
+            }
+
+            // Term filter
+            if (term !== 'all') {
+                filtered = filtered.filter(r => r.term === term);
+            }
+
+            // Status filter
+            if (status !== 'all') {
+                filtered = filtered.filter(r => (r.status || 'active') === status);
+            }
+
+            staffFilteredRecords = filtered;
+            renderStaffList(filtered);
+            updateStaffFilterInfo(filtered);
+        }
+
+        function renderStaffList(filtered) {
+            const container = document.getElementById('staffListContainer');
+            if (!filtered || filtered.length === 0) {
+                container.innerHTML = '<p>No staff members found matching the current filters.</p>';
+                return;
+            }
+
+            let html =
+                '<div class="table-wrapper"><table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Phone</th><th>Email</th><th>Dept</th><th>Qualification</th><th>NIN</th><th>Social Security</th><th>DOB</th><th>Date of Entry</th><th>Year</th><th>Term</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+
+            filtered.forEach(data => {
+                const termLabel = data.term ? getTermLabel(data.term) : '—';
                 html += `<tr>
                     <td>${escapeHtml(data.id)}</td>
                     <td>${escapeHtml(data.name)}</td>
@@ -9753,25 +10002,73 @@
                     <td>${escapeHtml(data.phone || '')}</td>
                     <td>${escapeHtml(data.email || '')}</td>
                     <td>${escapeHtml(data.department || '')}</td>
+                    <td>${escapeHtml(data.qualification || '')}</td>
+                    <td>${escapeHtml(data.nin || '')}</td>
+                    <td>${escapeHtml(data.socialSecurity || '')}</td>
+                    <td>${escapeHtml(data.dob || '')}</td>
+                    <td>${escapeHtml(data.dateOfEntry || '')}</td>
+                    <td>${escapeHtml(data.year || '')}</td>
+                    <td>${escapeHtml(termLabel)}</td>
                     <td>${escapeHtml(data.status || 'active')}</td>
                     <td>
                         <button class="delete-staff" data-id="${data.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
                     </td>
                 </tr>`;
             });
-            html += '</tbody></table></div>';
-            document.getElementById('staffListContainer').innerHTML = html;
 
-            document.querySelectorAll('.delete-staff').forEach(btn => {
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+
+            // Delete handlers
+            container.querySelectorAll('.delete-staff').forEach(btn => {
                 btn.onclick = async function() {
                     if (confirm('Delete this staff member?')) {
                         await db.collection('staff').doc(this.dataset.id).delete();
-                        loadStaffList();
+                        loadStaffListInternal();
                     }
                 };
             });
         }
 
+        function updateStaffFilterInfo(filtered) {
+            const info = document.getElementById('staffFilterInfo');
+            const total = allStaffRecords.length;
+            const filteredCount = filtered ? filtered.length : 0;
+            let msg = `Showing ${filteredCount} of ${total} staff members.`;
+            if (staffFilterState.search) msg += ` Search: "${escapeHtml(staffFilterState.search)}"`;
+            if (staffFilterState.year !== 'all') msg += ` Year: ${staffFilterState.year}`;
+            if (staffFilterState.term !== 'all') msg += ` ${getTermLabel(staffFilterState.term)}`;
+            if (staffFilterState.status !== 'all') msg += ` Status: ${staffFilterState.status}`;
+            info.textContent = msg;
+        }
+
+        // ----- Staff filter event listeners -----
+        function setupStaffFilterEvents() {
+            document.getElementById('staffSearchBtn').onclick = applyStaffFiltersAndRender;
+            document.getElementById('staffResetBtn').onclick = function() {
+                document.getElementById('staffSearchInput').value = '';
+                document.getElementById('staffYearFilter').value = 'all';
+                document.getElementById('staffTermFilter').value = 'all';
+                document.getElementById('staffStatusFilter').value = 'all';
+                staffFilterState = { search: '', year: 'all', term: 'all', status: 'all' };
+                applyStaffFiltersAndRender();
+            };
+            document.getElementById('staffApplyFiltersBtn').onclick = applyStaffFiltersAndRender;
+            // Also on enter key in search input
+            document.getElementById('staffSearchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') applyStaffFiltersAndRender();
+            });
+            // When year/term/status change, we could auto-apply, but we let the user click Apply
+        }
+
+        // Legacy wrapper for loadStaffList (used elsewhere)
+        async function loadStaffList() {
+            await loadStaffListInternal();
+        }
+
+        // ==================================================================
+        //  OTHER ADMIN FUNCTIONS (unchanged)
+        // ==================================================================
         async function addAsset() {
             if (currentUserRole !== 'admin') return;
             const tenantId = getCurrentTenantId();
@@ -14645,7 +14942,7 @@ loadIncomeRecords();
 loadExpenseRecords();
 }
 if (m.moduleId === 'adminModule') {
-loadStaffList();
+loadStaffListInternal();
 loadAssetsList();
 loadInventoryList();
 loadVisitorsList();
@@ -14689,7 +14986,7 @@ document.getElementById('importSection').style.display = 'block';
 document.getElementById('manualSection').style.display = 'block';
 document.getElementById('adminTeacherSections').style.display = 'block';
 document.getElementById('teacherOwnProfileCard').style.display = 'block';
-loadStaffList();
+loadStaffListInternal();
 loadAssetsList();
 loadInventoryList();
 loadVisitorsList();
@@ -14708,7 +15005,7 @@ this.classList.add('active');
 document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display =
 'none');
 document.getElementById(id + 'Tab').style.display = 'block';
-if (id === 'staff') loadStaffList();
+if (id === 'staff') loadStaffListInternal();
 else if (id === 'assets') loadAssetsList();
 else if (id === 'inventory') loadInventoryList();
 else if (id === 'visitors') loadVisitorsList();
@@ -14729,6 +15026,7 @@ else if (id === 'schoolsettings') loadSchoolSettings();
 };
 });
 setupSettingsTab();
+setupStaffFilterEvents();
 } else if (role === 'bursar') {
 document.getElementById('importSection').style.display = 'none';
 document.getElementById('manualSection').style.display = 'none';
@@ -14940,7 +15238,9 @@ loadFeeStats(); };
 document.getElementById('feeStatsTerm').onchange = function() { if (currentUserRole === 'bursar')
 loadFeeStats(); };
 
-document.getElementById('addStaffBtn').onclick = addStaff;
+// UPDATED: Use the new addStaff function
+document.getElementById('addStaffBtn').onclick = function() { if (currentUserRole !== 'admin') return;
+addStaff(); };
 document.getElementById('addAssetBtn').onclick = addAsset;
 document.getElementById('addInventoryBtn').onclick = addInventory;
 document.getElementById('checkInVisitorBtn').onclick = checkInVisitor;
@@ -15008,7 +15308,7 @@ this.classList.add('active');
 document.querySelectorAll('#adminModule .admin-tab').forEach(t => t.style.display =
 'none');
 document.getElementById(id + 'Tab').style.display = 'block';
-if (id === 'staff') loadStaffList();
+if (id === 'staff') loadStaffListInternal();
 else if (id === 'assets') loadAssetsList();
 else if (id === 'inventory') loadInventoryList();
 else if (id === 'visitors') loadVisitorsList();
