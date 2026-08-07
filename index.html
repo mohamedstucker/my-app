@@ -3877,7 +3877,7 @@
                         <select id="staffType">
                             <option>Teacher</option>
                             <option>Admin</option>
-                            <option>Bursar</option>
+                            <option>Bursar</option>   <!-- Added Bursar -->
                             <option>Cleaner</option>
                             <option>Security</option>
                             <option>Driver</option>
@@ -3888,7 +3888,6 @@
                             <option>IT Support</option>
                             <option>Cook</option>
                             <option>Groundskeeper</option>
-                             
                         </select>
                     </div>
                     <!-- Row 3: Qualification, NIN, Social Security -->
@@ -4821,7 +4820,7 @@
         // Initialize EmailJS
         (function initEmailJS() {
             try {
-                if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== '2_zNx9GwIGvYwAn69Y') {
+                if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
                     emailjs.init(EMAILJS_PUBLIC_KEY);
                     console.log('✅ EmailJS initialized');
                 } else {
@@ -9818,7 +9817,7 @@
 
                 if (currentUserRole === 'admin') {
                     loadAllTeachersForAdmin();
-                    loadStaffList();
+                    loadStaffListInternal();
                 }
 
                 showMessage(`Teacher ${teacherId} and all associated data have been permanently deleted.`, 'success', 'teacherMessage');
@@ -11555,7 +11554,7 @@
         }
 
         // ==================================================================
-        //  STUDENT PROMOTION SYSTEM
+        //  STUDENT PROMOTION SYSTEM (FIXED using docId)
         // ==================================================================
         function populatePromotionDropdowns() {
             const fromSelect = document.getElementById('promotionFromClass');
@@ -11618,6 +11617,7 @@
             renderPromotionList();
         };
 
+        // FIXED: Use docId instead of id for update
         document.getElementById('promoteStudentsBtn').onclick = async function() {
             const fromClass = document.getElementById('promotionFromClass').value;
             const toClass = document.getElementById('promotionToClass').value;
@@ -11632,7 +11632,13 @@
             try {
                 const tenantId = getCurrentTenantId();
                 for (const s of selected) {
-                    await db.collection('students').doc(s.id).update({
+                    // Use docId for the Firestore document reference
+                    const docId = s.docId || s.id; // fallback to id if docId missing
+                    if (!docId) {
+                        console.warn('Skipping student without docId:', s);
+                        continue;
+                    }
+                    await db.collection('students').doc(docId).update({
                         class: toClass,
                         previousClass: fromClass,
                         promotionDate: new Date().toISOString(),
