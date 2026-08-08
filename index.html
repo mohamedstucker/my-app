@@ -4492,6 +4492,48 @@
         </div>
     </div>
 
+    <!-- ===== EDIT STAFF MODAL ===== -->
+    <div id="editStaffModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('editStaffModal')">&times;</span>
+            <h3>✏️ Edit Staff Member</h3>
+            <input type="hidden" id="editStaffDocId" />
+            <div class="form-row">
+                <input id="editStaffId" placeholder="Staff ID *" />
+                <input id="editStaffName" placeholder="Full Name *" />
+                <input id="editStaffPhone" placeholder="Phone Number" />
+            </div>
+            <div class="form-row">
+                <input id="editStaffEmail" placeholder="Email Address" />
+                <input id="editStaffDepartment" placeholder="Department" />
+                <select id="editStaffType">
+                    <option>Teacher</option><option>Admin</option><option>Bursar</option>
+                    <option>Cleaner</option><option>Security</option><option>Driver</option>
+                    <option>Librarian</option><option>Counselor</option><option>Accountant</option>
+                    <option>Nurse</option><option>IT Support</option><option>Cook</option>
+                    <option>Groundskeeper</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <input id="editStaffQualification" placeholder="Qualification" />
+                <input id="editStaffNIN" placeholder="NIN" />
+                <input id="editStaffSocialSecurity" placeholder="Social Security" />
+            </div>
+            <div class="form-row">
+                <label style="font-weight:600; font-size:0.85rem; margin-right:4px;">DOB:</label>
+                <input id="editStaffDob" type="date" style="max-width:160px;" />
+                <label style="font-weight:600; font-size:0.85rem; margin-right:4px; margin-left:6px;">Date of Entry:</label>
+                <input id="editStaffDateOfEntry" type="date" style="max-width:160px;" />
+                <select id="editStaffStatus">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <button id="saveStaffEditBtn" class="refresh-btn">Save Changes</button>
+            <div id="editStaffMessage" style="margin-top:8px;"></div>
+        </div>
+    </div>
+
     <!-- ===== OTHER MODALS ===== -->
     <div id="editProfileModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('editProfileModal')">&times;</span><h3>Edit Student Profile</h3><input type="text" id="editProfileName" placeholder="Full Name" /><input type="date" id="editProfileDob" /><select id="editProfileClass"><option>Nursery1</option><option>Nursery2</option><option>Nursery3</option><option>Class1</option><option>Class2</option><option>Class3</option><option>Class4</option><option>Class5</option><option>Class6</option><option>JSS1</option><option>JSS2</option><option>JSS3</option><option>SSS1</option><option>SSS2</option><option>SSS3</option><option>Others</option></select><input id="editProfileDepartment" placeholder="Department" /><input id="editProfileAddress" placeholder="Address" /><input id="editProfileParentPhone" placeholder="Parent Phone" /><input id="editProfileParentName" placeholder="Parent Name" /><input id="editProfileGuardian" placeholder="Guardian" /><input id="editProfileParentEmail" type="email" placeholder="Parent Email" /><select id="editProfileGender"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select><div class="password-wrapper"><input id="editProfileTempPassword" type="password" placeholder="Temporary Password" /><button type="button" class="password-toggle" data-target="editProfileTempPassword" aria-label="Toggle password visibility"><span class="eye-icon">👁️</span></button></div><select id="editProfileStatus"><option>active</option><option>inactive</option></select><button id="saveProfileBtn" class="refresh-btn">Save Changes</button></div></div>
 
@@ -5218,9 +5260,18 @@
         const ALL_CLASSES = [
             'Pre-Nursery',
             'Nursery1', 'Nursery2', 'Nursery3',
-            'Class1', 'Class2', 'Class3', 'Class4', 'Class5', 'Class6',
-            'JSS1', 'JSS2', 'JSS3',
-            'SSS1', 'SSS2', 'SSS3',
+            'Class1', 'Class1E',
+            'Class2', 'Class2E',
+            'Class3', 'Class3E',
+            'Class4', 'Class4E',
+            'Class5', 'Class5E',
+            'Class6', 'Class6E',
+            'JSS1', 'JSS1E',
+            'JSS2', 'JSS2E',
+            'JSS3', 'JSS3E',
+            'SSS1', 'SSS1E',
+            'SSS2', 'SSS2E',
+            'SSS3', 'SSS3E',
             'Others'
         ];
 
@@ -9982,6 +10033,7 @@
             updateStaffFilterInfo(filtered);
         }
 
+        // ===== UPDATED renderStaffList with edit button =====
         function renderStaffList(filtered) {
             const container = document.getElementById('staffListContainer');
             if (!filtered || filtered.length === 0) {
@@ -10010,6 +10062,7 @@
                     <td>${escapeHtml(termLabel)}</td>
                     <td>${escapeHtml(data.status || 'active')}</td>
                     <td>
+                        <button class="edit-staff-btn" data-id="${data.id}" style="background:#e8f0fe; color:#1a4b8a;">Edit</button>
                         <button class="delete-staff" data-id="${data.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>
                     </td>
                 </tr>`;
@@ -10017,6 +10070,14 @@
 
             html += '</tbody></table></div>';
             container.innerHTML = html;
+
+            // Edit button handler
+            container.querySelectorAll('.edit-staff-btn').forEach(btn => {
+                btn.onclick = function() {
+                    const staffId = this.dataset.id;
+                    openEditStaffModal(staffId);
+                };
+            });
 
             // Delete handlers
             container.querySelectorAll('.delete-staff').forEach(btn => {
@@ -10064,6 +10125,87 @@
         async function loadStaffList() {
             await loadStaffListInternal();
         }
+
+        // ==================================================================
+        //  OPEN EDIT STAFF MODAL (new function)
+        // ==================================================================
+        async function openEditStaffModal(staffId) {
+            const tenantId = getCurrentTenantId();
+            const doc = await db.collection('staff').doc(staffId).get();
+            if (!doc.exists) {
+                alert('Staff record not found.');
+                return;
+            }
+            const data = doc.data();
+            if (data.tenantId !== tenantId) {
+                alert('You do not have permission to edit this staff member.');
+                return;
+            }
+
+            document.getElementById('editStaffDocId').value = staffId;
+            document.getElementById('editStaffId').value = data.id || '';
+            document.getElementById('editStaffName').value = data.name || '';
+            document.getElementById('editStaffPhone').value = data.phone || '';
+            document.getElementById('editStaffEmail').value = data.email || '';
+            document.getElementById('editStaffDepartment').value = data.department || '';
+            document.getElementById('editStaffType').value = data.type || 'Teacher';
+            document.getElementById('editStaffQualification').value = data.qualification || '';
+            document.getElementById('editStaffNIN').value = data.nin || '';
+            document.getElementById('editStaffSocialSecurity').value = data.socialSecurity || '';
+            document.getElementById('editStaffDob').value = data.dob || '';
+            document.getElementById('editStaffDateOfEntry').value = data.dateOfEntry || '';
+            document.getElementById('editStaffStatus').value = data.status || 'active';
+            document.getElementById('editStaffMessage').innerHTML = '';
+
+            openModal('editStaffModal');
+        }
+
+        // ===== Save Staff Edit Button =====
+        document.getElementById('saveStaffEditBtn').onclick = async function() {
+            const docId = document.getElementById('editStaffDocId').value;
+            if (!docId) {
+                showMessage('No document ID.', 'error', 'editStaffMessage');
+                return;
+            }
+
+            const tenantId = getCurrentTenantId();
+            const updates = {
+                id: document.getElementById('editStaffId').value.trim(),
+                name: document.getElementById('editStaffName').value.trim(),
+                phone: document.getElementById('editStaffPhone').value.trim(),
+                email: document.getElementById('editStaffEmail').value.trim(),
+                department: document.getElementById('editStaffDepartment').value.trim(),
+                type: document.getElementById('editStaffType').value,
+                qualification: document.getElementById('editStaffQualification').value.trim(),
+                nin: document.getElementById('editStaffNIN').value.trim(),
+                socialSecurity: document.getElementById('editStaffSocialSecurity').value.trim(),
+                dob: document.getElementById('editStaffDob').value,
+                dateOfEntry: document.getElementById('editStaffDateOfEntry').value,
+                status: document.getElementById('editStaffStatus').value,
+                tenantId: tenantId
+            };
+
+            // Recalculate year/term from dateOfEntry
+            if (updates.dateOfEntry) {
+                updates.year = updates.dateOfEntry.split('-')[0];
+                updates.term = getTermFromDate(updates.dateOfEntry);
+            } else {
+                updates.year = '';
+                updates.term = '';
+            }
+
+            try {
+                await db.collection('staff').doc(docId).update(updates);
+                showMessage('Staff member updated successfully.', 'success', 'editStaffMessage');
+                setTimeout(() => {
+                    closeModal('editStaffModal');
+                    applyStaffFiltersAndRender();
+                }, 1000);
+            } catch (error) {
+                showMessage('Error updating staff: ' + error.message, 'error', 'editStaffMessage');
+                console.error('Edit staff error:', error);
+            }
+        };
 
         // ==================================================================
         //  OTHER ADMIN FUNCTIONS (unchanged)
@@ -14711,7 +14853,8 @@ yearSelect.innerHTML = '<option value="all">All Years</option>';
 years.forEach(y => {
 yearSelect.innerHTML +=
 `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
-});
+}
+);
 }
 }).catch(() => {});
 }
@@ -15376,7 +15519,8 @@ yearSelect.innerHTML = '<option value="all">All Years</option>';
 years.forEach(y => {
 yearSelect.innerHTML +=
 `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
-});
+}
+);
 }
 }).catch(() => {});
 }
