@@ -6,7 +6,7 @@
     <title>EduSL – School Management System</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a4b8a'/%3E%3Ctext x='18' y='62' font-family='Arial' font-size='48' fill='%23ffd700' font-weight='bold'%3EES%3C/text%3E%3C/svg%3E" />
     <style>
-        /* ===== ALL ORIGINAL STYLES ===== */
+        /* ===== ALL ORIGINAL STYLES RETAINED ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -340,20 +340,520 @@
             max-width: 360px;
         }
 
+        /* ================================================================
+               PROFESSIONAL TABLE STYLES — ENHANCED with text overflow fixes
+               ================================================================ */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            margin: 8px 0;
-            border-radius: 14px;
-            border: 1px solid #e6edf4;
+            margin: 12px 0;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease;
         }
+        .table-wrapper:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.82rem;
             background: #fff;
             min-width: 600px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
+
+        /* ---- Table Header ---- */
+        thead {
+            background: linear-gradient(135deg, #f0f5fa, #e8eef5);
+            border-bottom: 2px solid #d0dae8;
+        }
+        thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1a3a5c;
+            white-space: nowrap;
+            border-bottom: 2px solid #d0dae8;
+            position: sticky;
+            top: 0;
+            background: #f0f5fa;
+            z-index: 2;
+        }
+        thead th i {
+            margin-right: 6px;
+            font-size: 0.7rem;
+            color: #4a6a8a;
+            opacity: 0.7;
+        }
+        thead th:last-child {
+            text-align: center;
+        }
+
+        /* ---- Table Body ---- */
+        tbody tr {
+            border-bottom: 1px solid #eef2f8;
+            transition: background 0.15s ease;
+        }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        tbody tr:hover {
+            background: #f5f9ff;
+        }
+        tbody tr:nth-child(even) {
+            background: #fafcfe;
+        }
+        tbody tr:nth-child(even):hover {
+            background: #f5f9ff;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            color: #1f2e44;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            word-break: break-word;       /* <-- FIX: wrap long words */
+            overflow-wrap: break-word;
+            max-width: 200px;              /* prevent cells from growing too wide */
+        }
+
+        /* ---- Status Badge (modern, pill-style) ---- */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px 4px 10px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            background: #eef2f7;
+            color: #2c3e50;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .status-badge i {
+            font-size: 0.7rem;
+        }
+        .status-badge.present {
+            background: #e3f0e9;
+            color: #0f6e4a;
+            border-color: #b7e4c7;
+        }
+        .status-badge.present i {
+            color: #1f9d6a;
+        }
+        .status-badge.absent {
+            background: #fde8e8;
+            color: #842029;
+            border-color: #f5c2c7;
+        }
+        .status-badge.absent i {
+            color: #e74c3c;
+        }
+        .status-badge.late {
+            background: #fef3e0;
+            color: #7a4a0a;
+            border-color: #f5d6a0;
+        }
+        .status-badge.late i {
+            color: #f39c12;
+        }
+        .status-badge.not-marked {
+            background: #f0f3f8;
+            color: #6e83a0;
+            border-color: #e2e8f0;
+        }
+        .status-badge.not-marked i {
+            color: #8da0bb;
+        }
+        .status-badge.checked-in {
+            background: #e3f0e9;
+            color: #0f6e4a;
+            border-color: #b7e4c7;
+        }
+        .status-badge.checked-out {
+            background: #fde8e8;
+            color: #842029;
+            border-color: #f5c2c7;
+        }
+
+        /* ---- Action Buttons (icon-only) ---- */
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .actions .act-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 40px;
+            border: none;
+            background: transparent;
+            color: #4a6180;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            padding: 0;
+        }
+        .actions .act-btn:hover {
+            background: #e7eef8;
+            color: #1a3f66;
+            transform: scale(1.05);
+        }
+        .actions .act-btn.edit {
+            color: #2a7de1;
+        }
+        .actions .act-btn.edit:hover {
+            background: #dce7f5;
+        }
+        .actions .act-btn.delete {
+            color: #c73a4a;
+        }
+        .actions .act-btn.delete:hover {
+            background: #fde8e8;
+        }
+        .actions .act-btn.view {
+            color: #5b7a9a;
+        }
+        .actions .act-btn.view:hover {
+            background: #e8f0fe;
+        }
+
+        /* ---- Checkbox / DELE column ---- */
+        .dele-cell {
+            text-align: center;
+        }
+        .dele-cell input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #2a7de1;
+            border-radius: 4px;
+            border: 1.5px solid #bcc9db;
+            cursor: pointer;
+            transition: 0.1s;
+            margin: 0;
+            padding: 0;
+        }
+        .dele-cell input[type="checkbox"]:hover {
+            border-color: #2a7de1;
+        }
+
+        /* ---- Remark & Voice cell ---- */
+        .remark-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .remark-cell .remark-text {
+            color: #2d405b;
+            font-size: 0.8rem;
+            background: #f0f5fa;
+            padding: 2px 10px;
+            border-radius: 20px;
+            min-width: 40px;
+            text-align: center;
+        }
+        .remark-cell .voice-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #edf2fa;
+            border-radius: 50%;
+            color: #3a5f85;
+            font-size: 0.8rem;
+            transition: 0.15s;
+            cursor: default;
+        }
+        .remark-cell .voice-icon:hover {
+            background: #dce7f5;
+        }
+
+        /* ---- Input inside table (remark input) ---- */
+        .remark-input {
+            width: 120px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: 1.5px solid #dce4ec;
+            font-size: 0.75rem;
+            max-width: 140px;
+            background: #fafcfe;
+            transition: 0.2s;
+        }
+        .remark-input:focus {
+            border-color: #2a6bb0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(42, 107, 176, 0.12);
+        }
+
+        /* ---- ID column ---- */
+        .col-id {
+            font-weight: 600;
+            color: #2a5c8a;
+            font-size: 0.8rem;
+            font-family: 'Inter', monospace;
+            letter-spacing: 0.3px;
+            word-break: break-word;
+            max-width: 80px;
+        }
+
+        /* ---- Name column with avatar ---- */
+        .col-name {
+            font-weight: 500;
+            color: #0b1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;                /* allow wrap on small screens */
+        }
+        .col-name .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #dce5f2, #c8d4e8);
+            border-radius: 50%;
+            color: #1f3b5c;
+            font-weight: 700;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .col-name .avatar.green {
+            background: linear-gradient(135deg, #d4edda, #b7e4c7);
+            color: #0f6e4a;
+        }
+        .col-name .avatar.orange {
+            background: linear-gradient(135deg, #fef3e0, #f5d6a0);
+            color: #7a4a0a;
+        }
+        .col-name .avatar.red {
+            background: linear-gradient(135deg, #fde8e8, #f5c2c7);
+            color: #842029;
+        }
+
+        /* ---- Responsive table tweaks ---- */
+        @media (max-width: 768px) {
+            thead th {
+                padding: 10px 12px;
+                font-size: 0.6rem;
+                letter-spacing: 0.3px;
+            }
+            tbody td {
+                padding: 8px 10px;
+                font-size: 0.7rem;
+                max-width: 150px;
+            }
+            .remark-input {
+                width: 80px;
+                font-size: 0.65rem;
+                padding: 3px 6px;
+            }
+            .col-name .avatar {
+                width: 26px;
+                height: 26px;
+                font-size: 0.6rem;
+            }
+            .actions .act-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 0.75rem;
+            }
+            .status-badge {
+                font-size: 0.65rem;
+                padding: 3px 10px 3px 8px;
+            }
+            .dele-cell input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+            }
+            .remark-cell .voice-icon {
+                width: 26px;
+                height: 26px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            table {
+                font-size: 0.6rem;
+                min-width: 420px;
+            }
+            thead th {
+                padding: 6px 8px;
+                font-size: 0.55rem;
+            }
+            tbody td {
+                padding: 6px 8px;
+                font-size: 0.6rem;
+                max-width: 120px;
+            }
+            .remark-input {
+                width: 60px;
+                font-size: 0.55rem;
+                padding: 2px 4px;
+            }
+            .col-name .avatar {
+                width: 22px;
+                height: 22px;
+                font-size: 0.5rem;
+            }
+            .actions .act-btn {
+                width: 24px;
+                height: 24px;
+                font-size: 0.65rem;
+            }
+            .status-badge {
+                font-size: 0.55rem;
+                padding: 2px 8px 2px 6px;
+                gap: 3px;
+            }
+            .status-badge i {
+                font-size: 0.55rem;
+            }
+            .dele-cell input[type="checkbox"] {
+                width: 14px;
+                height: 14px;
+            }
+            .remark-cell .voice-icon {
+                width: 22px;
+                height: 22px;
+                font-size: 0.6rem;
+            }
+        }
+
+        /* ---- Card footer (bottom bar) ---- */
+        .footer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-top: 8px;
+            padding-top: 16px;
+            border-top: 1px solid #eaedf2;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .btn-group .btn {
+            padding: 8px 22px;
+            border-radius: 40px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #f0f4fc;
+            color: #1f3857;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.15s;
+            cursor: pointer;
+            letter-spacing: 0.2px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+        .btn-group .btn i {
+            font-size: 0.85rem;
+            color: #4d6b8f;
+        }
+        .btn-group .btn:hover {
+            background: #e4ebf6;
+            box-shadow: 0 2px 8px rgba(0, 20, 40, 0.06);
+            transform: translateY(-2px);
+        }
+        .btn-group .btn.primary {
+            background: #1a3f66;
+            color: white;
+        }
+        .btn-group .btn.primary i {
+            color: #aac2e0;
+        }
+        .btn-group .btn.primary:hover {
+            background: #0f3152;
+        }
+        .btn-group .btn.outline {
+            background: transparent;
+            border: 1px solid #d4deec;
+        }
+        .btn-group .btn.outline:hover {
+            background: #f2f7ff;
+            border-color: #b0c2db;
+        }
+
+        .suggestions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #476186;
+            font-size: 0.8rem;
+            font-weight: 450;
+            background: #f1f6fe;
+            padding: 6px 18px 6px 16px;
+            border-radius: 40px;
+            border: 1px solid #e1eaf5;
+        }
+        .suggestions i {
+            color: #2a7de1;
+            font-size: 0.9rem;
+        }
+        .suggestions .dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            background: #2a7de1;
+            border-radius: 50%;
+            margin-left: 2px;
+            animation: pulse-dot 1.5s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+        }
+
+        /* ---- Empty row (placeholder) ---- */
+        .empty-row td {
+            color: #9aadc7;
+            font-size: 0.8rem;
+        }
+        .empty-row .col-name {
+            color: #9aadc7;
+        }
+        .empty-row .status-badge {
+            background: #f0f3f8;
+            color: #6e83a0;
+            border-color: #e2e8f0;
+        }
+        .empty-row .status-badge i {
+            color: #8da0bb;
+        }
+
+        /* ---- Legacy table styles (kept for compatibility) ---- */
         th,
         td {
             border: 1px solid #e6edf4;
@@ -377,15 +877,8 @@
         tr:hover {
             background: #edf3f9;
         }
-        .remark-input {
-            width: 120px;
-            padding: 5px 8px;
-            border-radius: 8px;
-            border: 1px solid #dce4ec;
-            font-size: 0.75rem;
-            max-width: 140px;
-        }
 
+        /* ---- Rest of original styles (unchanged) ---- */
         .module-buttons {
             display: flex;
             gap: 8px;
@@ -521,7 +1014,6 @@
         .fee-unpaid {
             background: #f8d7da !important;
         }
-        /* Finance status colors */
         .finance-income {
             background: #d4edda !important;
         }
@@ -775,7 +1267,6 @@
             text-align: center;
         }
 
-        /* ===== CHART CARD SIZING — FIXED ===== */
         #chartsCard .chart-container {
             position: relative;
             height: 320px;
@@ -807,7 +1298,6 @@
             text-align: center;
         }
 
-        /* ---- Mobile fixes for finance charts and grids ---- */
         .finance-chart-container {
             position: relative;
             height: 280px;
@@ -976,7 +1466,6 @@
             text-align: center;
         }
 
-        /* Finance KPI cards */
         .finance-kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1017,7 +1506,6 @@
             letter-spacing: 0.3px;
         }
 
-        /* Finance filter bar */
         .finance-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -1298,7 +1786,6 @@
             transform: scale(1.02);
         }
 
-        /* ===== STARTUP FLYER ===== */
         #startupPage {
             position: fixed;
             top: 0;
@@ -1473,7 +1960,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== Schools Page ===== */
         #schoolsPage {
             display: none;
             padding: 16px 0;
@@ -1634,7 +2120,6 @@
             font-size: 0.85rem;
         }
 
-        /* ===== PASSWORD TOGGLE STYLES ===== */
         .password-wrapper {
             position: relative;
             width: 100%;
@@ -1680,7 +2165,6 @@
             line-height: 1;
         }
 
-        /* ===== VISITOR TOGGLE ===== */
         .visitor-toggle-row {
             display: flex;
             flex-wrap: wrap;
@@ -1723,7 +2207,6 @@
             color: #842029;
         }
 
-        /* ===== LIBRARY STYLES ===== */
         .library-book-list {
             list-style: none;
             padding: 0;
@@ -1759,7 +2242,6 @@
             text-decoration: underline;
         }
 
-        /* ===== DOCUMENT STYLES ===== */
         .doc-item {
             background: #f8fafc;
             border-radius: 12px;
@@ -1808,7 +2290,6 @@
             max-width: 250px;
         }
 
-        /* ===== FEE COLLECTIONS DASHBOARD ===== */
         .fee-collection-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1886,7 +2367,6 @@
             min-width: 30px;
         }
 
-        /* ===== REPORT CARD STYLES ===== */
         .report-card {
             background: #fff;
             border-radius: 16px;
@@ -1984,7 +2464,6 @@
             }
         }
 
-        /* ===== PROMOTION STYLES ===== */
         .promotion-student-item {
             display: flex;
             align-items: center;
@@ -2011,7 +2490,6 @@
             font-size: 0.8rem;
         }
 
-        /* ===== BULK ATTENDANCE ===== */
         .bulk-attendance-bar {
             display: flex;
             flex-wrap: wrap;
@@ -2066,7 +2544,6 @@
             background: #dce4ec;
         }
 
-        /* ===== E-LEARNING STYLES ===== */
         .elearning-tabs {
             display: flex;
             gap: 6px;
@@ -2193,7 +2670,6 @@
             margin: 4px 0;
         }
 
-        /* ===== ENTRANCE EXAM STYLES ===== */
         .entrance-exam-assign-item {
             display: flex;
             align-items: center;
@@ -2212,7 +2688,6 @@
             flex-shrink: 0;
         }
 
-        /* ===== SCHOOL SETTINGS STYLES ===== */
         .settings-group {
             background: #f8fafc;
             border-radius: 12px;
@@ -2263,7 +2738,6 @@
             object-fit: contain;
         }
 
-        /* ===== STAFF FILTER BAR STYLES ===== */
         .staff-filter-section {
             margin-top: 20px;
             border-top: 1px solid #e6edf4;
@@ -2305,7 +2779,6 @@
             }
         }
 
-        /* ===== MOBILE RESPONSIVE FIXES ===== */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -2820,6 +3293,137 @@
             .password-toggle .eye-icon {
                 font-size: 0.9rem;
             }
+        }
+
+        /* ---- Enhanced table action button styles (overrides) ---- */
+        .table-wrapper .actions .act-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #5b7a9a;
+            cursor: pointer;
+        }
+        .table-wrapper .actions .act-btn:hover {
+            background: #e8f0fe;
+            color: #1a4b8a;
+            transform: scale(1.08);
+        }
+        .table-wrapper .actions .act-btn.edit {
+            color: #2a7de1;
+        }
+        .table-wrapper .actions .act-btn.delete {
+            color: #c73a4a;
+        }
+        .table-wrapper .actions .act-btn.view {
+            color: #5b7a9a;
+        }
+        .table-wrapper .actions .act-btn.edit:hover {
+            background: #dce7f5;
+        }
+        .table-wrapper .actions .act-btn.delete:hover {
+            background: #fde8e8;
+        }
+        .table-wrapper .actions .act-btn.view:hover {
+            background: #e8f0fe;
+        }
+
+        /* ---- Compact status badge inside table ---- */
+        .table-wrapper .status-badge {
+            font-size: 0.7rem;
+            padding: 3px 12px 3px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .table-wrapper .status-badge i {
+            font-size: 0.65rem;
+        }
+
+        /* ---- Table row hover lift ---- */
+        .table-wrapper tbody tr {
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+        .table-wrapper tbody tr:hover {
+            background: #f5f9ff;
+            transform: scale(1.002);
+        }
+
+        /* ---- Delete button inside table ---- */
+        .table-wrapper .delete-btn {
+            background: #fde8e8;
+            color: #b71c1c;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .table-wrapper .delete-btn:hover {
+            background: #fccccc;
+            transform: scale(1.05);
+        }
+
+        /* ---- Edit button inside table ---- */
+        .table-wrapper .edit-btn {
+            background: #e8f0fe;
+            color: #1a4b8a;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .table-wrapper .edit-btn:hover {
+            background: #d0dff0;
+            transform: scale(1.05);
+        }
+
+        /* ---- Primary button inside table ---- */
+        .table-wrapper .primary-btn-sm {
+            background: #1a4b8a;
+            color: #fff;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .table-wrapper .primary-btn-sm:hover {
+            background: #0b2b5c;
+            transform: scale(1.05);
+        }
+
+        /* ---- Success button inside table ---- */
+        .table-wrapper .success-btn-sm {
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .table-wrapper .success-btn-sm:hover {
+            background: #1e8449;
+            transform: scale(1.05);
         }
     </style>
 </head>
@@ -3877,7 +4481,7 @@
                         <select id="staffType">
                             <option>Teacher</option>
                             <option>Admin</option>
-                            <option>Bursar</option>   <!-- Added Bursar -->
+                            <option>Bursar</option>
                             <option>Cleaner</option>
                             <option>Security</option>
                             <option>Driver</option>
@@ -13690,6 +14294,9 @@
 
                     updateColorPreviews();
                     updateLogoPreview();
+
+                    // ---- FIX: Re‑apply the saved settings to the UI (colors, etc.) ----
+                    applySettingsToUI(data);
 
                     container.innerHTML = '<div class="success">✅ Settings loaded successfully.</div>';
                 } else {
