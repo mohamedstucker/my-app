@@ -420,9 +420,9 @@
             color: #1f2e44;
             font-size: 0.82rem;
             line-height: 1.4;
-            word-break: break-word;       /* <-- FIX: wrap long words */
+            word-break: break-word;
             overflow-wrap: break-word;
-            max-width: 200px;              /* prevent cells from growing too wide */
+            max-width: 200px;
         }
 
         /* ---- Status Badge (modern, pill-style) ---- */
@@ -619,7 +619,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            flex-wrap: wrap;                /* allow wrap on small screens */
+            flex-wrap: wrap;
         }
         .col-name .avatar {
             display: inline-flex;
@@ -1209,13 +1209,13 @@
         #loginModal .signup-toggle:hover {
             color: #0b2b5c;
         }
-        #signupFields {
+        #loginModal #signupFields {
             display: none;
             margin-top: 10px;
             border-top: 1px solid #e6edf4;
             padding-top: 12px;
         }
-        #signupFields.active {
+        #loginModal #signupFields.active {
             display: block;
         }
 
@@ -3425,6 +3425,112 @@
             background: #1e8449;
             transform: scale(1.05);
         }
+
+        /* ===== NEW: Means Summary Table Styles (updated to show T1, T2, Exam, Mean) ===== */
+        .means-summary {
+            margin-top: 16px;
+            padding: 12px 14px;
+            background: #f0f7ff;
+            border-radius: 14px;
+            border-left: 5px solid #1a4b8a;
+        }
+        .means-summary h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0b2b5c;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .means-summary table {
+            font-size: 0.8rem;
+            min-width: 500px;
+            background: transparent;
+        }
+        .means-summary table th {
+            background: #dce7f5;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #0b2b5c;
+        }
+        .means-summary table td,
+        .means-summary table th {
+            padding: 6px 12px;
+            border: 1px solid #d0dae8;
+        }
+        .means-summary table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .means-summary table tbody tr:hover {
+            background: #edf3f9;
+        }
+        .means-summary .mean-value {
+            font-weight: 600;
+        }
+        .means-summary .mean-value.good {
+            color: #27ae60;
+        }
+        .means-summary .mean-value.average {
+            color: #f39c12;
+        }
+        .means-summary .mean-value.poor {
+            color: #e74c3c;
+        }
+        .means-summary .no-data {
+            color: #6c7a89;
+            font-style: italic;
+        }
+
+        /* ---- Exam History Means Table (updated) ---- */
+        .exam-history-means {
+            margin: 8px 0;
+        }
+        .exam-history-means table {
+            font-size: 0.8rem;
+            min-width: 500px;
+        }
+        .exam-history-means table th {
+            background: #dce7f5;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #0b2b5c;
+        }
+        .exam-history-means table td,
+        .exam-history-means table th {
+            padding: 6px 12px;
+            border: 1px solid #d0dae8;
+        }
+        .exam-history-means table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .exam-history-means table tbody tr:hover {
+            background: #edf3f9;
+        }
+        .exam-history-means .mean-value {
+            font-weight: 600;
+        }
+        .exam-history-means .mean-value.good {
+            color: #27ae60;
+        }
+        .exam-history-means .mean-value.average {
+            color: #f39c12;
+        }
+        .exam-history-means .mean-value.poor {
+            color: #e74c3c;
+        }
+        .exam-history-means .no-data {
+            color: #6c7a89;
+            font-style: italic;
+        }
+        .exam-history-means .section-title {
+            font-weight: 700;
+            color: #0b2b5c;
+            margin: 12px 0 6px 0;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -3812,6 +3918,11 @@
                 </div>
                 <div id="examTermAssessmentSelector"></div>
                 <div id="examRecordsContent"></div>
+                <!-- ===== NEW: Means Summary Table (T1, T2, Exam, Mean) ===== -->
+                <div id="examMeansSummary" class="means-summary" style="display:none;">
+                    <h4>📊 Score Summary (T1, T2, Exam, Mean)</h4>
+                    <div id="examMeansTableContainer"></div>
+                </div>
                 <button id="saveExamRecordsBtn" class="refresh-btn">Save Exam Records</button>
                 <div id="examMessage"></div>
             </div>
@@ -5447,7 +5558,6 @@
         // ==================================================================
 
         // Initialize EmailJS with your public key
-        // Replace with your actual EmailJS public key
         const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';
         const EMAILJS_SERVICE_ID = 'service_edusl';
         const EMAILJS_TEMPLATE_ID = 'template_edusl_notification';
@@ -5512,10 +5622,8 @@
                 return;
             }
 
-            // Check if EmailJS is configured
             if (EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY') {
                 console.warn('📧 EmailJS not configured. Notification not sent.');
-                // Store in Firestore as a fallback
                 try {
                     const tenantId = getCurrentTenantId();
                     await db.collection('email_logs').add({
@@ -5544,7 +5652,6 @@
                 const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
                 console.log('📧 Email sent successfully:', result.text);
 
-                // Log successful email
                 try {
                     const tenantId = getCurrentTenantId();
                     await db.collection('email_logs').add({
@@ -5560,7 +5667,6 @@
                 return result;
             } catch (error) {
                 console.error('📧 Email send error:', error);
-                // Log failed email
                 try {
                     const tenantId = getCurrentTenantId();
                     await db.collection('email_logs').add({
@@ -5579,225 +5685,88 @@
 
         // ----- Notification helper functions -----
 
-        // Attendance alert
         async function notifyAttendance(studentName, studentId, status, date, remark) {
             if (!notifSettings.attendance) return;
             const subject = `📊 Attendance Alert: ${studentName} (${studentId})`;
-            const message = `Dear Admin,
-
-        This is to inform you that student ${studentName} (ID: ${studentId}) was marked as "${status.toUpperCase()}" on ${date}.
-
-        Remark: ${remark || 'None'}
-
-        Please review this attendance record.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nThis is to inform you that student ${studentName} (ID: ${studentId}) was marked as "${status.toUpperCase()}" on ${date}.\n\nRemark: ${remark || 'None'}\n\nPlease review this attendance record.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Fee payment notification
         async function notifyFeePayment(studentName, studentId, amount, term, note) {
             if (!notifSettings.fees) return;
             const subject = `💰 Fee Payment: ${studentName} (${studentId})`;
-            const message = `Dear Admin,
-
-        A fee payment has been recorded for:
-
-        Student: ${studentName} (ID: ${studentId})
-        Amount: Le ${amount.toLocaleString()}
-        Term: ${term}
-        Note: ${note || 'None'}
-
-        Please verify this transaction.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA fee payment has been recorded for:\n\nStudent: ${studentName} (ID: ${studentId})\nAmount: Le ${amount.toLocaleString()}\nTerm: ${term}\nNote: ${note || 'None'}\n\nPlease verify this transaction.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Exam submission notification
         async function notifyExamSubmission(studentName, studentId, examType, score) {
             if (!notifSettings.exams) return;
             const subject = `📝 Exam Submission: ${studentName} (${studentId})`;
-            const message = `Dear Admin,
-
-        A student has submitted an exam:
-
-        Student: ${studentName} (ID: ${studentId})
-        Exam Type: ${examType}
-        Score: ${score}%
-
-        Please review the submission.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA student has submitted an exam:\n\nStudent: ${studentName} (ID: ${studentId})\nExam Type: ${examType}\nScore: ${score}%\n\nPlease review the submission.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Staff payment notification
         async function notifyStaffPayment(staffName, staffId, amount, month, note) {
             if (!notifSettings.staff) return;
             const subject = `💰 Staff Payment: ${staffName} (${staffId})`;
-            const message = `Dear Admin,
-
-        A staff payment has been recorded:
-
-        Staff: ${staffName} (ID: ${staffId})
-        Amount: Le ${amount.toLocaleString()}
-        Month: ${month}
-        Note: ${note || 'None'}
-
-        Please verify this transaction.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA staff payment has been recorded:\n\nStaff: ${staffName} (ID: ${staffId})\nAmount: Le ${amount.toLocaleString()}\nMonth: ${month}\nNote: ${note || 'None'}\n\nPlease verify this transaction.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Admission request notification
         async function notifyAdmissionRequest(studentName, schoolName, classApplying, parentPhone) {
             if (!notifSettings.admissions) return;
             const subject = `📋 New Admission Request: ${studentName}`;
-            const message = `Dear Admin,
-
-        A new admission request has been submitted:
-
-        Student: ${studentName}
-        School: ${schoolName}
-        Class: ${classApplying}
-        Parent Phone: ${parentPhone}
-
-        Please review this request.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA new admission request has been submitted:\n\nStudent: ${studentName}\nSchool: ${schoolName}\nClass: ${classApplying}\nParent Phone: ${parentPhone}\n\nPlease review this request.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Suggestion notification
         async function notifySuggestion(userName, suggestionText, hasVoice) {
             if (!notifSettings.suggestions) return;
             const subject = `💡 New Suggestion from ${userName || 'Anonymous'}`;
-            const message = `Dear Admin,
-
-        A new suggestion has been submitted:
-
-        From: ${userName || 'Anonymous'}
-        ${hasVoice ? 'Contains a voice note. Please listen to it.' : ''}
-
-        Suggestion:
-        ${suggestionText || '(Text not provided)'}
-
-        Please review and respond.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA new suggestion has been submitted:\n\nFrom: ${userName || 'Anonymous'}\n${hasVoice ? 'Contains a voice note. Please listen to it.' : ''}\n\nSuggestion:\n${suggestionText || '(Text not provided)'}\n\nPlease review and respond.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Registration request notification
         async function notifyRegistrationRequest(schoolName, adminName, email, phone) {
             const subject = `📋 School Registration Request: ${schoolName}`;
-            const message = `Dear Admin,
-
-        A new school registration request has been submitted:
-
-        School: ${schoolName}
-        Admin: ${adminName}
-        Email: ${email}
-        Phone: ${phone}
-
-        Please review this request.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA new school registration request has been submitted:\n\nSchool: ${schoolName}\nAdmin: ${adminName}\nEmail: ${email}\nPhone: ${phone}\n\nPlease review this request.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Quiz submission notification
         async function notifyQuizSubmission(userName, quizTitle, score) {
             if (!notifSettings.exams) return;
             const subject = `📝 Quiz Submission: ${userName}`;
-            const message = `Dear Admin,
-
-        A quiz has been submitted:
-
-        User: ${userName}
-        Quiz: ${quizTitle}
-        Score: ${score}%
-
-        Please review the submission.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA quiz has been submitted:\n\nUser: ${userName}\nQuiz: ${quizTitle}\nScore: ${score}%\n\nPlease review the submission.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Assignment submission notification
         async function notifyAssignmentSubmission(userName, assignmentTitle) {
             if (!notifSettings.exams) return;
             const subject = `📄 Assignment Submission: ${userName}`;
-            const message = `Dear Admin,
-
-        An assignment has been submitted:
-
-        User: ${userName}
-        Assignment: ${assignmentTitle}
-
-        Please review the submission.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nAn assignment has been submitted:\n\nUser: ${userName}\nAssignment: ${assignmentTitle}\n\nPlease review the submission.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Login alert for suspicious activity
         async function notifyLoginAlert(email, role, ip) {
             const subject = `🔐 Login Alert: ${email}`;
-            const message = `Dear Admin,
-
-        A user has logged into the system:
-
-        Email: ${email}
-        Role: ${role}
-        Time: ${new Date().toLocaleString()}
-        User Agent: ${navigator.userAgent}
-
-        If this was not you or an authorized user, please take action immediately.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA user has logged into the system:\n\nEmail: ${email}\nRole: ${role}\nTime: ${new Date().toLocaleString()}\nUser Agent: ${navigator.userAgent}\n\nIf this was not you or an authorized user, please take action immediately.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
-        // Document upload notification
         async function notifyDocumentUpload(studentName, studentId, fileName, uploadedBy) {
             const subject = `📄 Document Uploaded: ${studentName} (${studentId})`;
-            const message = `Dear Admin,
-
-        A document has been uploaded:
-
-        Student: ${studentName} (ID: ${studentId})
-        File: ${fileName}
-        Uploaded by: ${uploadedBy}
-        Time: ${new Date().toLocaleString()}
-
-        Please review the document.
-
-        ---
-        This is an automated notification from EduSL School Management System.
-        `;
+            const message =
+                `Dear Admin,\n\nA document has been uploaded:\n\nStudent: ${studentName} (ID: ${studentId})\nFile: ${fileName}\nUploaded by: ${uploadedBy}\nTime: ${new Date().toLocaleString()}\n\nPlease review the document.\n\n---\nThis is an automated notification from EduSL School Management System.`;
             await sendEmailNotification(subject, message);
         }
 
@@ -5823,7 +5792,6 @@
                 });
             });
 
-            // Also support dynamically added password fields
             const observer = new MutationObserver(function() {
                 document.querySelectorAll('.password-toggle:not([data-initialized])').forEach(btn => {
                     btn.setAttribute('data-initialized', 'true');
@@ -5860,7 +5828,6 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // ===== ADD 'Others' TO ALL_CLASSES =====
         const ALL_CLASSES = [
             'Pre-Nursery',
             'Nursery1', 'Nursery2', 'Nursery3',
@@ -5908,7 +5875,6 @@
 
         let currentEntranceExamTaking = null;
 
-        // ===== STAFF FILTER STATE =====
         let allStaffRecords = [];
         let staffFilteredRecords = [];
         let staffFilterState = {
@@ -5918,7 +5884,6 @@
             status: 'all'
         };
 
-        // ===== SCHOOL SETTINGS STATE =====
         let schoolSettings = {
             schoolName: '',
             schoolTagline: '',
@@ -5951,7 +5916,9 @@
         // ===== LIBRARY DATA =====
         const libraryData = {
             'Nursery1': {
-                books: ['My First ABC', 'Number Fun 1', 'Shapes and Colors', 'Early Science: My Body', 'Social Studies: My Family'],
+                books: ['My First ABC', 'Number Fun 1', 'Shapes and Colors', 'Early Science: My Body',
+                    'Social Studies: My Family'
+                ],
                 syllabus: 'Early childhood basics: letters, numbers, shapes, colors, social skills.',
                 videos: [
                     { title: 'ABC Song', url: 'https://www.youtube.com/watch?v=75p-N9YKqNo' },
@@ -5960,7 +5927,9 @@
                 ]
             },
             'Nursery2': {
-                books: ['Phonics Fun', 'Counting with Animals', 'My World', 'Science: Plants', 'Social Studies: Community Helpers'],
+                books: ['Phonics Fun', 'Counting with Animals', 'My World', 'Science: Plants',
+                    'Social Studies: Community Helpers'
+                ],
                 syllabus: 'Phonics, counting to 50, basic addition, environmental awareness.',
                 videos: [
                     { title: 'Phonics Song', url: 'https://www.youtube.com/watch?v=BELlZKpi1Zs' },
@@ -5969,7 +5938,9 @@
                 ]
             },
             'Nursery3': {
-                books: ['Reading Readiness', 'Math Magic 3', 'Science for Kids', 'Social Studies: Our World', 'ICT Basics'],
+                books: ['Reading Readiness', 'Math Magic 3', 'Science for Kids', 'Social Studies: Our World',
+                    'ICT Basics'
+                ],
                 syllabus: 'Pre-reading skills, counting to 100, simple addition/subtraction, basic science.',
                 videos: [
                     { title: 'Reading CVC Words', url: 'https://www.youtube.com/watch?v=5D0T7W2zX9I' },
@@ -5978,7 +5949,9 @@
                 ]
             },
             'Class1': {
-                books: ['English Grade 1', 'Mathematics Grade 1', 'Science Grade 1', 'Social Studies Grade 1', 'ICT Grade 1'],
+                books: ['English Grade 1', 'Mathematics Grade 1', 'Science Grade 1', 'Social Studies Grade 1',
+                    'ICT Grade 1'
+                ],
                 syllabus: 'Literacy, numeracy, basic science, social studies, arts and crafts.',
                 videos: [
                     { title: 'English Grammar 1', url: 'https://www.youtube.com/watch?v=Yb6P9jT2s0Y' },
@@ -5987,7 +5960,9 @@
                 ]
             },
             'Class2': {
-                books: ['English Grade 2', 'Mathematics Grade 2', 'Science Grade 2', 'Social Studies Grade 2', 'ICT Grade 2'],
+                books: ['English Grade 2', 'Mathematics Grade 2', 'Science Grade 2', 'Social Studies Grade 2',
+                    'ICT Grade 2'
+                ],
                 syllabus: 'Reading comprehension, multiplication basics, life sciences, community studies.',
                 videos: [
                     { title: 'Reading Comprehension', url: 'https://www.youtube.com/watch?v=4i3M7sPcL4o' },
@@ -5996,7 +5971,9 @@
                 ]
             },
             'Class3': {
-                books: ['English Grade 3', 'Mathematics Grade 3', 'Science Grade 3', 'Social Studies Grade 3', 'ICT Grade 3'],
+                books: ['English Grade 3', 'Mathematics Grade 3', 'Science Grade 3', 'Social Studies Grade 3',
+                    'ICT Grade 3'
+                ],
                 syllabus: 'Grammar, division, simple fractions, ecosystems, local history.',
                 videos: [
                     { title: 'Division Basics', url: 'https://www.youtube.com/watch?v=2C8cBvB4L2k' },
@@ -6005,7 +5982,9 @@
                 ]
             },
             'Class4': {
-                books: ['English Grade 4', 'Mathematics Grade 4', 'Science Grade 4', 'Social Studies Grade 4', 'ICT Grade 4'],
+                books: ['English Grade 4', 'Mathematics Grade 4', 'Science Grade 4', 'Social Studies Grade 4',
+                    'ICT Grade 4'
+                ],
                 syllabus: 'Writing skills, decimals, geometry, human body, geography.',
                 videos: [
                     { title: 'Writing Paragraphs', url: 'https://www.youtube.com/watch?v=9y5WgQlQHqE' },
@@ -6014,7 +5993,9 @@
                 ]
             },
             'Class5': {
-                books: ['English Grade 5', 'Mathematics Grade 5', 'Science Grade 5', 'Social Studies Grade 5', 'ICT Grade 5'],
+                books: ['English Grade 5', 'Mathematics Grade 5', 'Science Grade 5', 'Social Studies Grade 5',
+                    'ICT Grade 5'
+                ],
                 syllabus: 'Essay writing, percentages, basic algebra, physics intro, world geography.',
                 videos: [
                     { title: 'Essay Writing Tips', url: 'https://www.youtube.com/watch?v=4DnN4VxqSbI' },
@@ -6023,7 +6004,9 @@
                 ]
             },
             'Class6': {
-                books: ['English Grade 6', 'Mathematics Grade 6', 'Science Grade 6', 'Social Studies Grade 6', 'ICT Grade 6'],
+                books: ['English Grade 6', 'Mathematics Grade 6', 'Science Grade 6', 'Social Studies Grade 6',
+                    'ICT Grade 6'
+                ],
                 syllabus: 'Advanced grammar, ratios, chemistry basics, history of Sierra Leone.',
                 videos: [
                     { title: 'Ratios and Proportions', url: 'https://www.youtube.com/watch?v=7PqXZ4Tk1Uo' },
@@ -6032,7 +6015,9 @@
                 ]
             },
             'JSS1': {
-                books: ['English JSS1', 'Mathematics JSS1', 'Basic Science JSS1', 'Social Studies JSS1', 'ICT JSS1'],
+                books: ['English JSS1', 'Mathematics JSS1', 'Basic Science JSS1', 'Social Studies JSS1',
+                    'ICT JSS1'
+                ],
                 syllabus: 'Junior secondary core subjects: English, Math, Science, Social Studies, ICT.',
                 videos: [
                     { title: 'English Grammar JSS1', url: 'https://www.youtube.com/watch?v=ZzPJg3i4kfU' },
@@ -6042,7 +6027,9 @@
                 ]
             },
             'JSS2': {
-                books: ['English JSS2', 'Mathematics JSS2', 'Basic Science JSS2', 'Social Studies JSS2', 'ICT JSS2'],
+                books: ['English JSS2', 'Mathematics JSS2', 'Basic Science JSS2', 'Social Studies JSS2',
+                    'ICT JSS2'
+                ],
                 syllabus: 'Deepening core subjects, introduction to business studies, civic education.',
                 videos: [
                     { title: 'Linear Equations', url: 'https://www.youtube.com/watch?v=U8L6bHQ9zGk' },
@@ -6051,7 +6038,9 @@
                 ]
             },
             'JSS3': {
-                books: ['English JSS3', 'Mathematics JSS3', 'Basic Science JSS3', 'Social Studies JSS3', 'ICT JSS3'],
+                books: ['English JSS3', 'Mathematics JSS3', 'Basic Science JSS3', 'Social Studies JSS3',
+                    'ICT JSS3'
+                ],
                 syllabus: 'Preparation for BECE: all core subjects with exam-focused practice.',
                 videos: [
                     { title: 'BECE English Preparation', url: 'https://www.youtube.com/watch?v=Q6Ck5u6c2H8' },
@@ -6060,7 +6049,9 @@
                 ]
             },
             'SSS1': {
-                books: ['English SSS1', 'Mathematics SSS1', 'Physics SSS1', 'Chemistry SSS1', 'Biology SSS1', 'ICT SSS1'],
+                books: ['English SSS1', 'Mathematics SSS1', 'Physics SSS1', 'Chemistry SSS1', 'Biology SSS1',
+                    'ICT SSS1'
+                ],
                 syllabus: 'Senior secondary core: English, Math, Physics, Chemistry, Biology, ICT.',
                 videos: [
                     { title: 'Physics: Motion', url: 'https://www.youtube.com/watch?v=3Jg7QQXzVdE' },
@@ -6070,7 +6061,9 @@
                 ]
             },
             'SSS2': {
-                books: ['English SSS2', 'Mathematics SSS2', 'Physics SSS2', 'Chemistry SSS2', 'Biology SSS2', 'ICT SSS2'],
+                books: ['English SSS2', 'Mathematics SSS2', 'Physics SSS2', 'Chemistry SSS2', 'Biology SSS2',
+                    'ICT SSS2'
+                ],
                 syllabus: 'Advanced topics in all core subjects with practical applications.',
                 videos: [
                     { title: 'Physics: Waves', url: 'https://www.youtube.com/watch?v=5i7h7n2Q3bE' },
@@ -6080,7 +6073,9 @@
                 ]
             },
             'SSS3': {
-                books: ['English SSS3', 'Mathematics SSS3', 'Physics SSS3', 'Chemistry SSS3', 'Biology SSS3', 'ICT SSS3'],
+                books: ['English SSS3', 'Mathematics SSS3', 'Physics SSS3', 'Chemistry SSS3', 'Biology SSS3',
+                    'ICT SSS3'
+                ],
                 syllabus: 'WASSCE preparation: comprehensive revision, past questions, exam strategies.',
                 videos: [
                     { title: 'WASSCE English Revision', url: 'https://www.youtube.com/watch?v=Q6Ck5u6c2H8' },
@@ -6335,7 +6330,6 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     userAgent: navigator.userAgent
                 });
-                // Send email notification for login (only for admin login)
                 if (userData.role === 'admin' || userData.role === 'bursar') {
                     await notifyLoginAlert(user.email, userData.role, navigator.userAgent);
                 }
@@ -6740,7 +6734,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Send email notification
                 await notifyAdmissionRequest(studentName, schoolName, classApplying, parentPhone);
 
                 showMessage('✅ Admission request submitted successfully! The school will contact you soon.', 'success',
@@ -6887,7 +6880,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Send email notification
                 await notifyRegistrationRequest(schoolName, adminName, email, phone);
 
                 showMessage('✅ Registration request submitted successfully! We will review and contact you shortly.',
@@ -7388,7 +7380,6 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
 
-            // Send email notification for absent/late
             if (status === 'absent' || status === 'late') {
                 try {
                     const studentDoc = await db.collection('students').doc(sid).get();
@@ -8056,7 +8047,6 @@
                                 name: parentName || 'Parent', studentId: id, tenantId: tenantId });
                             showMessage('Student added. Parent account created for ' + parentEmail, 'success',
                                 'manualMessage');
-                            // Send email notification to parent
                             await sendEmailNotification(
                                 `Welcome to EduSL - ${schoolSettings.schoolName || 'School'}`,
                                 `Dear ${parentName || 'Parent'},\n\nYour child ${name} (ID: ${id}) has been registered at ${schoolSettings.schoolName || 'our school'}.\n\nYou can log in to the EduSL system using:\nEmail: ${parentEmail}\nTemporary Password: ${tempPassword}\n\nPlease change your password after your first login.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
@@ -8177,8 +8167,9 @@
         }
 
         // ==================================================================
-        //  EXAM RECORDS
+        //  EXAM RECORDS (with T1, T2, Exam, Mean display)
         // ==================================================================
+
         async function loadExamStudent() {
             try {
                 const q = document.getElementById('examStudentSearch').value.trim();
@@ -8196,6 +8187,7 @@
                         showMessage('Student not found.', 'error', 'examMessage');
                         document.getElementById('examStudentInfo').innerHTML = '';
                         document.getElementById('examRecordsContent').innerHTML = '';
+                        document.getElementById('examMeansSummary').style.display = 'none';
                         return;
                     }
                     if (matches.length > 1) {
@@ -8226,6 +8218,143 @@
             }
         }
 
+        // ----- NEW: Render summary table with T1, T2, Exam, Mean -----
+        function renderExamMeans(year, level, term, assessment, subjectsData) {
+            const container = document.getElementById('examMeansTableContainer');
+            const summaryDiv = document.getElementById('examMeansSummary');
+
+            if (!subjectsData || subjectsData.length === 0) {
+                summaryDiv.style.display = 'none';
+                return;
+            }
+
+            // Get data for all three assessments
+            getExamDataForMeans(year, level, term).then(data => {
+                if (!data || Object.keys(data).length === 0) {
+                    summaryDiv.style.display = 'none';
+                    return;
+                }
+
+                // Build the means table with T1, T2, Exam, Mean
+                const subjects = new Set();
+                for (const ass of ['test1', 'test2', 'exam']) {
+                    if (data[ass]) {
+                        data[ass].forEach(sub => {
+                            if (sub.name) subjects.add(sub.name);
+                        });
+                    }
+                }
+
+                if (subjects.size === 0) {
+                    summaryDiv.style.display = 'none';
+                    return;
+                }
+
+                let html = `<div class="table-wrapper"><table>
+                    <thead><tr>
+                        <th>Subject</th>
+                        <th>T1</th>
+                        <th>T2</th>
+                        <th>Exam</th>
+                        <th>Mean</th>
+                    </tr></thead><tbody>`;
+
+                const subjectNames = Array.from(subjects);
+                for (const sub of subjectNames) {
+                    const t1 = data.test1?.find(s => s.name === sub)?.score;
+                    const t2 = data.test2?.find(s => s.name === sub)?.score;
+                    const exam = data.exam?.find(s => s.name === sub)?.score;
+
+                    const t1Val = (t1 !== undefined && t1 !== '' && !isNaN(parseFloat(t1))) ? parseFloat(t1) : null;
+                    const t2Val = (t2 !== undefined && t2 !== '' && !isNaN(parseFloat(t2))) ? parseFloat(t2) : null;
+                    const examVal = (exam !== undefined && exam !== '' && !isNaN(parseFloat(exam))) ? parseFloat(exam) :
+                    null;
+
+                    // Mean = average of T1, T2, Exam (if all three exist)
+                    let mean = null;
+                    if (t1Val !== null && t2Val !== null && examVal !== null) {
+                        mean = (t1Val + t2Val + examVal) / 3;
+                    } else if (t1Val !== null && t2Val !== null) {
+                        mean = (t1Val + t2Val) / 2;
+                    } else if (t1Val !== null) {
+                        mean = t1Val;
+                    } // else null
+
+                    const t1Display = (t1Val !== null) ? t1Val.toFixed(1) : '—';
+                    const t2Display = (t2Val !== null) ? t2Val.toFixed(1) : '—';
+                    const examDisplay = (examVal !== null) ? examVal.toFixed(1) : '—';
+                    const meanDisplay = (mean !== null) ? mean.toFixed(1) : '—';
+
+                    const getClass = (val) => {
+                        if (val === null) return '';
+                        if (val >= 80) return 'good';
+                        if (val >= 50) return 'average';
+                        return 'poor';
+                    };
+
+                    html += `<tr>
+                        <td><strong>${escapeHtml(sub)}</strong></td>
+                        <td class="mean-value ${getClass(t1Val)}">${t1Display}</td>
+                        <td class="mean-value ${getClass(t2Val)}">${t2Display}</td>
+                        <td class="mean-value ${getClass(examVal)}">${examDisplay}</td>
+                        <td class="mean-value ${getClass(mean)}">${meanDisplay}</td>
+                    </tr>`;
+                }
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+                summaryDiv.style.display = 'block';
+            }).catch(err => {
+                console.warn('Error getting exam data for means:', err);
+                summaryDiv.style.display = 'none';
+            });
+        }
+
+        // Helper to get exam data for all assessments for a given year, level, term
+        async function getExamDataForMeans(year, level, term) {
+            if (!examCurrentStudent) return null;
+
+            const tenantId = getCurrentTenantId();
+            const examDoc = await db.collection('exam_records').where('tenantId', '==', tenantId).where(
+                'studentId', '==', examCurrentStudent.id).get();
+
+            let records = {};
+            examDoc.forEach(d => { records = d.data(); });
+
+            const years = records.years || {};
+            const yearData = years[year] || {};
+            const levelData = yearData[level] || {};
+            const termData = levelData[term] || {};
+
+            const result = {};
+            for (const ass of ['test1', 'test2', 'exam']) {
+                if (termData[ass]) {
+                    result[ass] = termData[ass];
+                } else {
+                    result[ass] = [];
+                }
+            }
+
+            // Also check if we have data in the DOM for the active assessment
+            const activeAssessment = currentAssessment;
+            const rows = document.querySelectorAll('#examSubjectsContainer .subject-row');
+            const domSubjects = [];
+            rows.forEach(row => {
+                const name = row.querySelector('.subject-name').value.trim();
+                const score = row.querySelector('.subject-score').value;
+                if (name) {
+                    domSubjects.push({ name, score: score ? parseFloat(score) : '' });
+                }
+            });
+
+            if (domSubjects.length > 0) {
+                result[activeAssessment] = domSubjects;
+            }
+
+            return result;
+        }
+
+        // ----- Modified loadExamUIForStudent with means -----
         async function loadExamUIForStudent() {
             try {
                 if (!examCurrentStudent) return;
@@ -8266,9 +8395,58 @@
                 const subjectsData = termData[currentAssessment] || [];
                 document.getElementById('examRecordsContent').innerHTML = buildSubjectInputs(subjectsData);
                 attachExamRemoveEvents();
+
+                // ---- Render means summary with T1, T2, Exam, Mean ----
+                const allData = await getExamDataForMeans(year, currentExamLevel, currentTerm);
+                if (allData && Object.keys(allData).length > 0) {
+                    renderExamMeans(year, currentExamLevel, currentTerm, currentAssessment, subjectsData);
+                } else {
+                    document.getElementById('examMeansSummary').style.display = 'none';
+                }
+
+                // Add event listeners to subject inputs to update means on change
+                document.querySelectorAll('#examSubjectsContainer .subject-name, #examSubjectsContainer .subject-score')
+                    .forEach(el => {
+                        el.addEventListener('change', function() {
+                            const year2 = document.getElementById('examYearInput').value.trim() || new Date()
+                                .getFullYear();
+                            const activeTermBtn2 = document.querySelector('#examTermButtons .term-btn.active');
+                            const activeLevelBtn2 = document.querySelector('#examLevelButtons .exam-level-btn.active');
+                            const term2 = activeTermBtn2 ? activeTermBtn2.dataset.term : currentTerm;
+                            const level2 = activeLevelBtn2 ? activeLevelBtn2.dataset.examLevel :
+                            currentExamLevel;
+                            getExamDataForMeans(year2, level2, term2).then(data => {
+                                if (data && Object.keys(data).length > 0) {
+                                    renderExamMeans(year2, level2, term2, currentAssessment, []);
+                                }
+                            });
+                        });
+                    });
+
+                // Also update when assessment buttons change
+                document.querySelectorAll('#examTermAssessmentSelector .assessment-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        setTimeout(() => {
+                            const year2 = document.getElementById('examYearInput').value.trim() ||
+                                new Date().getFullYear();
+                            const activeTermBtn2 = document.querySelector('#examTermButtons .term-btn.active');
+                            const activeLevelBtn2 = document.querySelector('#examLevelButtons .exam-level-btn.active');
+                            const term2 = activeTermBtn2 ? activeTermBtn2.dataset.term : currentTerm;
+                            const level2 = activeLevelBtn2 ? activeLevelBtn2.dataset.examLevel :
+                                currentExamLevel;
+                            getExamDataForMeans(year2, level2, term2).then(data => {
+                                if (data && Object.keys(data).length > 0) {
+                                    renderExamMeans(year2, level2, term2, currentAssessment, []);
+                                }
+                            });
+                        }, 100);
+                    });
+                });
+
             } catch (error) {
                 document.getElementById('examRecordsContent').innerHTML = '<div class="error">Error loading exam data: ' +
                     escapeHtml(error.message) + '</div>';
+                document.getElementById('examMeansSummary').style.display = 'none';
             }
         }
 
@@ -8327,6 +8505,17 @@
                             const remBtn = allRows[r].querySelector('.remove-exam-subject-btn');
                             if (remBtn) remBtn.setAttribute('data-index', r);
                         }
+                        // Update means
+                        const year2 = document.getElementById('examYearInput').value.trim() || new Date().getFullYear();
+                        const activeTermBtn2 = document.querySelector('#examTermButtons .term-btn.active');
+                        const activeLevelBtn2 = document.querySelector('#examLevelButtons .exam-level-btn.active');
+                        const term2 = activeTermBtn2 ? activeTermBtn2.dataset.term : currentTerm;
+                        const level2 = activeLevelBtn2 ? activeLevelBtn2.dataset.examLevel : currentExamLevel;
+                        getExamDataForMeans(year2, level2, term2).then(data => {
+                            if (data && Object.keys(data).length > 0) {
+                                renderExamMeans(year2, level2, term2, currentAssessment, []);
+                            }
+                        });
                     } else { alert('At least one subject required.'); }
                 };
             });
@@ -8342,6 +8531,20 @@
                         `<input type="text" class="subject-name" placeholder="Subject name"><input type="number" class="subject-score" placeholder="Score" step="0.01" style="width:70px;"><button class="remove-exam-subject-btn" data-index="${newIndex}" style="background:#fde8e8; color:#b71c1c;">Remove</button>`;
                     container.appendChild(newDiv);
                     attachExamRemoveEvents();
+                    // Update means after adding
+                    setTimeout(() => {
+                        const year2 = document.getElementById('examYearInput').value.trim() || new Date()
+                            .getFullYear();
+                        const activeTermBtn2 = document.querySelector('#examTermButtons .term-btn.active');
+                        const activeLevelBtn2 = document.querySelector('#examLevelButtons .exam-level-btn.active');
+                        const term2 = activeTermBtn2 ? activeTermBtn2.dataset.term : currentTerm;
+                        const level2 = activeLevelBtn2 ? activeLevelBtn2.dataset.examLevel : currentExamLevel;
+                        getExamDataForMeans(year2, level2, term2).then(data => {
+                            if (data && Object.keys(data).length > 0) {
+                                renderExamMeans(year2, level2, term2, currentAssessment, []);
+                            }
+                        });
+                    }, 50);
                 };
             }
         }
@@ -8377,15 +8580,24 @@
                 showMessage('Exam records saved for ' + currentTerm + '!', 'success', 'examMessage');
                 if (document.getElementById('dashboardModule').style.display !== 'none') loadDashboard();
 
-                // Send email notification
                 await notifyExamSubmission(examCurrentStudent.name, examCurrentStudent.id, `${currentExamLevel} ${currentTerm} ${currentAssessment}`, 'Saved');
+
+                // Update means after save
+                setTimeout(() => {
+                    getExamDataForMeans(year, currentExamLevel, currentTerm).then(data => {
+                        if (data && Object.keys(data).length > 0) {
+                            renderExamMeans(year, currentExamLevel, currentTerm, currentAssessment, subjects);
+                        }
+                    });
+                }, 300);
+
             } catch (error) {
                 showMessage('Error saving exam records: ' + error.message, 'error', 'examMessage');
             }
         }
 
         // ==================================================================
-        //  EXAM HISTORY
+        //  EXAM HISTORY (updated with T1, T2, Exam, Mean columns)
         // ==================================================================
         async function loadExamHistory() {
             if (!currentStudentDoc) {
@@ -8408,27 +8620,31 @@
 
             const yearFilter = document.getElementById('examHistoryYear').value.trim();
 
-            let allRows = [];
+            // Group data by year, level, term, and subject
+            const groupedData = {};
             const years = records.years || {};
-            for (const year of Object.keys(years)) {
-                if (yearFilter && year !== yearFilter) continue;
+
+            // Collect all years that match filter
+            const yearKeys = Object.keys(years).filter(y => !yearFilter || y === yearFilter);
+
+            for (const year of yearKeys) {
                 const yearData = years[year];
                 for (const level of Object.keys(yearData)) {
                     const levelData = yearData[level];
                     for (const term of Object.keys(levelData)) {
                         const termData = levelData[term];
+                        const key = year + '|' + level + '|' + term;
+                        if (!groupedData[key]) {
+                            groupedData[key] = { year, level, term, subjects: {} };
+                        }
                         for (const assessment of Object.keys(termData)) {
                             const subjects = termData[assessment];
                             if (Array.isArray(subjects)) {
                                 subjects.forEach(sub => {
-                                    allRows.push({
-                                        year,
-                                        level,
-                                        term,
-                                        assessment,
-                                        subject: sub.name,
-                                        score: sub.score
-                                    });
+                                    if (!groupedData[key].subjects[sub.name]) {
+                                        groupedData[key].subjects[sub.name] = {};
+                                    }
+                                    groupedData[key].subjects[sub.name][assessment] = sub.score;
                                 });
                             }
                         }
@@ -8436,27 +8652,69 @@
                 }
             }
 
-            if (allRows.length === 0) {
+            const keys = Object.keys(groupedData).sort((a, b) => {
+                const [yearA, levelA, termA] = a.split('|');
+                const [yearB, levelB, termB] = b.split('|');
+                return yearB.localeCompare(yearA) || termA.localeCompare(termB);
+            });
+
+            if (keys.length === 0) {
                 document.getElementById('examHistoryContent').innerHTML =
                     '<p>No exam records found for the selected filters.</p>';
                 return;
             }
 
-            allRows.sort((a, b) => b.year - a.year);
+            let html = '<div class="exam-history-means">';
 
-            let html =
-                '<div class="table-wrapper"><table><thead><tr><th>Year</th><th>Level</th><th>Term</th><th>Assessment</th><th>Subject</th><th>Score</th></tr></thead><tbody>';
-            allRows.forEach(row => {
-                html += `<tr>
-                    <td>${escapeHtml(row.year)}</td>
-                    <td>${escapeHtml(row.level)}</td>
-                    <td>${escapeHtml(row.term)}</td>
-                    <td>${escapeHtml(row.assessment)}</td>
-                    <td>${escapeHtml(row.subject)}</td>
-                    <td>${escapeHtml(row.score)}</td>
-                </tr>`;
-            });
-            html += '</tbody></table></div>';
+            for (const key of keys) {
+                const data = groupedData[key];
+                const subjects = Object.keys(data.subjects).sort();
+
+                html += `<div class="section-title">📚 ${data.year} — ${data.level.toUpperCase()} — ${getTermLabel(data.term)}</div>`;
+                html +=
+                    '<div class="table-wrapper"><table><thead><tr><th>Subject</th><th>T1</th><th>T2</th><th>Exam</th><th>Mean</th></tr></thead><tbody>';
+
+                for (const sub of subjects) {
+                    const scores = data.subjects[sub];
+                    const t1 = scores.test1 !== undefined && scores.test1 !== '' ? parseFloat(scores.test1) : null;
+                    const t2 = scores.test2 !== undefined && scores.test2 !== '' ? parseFloat(scores.test2) : null;
+                    const exam = scores.exam !== undefined && scores.exam !== '' ? parseFloat(scores.exam) : null;
+
+                    // Mean = average of available scores
+                    let mean = null;
+                    if (t1 !== null && t2 !== null && exam !== null) {
+                        mean = (t1 + t2 + exam) / 3;
+                    } else if (t1 !== null && t2 !== null) {
+                        mean = (t1 + t2) / 2;
+                    } else if (t1 !== null) {
+                        mean = t1;
+                    }
+
+                    const t1Display = (t1 !== null) ? t1.toFixed(1) : '—';
+                    const t2Display = (t2 !== null) ? t2.toFixed(1) : '—';
+                    const examDisplay = (exam !== null) ? exam.toFixed(1) : '—';
+                    const meanDisplay = (mean !== null) ? mean.toFixed(1) : '—';
+
+                    const getClass = (val) => {
+                        if (val === null) return '';
+                        if (val >= 80) return 'good';
+                        if (val >= 50) return 'average';
+                        return 'poor';
+                    };
+
+                    html += `<tr>
+                        <td><strong>${escapeHtml(sub)}</strong></td>
+                        <td class="mean-value ${getClass(t1)}">${t1Display}</td>
+                        <td class="mean-value ${getClass(t2)}">${t2Display}</td>
+                        <td class="mean-value ${getClass(exam)}">${examDisplay}</td>
+                        <td class="mean-value ${getClass(mean)}">${meanDisplay}</td>
+                    </tr>`;
+                }
+
+                html += '</tbody></table></div>';
+            }
+
+            html += '</div>';
             document.getElementById('examHistoryContent').innerHTML = html;
         }
 
@@ -8992,35 +9250,54 @@
         }
 
         async function saveProfile() {
-            if (currentUserRole !== 'admin') { alert('Only admin can edit student profiles'); return; }
-            if (!currentStudentDoc) return;
+            if (currentUserRole !== 'admin') {
+                showMessage('Only admin can edit student profiles.', 'error', 'searchResults');
+                return;
+            }
+            if (!currentStudentDoc) {
+                showMessage('No student loaded.', 'error', 'searchResults');
+                return;
+            }
+
+            const tenantId = getCurrentTenantId();
+            if (currentStudentDoc.tenantId !== tenantId) {
+                showMessage('You do not have permission to edit this student.', 'error', 'searchResults');
+                return;
+            }
+
+            const updates = {
+                name: document.getElementById('editProfileName').value.trim(),
+                dob: document.getElementById('editProfileDob').value,
+                class: document.getElementById('editProfileClass').value,
+                department: document.getElementById('editProfileDepartment').value.trim(),
+                address: document.getElementById('editProfileAddress').value.trim(),
+                parentPhone: document.getElementById('editProfileParentPhone').value.trim(),
+                parentName: document.getElementById('editProfileParentName').value.trim(),
+                guardian: document.getElementById('editProfileGuardian').value.trim(),
+                parentEmail: document.getElementById('editProfileParentEmail').value.trim(),
+                gender: document.getElementById('editProfileGender').value,
+                tempPassword: document.getElementById('editProfileTempPassword').value,
+                status: document.getElementById('editProfileStatus').value,
+                tenantId: tenantId
+            };
+
             try {
-                const tenantId = getCurrentTenantId();
-                if (currentStudentDoc.tenantId !== tenantId) { alert('You do not have permission to edit this student.');
-                    return; }
-                const updates = {
-                    name: document.getElementById('editProfileName').value.trim(),
-                    dob: document.getElementById('editProfileDob').value,
-                    class: document.getElementById('editProfileClass').value,
-                    department: document.getElementById('editProfileDepartment').value.trim(),
-                    address: document.getElementById('editProfileAddress').value.trim(),
-                    parentPhone: document.getElementById('editProfileParentPhone').value.trim(),
-                    parentName: document.getElementById('editProfileParentName').value.trim(),
-                    guardian: document.getElementById('editProfileGuardian').value.trim(),
-                    parentEmail: document.getElementById('editProfileParentEmail').value.trim(),
-                    gender: document.getElementById('editProfileGender').value,
-                    tempPassword: document.getElementById('editProfileTempPassword').value,
-                    status: document.getElementById('editProfileStatus').value,
-                    tenantId: tenantId
-                };
-                await db.collection('students').doc(currentStudentDoc.id).update(updates);
+                // Check if the document exists before updating
+                const docRef = db.collection('students').doc(currentStudentDoc.id);
+                const doc = await docRef.get();
+                if (!doc.exists) {
+                    showMessage('Student document not found. It may have been deleted.', 'error', 'searchResults');
+                    return;
+                }
+                await docRef.update(updates);
                 closeModal('editProfileModal');
                 await loadStudents();
-                const refreshed = await db.collection('students').doc(currentStudentDoc.id).get();
+                const refreshed = await docRef.get();
                 currentStudentDoc = { docId: refreshed.id, ...refreshed.data() };
                 loadStudentProfile();
-                showMessage('Profile updated', 'success', 'searchResults');
+                showMessage('Profile updated successfully.', 'success', 'searchResults');
             } catch (error) {
+                console.error('Error saving profile:', error);
                 showMessage('Error saving profile: ' + error.message, 'error', 'searchResults');
             }
         }
@@ -9212,7 +9489,6 @@
             data[term].paid += amount;
             await docRef.set(data);
 
-            // --- NEW: Record income in finance module ---
             const user = auth.currentUser;
             const incomeData = {
                 amount: amount,
@@ -9228,7 +9504,6 @@
             };
             await db.collection('income').add(incomeData);
 
-            // Send email notification
             await notifyFeePayment(bursarCurrentStudent.name, bursarCurrentStudent.id, amount, getTermLabel(term), note);
 
             showMessage('Payment recorded for ' + getTermLabel(term) + ' (income logged)', 'success', 'bursarPaymentMessage');
@@ -10042,7 +10317,6 @@
                 return;
             }
 
-            // --- UNIQUENESS CHECK ---
             const existingUser = await db.collection('users')
                 .where('tenantId', '==', tenantId)
                 .where('idNumber', '==', idNumber)
@@ -10491,7 +10765,6 @@
             if (currentUserRole !== 'admin') return;
             const tenantId = getCurrentTenantId();
 
-            // Grab all fields
             const id = document.getElementById('staffId').value.trim();
             const name = document.getElementById('staffName').value.trim();
             const type = document.getElementById('staffType').value;
@@ -10500,7 +10773,6 @@
             const department = document.getElementById('staffDepartment').value.trim();
             const status = document.getElementById('staffStatus').value;
 
-            // NEW fields
             const qualification = document.getElementById('staffQualification').value.trim();
             const nin = document.getElementById('staffNIN').value.trim();
             const socialSecurity = document.getElementById('staffSocialSecurity').value.trim();
@@ -10512,7 +10784,6 @@
                 return;
             }
 
-            // Determine year and term from dateOfEntry
             let year = '';
             let term = '';
             if (dateOfEntry) {
@@ -10541,7 +10812,6 @@
 
             showMessage('Staff added successfully with all details.', 'success', 'staffMessage');
 
-            // Clear form
             document.getElementById('staffId').value = '';
             document.getElementById('staffName').value = '';
             document.getElementById('staffPhone').value = '';
@@ -10553,7 +10823,6 @@
             document.getElementById('staffDob').value = '';
             document.getElementById('staffDateOfEntry').value = '';
 
-            // Refresh list with filters applied
             applyStaffFiltersAndRender();
         }
 
@@ -10564,16 +10833,13 @@
             allStaffRecords = [];
             snap.forEach(d => {
                 const data = d.data();
-                // Ensure year/term are populated if dateOfEntry exists
                 if (data.dateOfEntry && !data.year) {
                     data.year = data.dateOfEntry.split('-')[0];
                     data.term = getTermFromDate(data.dateOfEntry);
                 }
                 allStaffRecords.push({ docId: d.id, ...data });
             });
-            // Populate year filter dropdown
             populateStaffYearFilter();
-            // Apply current filters and render
             applyStaffFiltersAndRender();
         }
 
@@ -10589,7 +10855,6 @@
             sorted.forEach(y => {
                 sel.innerHTML += `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
             });
-            // If current value not in list, reset to 'all'
             if (currentVal !== 'all' && !sorted.includes(currentVal)) {
                 sel.value = 'all';
                 staffFilterState.year = 'all';
@@ -10609,7 +10874,6 @@
 
             let filtered = allStaffRecords;
 
-            // Search
             if (search) {
                 filtered = filtered.filter(r =>
                     (r.name && r.name.toLowerCase().includes(search)) ||
@@ -10617,17 +10881,14 @@
                 );
             }
 
-            // Year filter
             if (year !== 'all') {
                 filtered = filtered.filter(r => r.year === year);
             }
 
-            // Term filter
             if (term !== 'all') {
                 filtered = filtered.filter(r => r.term === term);
             }
 
-            // Status filter
             if (status !== 'all') {
                 filtered = filtered.filter(r => (r.status || 'active') === status);
             }
@@ -10675,7 +10936,6 @@
             html += '</tbody></table></div>';
             container.innerHTML = html;
 
-            // Edit button handler
             container.querySelectorAll('.edit-staff-btn').forEach(btn => {
                 btn.onclick = function() {
                     const staffId = this.dataset.id;
@@ -10683,7 +10943,6 @@
                 };
             });
 
-            // Delete handlers
             container.querySelectorAll('.delete-staff').forEach(btn => {
                 btn.onclick = async function() {
                     if (confirm('Delete this staff member?')) {
@@ -10718,11 +10977,9 @@
                 applyStaffFiltersAndRender();
             };
             document.getElementById('staffApplyFiltersBtn').onclick = applyStaffFiltersAndRender;
-            // Also on enter key in search input
             document.getElementById('staffSearchInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') applyStaffFiltersAndRender();
             });
-            // When year/term/status change, we could auto-apply, but we let the user click Apply
         }
 
         // Legacy wrapper for loadStaffList (used elsewhere)
@@ -10789,7 +11046,6 @@
                 tenantId: tenantId
             };
 
-            // Recalculate year/term from dateOfEntry
             if (updates.dateOfEntry) {
                 updates.year = updates.dateOfEntry.split('-')[0];
                 updates.term = getTermFromDate(updates.dateOfEntry);
@@ -11526,7 +11782,6 @@
                 tenantId: tenantId
             });
 
-            // Send email notification
             await notifySuggestion(user ? user.displayName || user.email : 'Anonymous', text, !!voiceData);
 
             document.getElementById('suggestionText').value = '';
@@ -11615,7 +11870,6 @@
                             await db.collection('suggestions').doc(this.dataset.id).update({ status: 'resolved' });
                             loadSuggestions('suggestionsList');
                             loadSuggestions('mySuggestionsList');
-                            // Send email notification
                             const sugDoc = await db.collection('suggestions').doc(this.dataset.id).get();
                             if (sugDoc.exists) {
                                 const data = sugDoc.data();
@@ -11672,7 +11926,6 @@
             loadSuggestions('suggestionsList');
             loadSuggestions('mySuggestionsList');
 
-            // Send email notification
             const sugDoc = await db.collection('suggestions').doc(id).get();
             if (sugDoc.exists) {
                 const data = sugDoc.data();
@@ -11778,7 +12031,6 @@
                 };
                 const docRef = await db.collection('staff_payments').add(paymentData);
 
-                // --- NEW: Record as expense in finance module ---
                 const user = auth.currentUser;
                 const expenseData = {
                     amount: amount,
@@ -11794,7 +12046,6 @@
                 };
                 await db.collection('expenses').add(expenseData);
 
-                // Send email notification
                 await notifyStaffPayment(staffName, staffId, amount, month, note);
 
                 showMessage('Payment recorded successfully! (expense logged)', 'success', 'payrollModalMessage');
@@ -12161,7 +12412,6 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
 
-                    // Send email notification
                     await notifyDocumentUpload(
                         currentStudentDoc.name,
                         currentStudentDoc.id,
@@ -12378,8 +12628,7 @@
             try {
                 const tenantId = getCurrentTenantId();
                 for (const s of selected) {
-                    // Use docId for the Firestore document reference
-                    const docId = s.docId || s.id; // fallback to id if docId missing
+                    const docId = s.docId || s.id;
                     if (!docId) {
                         console.warn('Skipping student without docId:', s);
                         continue;
@@ -12392,7 +12641,6 @@
                     });
                 }
 
-                // Send email notification
                 const studentNames = selected.map(s => s.name).join(', ');
                 await sendEmailNotification(
                     `🎓 Student Promotion - ${schoolSettings.schoolName || 'EduSL'}`,
@@ -12414,7 +12662,7 @@
         };
 
         // ==================================================================
-        //  REPORT CARD GENERATION
+        //  REPORT CARD GENERATION (updated to show T1, T2, Exam, Mean)
         // ==================================================================
         async function generateReportCard() {
             if (!currentStudentDoc) {
@@ -12464,7 +12712,8 @@
                 });
                 const totalAtt = filteredAtt.length;
 
-                let examRows = [];
+                // Build exam results grouped by year/level/term with T1, T2, Exam, Mean
+                const groupedExam = {};
                 const years = examData.years || {};
                 for (const y of Object.keys(years)) {
                     if (year !== 'all' && y !== year) continue;
@@ -12474,18 +12723,18 @@
                         for (const t of Object.keys(levelData)) {
                             if (term !== 'all' && t !== term) continue;
                             const termData = levelData[t];
+                            const key = y + '|' + level + '|' + t;
+                            if (!groupedExam[key]) {
+                                groupedExam[key] = { year: y, level, term: t, subjects: {} };
+                            }
                             for (const assessment of Object.keys(termData)) {
                                 const subjects = termData[assessment];
                                 if (Array.isArray(subjects)) {
                                     subjects.forEach(sub => {
-                                        examRows.push({
-                                            year: y,
-                                            level,
-                                            term: t,
-                                            assessment,
-                                            subject: sub.name,
-                                            score: sub.score
-                                        });
+                                        if (!groupedExam[key].subjects[sub.name]) {
+                                            groupedExam[key].subjects[sub.name] = {};
+                                        }
+                                        groupedExam[key].subjects[sub.name][assessment] = sub.score;
                                     });
                                 }
                             }
@@ -12521,24 +12770,52 @@
                     <div><span class="label">Contact:</span> ${escapeHtml(student.parentPhone || 'N/A')}</div>
                 </div>`;
 
-                if (examRows.length > 0) {
+                // Exam Results section with T1, T2, Exam, Mean
+                if (Object.keys(groupedExam).length > 0) {
                     html += `<div class="report-section">
-                        <h4>📝 Exam Results</h4>
-                        <div class="table-wrapper"><table>
-                            <thead><tr><th>Year</th><th>Level</th><th>Term</th><th>Assessment</th><th>Subject</th><th>Score</th></tr></thead>
-                            <tbody>`;
-                    examRows.forEach(r => {
-                        const pass = parseFloat(r.score) >= (schoolSettings.passingScore || 50) ? '✅' : '❌';
-                        html += `<tr>
-                            <td>${escapeHtml(r.year)}</td>
-                            <td>${escapeHtml(r.level)}</td>
-                            <td>${escapeHtml(r.term)}</td>
-                            <td>${escapeHtml(r.assessment)}</td>
-                            <td>${escapeHtml(r.subject)}</td>
-                            <td>${escapeHtml(r.score)} ${pass}</td>
-                        </tr>`;
+                        <h4>📝 Exam Results</h4>`;
+                    // Sort keys by year, term order
+                    const sortedKeys = Object.keys(groupedExam).sort((a, b) => {
+                        const [yearA, levelA, termA] = a.split('|');
+                        const [yearB, levelB, termB] = b.split('|');
+                        return yearB.localeCompare(yearA) || termA.localeCompare(termB);
                     });
-                    html += `</tbody></table></div></div>`;
+                    for (const key of sortedKeys) {
+                        const data = groupedExam[key];
+                        const subjects = Object.keys(data.subjects).sort();
+                        if (subjects.length === 0) continue;
+                        html += `<div style="margin:10px 0;"><strong>${data.year} — ${data.level.toUpperCase()} — ${getTermLabel(data.term)}</strong></div>`;
+                        html += `<div class="table-wrapper"><table>
+                            <thead><tr><th>Subject</th><th>T1</th><th>T2</th><th>Exam</th><th>Mean</th></tr></thead>
+                            <tbody>`;
+                        for (const sub of subjects) {
+                            const scores = data.subjects[sub];
+                            const t1 = scores.test1 !== undefined && scores.test1 !== '' ? parseFloat(scores.test1) : null;
+                            const t2 = scores.test2 !== undefined && scores.test2 !== '' ? parseFloat(scores.test2) : null;
+                            const exam = scores.exam !== undefined && scores.exam !== '' ? parseFloat(scores.exam) : null;
+                            let mean = null;
+                            if (t1 !== null && t2 !== null && exam !== null) {
+                                mean = (t1 + t2 + exam) / 3;
+                            } else if (t1 !== null && t2 !== null) {
+                                mean = (t1 + t2) / 2;
+                            } else if (t1 !== null) {
+                                mean = t1;
+                            }
+                            const t1Display = (t1 !== null) ? t1.toFixed(1) : '—';
+                            const t2Display = (t2 !== null) ? t2.toFixed(1) : '—';
+                            const examDisplay = (exam !== null) ? exam.toFixed(1) : '—';
+                            const meanDisplay = (mean !== null) ? mean.toFixed(1) : '—';
+                            html += `<tr>
+                                <td>${escapeHtml(sub)}</td>
+                                <td>${t1Display}</td>
+                                <td>${t2Display}</td>
+                                <td>${examDisplay}</td>
+                                <td>${meanDisplay}</td>
+                            </tr>`;
+                        }
+                        html += `</tbody></table></div>`;
+                    }
+                    html += `</div>`;
                 } else {
                     html += `<div class="report-section"><p>No exam records found.</p></div>`;
                 }
@@ -12820,7 +13097,6 @@
 
                 await db.collection('assignments').add(assignmentData);
 
-                // Send email notification
                 await sendEmailNotification(
                     `📄 New Assignment Created - ${schoolSettings.schoolName || 'EduSL'}`,
                     `Dear Admin,\n\nA new assignment has been created:\n\nTitle: ${title}\nClass: ${classVal || 'All Classes'}\nDue Date: ${dueDate}\nDescription: ${description}\n\nPlease review and notify students.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
@@ -12909,7 +13185,6 @@
                     tenantId: tenantId
                 });
 
-                // Send email notification
                 await sendEmailNotification(
                     `📝 New Quiz Created - ${schoolSettings.schoolName || 'EduSL'}`,
                     `Dear Admin,\n\nA new quiz has been created:\n\nTitle: ${title}\nClass: ${classVal || 'All Classes'}\nTime Limit: ${timeLimit} min\nDescription: ${description || 'None'}\nQuestions: ${questions.length}\n\nPlease review and notify students.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
@@ -13115,7 +13390,6 @@
 
             await db.collection('quiz_submissions').add(submission);
 
-            // Send email notification
             await notifyQuizSubmission(submission.userName, data.quizTitle || 'Quiz', score);
 
             closeModal('takeQuizModal');
@@ -13190,7 +13464,6 @@
                 });
             });
 
-            // Send email notification
             await notifyExamSubmission(data.studentName, data.studentId, 'Entrance Exam', score);
 
             closeModal('takeEntranceExamModal');
@@ -13554,7 +13827,6 @@
                         };
                         await db.collection('assignment_submissions').add(submission);
 
-                        // Send email notification
                         const assignment = assignments.find(a => a.id === assignmentId);
                         await notifyAssignmentSubmission(submission.userName, assignment ? assignment.title : assignmentId);
 
@@ -14295,7 +14567,6 @@
                     updateColorPreviews();
                     updateLogoPreview();
 
-                    // ---- FIX: Re‑apply the saved settings to the UI (colors, etc.) ----
                     applySettingsToUI(data);
 
                     container.innerHTML = '<div class="success">✅ Settings loaded successfully.</div>';
@@ -14813,29 +15084,24 @@
                 const sixMonthsAgo = new Date(today);
                 sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
 
-                // Load income
                 const incomeSnap = await db.collection('income').where('tenantId', '==', tenantId).get();
                 const incomeRecords = [];
                 incomeSnap.forEach(d => incomeRecords.push({ id: d.id, ...d.data() }));
 
-                // Load expenses
                 const expenseSnap = await db.collection('expenses').where('tenantId', '==', tenantId).get();
                 const expenseRecords = [];
                 expenseSnap.forEach(d => expenseRecords.push({ id: d.id, ...d.data() }));
 
-                // Calculate totals
                 const totalIncome = incomeRecords.reduce((sum, r) => sum + r.amount, 0);
                 const totalExpenses = expenseRecords.reduce((sum, r) => sum + r.amount, 0);
                 const netProfit = totalIncome - totalExpenses;
                 const transactionCount = incomeRecords.length + expenseRecords.length;
 
-                // Update KPI cards
                 document.getElementById('finTotalIncome').textContent = totalIncome.toLocaleString();
                 document.getElementById('finTotalExpenses').textContent = totalExpenses.toLocaleString();
                 document.getElementById('finNetProfit').textContent = netProfit.toLocaleString();
                 document.getElementById('finTransactionCount').textContent = transactionCount;
 
-                // ---- Income vs Expenses Trend Chart ----
                 const months = [];
                 const monthLabels = [];
                 for (let i = 5; i >= 0; i--) {
@@ -14890,7 +15156,6 @@
                     });
                 }
 
-                // ---- Income by Category Chart ----
                 const incomeByCategory = {};
                 incomeRecords.forEach(r => {
                     incomeByCategory[r.category] = (incomeByCategory[r.category] || 0) + r.amount;
@@ -14919,7 +15184,6 @@
                     });
                 }
 
-                // ---- Expenses by Category Chart ----
                 const expenseByCategory = {};
                 expenseRecords.forEach(r => {
                     expenseByCategory[r.category] = (expenseByCategory[r.category] || 0) + r.amount;
@@ -14948,7 +15212,6 @@
                     });
                 }
 
-                // ---- Monthly Summary ----
                 const monthlySummary = document.getElementById('financeMonthlySummary');
                 const allMonths = new Set();
                 incomeRecords.forEach(r => allMonths.add(r.year + '-' + r.month));
@@ -15038,7 +15301,6 @@
                     <div class="finance-kpi-card"><div class="kpi-number">${incomeRecords.length + expenseRecords.length}</div><div class="kpi-label">Transactions</div></div>
                 </div>`;
 
-                // Income breakdown
                 const incomeByCat = {};
                 incomeRecords.forEach(r => { incomeByCat[r.category] = (incomeByCat[r.category] || 0) + r.amount; });
                 const expenseByCat = {};
@@ -15059,7 +15321,6 @@
                 if (Object.keys(expenseByCat).length === 0) html += '<li>No expense records.</li>';
                 html += `</ul></div></div>`;
 
-                // Transaction list
                 const allTrans = [...incomeRecords.map(r => ({ ...r, type: 'Income' })), ...expenseRecords.map(r => ({ ...r,
                     type: 'Expense' }))];
                 allTrans.sort((a, b) => b.date.localeCompare(a.date));
@@ -15184,7 +15445,6 @@ const tenantId = getCurrentTenantId();
 const user = auth.currentUser;
 if (!user) return;
 
-// Check if migration already done for this tenant
 const migRef = db.collection('settings').doc('finance_migration_' + tenantId);
 const migDoc = await migRef.get();
 if (migDoc.exists && migDoc.data().done === true) {
@@ -15196,12 +15456,10 @@ let incomeCount = 0,
 expenseCount = 0;
 const batch = db.batch();
 
-// ---- Migrate fee payments to income ----
 const feeSnap = await db.collection('fee_records').where('tenantId', '==', tenantId).get();
 for (const doc of feeSnap.docs) {
 const data = doc.data();
 const studentId = data.studentId;
-// Get student name
 let studentName = studentId;
 try {
 const studentDoc = await db.collection('students').doc(studentId).get();
@@ -15215,8 +15473,7 @@ for (let idx = 0; idx < termData.transactions.length; idx++) {
 const tr = termData.transactions[idx];
 if (!tr.date) continue;
 const [year, month] = tr.date.split('-');
-// Create income record with migrationId to avoid duplicates
-const incomeRef = db.collection('income').doc(); // auto-id
+const incomeRef = db.collection('income').doc();
 const incomeData = {
 amount: tr.amount,
 category: 'School Fees',
@@ -15236,13 +15493,12 @@ incomeCount++;
 }
 }
 
-// ---- Migrate staff payments to expenses ----
 const paySnap = await db.collection('staff_payments').where('tenantId', '==', tenantId).get();
 for (const doc of paySnap.docs) {
 const data = doc.data();
 if (!data.date) continue;
 const [year, month] = data.date.split('-');
-const expenseRef = db.collection('expenses').doc(); // auto-id
+const expenseRef = db.collection('expenses').doc();
 const expenseData = {
 amount: data.amount,
 category: 'Salaries',
@@ -15260,18 +15516,13 @@ batch.set(expenseRef, expenseData);
 expenseCount++;
 }
 
-// Commit all writes
 await batch.commit();
 
-// Mark migration as done
 await migRef.set({ done: true, migratedAt: firebase.firestore.FieldValue.serverTimestamp() });
 
 console.log(`Finance migration completed: ${incomeCount} income records, ${expenseCount} expense records created.`);
 showMessage(`✅ Finance migration completed: ${incomeCount} income, ${expenseCount} expense records backed up.`, 'success', 'financeDashboardMessage');
 }
-
-// ---- Trigger migration on login for admin/bursar ----
-// We'll call it after login in setupRoleUI for bursar and admin
 
 // ==================================================================
 //  LOGIN AND SETUP (updated with finance module)
@@ -15300,7 +15551,6 @@ document.getElementById('mainApp').style.display = 'block';
 document.getElementById('userInfo').innerText = role.toUpperCase() + ': ' + email;
 document.getElementById('logoutBtn').style.display = 'inline-block';
 
-// Load school settings (including email settings)
 await loadSchoolSettingsSilent();
 await loadSchoolSettings();
 
@@ -15313,13 +15563,11 @@ const teacherSnap = await db.collection('teachers').where('tenantId', '==', tena
 if (!teacherSnap.empty) teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherSnap.docs[0]
 .data() };
 setupRoleUI('admin');
-// Run migration for admin
 setTimeout(() => {
 migratePastFinanceRecords().catch(e => console.warn('Migration error:', e));
 }, 3000);
 } else if (role === 'bursar') {
 setupRoleUI('bursar');
-// Run migration for bursar
 setTimeout(() => {
 migratePastFinanceRecords().catch(e => console.warn('Migration error:', e));
 }, 3000);
@@ -15500,7 +15748,6 @@ datePicker.value = attendanceDate;
 document.getElementById('attendanceDateInfo').textContent = 'Today';
 }
 
-// --- Load finance data for bursar ---
 if (role === 'bursar') {
 setTimeout(() => {
 populateFinanceFilterYears();
@@ -15534,7 +15781,6 @@ renderAttendanceForDate(date);
 }
 });
 
-// Initialize password toggle for dynamically added fields
 initPasswordToggles();
 
 } catch (e) {
@@ -15850,7 +16096,6 @@ setTimeout(initChatbot, 1000);
 //  WINDOW ONLOAD
 // ==================================================================
 window.onload = function() {
-// Initialize password toggles
 initPasswordToggles();
 
 function updateOnlineStatus() {
@@ -15994,7 +16239,6 @@ loadFeeStats(); };
 document.getElementById('feeStatsTerm').onchange = function() { if (currentUserRole === 'bursar')
 loadFeeStats(); };
 
-// UPDATED: Use the new addStaff function
 document.getElementById('addStaffBtn').onclick = function() { if (currentUserRole !== 'admin') return;
 addStaff(); };
 document.getElementById('addAssetBtn').onclick = addAsset;
@@ -16550,7 +16794,6 @@ this.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
 });
 });
 
-// Also support dynamically added password fields
 const observer = new MutationObserver(function() {
 document.querySelectorAll('.password-toggle:not([data-initialized])').forEach(btn => {
 btn.setAttribute('data-initialized', 'true');
