@@ -3533,446 +3533,489 @@
             margin: 12px 0 6px 0;
             font-size: 0.9rem;
         }
+
+        /* ===== NEW: Quiz/Exam Submission History Styles ===== */
+        .submission-history-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border: 1px solid #e6edf4;
+            transition: 0.2s;
+        }
+        .submission-history-card:hover {
+            background: #f0f5fa;
+            border-color: #b0c4de;
+        }
+        .submission-history-card .submission-title {
+            font-weight: 700;
+            color: #0b2b5c;
+            font-size: 0.95rem;
+        }
+        .submission-history-card .submission-meta {
+            font-size: 0.8rem;
+            color: #6c7a89;
+            margin: 2px 0;
+        }
+        .submission-history-card .submission-score {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a4b8a;
+        }
+        .submission-history-card .submission-score.high {
+            color: #27ae60;
+        }
+        .submission-history-card .submission-score.medium {
+            color: #f39c12;
+        }
+        .submission-history-card .submission-score.low {
+            color: #e74c3c;
+        }
     </style>
 
-<style id="edusl-professional-ui">
-/* ================================================================
-   EduSL Professional UI Layer
-   Visual/accessibility improvements only.
-   Existing IDs/classes and JavaScript behavior are preserved.
-   ================================================================ */
-
-:root {
-    --edusl-primary: #123f73;
-    --edusl-primary-2: #1f67ad;
-    --edusl-primary-dark: #0a2850;
-    --edusl-accent: #f4c542;
-    --edusl-success: #198754;
-    --edusl-danger: #dc3545;
-    --edusl-warning: #d88a00;
-    --edusl-text: #172033;
-    --edusl-muted: #667085;
-    --edusl-border: #e4e9f0;
-    --edusl-surface: rgba(255,255,255,.94);
-    --edusl-shadow-sm: 0 2px 10px rgba(15, 35, 60, .06);
-    --edusl-shadow-md: 0 10px 30px rgba(15, 35, 60, .09);
-    --edusl-shadow-lg: 0 20px 60px rgba(15, 35, 60, .14);
-    --edusl-radius: 18px;
-    --edusl-radius-sm: 12px;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    background:
-        radial-gradient(circle at 10% 0%, rgba(31,103,173,.08), transparent 28rem),
-        radial-gradient(circle at 90% 10%, rgba(244,197,66,.08), transparent 24rem),
-        linear-gradient(145deg, #f7f9fc 0%, #edf3f8 52%, #e9f0f6 100%);
-    color: var(--edusl-text);
-    line-height: 1.5;
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: -1;
-    background:
-        linear-gradient(rgba(255,255,255,.22) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.22) 1px, transparent 1px);
-    background-size: 32px 32px;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,.35), transparent 70%);
-}
-
-.header {
-    position: sticky;
-    top: 12px;
-    z-index: 1200;
-    padding: 14px 18px;
-    border: 1px solid rgba(255,255,255,.82);
-    background: rgba(255,255,255,.86);
-    box-shadow: var(--edusl-shadow-md);
-}
-
-.header h1 {
-    min-width: 0;
-}
-
-.header h1 span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.header-right {
-    justify-content: flex-end;
-}
-
-#userInfo,
-.online-badge,
-#logoutBtn {
-    min-height: 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#logoutBtn {
-    box-shadow: 0 4px 12px rgba(220,53,69,.18);
-}
-
-.sync-bar {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,.22);
-}
-
-.sync-bar::after {
-    content: "";
-    position: absolute;
-    left: -30%;
-    top: 0;
-    width: 30%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.20), transparent);
-    animation: edusl-shimmer 3.2s ease-in-out infinite;
-}
-
-@keyframes edusl-shimmer {
-    0%, 65% { transform: translateX(0); }
-    100% { transform: translateX(430%); }
-}
-
-.module-buttons {
-    position: sticky;
-    top: 78px;
-    z-index: 1000;
-    padding: 8px;
-    margin: 12px 0 18px;
-    border-radius: 18px;
-    background: rgba(247,249,252,.84);
-    border: 1px solid rgba(255,255,255,.85);
-    box-shadow: var(--edusl-shadow-sm);
-    backdrop-filter: blur(14px);
-}
-
-.module-btn {
-    min-height: 42px;
-    padding: 9px 18px;
-    border: 1px solid var(--edusl-border);
-    background: rgba(255,255,255,.86);
-}
-
-.module-btn.active {
-    box-shadow: 0 7px 20px rgba(18,63,115,.22);
-}
-
-.card,
-.import-section,
-.manual-section,
-.dash-card,
-.notice-card,
-#globalNotices {
-    border-color: rgba(210,220,232,.72);
-    box-shadow: var(--edusl-shadow-sm);
-}
-
-.card {
-    border-radius: var(--edusl-radius);
-}
-
-.card:hover,
-.import-section:hover,
-.manual-section:hover,
-.dash-card:hover {
-    box-shadow: var(--edusl-shadow-md);
-}
-
-.card h3,
-.import-section h3,
-.manual-section h3 {
-    letter-spacing: -.15px;
-}
-
-input,
-select,
-textarea {
-    min-height: 40px;
-    border-color: #d8e0ea;
-    box-shadow: inset 0 1px 2px rgba(16,24,40,.02);
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: #98a2b3;
-}
-
-button {
-    min-height: 36px;
-}
-
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-a:focus-visible {
-    outline: 3px solid rgba(31,103,173,.28);
-    outline-offset: 2px;
-}
-
-.table-wrapper {
-    border-color: #dfe6ef;
-    box-shadow: var(--edusl-shadow-sm);
-}
-
-table {
-    border-spacing: 0;
-}
-
-thead th {
-    background: linear-gradient(135deg, #eef4fa, #e5edf6);
-    color: #17395e;
-}
-
-tbody td {
-    color: #26364d;
-}
-
-.actions .act-btn {
-    min-height: 32px;
-}
-
-.status-badge {
-    white-space: nowrap;
-}
-
-.dashboard-grid,
-.finance-kpi-grid,
-.stats-grid {
-    align-items: stretch;
-}
-
-.dash-card,
-.finance-kpi-card,
-.stat-card {
-    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-}
-
-.dash-card:hover,
-.finance-kpi-card:hover,
-.stat-card:hover {
-    transform: translateY(-2px);
-    border-color: #d4dfec;
-}
-
-.total-count {
-    letter-spacing: -1px;
-}
-
-.modal {
-    background: rgba(9, 24, 42, .58);
-}
-
-.modal-content {
-    border: 1px solid rgba(255,255,255,.8);
-    box-shadow: var(--edusl-shadow-lg);
-}
-
-.close-modal {
-    width: 38px;
-    height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: #f5f7fa;
-}
-
-.close-modal:hover {
-    background: #fdebec;
-}
-
-.success,
-.error {
-    box-shadow: 0 3px 12px rgba(15,35,60,.06);
-}
-
-.file-item {
-    background: #f8fafc;
-}
-
-.file-item:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--edusl-shadow-sm);
-}
-
-.suggestion-fab {
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 12px 32px rgba(18,63,115,.30);
-}
-
-.suggestion-fab:hover {
-    box-shadow: 0 16px 40px rgba(18,63,115,.38);
-}
-
-#startupPage .flyer {
-    border: 1px solid rgba(255,255,255,.9);
-    box-shadow: 0 30px 90px rgba(0,0,0,.28);
-}
-
-#startupPage .flyer .feature {
-    border: 1px solid #e4eaf2;
-}
-
-#schoolsPage .school-card {
-    border-color: #e1e8f0;
-}
-
-#schoolsPage .school-card:hover {
-    border-color: #cfdae7;
-}
-
-.voice-recorder {
-    min-height: 32px;
-}
-
-.reply-box {
-    border: 1px solid #e5eaf0;
-}
-
-.chat-message {
-    box-shadow: 0 2px 8px rgba(15,35,60,.05);
-}
-
-#chartsCard .chart-grid .chart-box {
-    border-color: #e3e9f0;
-    box-shadow: var(--edusl-shadow-sm);
-}
-
-@media (max-width: 900px) {
-    body {
-        padding: 14px;
-    }
-
-    .header {
-        position: relative;
-        top: auto;
-    }
-
-    .module-buttons {
-        position: relative;
-        top: auto;
-    }
-
-    .header h1 span {
-        max-width: 46vw;
-    }
-}
-
-@media (max-width: 600px) {
-    body {
-        padding: 9px;
-    }
-
-    .header {
-        border-radius: 16px;
-        padding: 10px 12px;
-    }
-
-    .header h1 {
-        font-size: 1.05rem;
-    }
-
-    .header h1 svg {
-        height: 34px;
-    }
-
-    .header-right {
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    .module-buttons {
-        padding: 6px;
-        border-radius: 14px;
-    }
-
-    .module-btn {
-        flex: 1 1 auto;
-        min-width: 135px;
-    }
-
-    .card,
-    .import-section,
-    .manual-section {
-        padding: 14px;
-        border-radius: 15px;
-    }
-
-    .form-row,
-    .search-box {
-        align-items: stretch;
-    }
-
-    input,
-    select,
-    textarea {
-        max-width: 100%;
-        width: 100%;
-    }
-
-    .suggestion-fab {
-        right: 12px;
-        bottom: 12px;
-        padding: 10px 16px;
-    }
-}
-
-@media print {
-    body {
-        padding: 0;
-        max-width: none;
-        background: #fff !important;
-    }
-
-    body::before,
-    .header,
-    .module-buttons,
-    .suggestion-fab,
-    .sync-bar,
-    #globalNotices,
-    button,
-    .export-buttons {
-        display: none !important;
-    }
-
-    .card,
-    .table-wrapper,
-    .dash-card {
-        box-shadow: none !important;
-        border: 1px solid #ccc !important;
-        break-inside: avoid;
-    }
-
-    table {
-        min-width: 0 !important;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
-    }
-}
-</style>
+    <style id="edusl-professional-ui">
+        /* ================================================================
+           EduSL Professional UI Layer
+           Visual/accessibility improvements only.
+           Existing IDs/classes and JavaScript behavior are preserved.
+           ================================================================ */
+
+        :root {
+            --edusl-primary: #123f73;
+            --edusl-primary-2: #1f67ad;
+            --edusl-primary-dark: #0a2850;
+            --edusl-accent: #f4c542;
+            --edusl-success: #198754;
+            --edusl-danger: #dc3545;
+            --edusl-warning: #d88a00;
+            --edusl-text: #172033;
+            --edusl-muted: #667085;
+            --edusl-border: #e4e9f0;
+            --edusl-surface: rgba(255, 255, 255, .94);
+            --edusl-shadow-sm: 0 2px 10px rgba(15, 35, 60, .06);
+            --edusl-shadow-md: 0 10px 30px rgba(15, 35, 60, .09);
+            --edusl-shadow-lg: 0 20px 60px rgba(15, 35, 60, .14);
+            --edusl-radius: 18px;
+            --edusl-radius-sm: 12px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 10% 0%, rgba(31, 103, 173, .08), transparent 28rem),
+                radial-gradient(circle at 90% 10%, rgba(244, 197, 66, .08), transparent 24rem),
+                linear-gradient(145deg, #f7f9fc 0%, #edf3f8 52%, #e9f0f6 100%);
+            color: var(--edusl-text);
+            line-height: 1.5;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            background:
+                linear-gradient(rgba(255, 255, 255, .22) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, .22) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .35), transparent 70%);
+        }
+
+        .header {
+            position: sticky;
+            top: 12px;
+            z-index: 1200;
+            padding: 14px 18px;
+            border: 1px solid rgba(255, 255, 255, .82);
+            background: rgba(255, 255, 255, .86);
+            box-shadow: var(--edusl-shadow-md);
+        }
+
+        .header h1 {
+            min-width: 0;
+        }
+
+        .header h1 span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .header-right {
+            justify-content: flex-end;
+        }
+
+        #userInfo,
+        .online-badge,
+        #logoutBtn {
+            min-height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #logoutBtn {
+            box-shadow: 0 4px 12px rgba(220, 53, 69, .18);
+        }
+
+        .sync-bar {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, .22);
+        }
+
+        .sync-bar::after {
+            content: "";
+            position: absolute;
+            left: -30%;
+            top: 0;
+            width: 30%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .20), transparent);
+            animation: edusl-shimmer 3.2s ease-in-out infinite;
+        }
+
+        @keyframes edusl-shimmer {
+            0%,
+            65% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(430%);
+            }
+        }
+
+        .module-buttons {
+            position: sticky;
+            top: 78px;
+            z-index: 1000;
+            padding: 8px;
+            margin: 12px 0 18px;
+            border-radius: 18px;
+            background: rgba(247, 249, 252, .84);
+            border: 1px solid rgba(255, 255, 255, .85);
+            box-shadow: var(--edusl-shadow-sm);
+            backdrop-filter: blur(14px);
+        }
+
+        .module-btn {
+            min-height: 42px;
+            padding: 9px 18px;
+            border: 1px solid var(--edusl-border);
+            background: rgba(255, 255, 255, .86);
+        }
+
+        .module-btn.active {
+            box-shadow: 0 7px 20px rgba(18, 63, 115, .22);
+        }
+
+        .card,
+        .import-section,
+        .manual-section,
+        .dash-card,
+        .notice-card,
+        #globalNotices {
+            border-color: rgba(210, 220, 232, .72);
+            box-shadow: var(--edusl-shadow-sm);
+        }
+
+        .card {
+            border-radius: var(--edusl-radius);
+        }
+
+        .card:hover,
+        .import-section:hover,
+        .manual-section:hover,
+        .dash-card:hover {
+            box-shadow: var(--edusl-shadow-md);
+        }
+
+        .card h3,
+        .import-section h3,
+        .manual-section h3 {
+            letter-spacing: -.15px;
+        }
+
+        input,
+        select,
+        textarea {
+            min-height: 40px;
+            border-color: #d8e0ea;
+            box-shadow: inset 0 1px 2px rgba(16, 24, 40, .02);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #98a2b3;
+        }
+
+        button {
+            min-height: 36px;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        a:focus-visible {
+            outline: 3px solid rgba(31, 103, 173, .28);
+            outline-offset: 2px;
+        }
+
+        .table-wrapper {
+            border-color: #dfe6ef;
+            box-shadow: var(--edusl-shadow-sm);
+        }
+
+        table {
+            border-spacing: 0;
+        }
+
+        thead th {
+            background: linear-gradient(135deg, #eef4fa, #e5edf6);
+            color: #17395e;
+        }
+
+        tbody td {
+            color: #26364d;
+        }
+
+        .actions .act-btn {
+            min-height: 32px;
+        }
+
+        .status-badge {
+            white-space: nowrap;
+        }
+
+        .dashboard-grid,
+        .finance-kpi-grid,
+        .stats-grid {
+            align-items: stretch;
+        }
+
+        .dash-card,
+        .finance-kpi-card,
+        .stat-card {
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+
+        .dash-card:hover,
+        .finance-kpi-card:hover,
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: #d4dfec;
+        }
+
+        .total-count {
+            letter-spacing: -1px;
+        }
+
+        .modal {
+            background: rgba(9, 24, 42, .58);
+        }
+
+        .modal-content {
+            border: 1px solid rgba(255, 255, 255, .8);
+            box-shadow: var(--edusl-shadow-lg);
+        }
+
+        .close-modal {
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f5f7fa;
+        }
+
+        .close-modal:hover {
+            background: #fdebec;
+        }
+
+        .success,
+        .error {
+            box-shadow: 0 3px 12px rgba(15, 35, 60, .06);
+        }
+
+        .file-item {
+            background: #f8fafc;
+        }
+
+        .file-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--edusl-shadow-sm);
+        }
+
+        .suggestion-fab {
+            border: 1px solid rgba(255, 255, 255, .25);
+            box-shadow: 0 12px 32px rgba(18, 63, 115, .30);
+        }
+
+        .suggestion-fab:hover {
+            box-shadow: 0 16px 40px rgba(18, 63, 115, .38);
+        }
+
+        #startupPage .flyer {
+            border: 1px solid rgba(255, 255, 255, .9);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, .28);
+        }
+
+        #startupPage .flyer .feature {
+            border: 1px solid #e4eaf2;
+        }
+
+        #schoolsPage .school-card {
+            border-color: #e1e8f0;
+        }
+
+        #schoolsPage .school-card:hover {
+            border-color: #cfdae7;
+        }
+
+        .voice-recorder {
+            min-height: 32px;
+        }
+
+        .reply-box {
+            border: 1px solid #e5eaf0;
+        }
+
+        .chat-message {
+            box-shadow: 0 2px 8px rgba(15, 35, 60, .05);
+        }
+
+        #chartsCard .chart-grid .chart-box {
+            border-color: #e3e9f0;
+            box-shadow: var(--edusl-shadow-sm);
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 14px;
+            }
+
+            .header {
+                position: relative;
+                top: auto;
+            }
+
+            .module-buttons {
+                position: relative;
+                top: auto;
+            }
+
+            .header h1 span {
+                max-width: 46vw;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 9px;
+            }
+
+            .header {
+                border-radius: 16px;
+                padding: 10px 12px;
+            }
+
+            .header h1 {
+                font-size: 1.05rem;
+            }
+
+            .header h1 svg {
+                height: 34px;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .module-buttons {
+                padding: 6px;
+                border-radius: 14px;
+            }
+
+            .module-btn {
+                flex: 1 1 auto;
+                min-width: 135px;
+            }
+
+            .card,
+            .import-section,
+            .manual-section {
+                padding: 14px;
+                border-radius: 15px;
+            }
+
+            .form-row,
+            .search-box {
+                align-items: stretch;
+            }
+
+            input,
+            select,
+            textarea {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .suggestion-fab {
+                right: 12px;
+                bottom: 12px;
+                padding: 10px 16px;
+            }
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                max-width: none;
+                background: #fff !important;
+            }
+
+            body::before,
+            .header,
+            .module-buttons,
+            .suggestion-fab,
+            .sync-bar,
+            #globalNotices,
+            button,
+            .export-buttons {
+                display: none !important;
+            }
+
+            .card,
+            .table-wrapper,
+            .dash-card {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                break-inside: avoid;
+            }
+
+            table {
+                min-width: 0 !important;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
 
 </head>
 <body>
@@ -4392,6 +4435,8 @@ tbody td {
                     <button class="tab-btn" data-tab="documents">📄 Documents</button>
                     <button class="tab-btn" data-tab="reportcard">📋 Report Card</button>
                     <button class="tab-btn" data-tab="entranceexam">📋 Entrance Exam</button>
+                    <!-- NEW: Quiz/Exam Submission History Tab -->
+                    <button class="tab-btn" data-tab="submissionhistory">📊 Submissions</button>
                 </div>
                 <div id="profileTab" class="tab-content active">
                     <div class="card">
@@ -4557,6 +4602,27 @@ tbody td {
                             <div id="entranceExamList"><p>Loading...</p></div>
                             <div id="entranceExamTakeArea" style="display:none;"></div>
                             <div id="entranceExamResultArea" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ===== NEW: SUBMISSION HISTORY TAB ===== -->
+                <div id="submissionhistoryTab" class="tab-content">
+                    <div class="card">
+                        <h3>📊 Quiz & Exam Submission History</h3>
+                        <p style="color:#6c7a89; margin-bottom:12px;">
+                            All quiz and entrance exam submissions for this student. Each record shows the student name, quiz/exam title, score, and submission date.
+                        </p>
+                        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;">
+                            <label style="font-weight:600; font-size:0.85rem;">Type:</label>
+                            <select id="submissionTypeFilter" style="max-width:140px;">
+                                <option value="all">All</option>
+                                <option value="quiz">Quizzes</option>
+                                <option value="entrance">Entrance Exams</option>
+                            </select>
+                            <button id="refreshSubmissionsBtn" class="refresh-btn">Refresh</button>
+                        </div>
+                        <div id="submissionHistoryContainer">
+                            <p>Loading submission history...</p>
                         </div>
                     </div>
                 </div>
@@ -5277,6 +5343,7 @@ tbody td {
                     <h3>📋 Entrance Exams</h3>
                     <p style="color:#6c7a89; margin-bottom:12px;">
                         Create and manage entrance exams for admission candidates. Assign exams to pending admission requests.
+                        <strong>Now with class assignment!</strong>
                     </p>
                     <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
                         <button id="createEntranceExamBtn" class="refresh-btn" style="background:#27ae60;">➕ Create Exam</button>
@@ -5879,7 +5946,7 @@ tbody td {
         </div>
     </div>
 
-    <!-- ===== ENTRANCE EXAM MODALS ===== -->
+    <!-- ===== ENTRANCE EXAM MODALS (updated with class field) ===== -->
     <div id="createEntranceExamModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('createEntranceExamModal')">&times;</span>
@@ -5887,6 +5954,19 @@ tbody td {
             <div style="margin-bottom:10px;">
                 <label style="font-weight:600; font-size:0.85rem;">Exam Title *</label>
                 <input type="text" id="entranceExamTitle" placeholder="e.g. Math Entrance 2026" />
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:600; font-size:0.85rem;">Class / Target *</label>
+                <select id="entranceExamClass" style="max-width:100%;">
+                    <option value="">All Classes</option>
+                    <option>Nursery1</option><option>Nursery2</option><option>Nursery3</option>
+                    <option>Class1</option><option>Class2</option><option>Class3</option>
+                    <option>Class4</option><option>Class5</option><option>Class6</option>
+                    <option>JSS1</option><option>JSS2</option><option>JSS3</option>
+                    <option>SSS1</option><option>SSS2</option><option>SSS3</option>
+                    <option>Others</option>
+                </select>
+                <span style="font-size:0.7rem; color:#6c7a89;">Select a class to target specific students</span>
             </div>
             <div style="margin-bottom:10px;">
                 <label style="font-weight:600; font-size:0.85rem;">Description (optional)</label>
@@ -13643,12 +13723,13 @@ tbody td {
         };
 
         // ==================================================================
-        //  ENTRANCE EXAM SAVE
+        //  ENTRANCE EXAM SAVE (updated with class field)
         // ==================================================================
         document.getElementById('saveEntranceExamBtn').onclick = async function() {
             const title = document.getElementById('entranceExamTitle').value.trim();
             const description = document.getElementById('entranceExamDescription').value.trim();
             const timeLimit = parseInt(document.getElementById('entranceExamTimeLimit').value) || 15;
+            const examClass = document.getElementById('entranceExamClass').value;
 
             if (!title) {
                 showMessage('Please enter an exam title.', 'error', 'entranceExamCreateMessage');
@@ -13698,6 +13779,7 @@ tbody td {
                     title,
                     description,
                     timeLimit,
+                    class: examClass || '',
                     questions,
                     createdBy: user ? user.uid : 'anonymous',
                     createdByName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
@@ -13821,13 +13903,17 @@ tbody td {
                 quizId: data.quizId,
                 userId: user ? user.uid : 'anonymous',
                 userName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
+                studentId: linkedStudentId || '',
+                studentName: currentStudentDoc ? currentStudentDoc.name : '',
+                class: currentStudentDoc ? currentStudentDoc.class : '',
                 score: score,
                 correct: correct,
                 total: data.questions.length,
                 results: results,
                 timeTaken: Math.round((Date.now() - data.startTime) / 1000),
                 submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                tenantId: tenantId
+                tenantId: tenantId,
+                quizTitle: data.quizTitle || 'Quiz'
             };
 
             await db.collection('quiz_submissions').add(submission);
@@ -13839,6 +13925,10 @@ tbody td {
 
             if (currentUserRole === 'parent' || currentUserRole === 'student') {
                 loadQuizzes();
+            }
+            // Refresh submission history if visible
+            if (document.getElementById('submissionhistoryTab').classList.contains('active')) {
+                loadSubmissionHistory();
             }
         };
 
@@ -13878,8 +13968,9 @@ tbody td {
 
             const submission = {
                 examId: data.examId,
-                studentId: data.studentId,
-                studentName: data.studentName,
+                studentId: data.studentId || linkedStudentId || '',
+                studentName: data.studentName || (currentStudentDoc ? currentStudentDoc.name : ''),
+                class: currentStudentDoc ? currentStudentDoc.class : '',
                 userId: user ? user.uid : 'anonymous',
                 userName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
                 score: score,
@@ -13888,7 +13979,8 @@ tbody td {
                 results: results,
                 timeTaken: Math.round((Date.now() - data.startTime) / 1000),
                 submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                tenantId: tenantId
+                tenantId: tenantId,
+                examTitle: data.examTitle || 'Entrance Exam'
             };
 
             await db.collection('entrance_exam_submissions').add(submission);
@@ -13906,12 +13998,16 @@ tbody td {
                 });
             });
 
-            await notifyExamSubmission(data.studentName, data.studentId, 'Entrance Exam', score);
+            await notifyExamSubmission(data.studentName, data.studentId || linkedStudentId || '', 'Entrance Exam',
+            score);
 
             closeModal('takeEntranceExamModal');
             alert(`✅ Exam submitted! Your MCQ score: ${score}% (${correct}/${data.questions.filter(q => q.type === 'mcq').length}). Short answers will be graded by the teacher.`);
 
             loadEntranceExamForParent();
+            if (document.getElementById('submissionhistoryTab').classList.contains('active')) {
+                loadSubmissionHistory();
+            }
         };
 
         // ==================================================================
@@ -13981,6 +14077,7 @@ tbody td {
                         html += `<div class="quiz-card">
                             <div class="quiz-title">📋 ${escapeHtml(exam.title)}</div>
                             <div class="quiz-meta">⏱️ ${exam.timeLimit || 15} min • ${exam.questions ? exam.questions.length : 0} questions</div>
+                            ${exam.class ? `<div class="quiz-meta">📚 Target Class: ${escapeHtml(exam.class)}</div>` : ''}
                             ${exam.description ? `<div class="quiz-meta">${escapeHtml(exam.description)}</div>` : ''}
                             <div class="quiz-actions">
                                 <button class="take-entrance-exam-btn" data-exam='${JSON.stringify(exam)}' style="background:#27ae60; color:#fff;">📝 Take Exam</button>
@@ -14005,7 +14102,7 @@ tbody td {
         }
 
         // ==================================================================
-        //  LOAD QUIZZES & ASSIGNMENTS
+        //  LOAD QUIZZES & ASSIGNMENTS (updated with class filtering)
         // ==================================================================
         async function loadQuizzes() {
             const container = document.getElementById('quizzesList');
@@ -14050,6 +14147,7 @@ tbody td {
 
             let html = '';
             quizzes.forEach(q => {
+                // Filter by class for students/parents
                 if (isStudent || isParent) {
                     if (studentClass && q.class && q.class !== '' && q.class !== 'All Classes') {
                         if (q.class !== studentClass) {
@@ -14060,17 +14158,25 @@ tbody td {
 
                 const canEdit = isAdmin || (isTeacher && q.createdBy === user.uid);
                 const canDelete = isAdmin || (isTeacher && q.createdBy === user.uid);
-                const canTake = (isStudent || isParent || isAdmin) && (studentClass ? true : true);
+                const canTake = (isStudent || isParent || isAdmin);
 
                 const classLabel = q.class || 'All Classes';
                 const timeLabel = q.timeLimit ? `${q.timeLimit} min` : 'No time limit';
+
+                // Check if already submitted
+                let alreadySubmitted = false;
+                if (user && (isStudent || isParent)) {
+                    const subKey = q.id + '_' + user.uid;
+                    if (quizSubmissions[subKey]) alreadySubmitted = true;
+                }
 
                 html += `<div class="quiz-card">
                     <div class="quiz-title">${escapeHtml(q.title)}</div>
                     <div class="quiz-meta">📚 ${escapeHtml(classLabel)} • ⏱️ ${timeLabel} • ${q.questions ? q.questions.length : 0} questions</div>
                     ${q.description ? `<div class="quiz-meta">${escapeHtml(q.description)}</div>` : ''}
                     <div class="quiz-actions">
-                        ${canTake ? `<button class="take-quiz-btn" data-id="${q.id}" style="background:#27ae60; color:#fff;">Take Quiz</button>` : ''}
+                        ${canTake && !alreadySubmitted ? `<button class="take-quiz-btn" data-id="${q.id}" style="background:#27ae60; color:#fff;">Take Quiz</button>` : ''}
+                        ${alreadySubmitted ? `<span style="color:#27ae60; font-weight:600;">✅ Submitted</span>` : ''}
                         ${canEdit ? `<button class="edit-quiz-btn" data-id="${q.id}" style="background:#e8f0fe; color:#1a4b8a;">Edit</button>` : ''}
                         ${canDelete ? `<button class="delete-quiz-btn" data-id="${q.id}" style="background:#fde8e8; color:#b71c1c;">Delete</button>` : ''}
                     </div>
@@ -14087,7 +14193,11 @@ tbody td {
                 btn.onclick = function() {
                     const id = this.dataset.id;
                     const quiz = quizzes.find(q => q.id === id);
-                    if (quiz) startQuiz(quiz);
+                    if (quiz) {
+                        // Store quiz title for submission
+                        currentQuizTaking = null;
+                        startQuiz(quiz);
+                    }
                 };
             });
 
@@ -14108,7 +14218,7 @@ tbody td {
         }
 
         // ==================================================================
-        //  LOAD ASSIGNMENTS
+        //  LOAD ASSIGNMENTS (unchanged)
         // ==================================================================
         async function loadAssignments() {
             const container = document.getElementById('assignmentsList');
@@ -14260,6 +14370,9 @@ tbody td {
                             assignmentId: assignmentId,
                             userId: user ? user.uid : 'anonymous',
                             userName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
+                            studentId: linkedStudentId || '',
+                            studentName: currentStudentDoc ? currentStudentDoc.name : '',
+                            class: currentStudentDoc ? currentStudentDoc.class : '',
                             fileName: file.name,
                             fileType: file.type,
                             fileSize: file.size,
@@ -14282,6 +14395,116 @@ tbody td {
                 reader.readAsDataURL(file);
             };
             fileInput.click();
+        }
+
+        // ==================================================================
+        //  SUBMISSION HISTORY (NEW)
+        // ==================================================================
+        async function loadSubmissionHistory() {
+            const container = document.getElementById('submissionHistoryContainer');
+            container.innerHTML = '<p>Loading submission history...</p>';
+
+            try {
+                const tenantId = getCurrentTenantId();
+                const typeFilter = document.getElementById('submissionTypeFilter').value;
+
+                let submissions = [];
+
+                // Load quiz submissions
+                if (typeFilter === 'all' || typeFilter === 'quiz') {
+                    let quizQuery = db.collection('quiz_submissions')
+                        .where('tenantId', '==', tenantId);
+                    if (currentStudentDoc) {
+                        quizQuery = quizQuery.where('studentId', '==', currentStudentDoc.id);
+                    }
+                    const quizSnap = await quizQuery.orderBy('submittedAt', 'desc').get();
+                    quizSnap.forEach(doc => {
+                        const data = doc.data();
+                        submissions.push({
+                            id: doc.id,
+                            type: 'quiz',
+                            title: data.quizTitle || 'Quiz',
+                            studentName: data.studentName || data.userName || 'Unknown',
+                            studentId: data.studentId || '',
+                            class: data.class || '',
+                            score: data.score || 0,
+                            submittedAt: data.submittedAt,
+                            correct: data.correct,
+                            total: data.total,
+                            userName: data.userName
+                        });
+                    });
+                }
+
+                // Load entrance exam submissions
+                if (typeFilter === 'all' || typeFilter === 'entrance') {
+                    let examQuery = db.collection('entrance_exam_submissions')
+                        .where('tenantId', '==', tenantId);
+                    if (currentStudentDoc) {
+                        examQuery = examQuery.where('studentId', '==', currentStudentDoc.id);
+                    }
+                    const examSnap = await examQuery.orderBy('submittedAt', 'desc').get();
+                    examSnap.forEach(doc => {
+                        const data = doc.data();
+                        submissions.push({
+                            id: doc.id,
+                            type: 'entrance',
+                            title: data.examTitle || 'Entrance Exam',
+                            studentName: data.studentName || data.userName || 'Unknown',
+                            studentId: data.studentId || '',
+                            class: data.class || '',
+                            score: data.score || 0,
+                            submittedAt: data.submittedAt,
+                            correct: data.correct,
+                            total: data.total,
+                            userName: data.userName
+                        });
+                    });
+                }
+
+                // Sort by date (newest first)
+                submissions.sort((a, b) => {
+                    const da = a.submittedAt ? a.submittedAt.toDate ? a.submittedAt.toDate() : new Date(a
+                        .submittedAt) : new Date(0);
+                    const db = b.submittedAt ? b.submittedAt.toDate ? b.submittedAt.toDate() : new Date(b
+                        .submittedAt) : new Date(0);
+                    return db - da;
+                });
+
+                if (submissions.length === 0) {
+                    container.innerHTML = '<p>No submissions found for this student.</p>';
+                    return;
+                }
+
+                let html =
+                    '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Type</th><th>Title</th><th>Score</th><th>Details</th></tr></thead><tbody>';
+
+                for (const sub of submissions) {
+                    const date = sub.submittedAt ? (sub.submittedAt.toDate ? new Date(sub.submittedAt.toDate())
+                        .toLocaleString() : new Date(sub.submittedAt).toLocaleString()) : 'N/A';
+                    const typeLabel = sub.type === 'quiz' ? '📝 Quiz' : '📋 Entrance Exam';
+                    const scoreColor = sub.score >= 70 ? 'good' : (sub.score >= 50 ? 'average' : 'poor');
+                    const scoreDisplay = sub.total > 0 ? `${sub.score}% (${sub.correct}/${sub.total})` : `${sub.score}%`;
+
+                    html += `<tr>
+                        <td style="font-size:0.75rem;">${escapeHtml(date)}</td>
+                        <td><strong>${escapeHtml(sub.studentName)}</strong><br><span style="font-size:0.7rem; color:#6c7a89;">${escapeHtml(sub.studentId)}</span></td>
+                        <td>${escapeHtml(sub.class || 'N/A')}</td>
+                        <td>${typeLabel}</td>
+                        <td>${escapeHtml(sub.title)}</td>
+                        <td><span class="mean-value ${scoreColor}">${scoreDisplay}</span></td>
+                        <td>${sub.userName ? `By ${escapeHtml(sub.userName)}` : ''}</td>
+                    </tr>`;
+                }
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading submission history: ' + escapeHtml(error.message) +
+                    '</div>';
+                console.error('Submission history error:', error);
+            }
         }
 
         // ==================================================================
@@ -14603,7 +14826,7 @@ tbody td {
         document.getElementById('refreshQuizzesBtn').addEventListener('click', function() { loadQuizzes(); });
 
         // ==================================================================
-        //  ENTRANCE EXAM CREATION INIT
+        //  ENTRANCE EXAM CREATION INIT (updated with class field)
         // ==================================================================
         document.getElementById('createEntranceExamBtn').addEventListener('click', function() {
             if (currentUserRole !== 'admin') {
@@ -14613,6 +14836,7 @@ tbody td {
             document.getElementById('entranceExamTitle').value = '';
             document.getElementById('entranceExamDescription').value = '';
             document.getElementById('entranceExamTimeLimit').value = '15';
+            document.getElementById('entranceExamClass').value = '';
             document.getElementById('entranceExamCreateMessage').innerHTML = '';
             initEntranceExamQuestionContainer();
             openModal('createEntranceExamModal');
@@ -15967,7 +16191,7 @@ showMessage(`✅ Finance migration completed: ${incomeCount} income, ${expenseCo
 }
 
 // ==================================================================
-//  LOGIN AND SETUP (updated with finance module)
+//  LOGIN AND SETUP (updated with finance module + submission history)
 // ==================================================================
 async function loginAndSetup(email, password, skipAuth = false) {
 try {
@@ -16175,6 +16399,25 @@ document.getElementById('entranceExamList').innerHTML =
 });
 }
 
+// NEW: Submission History Tab
+const submissionHistoryTabBtn = document.querySelector('[data-tab="submissionhistory"]');
+if (submissionHistoryTabBtn) {
+submissionHistoryTabBtn.addEventListener('click', function() {
+if (currentStudentDoc) {
+loadSubmissionHistory();
+} else {
+document.getElementById('submissionHistoryContainer').innerHTML =
+'<p>Please load a student first.</p>';
+}
+});
+}
+document.getElementById('refreshSubmissionsBtn')?.addEventListener('click', function() {
+if (currentStudentDoc) loadSubmissionHistory();
+});
+document.getElementById('submissionTypeFilter')?.addEventListener('change', function() {
+if (currentStudentDoc) loadSubmissionHistory();
+});
+
 const eLearningBtn = document.getElementById('eLearningModuleBtn');
 if (eLearningBtn) {
 eLearningBtn.addEventListener('click', function() {
@@ -16232,7 +16475,7 @@ document.getElementById('loginMessage').innerHTML = '<div class="error">' + esca
 }
 
 // ==================================================================
-//  ROLE-BASED UI (updated for finance)
+//  ROLE-BASED UI (updated for finance + submission history)
 // ==================================================================
 function setupRoleUI(role, extra) {
 extra = extra || {};
@@ -16322,6 +16565,11 @@ generateReportCard();
 const entranceTab = document.querySelector('[data-tab="entranceexam"]');
 if (entranceTab && entranceTab.classList.contains('active')) {
 loadEntranceExamForParent();
+}
+// NEW: Submission History
+const subTab = document.querySelector('[data-tab="submissionhistory"]');
+if (subTab && subTab.classList.contains('active')) {
+loadSubmissionHistory();
 }
 }
 
@@ -16831,6 +17079,15 @@ document.getElementById('entranceExamList').innerHTML =
 '<p>Please load a student first.</p>';
 }
 }
+// NEW: Submission History
+if (this.dataset.tab === 'submissionhistory') {
+if (currentStudentDoc) {
+loadSubmissionHistory();
+} else {
+document.getElementById('submissionHistoryContainer').innerHTML =
+'<p>Please load a student first.</p>';
+}
+}
 };
 });
 
@@ -16890,7 +17147,7 @@ loadChatbotData(linkedStudentId).catch(console.warn);
 };
 
 // ==================================================================
-//  ENTRANCE EXAMS ADMIN FUNCTIONS
+//  ENTRANCE EXAMS ADMIN FUNCTIONS (updated with class field)
 // ==================================================================
 async function loadEntranceExams() {
 const container = document.getElementById('entranceExamsList');
@@ -16908,11 +17165,13 @@ if (exams.length === 0) {
 container.innerHTML = '<p>No entrance exams created yet. Click "Create Exam" to start.</p>';
 return;
 }
-let html = '<div class="table-wrapper"><table><thead><tr><th>Title</th><th>Questions</th><th>Time Limit</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody>';
+let html = '<div class="table-wrapper"><table><thead><tr><th>Title</th><th>Class</th><th>Questions</th><th>Time Limit</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody>';
 for (const exam of exams) {
 const assignedCount = exam.assignedTo ? exam.assignedTo.length : 0;
+const classLabel = exam.class || 'All Classes';
 html += `<tr>
 <td>${escapeHtml(exam.title)}</td>
+<td>${escapeHtml(classLabel)}</td>
 <td>${exam.questions ? exam.questions.length : 0}</td>
 <td>${exam.timeLimit || 15} min</td>
 <td>${assignedCount} admission(s)</td>
@@ -17016,7 +17275,7 @@ console.error('Error:', error);
 }
 
 // ==================================================================
-//  QUIZ / ENTRANCE EXAM START FUNCTIONS
+//  QUIZ / ENTRANCE EXAM START FUNCTIONS (updated with student info)
 // ==================================================================
 function startQuiz(quiz) {
 const user = auth.currentUser;
@@ -17037,7 +17296,8 @@ questions: quiz.questions || [],
 answers: new Array(quiz.questions ? quiz.questions.length : 0).fill(null),
 currentIndex: 0,
 startTime: Date.now(),
-timeLimit: quiz.timeLimit || 15
+timeLimit: quiz.timeLimit || 15,
+quizTitle: quiz.title || 'Quiz'
 };
 document.getElementById('takeQuizTitle').textContent = '📝 ' + quiz.title;
 document.getElementById('takeQuizMeta').textContent =
@@ -17070,6 +17330,15 @@ function startEntranceExam(exam) {
 const user = auth.currentUser;
 if (!user) { alert('Please log in to take this exam.'); return; }
 
+// Check if the student's class matches the exam's target class
+if (exam.class && exam.class !== '' && exam.class !== 'All Classes') {
+const studentClass = currentStudentDoc ? currentStudentDoc.class : '';
+if (studentClass && exam.class !== studentClass) {
+alert(`This exam is for class "${exam.class}". Your class is "${studentClass}". You cannot take this exam.`);
+return;
+}
+}
+
 db.collection('entrance_exam_submissions')
 .where('examId', '==', exam.id)
 .where('studentId', '==', currentStudentDoc ? currentStudentDoc.id : '')
@@ -17087,7 +17356,8 @@ currentIndex: 0,
 startTime: Date.now(),
 timeLimit: exam.timeLimit || 15,
 studentId: currentStudentDoc ? currentStudentDoc.id : '',
-studentName: currentStudentDoc ? currentStudentDoc.name : ''
+studentName: currentStudentDoc ? currentStudentDoc.name : '',
+examTitle: exam.title || 'Entrance Exam'
 };
 document.getElementById('takeEntranceExamTitle').textContent = '📋 ' + exam.title;
 document.getElementById('takeEntranceExamMeta').textContent =
@@ -17262,12 +17532,18 @@ initPasswordToggles();
 });
 </script>
 
-<!-- ===== SERVICE WORKER REGISTRATION ===== -->
+<!-- ===== SERVICE WORKER REGISTRATION (fixed) ===== -->
 <script>
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/my-app/sw.js')
-            .then(() => console.log('✅ Service Worker registered'))
-            .catch(err => console.log('❌ Service Worker error:', err));
+        const origin = window.location.protocol;
+        // Only register if served over HTTP/HTTPS (not file://)
+        if (origin === 'http:' || origin === 'https:') {
+            navigator.serviceWorker.register('/my-app/sw.js')
+                .then(() => console.log('✅ Service Worker registered'))
+                .catch(err => console.log('❌ Service Worker error:', err));
+        } else {
+            console.log('ℹ️ Service Worker not registered: protocol is', origin);
+        }
     }
 </script>
 
