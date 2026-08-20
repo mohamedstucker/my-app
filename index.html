@@ -5729,7 +5729,7 @@
                     <h3>📋 Entrance Exams</h3>
                     <p style="color:#6c7a89; margin-bottom:10px; font-size:0.8rem;">
                         Create and manage entrance exams for admission candidates. Assign exams to pending admission requests.
-                        <strong>Now with class assignment!</strong>
+                        <strong>Now with class assignment and attempt limits!</strong>
                     </p>
                     <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                         <button id="createEntranceExamBtn" class="refresh-btn" style="background:#27ae60; font-size:0.7rem; padding:6px 16px;">➕ Create Exam</button>
@@ -5747,13 +5747,14 @@
                         All settings are stored per tenant (school). You can also manage all registered schools.
                     </p>
 
-                    <!-- ===== SCHOOL MANAGEMENT (NEW) ===== -->
-                    <h4>🏫 Manage All Schools (Demo Only)</h4>
+                    <!-- ===== SCHOOL MANAGEMENT (NEW) — only visible in demo school ===== -->
+                    <div class="settings-group" id="schoolManagementGroup">
+                        <h4>🏫 Manage All Schools <span style="font-size:0.6rem; color:#e74c3c; font-weight:400;">(Demo only)</span></h4>
                         <p style="color:#6c7a89; font-size:0.75rem; margin-bottom:8px;">
-                            Enable, disable, or delete schools. <strong>This feature is only available in the demo environment.</strong>
-                            For real tenants, your own school information is displayed below.
+                            Enable, disable, or delete schools. Disabled schools are hidden from the directory.
+                            <strong>Only available in the demo school (default_tenant).</strong>
                         </p>
-                         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
                             <button id="refreshSchoolsManagementBtn" class="refresh-btn" style="font-size:0.7rem; padding:6px 16px;">🔄 Refresh Schools</button>
                         </div>
                         <div id="schoolsManagementContainer">
@@ -5904,6 +5905,7 @@
                 <h3>📚 E-Learning</h3>
                 <p style="color:#6c7a89; margin-bottom:10px; font-size:0.8rem;">
                     Quizzes and assignments for your classes. Teachers can create, students can participate.
+                    <strong>Quizzes and entrance exams now support up to 3 attempts!</strong>
                 </p>
                 <div class="elearning-tabs">
                     <button class="elearning-tab-btn active" data-etab="quizzes">📝 Quizzes</button>
@@ -6242,11 +6244,12 @@
     <div id="bursarHistoryModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('bursarHistoryModal')">&times;</span><h3>Payment History</h3><div id="bursarHistoryContent"></div></div></div>
     <div id="bursarEditFeesModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('bursarEditFeesModal')">&times;</span><h3>Edit Term Fees</h3><label>Term 1: <input type="number" id="bursarEditTerm1" step="0.01" /></label><label>Term 2: <input type="number" id="bursarEditTerm2" step="0.01" /></label><label>Term 3: <input type="number" id="bursarEditTerm3" step="0.01" /></label><button id="saveBursarEditFeesBtn" class="refresh-btn" style="font-size:0.7rem; padding:6px 16px;">Save Changes</button><div id="bursarEditFeesMessage"></div></div></div>
 
-    <!-- ===== QUIZ MODALS ===== -->
+    <!-- ===== QUIZ MODALS (updated with attempt limit) ===== -->
     <div id="createQuizModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('createQuizModal')">&times;</span>
-            <h3>📝 Create Quiz</h3>
+            <h3 id="createQuizModalTitle">📝 Create Quiz</h3>
+            <input type="hidden" id="editQuizId" value="" />
             <div style="margin-bottom:8px;">
                 <label style="font-weight:600; font-size:0.75rem;">Quiz Title *</label>
                 <input type="text" id="quizTitle" placeholder="e.g. Math Test 1" />
@@ -6260,6 +6263,11 @@
             <div style="margin-bottom:8px;">
                 <label style="font-weight:600; font-size:0.75rem;">Time Limit (minutes)</label>
                 <input type="number" id="quizTimeLimit" placeholder="e.g. 15" value="15" min="1" max="120" />
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-weight:600; font-size:0.75rem;">Max Attempts *</label>
+                <input type="number" id="quizMaxAttempts" placeholder="e.g. 3" value="3" min="1" max="10" />
+                <span style="font-size:0.6rem; color:#6c7a89;">Maximum number of times a student can attempt this quiz</span>
             </div>
             <div style="margin-bottom:8px;">
                 <label style="font-weight:600; font-size:0.75rem;">Description (optional)</label>
@@ -6285,6 +6293,7 @@
                 <span id="takeQuizMeta" style="font-size:0.75rem; color:#6c7a89;"></span>
                 <span class="timer-display" id="takeQuizTimer">⏱️ 00:00</span>
             </div>
+            <div id="takeQuizAttemptsInfo" style="font-size:0.7rem; color:#6c7a89; margin-bottom:6px;"></div>
             <div id="takeQuizProgress" style="font-size:0.7rem; color:#6c7a89; margin-bottom:6px;">Question 1 of 1</div>
             <div id="takeQuizQuestionContainer"></div>
             <div style="display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;">
@@ -6369,11 +6378,12 @@
         </div>
     </div>
 
-    <!-- ===== ENTRANCE EXAM MODALS (updated with class field) ===== -->
+    <!-- ===== ENTRANCE EXAM MODALS (updated with attempt limit and class field) ===== -->
     <div id="createEntranceExamModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('createEntranceExamModal')">&times;</span>
-            <h3>📋 Create Entrance Exam</h3>
+            <h3 id="createEntranceExamModalTitle">📋 Create Entrance Exam</h3>
+            <input type="hidden" id="editEntranceExamId" value="" />
             <div style="margin-bottom:8px;">
                 <label style="font-weight:600; font-size:0.75rem;">Exam Title *</label>
                 <input type="text" id="entranceExamTitle" placeholder="e.g. Math Entrance 2026" />
@@ -6398,6 +6408,11 @@
             <div style="margin-bottom:8px;">
                 <label style="font-weight:600; font-size:0.75rem;">Time Limit (minutes)</label>
                 <input type="number" id="entranceExamTimeLimit" value="15" min="1" max="120" />
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-weight:600; font-size:0.75rem;">Max Attempts *</label>
+                <input type="number" id="entranceExamMaxAttempts" placeholder="e.g. 3" value="3" min="1" max="10" />
+                <span style="font-size:0.6rem; color:#6c7a89;">Maximum number of times a candidate can attempt this exam</span>
             </div>
             <div style="margin-bottom:10px;">
                 <label style="font-weight:600; font-size:0.75rem;">Questions *</label>
@@ -6433,6 +6448,7 @@
                 <span id="takeEntranceExamMeta" style="font-size:0.75rem; color:#6c7a89;"></span>
                 <span class="timer-display" id="takeEntranceExamTimer">⏱️ 00:00</span>
             </div>
+            <div id="takeEntranceExamAttemptsInfo" style="font-size:0.7rem; color:#6c7a89; margin-bottom:6px;"></div>
             <div id="takeEntranceExamProgress" style="font-size:0.7rem; color:#6c7a89; margin-bottom:6px;">Question 1 of 1</div>
             <div id="takeEntranceExamQuestionContainer"></div>
             <div style="display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;">
@@ -7407,10 +7423,10 @@
                 try { localStorage.setItem('tenantId', unique); } catch (_) { _tenantId = unique; }
                 showMessage('School created! Logging you in…', 'success', 'signupMessage');
                 setTimeout(() => {
-                    document.getElementById('signupMessage').innerHTML = '';
-                    loginAndSetup(email, password, true);
+                document.getElementById('signupMessage').innerHTML = '';
+                loginAndSetup(email, password, true);
                 }, 800);
-            } catch (error) {
+                } catch (error) {
                 showMessage('Signup failed: ' + error.message, 'error', 'signupMessage');
             }
         }
@@ -7635,13 +7651,25 @@
         }
 
         // ==================================================================
-        //  SCHOOL MANAGEMENT FUNCTIONS (NEW)
+        //  SCHOOL MANAGEMENT FUNCTIONS (NEW) — only visible in demo school
         // ==================================================================
-            async function loadSchoolsManagement() {
+        async function loadSchoolsManagement() {
             const container = document.getElementById('schoolsManagementContainer');
+            const group = document.getElementById('schoolManagementGroup');
+
+            // Check if this is the demo school (default_tenant)
+            const tenantId = getCurrentTenantId();
+            const isDemo = tenantId === 'default_tenant';
+
+            // Only show the management UI in the demo school
+            if (!isDemo) {
+                group.style.display = 'none';
+                return;
+            }
+            group.style.display = 'block';
+
             container.innerHTML = '<p>Loading schools...</p>';
             try {
-                const currentTenantId = getCurrentTenantId();
                 const snap = await db.collection('schools').get();
                 const schools = [];
                 snap.forEach(doc => {
@@ -7653,115 +7681,107 @@
                     return;
                 }
 
-                // Filter: show all schools only if current tenant is default_tenant
-                const isDemoAdmin = (currentTenantId === 'default_tenant');
-
                 let html = '';
-                if (isDemoAdmin) {
-                    // Full management for demo admin
-                    for (const school of schools) {
-                        const status = school.status || 'active';
-                        const statusClass = status === 'active' ? 'active' : (status === 'disabled' ? 'inactive' : 'pending');
-                        const statusLabel = status === 'active' ? '✅ Active' : (status === 'disabled' ? '❌ Disabled' : '⏳ Pending');
+                for (const school of schools) {
+                    const status = school.status || 'active';
+                    const statusClass = status === 'active' ? 'active' : (status === 'disabled' ? 'inactive' : 'pending');
+                    const statusLabel = status === 'active' ? '✅ Active' : (status === 'disabled' ? '❌ Disabled' :
+                        '⏳ Pending');
 
-                        html += `
-                            <div class="school-management-item">
-                                <div class="school-info">
-                                    <div class="school-name">${escapeHtml(school.name)}</div>
-                                    <div class="school-detail">${escapeHtml(school.location || 'N/A')} • ${escapeHtml(school.email || 'No email')}</div>
-                                    <div class="school-detail">Tenant ID: ${escapeHtml(school.tenantId || school.id)}</div>
-                                </div>
-                                <span class="school-status ${statusClass}">${statusLabel}</span>
-                                <div class="school-actions">
-                                    ${status === 'disabled' ? `<button class="enable-school-btn" data-id="${school.id}" style="background:#27ae60; color:#fff; font-size:0.6rem; padding:3px 10px;">Enable</button>` : `<button class="disable-school-btn" data-id="${school.id}" style="background:#f39c12; color:#fff; font-size:0.6rem; padding:3px 10px;">Disable</button>`}
-                                    <button class="delete-school-btn" data-id="${school.id}" style="background:#e74c3c; color:#fff; font-size:0.6rem; padding:3px 10px;">Delete</button>
-                                </div>
+                    html += `
+                        <div class="school-management-item">
+                            <div class="school-info">
+                                <div class="school-name">${escapeHtml(school.name)}</div>
+                                <div class="school-detail">${escapeHtml(school.location || 'N/A')} • ${escapeHtml(school.email || 'No email')}</div>
+                                <div class="school-detail">Tenant ID: ${escapeHtml(school.tenantId || school.id)}</div>
                             </div>
-                        `;
-                    }
-
-                    // Attach event listeners for demo admin
-                    // ... (existing listener code)
-                } else {
-                    // For real tenants: show only their own school (read-only)
-                    const mySchool = schools.find(s => s.tenantId === currentTenantId || s.id === currentTenantId);
-                    if (mySchool) {
-                        const status = mySchool.status || 'active';
-                        const statusClass = status === 'active' ? 'active' : (status === 'disabled' ? 'inactive' : 'pending');
-                        const statusLabel = status === 'active' ? '✅ Active' : (status === 'disabled' ? '❌ Disabled' : '⏳ Pending');
-                        html = `
-                            <div style="background:#f8fafc; border-radius:10px; padding:14px; border:1px solid #e6edf4;">
-                                <p style="font-size:0.8rem; color:#6c7a89; margin-bottom:6px;">Your school (tenant‑specific)</p>
-                                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                                    <div>
-                                        <strong style="font-size:1rem;">${escapeHtml(mySchool.name)}</strong>
-                                        <span style="font-size:0.7rem; color:#6c7a89; margin-left:8px;">${escapeHtml(mySchool.location || '')}</span>
-                                    </div>
-                                    <span class="school-status ${statusClass}">${statusLabel}</span>
-                                </div>
-                                <p style="font-size:0.7rem; color:#6c7a89; margin-top:8px;">
-                                    ℹ️ School management (enable/disable/delete) is only available in the demo environment.
-                                </p>
+                            <span class="school-status ${statusClass}">${statusLabel}</span>
+                            <div class="school-actions">
+                                ${status === 'disabled' ? `<button class="enable-school-btn" data-id="${school.id}" style="background:#27ae60; color:#fff; font-size:0.6rem; padding:3px 10px;">Enable</button>` : `<button class="disable-school-btn" data-id="${school.id}" style="background:#f39c12; color:#fff; font-size:0.6rem; padding:3px 10px;">Disable</button>`}
+                                <button class="delete-school-btn" data-id="${school.id}" style="background:#e74c3c; color:#fff; font-size:0.6rem; padding:3px 10px;">Delete</button>
                             </div>
-                        `;
-                    } else {
-                        html = `<p style="color:#6c7a89;">Your school record could not be found. Please contact support.</p>`;
-                    }
+                        </div>
+                    `;
                 }
 
                 container.innerHTML = html;
 
-                // Only attach event listeners if demo admin (isDemoAdmin === true)
-                if (isDemoAdmin) {
-                    // ... attach listeners for enable/disable/delete (same as before)
-                    container.querySelectorAll('.enable-school-btn').forEach(btn => {
-                        btn.onclick = async function() {
-                            if (confirm('Enable this school? It will appear in the directory.')) {
-                                await db.collection('schools').doc(this.dataset.id).update({ status: 'active' });
-                                loadSchoolsManagement();
-                                loadSchools();
+                container.querySelectorAll('.enable-school-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Enable this school? It will appear in the directory.')) {
+                            await db.collection('schools').doc(this.dataset.id).update({ status: 'active' });
+                            loadSchoolsManagement();
+                            loadSchools();
+                            // Check if the currently logged-in user's tenant was enabled
+                            const currentTenant = getCurrentTenantId();
+                            if (currentTenant === this.dataset.id) {
+                                // User's school was enabled; no action needed, they can continue
+                                showMessage('Your school has been enabled.', 'success', 'settingsMessage');
                             }
-                        };
-                    });
-                    container.querySelectorAll('.disable-school-btn').forEach(btn => {
-                        btn.onclick = async function() {
-                            if (confirm('Disable this school? It will be hidden from the directory.')) {
-                                await db.collection('schools').doc(this.dataset.id).update({ status: 'disabled' });
-                                loadSchoolsManagement();
-                                loadSchools();
+                        }
+                    };
+                });
+
+                container.querySelectorAll('.disable-school-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('Disable this school? It will be hidden from the directory. All users will be logged out.')) {
+                            const schoolId = this.dataset.id;
+                            await db.collection('schools').doc(schoolId).update({ status: 'disabled' });
+                            loadSchoolsManagement();
+                            loadSchools();
+                            // Check if the currently logged-in user belongs to this school
+                            const currentTenant = getCurrentTenantId();
+                            if (currentTenant === schoolId) {
+                                // Force logout for the current user
+                                await auth.signOut();
+                                try { localStorage.removeItem('tenantId'); } catch (_) {}
+                                _tenantId = 'default_tenant';
+                                showStartupPage();
+                                alert('⚠️ Your school has been disabled. You have been logged out.');
                             }
-                        };
-                    });
-                    container.querySelectorAll('.delete-school-btn').forEach(btn => {
-                        btn.onclick = async function() {
-                            if (confirm('⚠️ Permanently delete this school and all its data? This cannot be undone!')) {
-                                const schoolId = this.dataset.id;
-                                const batch = db.batch();
-                                const collections = ['students', 'teachers', 'attendance', 'fee_records', 'exam_records',
-                                    'notices', 'suggestions', 'staff', 'assets', 'inventory', 'visitors',
-                                    'staff_attendance', 'staff_payments', 'quiz_submissions',
-                                    'entrance_exam_submissions', 'quizzes', 'assignments', 'admissions',
-                                    'registration_requests', 'income', 'expenses', 'school_settings'
-                                ];
-                                for (const coll of collections) {
-                                    const snap = await db.collection(coll).where('tenantId', '==', schoolId).get();
-                                    snap.forEach(doc => batch.delete(doc.ref));
-                                }
-                                batch.delete(db.collection('schools').doc(schoolId));
-                                await batch.commit();
-                                alert('School and all associated data deleted.');
-                                loadSchoolsManagement();
-                                loadSchools();
+                        }
+                    };
+                });
+
+                container.querySelectorAll('.delete-school-btn').forEach(btn => {
+                    btn.onclick = async function() {
+                        if (confirm('⚠️ Permanently delete this school and all its data? This cannot be undone!')) {
+                            const schoolId = this.dataset.id;
+                            // Delete all associated data
+                            const batch = db.batch();
+                            const collections = ['students', 'teachers', 'attendance', 'fee_records', 'exam_records',
+                                'notices', 'suggestions', 'staff', 'assets', 'inventory', 'visitors',
+                                'staff_attendance', 'staff_payments', 'quiz_submissions',
+                                'entrance_exam_submissions', 'quizzes', 'assignments', 'admissions',
+                                'registration_requests', 'income', 'expenses', 'school_settings'
+                            ];
+                            for (const coll of collections) {
+                                const snap = await db.collection(coll).where('tenantId', '==', schoolId).get();
+                                snap.forEach(doc => batch.delete(doc.ref));
                             }
-                        };
-                    });
-                }
+                            batch.delete(db.collection('schools').doc(schoolId));
+                            await batch.commit();
+                            alert('School and all associated data deleted.');
+                            loadSchoolsManagement();
+                            loadSchools();
+                            // Logout if current user belongs to this school
+                            const currentTenant = getCurrentTenantId();
+                            if (currentTenant === schoolId) {
+                                await auth.signOut();
+                                try { localStorage.removeItem('tenantId'); } catch (_) {}
+                                _tenantId = 'default_tenant';
+                                showStartupPage();
+                            }
+                        }
+                    };
+                });
 
             } catch (error) {
                 container.innerHTML = '<div class="error">Error loading schools: ' + escapeHtml(error.message) + '</div>';
                 console.error('Schools management error:', error);
             }
         }
+
         // ==================================================================
         //  ADMISSION REQUEST FUNCTIONS (with email notification)
         // ==================================================================
@@ -14030,7 +14050,7 @@
         }
 
         // ==================================================================
-        //  E-LEARNING MODULE: QUIZZES & ASSIGNMENTS (with email notification)
+        //  E-LEARNING MODULE: QUIZZES & ASSIGNMENTS (with email notification + edit + attempt limit)
         // ==================================================================
         function populateELearningDropdowns() {
             const classSelects = ['quizClass', 'assignmentClass'];
@@ -14221,13 +14241,15 @@
         };
 
         // ==================================================================
-        //  QUIZ SAVE (with email notification)
+        //  QUIZ SAVE & EDIT (with attempt limit)
         // ==================================================================
         document.getElementById('saveQuizBtn').onclick = async function() {
             const title = document.getElementById('quizTitle').value.trim();
             const classVal = document.getElementById('quizClass').value;
             const timeLimit = parseInt(document.getElementById('quizTimeLimit').value) || 15;
+            const maxAttempts = parseInt(document.getElementById('quizMaxAttempts').value) || 3;
             const description = document.getElementById('quizDescription').value.trim();
+            const editId = document.getElementById('editQuizId').value;
 
             if (!title) {
                 showMessage('Please enter a quiz title.', 'error', 'quizCreateMessage');
@@ -14273,41 +14295,61 @@
             try {
                 const tenantId = getCurrentTenantId();
                 const user = auth.currentUser;
-                await db.collection('quizzes').add({
+
+                const quizData = {
                     title,
                     class: classVal,
                     timeLimit,
+                    maxAttempts,
                     description,
                     questions,
-                    createdBy: user ? user.uid : 'anonymous',
-                    createdByName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     tenantId: tenantId
-                });
+                };
 
-                await sendEmailNotification(
-                    `📝 New Quiz Created - ${schoolSettings.schoolName || 'EduSL'}`,
-                    `Dear Admin,\n\nA new quiz has been created:\n\nTitle: ${title}\nClass: ${classVal || 'All Classes'}\nTime Limit: ${timeLimit} min\nDescription: ${description || 'None'}\nQuestions: ${questions.length}\n\nPlease review and notify students.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
-                );
+                if (editId) {
+                    // Edit existing quiz
+                    await db.collection('quizzes').doc(editId).update(quizData);
+                    showMessage('✅ Quiz updated successfully!', 'success', 'quizCreateMessage');
+                } else {
+                    // Create new quiz
+                    quizData.createdBy = user ? user.uid : 'anonymous';
+                    quizData.createdByName = user ? user.displayName || user.email || 'Anonymous' : 'Anonymous';
+                    quizData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('quizzes').add(quizData);
 
-                showMessage('✅ Quiz created successfully! Email notification sent.', 'success', 'quizCreateMessage');
+                    await sendEmailNotification(
+                        `📝 New Quiz Created - ${schoolSettings.schoolName || 'EduSL'}`,
+                        `Dear Admin,\n\nA new quiz has been created:\n\nTitle: ${title}\nClass: ${classVal || 'All Classes'}\nTime Limit: ${timeLimit} min\nMax Attempts: ${maxAttempts}\nDescription: ${description || 'None'}\nQuestions: ${questions.length}\n\nPlease review and notify students.\n\nThank you,\n${schoolSettings.schoolName || 'EduSL Team'}`
+                    );
+
+                    showMessage('✅ Quiz created successfully! Email notification sent.', 'success', 'quizCreateMessage');
+                }
+
+                document.getElementById('editQuizId').value = '';
+                document.getElementById('createQuizModalTitle').textContent = '📝 Create Quiz';
+
                 setTimeout(() => {
                     closeModal('createQuizModal');
                     loadQuizzes();
                 }, 1200);
+
             } catch (error) {
-                showMessage('Error creating quiz: ' + error.message, 'error', 'quizCreateMessage');
+                showMessage('Error saving quiz: ' + error.message, 'error', 'quizCreateMessage');
+                console.error('Quiz save error:', error);
             }
         };
 
         // ==================================================================
-        //  ENTRANCE EXAM SAVE (updated with class field)
+        //  ENTRANCE EXAM SAVE & EDIT (updated with class field + attempt limit)
         // ==================================================================
         document.getElementById('saveEntranceExamBtn').onclick = async function() {
             const title = document.getElementById('entranceExamTitle').value.trim();
             const description = document.getElementById('entranceExamDescription').value.trim();
             const timeLimit = parseInt(document.getElementById('entranceExamTimeLimit').value) || 15;
+            const maxAttempts = parseInt(document.getElementById('entranceExamMaxAttempts').value) || 3;
             const examClass = document.getElementById('entranceExamClass').value;
+            const editId = document.getElementById('editEntranceExamId').value;
 
             if (!title) {
                 showMessage('Please enter an exam title.', 'error', 'entranceExamCreateMessage');
@@ -14353,26 +14395,43 @@
             try {
                 const tenantId = getCurrentTenantId();
                 const user = auth.currentUser;
-                await db.collection('entrance_exams').add({
+
+                const examData = {
                     title,
                     description,
                     timeLimit,
+                    maxAttempts,
                     class: examClass || '',
                     questions,
-                    createdBy: user ? user.uid : 'anonymous',
-                    createdByName: user ? user.displayName || user.email || 'Anonymous' : 'Anonymous',
-                    assignedTo: [],
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     tenantId: tenantId
-                });
+                };
 
-                showMessage('✅ Entrance exam created successfully!', 'success', 'entranceExamCreateMessage');
+                if (editId) {
+                    // Edit existing exam
+                    await db.collection('entrance_exams').doc(editId).update(examData);
+                    showMessage('✅ Entrance exam updated successfully!', 'success', 'entranceExamCreateMessage');
+                } else {
+                    // Create new exam
+                    examData.createdBy = user ? user.uid : 'anonymous';
+                    examData.createdByName = user ? user.displayName || user.email || 'Anonymous' : 'Anonymous';
+                    examData.assignedTo = [];
+                    examData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('entrance_exams').add(examData);
+                    showMessage('✅ Entrance exam created successfully!', 'success', 'entranceExamCreateMessage');
+                }
+
+                document.getElementById('editEntranceExamId').value = '';
+                document.getElementById('createEntranceExamModalTitle').textContent = '📋 Create Entrance Exam';
+
                 setTimeout(() => {
                     closeModal('createEntranceExamModal');
                     loadEntranceExams();
                 }, 1200);
+
             } catch (error) {
-                showMessage('Error creating entrance exam: ' + error.message, 'error', 'entranceExamCreateMessage');
+                showMessage('Error saving entrance exam: ' + error.message, 'error', 'entranceExamCreateMessage');
+                console.error('Entrance exam save error:', error);
             }
         };
 
@@ -14442,7 +14501,7 @@
             renderQuestionContainer('takeEntranceExamQuestionContainer', currentEntranceExamTaking, 'entrance');
         };
 
-        // ----- Submit Quiz (with email notification) -----
+        // ----- Submit Quiz (with attempt limit + email notification) -----
         window.submitQuiz = async function() {
             if (quizTimerInterval) clearInterval(quizTimerInterval);
 
@@ -14472,7 +14531,8 @@
                 });
             });
 
-            const score = Math.round((correct / data.questions.filter(q => q.type === 'mcq').length) * 100) || 0;
+            const totalMcq = data.questions.filter(q => q.type === 'mcq').length;
+            const score = totalMcq > 0 ? Math.round((correct / totalMcq) * 100) : 0;
 
             const user = auth.currentUser;
             const tenantId = getCurrentTenantId();
@@ -14491,7 +14551,8 @@
                 timeTaken: Math.round((Date.now() - data.startTime) / 1000),
                 submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 tenantId: tenantId,
-                quizTitle: data.quizTitle || 'Quiz'
+                quizTitle: data.quizTitle || 'Quiz',
+                attemptNumber: data.attemptNumber || 1
             };
 
             await db.collection('quiz_submissions').add(submission);
@@ -14539,7 +14600,8 @@
                 });
             });
 
-            const score = Math.round((correct / data.questions.filter(q => q.type === 'mcq').length) * 100) || 0;
+            const totalMcq = data.questions.filter(q => q.type === 'mcq').length;
+            const score = totalMcq > 0 ? Math.round((correct / totalMcq) * 100) : 0;
 
             const user = auth.currentUser;
             const tenantId = getCurrentTenantId();
@@ -14558,7 +14620,8 @@
                 timeTaken: Math.round((Date.now() - data.startTime) / 1000),
                 submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 tenantId: tenantId,
-                examTitle: data.examTitle || 'Entrance Exam'
+                examTitle: data.examTitle || 'Entrance Exam',
+                attemptNumber: data.attemptNumber || 1
             };
 
             await db.collection('entrance_exam_submissions').add(submission);
@@ -14580,7 +14643,7 @@
             score);
 
             closeModal('takeEntranceExamModal');
-            alert(`✅ Exam submitted! Your MCQ score: ${score}% (${correct}/${data.questions.filter(q => q.type === 'mcq').length}). Short answers will be graded by the teacher.`);
+            alert(`✅ Exam submitted! Your MCQ score: ${score}% (${correct}/${totalMcq}). Short answers will be graded by the teacher.`);
 
             loadEntranceExamForParent();
             if (document.getElementById('submissionhistoryTab').classList.contains('active')) {
@@ -14589,7 +14652,7 @@
         };
 
         // ==================================================================
-        //  LOAD ENTRANCE EXAM FOR PARENT
+        //  LOAD ENTRANCE EXAM FOR PARENT (with attempt tracking)
         // ==================================================================
         async function loadEntranceExamForParent() {
             const container = document.getElementById('entranceExamList');
@@ -14632,34 +14695,49 @@
                     if (!examDoc.exists) continue;
                     const exam = { id: examDoc.id, ...examDoc.data() };
 
-                    const submissionSnap = await db.collection('entrance_exam_submissions')
+                    // Count attempts for this student
+                    const subSnap = await db.collection('entrance_exam_submissions')
                         .where('tenantId', '==', tenantId)
                         .where('examId', '==', examId)
                         .where('studentId', '==', currentStudentDoc.id)
                         .get();
+                    const attempts = subSnap.size;
+                    const maxAttempts = exam.maxAttempts || 3;
+                    const canAttempt = attempts < maxAttempts;
 
                     let submitted = false;
                     let submissionData = null;
-                    submissionSnap.forEach(d => {
+                    subSnap.forEach(d => {
                         submitted = true;
                         submissionData = { id: d.id, ...d.data() };
                     });
+
+                    const attemptsLeft = maxAttempts - attempts;
 
                     if (submitted && submissionData) {
                         html += `<div class="quiz-card">
                             <div class="quiz-title">📋 ${escapeHtml(exam.title)}</div>
                             <div class="quiz-meta">✅ Submitted on ${escapeHtml(submissionData.submittedAt ? new Date(submissionData.submittedAt.toDate()).toLocaleString() : '')}</div>
                             <div class="quiz-meta">Score: ${submissionData.score}% (${submissionData.correct}/${submissionData.total})</div>
+                            <div class="quiz-meta">Attempt ${attempts} of ${maxAttempts} (${attemptsLeft} left)</div>
+                        </div>`;
+                    } else if (canAttempt) {
+                        html += `<div class="quiz-card">
+                            <div class="quiz-title">📋 ${escapeHtml(exam.title)}</div>
+                            <div class="quiz-meta">⏱️ ${exam.timeLimit || 15} min • ${exam.questions ? exam.questions.length : 0} questions</div>
+                            ${exam.class ? `<div class="quiz-meta">📚 Target Class: ${escapeHtml(exam.class)}</div>` : ''}
+                            ${exam.description ? `<div class="quiz-meta">${escapeHtml(exam.description)}</div>` : ''}
+                            <div class="quiz-meta">Attempts: ${attempts} of ${maxAttempts} (${attemptsLeft} remaining)</div>
+                            <div class="quiz-actions">
+                                <button class="take-entrance-exam-btn act-btn success" data-exam='${JSON.stringify(exam)}' data-attempt="${attempts + 1}">📝 Take Exam</button>
+                            </div>
                         </div>`;
                     } else {
                         html += `<div class="quiz-card">
                             <div class="quiz-title">📋 ${escapeHtml(exam.title)}</div>
                             <div class="quiz-meta">⏱️ ${exam.timeLimit || 15} min • ${exam.questions ? exam.questions.length : 0} questions</div>
                             ${exam.class ? `<div class="quiz-meta">📚 Target Class: ${escapeHtml(exam.class)}</div>` : ''}
-                            ${exam.description ? `<div class="quiz-meta">${escapeHtml(exam.description)}</div>` : ''}
-                            <div class="quiz-actions">
-                                <button class="take-entrance-exam-btn act-btn success" data-exam='${JSON.stringify(exam)}'>📝 Take Exam</button>
-                            </div>
+                            <div class="quiz-meta" style="color:#e74c3c;">❌ Max attempts (${maxAttempts}) reached. You cannot take this exam again.</div>
                         </div>`;
                     }
                 }
@@ -14669,7 +14747,8 @@
                 container.querySelectorAll('.take-entrance-exam-btn').forEach(btn => {
                     btn.onclick = function() {
                         const exam = JSON.parse(this.dataset.exam);
-                        startEntranceExam(exam);
+                        const attemptNumber = parseInt(this.dataset.attempt) || 1;
+                        startEntranceExam(exam, attemptNumber);
                     };
                 });
 
@@ -14680,7 +14759,7 @@
         }
 
         // ==================================================================
-        //  LOAD QUIZZES & ASSIGNMENTS (updated with class filtering)
+        //  LOAD QUIZZES & ASSIGNMENTS (updated with class filtering + attempt tracking)
         // ==================================================================
         async function loadQuizzes() {
             const container = document.getElementById('quizzesList');
@@ -14724,12 +14803,12 @@
             }
 
             let html = '';
-            quizzes.forEach(q => {
+            for (const q of quizzes) {
                 // Filter by class for students/parents
                 if (isStudent || isParent) {
                     if (studentClass && q.class && q.class !== '' && q.class !== 'All Classes') {
                         if (q.class !== studentClass) {
-                            return;
+                            continue;
                         }
                     }
                 }
@@ -14740,26 +14819,34 @@
 
                 const classLabel = q.class || 'All Classes';
                 const timeLabel = q.timeLimit ? `${q.timeLimit} min` : 'No time limit';
+                const maxAttempts = q.maxAttempts || 3;
 
-                // Check if already submitted
+                // Check if already submitted and count attempts
                 let alreadySubmitted = false;
+                let attemptCount = 0;
+                let canAttempt = true;
                 if (user && (isStudent || isParent)) {
-                    const subKey = q.id + '_' + user.uid;
-                    if (quizSubmissions[subKey]) alreadySubmitted = true;
+                    // Count attempts for this user
+                    const subKeyPrefix = q.id + '_' + user.uid;
+                    // We'll check via Firestore when user clicks take
+                    // For display, we just show the max attempts info
+                    attemptCount = 0; // Will be checked when taking
+                    alreadySubmitted = false; // Will be checked when taking
+                    canAttempt = true;
                 }
 
                 html += `<div class="quiz-card">
                     <div class="quiz-title">${escapeHtml(q.title)}</div>
                     <div class="quiz-meta">📚 ${escapeHtml(classLabel)} • ⏱️ ${timeLabel} • ${q.questions ? q.questions.length : 0} questions</div>
+                    <div class="quiz-meta">Max Attempts: ${maxAttempts}</div>
                     ${q.description ? `<div class="quiz-meta">${escapeHtml(q.description)}</div>` : ''}
                     <div class="quiz-actions">
-                        ${canTake && !alreadySubmitted ? `<button class="take-quiz-btn act-btn success" data-id="${q.id}">Take Quiz</button>` : ''}
-                        ${alreadySubmitted ? `<span style="color:#27ae60; font-weight:600; font-size:0.7rem;">✅ Submitted</span>` : ''}
+                        ${canTake ? `<button class="take-quiz-btn act-btn success" data-id="${q.id}">Take Quiz</button>` : ''}
                         ${canEdit ? `<button class="edit-quiz-btn act-btn edit" data-id="${q.id}">Edit</button>` : ''}
                         ${canDelete ? `<button class="delete-quiz-btn act-btn delete" data-id="${q.id}">Delete</button>` : ''}
                     </div>
                 </div>`;
-            });
+            }
 
             if (!html) {
                 html = '<p>No quizzes available for your class.</p>';
@@ -14772,8 +14859,6 @@
                     const id = this.dataset.id;
                     const quiz = quizzes.find(q => q.id === id);
                     if (quiz) {
-                        // Store quiz title for submission
-                        currentQuizTaking = null;
                         startQuiz(quiz);
                     }
                 };
@@ -14790,9 +14875,106 @@
 
             container.querySelectorAll('.edit-quiz-btn').forEach(btn => {
                 btn.onclick = function() {
-                    alert('Edit quiz functionality: You can modify the quiz in Firestore directly.');
+                    const id = this.dataset.id;
+                    const quiz = quizzes.find(q => q.id === id);
+                    if (quiz) {
+                        openEditQuizModal(quiz);
+                    }
                 };
             });
+        }
+
+        // ----- Edit Quiz Modal -----
+        function openEditQuizModal(quiz) {
+            document.getElementById('editQuizId').value = quiz.id;
+            document.getElementById('createQuizModalTitle').textContent = '✏️ Edit Quiz';
+            document.getElementById('quizTitle').value = quiz.title || '';
+            document.getElementById('quizClass').value = quiz.class || '';
+            document.getElementById('quizTimeLimit').value = quiz.timeLimit || 15;
+            document.getElementById('quizMaxAttempts').value = quiz.maxAttempts || 3;
+            document.getElementById('quizDescription').value = quiz.description || '';
+
+            // Load questions
+            const container = document.getElementById('quizQuestionsContainer');
+            container.innerHTML = '';
+            if (quiz.questions && quiz.questions.length > 0) {
+                quiz.questions.forEach((q, idx) => {
+                    const div = document.createElement('div');
+                    div.innerHTML = createQuestionHTML(idx, 'q');
+                    const el = div.firstElementChild;
+                    container.appendChild(el);
+                    // Fill in values
+                    el.querySelector('.q-text-input').value = q.text || '';
+                    const typeSelect = el.querySelector('.q-type-select');
+                    typeSelect.value = q.type || 'mcq';
+                    typeSelect.dispatchEvent(new Event('change'));
+                    if (q.type === 'mcq') {
+                        const optInputs = el.querySelectorAll('.q-opt-input');
+                        q.options.forEach((opt, i) => {
+                            if (optInputs[i]) optInputs[i].value = opt || '';
+                        });
+                        const radios = el.querySelectorAll(`input[name="q_correct_${idx}"]`);
+                        if (q.correct !== null && q.correct !== undefined && radios[q.correct]) {
+                            radios[q.correct].checked = true;
+                        }
+                    } else {
+                        const expected = el.querySelector('.q-expected-answer');
+                        if (expected) expected.value = q.correct || '';
+                    }
+                });
+            } else {
+                container.innerHTML = createQuestionHTML(0, 'q');
+            }
+            attachTypeToggle(container);
+            attachRemoveEvents();
+
+            openModal('createQuizModal');
+        }
+
+        // ----- Edit Entrance Exam Modal -----
+        function openEditEntranceExamModal(exam) {
+            document.getElementById('editEntranceExamId').value = exam.id;
+            document.getElementById('createEntranceExamModalTitle').textContent = '✏️ Edit Entrance Exam';
+            document.getElementById('entranceExamTitle').value = exam.title || '';
+            document.getElementById('entranceExamDescription').value = exam.description || '';
+            document.getElementById('entranceExamTimeLimit').value = exam.timeLimit || 15;
+            document.getElementById('entranceExamMaxAttempts').value = exam.maxAttempts || 3;
+            document.getElementById('entranceExamClass').value = exam.class || '';
+
+            // Load questions
+            const container = document.getElementById('entranceExamQuestionsContainer');
+            container.innerHTML = '';
+            if (exam.questions && exam.questions.length > 0) {
+                exam.questions.forEach((q, idx) => {
+                    const div = document.createElement('div');
+                    div.innerHTML = createQuestionHTML(idx, 'eq');
+                    const el = div.firstElementChild;
+                    container.appendChild(el);
+                    el.querySelector('.q-text-input').value = q.text || '';
+                    const typeSelect = el.querySelector('.q-type-select');
+                    typeSelect.value = q.type || 'mcq';
+                    typeSelect.dispatchEvent(new Event('change'));
+                    if (q.type === 'mcq') {
+                        const optInputs = el.querySelectorAll('.q-opt-input');
+                        q.options.forEach((opt, i) => {
+                            if (optInputs[i]) optInputs[i].value = opt || '';
+                        });
+                        const radios = el.querySelectorAll(`input[name="eq_correct_${idx}"]`);
+                        if (q.correct !== null && q.correct !== undefined && radios[q.correct]) {
+                            radios[q.correct].checked = true;
+                        }
+                    } else {
+                        const expected = el.querySelector('.q-expected-answer');
+                        if (expected) expected.value = q.correct || '';
+                    }
+                });
+            } else {
+                container.innerHTML = createQuestionHTML(0, 'eq');
+            }
+            attachTypeToggle(container);
+            attachRemoveEvents();
+
+            openModal('createEntranceExamModal');
         }
 
         // ==================================================================
@@ -14976,7 +15158,7 @@
         }
 
         // ==================================================================
-        //  SUBMISSION HISTORY (NEW) - improved with index fallback
+        //  SUBMISSION HISTORY (NEW) - improved with index fallback + attempt info
         // ==================================================================
         async function loadSubmissionHistory() {
             const container = document.getElementById('submissionHistoryContainer');
@@ -15013,7 +15195,8 @@
                                     submittedAt: data.submittedAt,
                                     correct: data.correct,
                                     total: data.total,
-                                    userName: data.userName
+                                    userName: data.userName,
+                                    attemptNumber: data.attemptNumber || 1
                                 });
                             });
                         } catch (orderError) {
@@ -15033,7 +15216,8 @@
                                         submittedAt: data.submittedAt,
                                         correct: data.correct,
                                         total: data.total,
-                                        userName: data.userName
+                                        userName: data.userName,
+                                        attemptNumber: data.attemptNumber || 1
                                     });
                                 });
                             } else {
@@ -15069,7 +15253,8 @@
                                     submittedAt: data.submittedAt,
                                     correct: data.correct,
                                     total: data.total,
-                                    userName: data.userName
+                                    userName: data.userName,
+                                    attemptNumber: data.attemptNumber || 1
                                 });
                             });
                         } catch (orderError) {
@@ -15089,7 +15274,8 @@
                                         submittedAt: data.submittedAt,
                                         correct: data.correct,
                                         total: data.total,
-                                        userName: data.userName
+                                        userName: data.userName,
+                                        attemptNumber: data.attemptNumber || 1
                                     });
                                 });
                             } else {
@@ -15125,7 +15311,7 @@
                 }
 
                 let html =
-                    '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Type</th><th>Title</th><th>Score</th><th>Details</th></tr></thead><tbody>';
+                    '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Type</th><th>Title</th><th>Score</th><th>Attempt</th><th>Details</th></tr></thead><tbody>';
 
                 for (const sub of submissions) {
                     const date = sub.submittedAt ? (sub.submittedAt.toDate ? new Date(sub.submittedAt.toDate())
@@ -15133,6 +15319,7 @@
                     const typeLabel = sub.type === 'quiz' ? '📝 Quiz' : '📋 Entrance Exam';
                     const scoreColor = sub.score >= 70 ? 'good' : (sub.score >= 50 ? 'average' : 'poor');
                     const scoreDisplay = sub.total > 0 ? `${sub.score}% (${sub.correct}/${sub.total})` : `${sub.score}%`;
+                    const attemptDisplay = sub.attemptNumber || 1;
 
                     html += `<tr>
                         <td style="font-size:0.65rem;">${escapeHtml(date)}</td>
@@ -15141,6 +15328,7 @@
                         <td>${typeLabel}</td>
                         <td>${escapeHtml(sub.title)}</td>
                         <td><span class="mean-value ${scoreColor}">${scoreDisplay}</span></td>
+                        <td>Attempt ${attemptDisplay}</td>
                         <td>${sub.userName ? `By ${escapeHtml(sub.userName)}` : ''}</td>
                     </tr>`;
                 }
@@ -15528,9 +15716,12 @@
                 alert('Only teachers and admins can create quizzes.');
                 return;
             }
+            document.getElementById('editQuizId').value = '';
+            document.getElementById('createQuizModalTitle').textContent = '📝 Create Quiz';
             document.getElementById('quizTitle').value = '';
             document.getElementById('quizClass').value = '';
             document.getElementById('quizTimeLimit').value = '15';
+            document.getElementById('quizMaxAttempts').value = '3';
             document.getElementById('quizDescription').value = '';
             document.getElementById('quizCreateMessage').innerHTML = '';
             initQuizQuestionContainer();
@@ -15540,16 +15731,19 @@
         document.getElementById('refreshQuizzesBtn').addEventListener('click', function() { loadQuizzes(); });
 
         // ==================================================================
-        //  ENTRANCE EXAM CREATION INIT (updated with class field)
+        //  ENTRANCE EXAM CREATION INIT (updated with class field + edit support)
         // ==================================================================
         document.getElementById('createEntranceExamBtn').addEventListener('click', function() {
             if (currentUserRole !== 'admin') {
                 alert('Only admins can create entrance exams.');
                 return;
             }
+            document.getElementById('editEntranceExamId').value = '';
+            document.getElementById('createEntranceExamModalTitle').textContent = '📋 Create Entrance Exam';
             document.getElementById('entranceExamTitle').value = '';
             document.getElementById('entranceExamDescription').value = '';
             document.getElementById('entranceExamTimeLimit').value = '15';
+            document.getElementById('entranceExamMaxAttempts').value = '3';
             document.getElementById('entranceExamClass').value = '';
             document.getElementById('entranceExamCreateMessage').innerHTML = '';
             initEntranceExamQuestionContainer();
@@ -16904,287 +17098,333 @@ showMessage(`✅ Finance migration completed: ${incomeCount} income, ${expenseCo
 }
 
 // ==================================================================
-//  LOGIN AND SETUP (updated with finance module + submission history)
+//  CHECK IF SCHOOL IS ENABLED
+// ==================================================================
+async function checkSchoolEnabled(tenantId) {
+    // Demo admin is always allowed
+    if (tenantId === 'default_tenant') return true;
+
+    try {
+        const doc = await db.collection('schools').doc(tenantId).get();
+        if (!doc.exists) {
+            return true;
+        }
+        const data = doc.data();
+        const status = data.status || 'active';
+        return status !== 'disabled';
+    } catch (error) {
+        console.warn('Error checking school status:', error);
+        return true;
+    }
+}
+
+// ==================================================================
+//  LOGIN AND SETUP (updated with finance module + submission history + school disabled check)
 // ==================================================================
 async function loginAndSetup(email, password, skipAuth = false) {
-try {
-if (!skipAuth) await auth.signInWithEmailAndPassword(email, password);
-const user = auth.currentUser;
-if (!user) throw new Error('Not logged in');
-const userDoc = await db.collection('users').doc(user.uid).get();
-if (!userDoc.exists) throw new Error('User role not found');
-const userData = userDoc.data();
-const role = userData.role;
-const tenantId = userData.tenantId || 'default_tenant';
-try { localStorage.setItem('tenantId', tenantId); } catch (_) { _tenantId = tenantId; }
-await logLoginActivity(user, userData, tenantId);
-currentUserRole = role;
+    try {
+        if (!skipAuth) await auth.signInWithEmailAndPassword(email, password);
+        const user = auth.currentUser;
+        if (!user) throw new Error('Not logged in');
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (!userDoc.exists) throw new Error('User role not found');
+        const userData = userDoc.data();
+        const role = userData.role;
+        const tenantId = userData.tenantId || 'default_tenant';
+        try { localStorage.setItem('tenantId', tenantId); } catch (_) { _tenantId = tenantId; }
+        
+        // 🔥 Check if school is enabled (skip for demo admin)
+        const isEnabled = await checkSchoolEnabled(tenantId);
+        if (!isEnabled && tenantId !== 'default_tenant') {
+            await auth.signOut();
+            document.getElementById('loginMessage').innerHTML = '<div class="error">This school has been disabled. Please contact the system administrator.</div>';
+            // Switch back to startup page
+            showStartupPage();
+            return;
+        }
+        
+        await logLoginActivity(user, userData, tenantId);
+        currentUserRole = role;
 
-document.getElementById('startupPage').style.display = 'none';
-document.getElementById('schoolsPage').style.display = 'none';
-document.getElementById('loginModal').style.display = 'none';
-document.getElementById('mainHeader').style.display = 'flex';
-document.getElementById('syncBar').style.display = 'block';
-document.getElementById('globalNotices').style.display = 'block';
-document.getElementById('mainApp').style.display = 'block';
-document.getElementById('userInfo').innerText = role.toUpperCase() + ': ' + email;
-document.getElementById('logoutBtn').style.display = 'inline-block';
+        document.getElementById('startupPage').style.display = 'none';
+        document.getElementById('schoolsPage').style.display = 'none';
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('mainHeader').style.display = 'flex';
+        document.getElementById('syncBar').style.display = 'block';
+        document.getElementById('globalNotices').style.display = 'block';
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('userInfo').innerText = role.toUpperCase() + ': ' + email;
+        document.getElementById('logoutBtn').style.display = 'inline-block';
 
-await loadSchoolSettingsSilent();
-await loadSchoolSettings();
+        await loadSchoolSettingsSilent();
+        await loadSchoolSettings();
 
-await loadStudents();
-renderNotices();
+        await loadStudents();
+        renderNotices();
 
-if (role === 'admin') {
-const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
-'==', user.uid).get();
-if (!teacherSnap.empty) teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherSnap.docs[0]
-.data() };
-setupRoleUI('admin');
-setTimeout(() => {
-migratePastFinanceRecords().catch(e => console.warn('Migration error:', e));
-}, 3000);
-} else if (role === 'bursar') {
-setupRoleUI('bursar');
-setTimeout(() => {
-migratePastFinanceRecords().catch(e => console.warn('Migration error:', e));
-}, 3000);
-} else if (role === 'teacher') {
-const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
-'==', user.uid).get();
-if (teacherSnap.empty) throw new Error('Teacher record not found for this account');
-const teacherData = teacherSnap.docs[0].data();
-teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherData };
-setupRoleUI('teacher', { class: teacherData.class, teacherData: teacherOwnData });
-} else if (role === 'parent') {
-const studentId = userData.studentId;
-if (!studentId) throw new Error('No student linked to this parent account');
-linkedStudentId = studentId;
-setupRoleUI('parent', { studentId: studentId });
-} else if (role === 'student') {
-const studentId = userData.studentId;
-if (!studentId) throw new Error('No student linked to this student account');
-linkedStudentId = studentId;
-setupRoleUI('student', { studentId: studentId });
-} else { throw new Error('Invalid role'); }
+        if (role === 'admin') {
+            const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
+                '==', user.uid).get();
+            if (!teacherSnap.empty) teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherSnap.docs[0]
+                .data() };
+            setupRoleUI('admin');
+            setTimeout(() => {
+                migratePastFinanceRecords().catch(e => console.warn('Migration error:', e));
+            }, 3000);
+        } else if (role === 'bursar') {
+            setupRoleUI('bursar');
+            setTimeout(() => {
+                migratePastFinanceRecords().catch(e => console.warn('Migration error:', e));
+            }, 3000);
+        } else if (role === 'teacher') {
+            const teacherSnap = await db.collection('teachers').where('tenantId', '==', tenantId).where('uid',
+                '==', user.uid).get();
+            if (teacherSnap.empty) throw new Error('Teacher record not found for this account');
+            const teacherData = teacherSnap.docs[0].data();
+            teacherOwnData = { docId: teacherSnap.docs[0].id, ...teacherData };
+            setupRoleUI('teacher', { class: teacherData.class, teacherData: teacherOwnData });
+        } else if (role === 'parent') {
+            const studentId = userData.studentId;
+            if (!studentId) throw new Error('No student linked to this parent account');
+            linkedStudentId = studentId;
+            setupRoleUI('parent', { studentId: studentId });
+        } else if (role === 'student') {
+            const studentId = userData.studentId;
+            if (!studentId) throw new Error('No student linked to this student account');
+            linkedStudentId = studentId;
+            setupRoleUI('student', { studentId: studentId });
+        } else { throw new Error('Invalid role'); }
 
-setupExamControls();
-initExamHistorySelectors();
-initPaymentHistorySelectors();
+        setupExamControls();
+        initExamHistorySelectors();
+        initPaymentHistorySelectors();
 
-if (!document.querySelector('#examTermButtons .term-btn.active')) {
-const defaultTerm = document.querySelector('#examTermButtons .term-btn');
-if (defaultTerm) defaultTerm.classList.add('active');
-currentTerm = defaultTerm ? defaultTerm.dataset.term : 'term1';
-}
-if (!document.querySelector('#examLevelButtons .exam-level-btn.active')) {
-const defaultLevel = document.querySelector('#examLevelButtons .exam-level-btn');
-if (defaultLevel) defaultLevel.classList.add('active');
-currentExamLevel = defaultLevel ? defaultLevel.dataset.examLevel : 'npse';
-}
+        if (!document.querySelector('#examTermButtons .term-btn.active')) {
+            const defaultTerm = document.querySelector('#examTermButtons .term-btn');
+            if (defaultTerm) defaultTerm.classList.add('active');
+            currentTerm = defaultTerm ? defaultTerm.dataset.term : 'term1';
+        }
+        if (!document.querySelector('#examLevelButtons .exam-level-btn.active')) {
+            const defaultLevel = document.querySelector('#examLevelButtons .exam-level-btn');
+            if (defaultLevel) defaultLevel.classList.add('active');
+            currentExamLevel = defaultLevel ? defaultLevel.dataset.examLevel : 'npse';
+        }
 
-document.querySelectorAll('.att-term-btn').forEach(btn => {
-btn.onclick = function() {
-document.querySelectorAll('.att-term-btn').forEach(b => b.classList.remove('active'));
-this.classList.add('active');
-currentAttendanceFilter.term = this.dataset.term;
-renderFilteredAttendanceHistory();
-};
-});
-document.getElementById('attendanceYearFilter')?.addEventListener('change', function() {
-currentAttendanceFilter.year = this.value;
-renderFilteredAttendanceHistory();
-});
-document.getElementById('refreshAttendanceHistoryBtn')?.addEventListener('click', function() {
-if (currentStudentDoc) loadAttendanceHistory();
-});
+        document.querySelectorAll('.att-term-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.att-term-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentAttendanceFilter.term = this.dataset.term;
+                renderFilteredAttendanceHistory();
+            };
+        });
+        document.getElementById('attendanceYearFilter')?.addEventListener('change', function() {
+            currentAttendanceFilter.year = this.value;
+            renderFilteredAttendanceHistory();
+        });
+        document.getElementById('refreshAttendanceHistoryBtn')?.addEventListener('click', function() {
+            if (currentStudentDoc) loadAttendanceHistory();
+        });
 
-document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
-document.getElementById('dashboardYearFilter').onchange = loadDashboard;
-document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
-document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
-document.getElementById('refreshExamHistoryBtn')?.addEventListener('click', function() {
-if (currentStudentDoc) loadExamHistory();
-});
-document.getElementById('examHistoryYear')?.addEventListener('change', function() {
-if (currentStudentDoc) loadExamHistory();
-});
-document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
+        document.getElementById('applyDashboardFiltersBtn').onclick = loadDashboard;
+        document.getElementById('dashboardYearFilter').onchange = loadDashboard;
+        document.getElementById('dashboardStatusFilter').onchange = loadDashboard;
+        document.getElementById('refreshDashboardBtn').onclick = loadDashboard;
+        document.getElementById('refreshExamHistoryBtn')?.addEventListener('click', function() {
+            if (currentStudentDoc) loadExamHistory();
+        });
+        document.getElementById('examHistoryYear')?.addEventListener('change', function() {
+            if (currentStudentDoc) loadExamHistory();
+        });
+        document.getElementById('refreshStaffDashboardBtn').onclick = loadStaffDashboard;
 
-const predictBtn = document.getElementById('predictRiskBtn');
-if (predictBtn) {
-predictBtn.onclick = function() {
-loadRiskPredictions(true);
-};
-}
-const sendAlertsBtn = document.getElementById('sendRiskAlertsBtn');
-if (sendAlertsBtn) {
-sendAlertsBtn.onclick = sendRiskAlerts;
-}
+        const predictBtn = document.getElementById('predictRiskBtn');
+        if (predictBtn) {
+            predictBtn.onclick = function() {
+                loadRiskPredictions(true);
+            };
+        }
+        const sendAlertsBtn = document.getElementById('sendRiskAlertsBtn');
+        if (sendAlertsBtn) {
+            sendAlertsBtn.onclick = sendRiskAlerts;
+        }
 
-if (role === 'parent' || role === 'student') {
-setTimeout(() => {
-const chatTab = document.querySelector('[data-tab="aichat"]');
-if (chatTab) {
-chatTab.click();
-initChatbot();
-}
-}, 1000);
-}
+        if (role === 'parent' || role === 'student') {
+            setTimeout(() => {
+                const chatTab = document.querySelector('[data-tab="aichat"]');
+                if (chatTab) {
+                    chatTab.click();
+                    initChatbot();
+                }
+            }, 1000);
+        }
 
-if (role === 'admin') {
-document.getElementById('admissionRequestsCard').style.display = 'block';
-loadAdmissionRequests('admissionRequestsList');
-loadAdmissionRequests('admissionRequestsAdminList');
-document.getElementById('registrationRequestsCard').style.display = 'block';
-loadRegistrationRequests('registrationRequestsList');
-loadRegistrationRequests('registrationRequestsAdminList');
-loadEntranceExams();
-setupSettingsTab();
-}
+        if (role === 'admin') {
+            document.getElementById('admissionRequestsCard').style.display = 'block';
+            loadAdmissionRequests('admissionRequestsList');
+            loadAdmissionRequests('admissionRequestsAdminList');
+            document.getElementById('registrationRequestsCard').style.display = 'block';
+            loadRegistrationRequests('registrationRequestsList');
+            loadRegistrationRequests('registrationRequestsAdminList');
+            loadEntranceExams();
+            setupSettingsTab();
+        }
 
-document.getElementById('libraryRefreshBtn').addEventListener('click', showLibraryResources);
-document.getElementById('libraryClassSelect').addEventListener('change', showLibraryResources);
-document.getElementById('libraryDepartmentSelect').addEventListener('change', showLibraryResources);
+        document.getElementById('libraryRefreshBtn').addEventListener('click', showLibraryResources);
+        document.getElementById('libraryClassSelect').addEventListener('change', showLibraryResources);
+        document.getElementById('libraryDepartmentSelect').addEventListener('change', showLibraryResources);
 
-const docTabBtn = document.querySelector('[data-tab="documents"]');
-if (docTabBtn) {
-docTabBtn.addEventListener('click', function() {
-if (currentStudentDoc) {
-loadStudentDocuments(currentStudentDoc.id);
-} else {
-document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
-}
-});
-}
+        const docTabBtn = document.querySelector('[data-tab="documents"]');
+        if (docTabBtn) {
+            docTabBtn.addEventListener('click', function() {
+                if (currentStudentDoc) {
+                    loadStudentDocuments(currentStudentDoc.id);
+                } else {
+                    document.getElementById('documentList').innerHTML = '<p>Please load a student first.</p>';
+                }
+            });
+        }
 
-document.getElementById('refreshFeeCollectionsBtn').addEventListener('click', function() {
-loadFeeCollections();
-});
-document.getElementById('resetFeeCollectionsBtn').addEventListener('click', function() {
-document.getElementById('feeCollectionYear').value = 'all';
-document.getElementById('feeCollectionTerm').value = 'all';
-document.getElementById('feeCollectionMonth').value = 'all';
-loadFeeCollections();
-});
-document.getElementById('feeCollectionYear').addEventListener('change', applyFeeFilters);
-document.getElementById('feeCollectionTerm').addEventListener('change', applyFeeFilters);
-document.getElementById('feeCollectionMonth').addEventListener('change', applyFeeFilters);
+        document.getElementById('refreshFeeCollectionsBtn').addEventListener('click', function() {
+            loadFeeCollections();
+        });
+        document.getElementById('resetFeeCollectionsBtn').addEventListener('click', function() {
+            document.getElementById('feeCollectionYear').value = 'all';
+            document.getElementById('feeCollectionTerm').value = 'all';
+            document.getElementById('feeCollectionMonth').value = 'all';
+            loadFeeCollections();
+        });
+        document.getElementById('feeCollectionYear').addEventListener('change', applyFeeFilters);
+        document.getElementById('feeCollectionTerm').addEventListener('change', applyFeeFilters);
+        document.getElementById('feeCollectionMonth').addEventListener('change', applyFeeFilters);
 
-const reportCardTabBtn = document.querySelector('[data-tab="reportcard"]');
-if (reportCardTabBtn) {
-reportCardTabBtn.addEventListener('click', function() {
-if (currentStudentDoc) {
-const yearSelect = document.getElementById('reportCardYear');
-if (yearSelect.options.length <= 1) {
-db.collection('exam_records').doc(currentStudentDoc.id).get().then(doc => {
-if (doc.exists) {
-const data = doc.data();
-const years = data.years ? Object.keys(data.years) : [];
-const currentVal = yearSelect.value;
-yearSelect.innerHTML = '<option value="all">All Years</option>';
-years.forEach(y => {
-yearSelect.innerHTML +=
-`<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
-}
-);
-}
-}).catch(() => {});
-}
-generateReportCard();
-} else {
-document.getElementById('reportCardContainer').innerHTML =
-'<p>Please load a student first.</p>';
-}
-});
-}
+        const reportCardTabBtn = document.querySelector('[data-tab="reportcard"]');
+        if (reportCardTabBtn) {
+            reportCardTabBtn.addEventListener('click', function() {
+                if (currentStudentDoc) {
+                    const yearSelect = document.getElementById('reportCardYear');
+                    if (yearSelect.options.length <= 1) {
+                        db.collection('exam_records').doc(currentStudentDoc.id).get().then(doc => {
+                            if (doc.exists) {
+                                const data = doc.data();
+                                const years = data.years ? Object.keys(data.years) : [];
+                                const currentVal = yearSelect.value;
+                                yearSelect.innerHTML = '<option value="all">All Years</option>';
+                                years.forEach(y => {
+                                    yearSelect.innerHTML +=
+                                        `<option value="${y}" ${y === currentVal ? 'selected' : ''}>${y}</option>`;
+                                });
+                            }
+                        }).catch(() => {});
+                    }
+                    generateReportCard();
+                } else {
+                    document.getElementById('reportCardContainer').innerHTML =
+                        '<p>Please load a student first.</p>';
+                }
+            });
+        }
 
-const entranceExamTabBtn = document.querySelector('[data-tab="entranceexam"]');
-if (entranceExamTabBtn) {
-entranceExamTabBtn.addEventListener('click', function() {
-if (currentStudentDoc) {
-loadEntranceExamForParent();
-} else {
-document.getElementById('entranceExamList').innerHTML =
-'<p>Please load a student first.</p>';
-}
-});
-}
+        const entranceExamTabBtn = document.querySelector('[data-tab="entranceexam"]');
+        if (entranceExamTabBtn) {
+            entranceExamTabBtn.addEventListener('click', function() {
+                if (currentStudentDoc) {
+                    loadEntranceExamForParent();
+                } else {
+                    document.getElementById('entranceExamList').innerHTML =
+                        '<p>Please load a student first.</p>';
+                }
+            });
+        }
 
-// NEW: Submission History Tab
-const submissionHistoryTabBtn = document.querySelector('[data-tab="submissionhistory"]');
-if (submissionHistoryTabBtn) {
-submissionHistoryTabBtn.addEventListener('click', function() {
-if (currentStudentDoc) {
-loadSubmissionHistory();
-} else {
-document.getElementById('submissionHistoryContainer').innerHTML =
-'<p>Please load a student first.</p>';
-}
-});
-}
-document.getElementById('refreshSubmissionsBtn')?.addEventListener('click', function() {
-if (currentStudentDoc) loadSubmissionHistory();
-});
-document.getElementById('submissionTypeFilter')?.addEventListener('change', function() {
-if (currentStudentDoc) loadSubmissionHistory();
-});
+        const submissionHistoryTabBtn = document.querySelector('[data-tab="submissionhistory"]');
+        if (submissionHistoryTabBtn) {
+            submissionHistoryTabBtn.addEventListener('click', function() {
+                if (currentStudentDoc) {
+                    loadSubmissionHistory();
+                } else {
+                    document.getElementById('submissionHistoryContainer').innerHTML =
+                        '<p>Please load a student first.</p>';
+                }
+            });
+        }
+        document.getElementById('refreshSubmissionsBtn')?.addEventListener('click', function() {
+            if (currentStudentDoc) loadSubmissionHistory();
+        });
+        document.getElementById('submissionTypeFilter')?.addEventListener('change', function() {
+            if (currentStudentDoc) loadSubmissionHistory();
+        });
 
-const eLearningBtn = document.getElementById('eLearningModuleBtn');
-if (eLearningBtn) {
-eLearningBtn.addEventListener('click', function() {
-populateELearningDropdowns();
-loadQuizzes();
-loadAssignments();
-});
-}
+        const eLearningBtn = document.getElementById('eLearningModuleBtn');
+        if (eLearningBtn) {
+            eLearningBtn.addEventListener('click', function() {
+                populateELearningDropdowns();
+                loadQuizzes();
+                loadAssignments();
+            });
+        }
 
-const datePicker = document.getElementById('attendanceDatePicker');
-if (datePicker) {
-datePicker.value = attendanceDate;
-document.getElementById('attendanceDateInfo').textContent = 'Today';
-}
+        const datePicker = document.getElementById('attendanceDatePicker');
+        if (datePicker) {
+            datePicker.value = attendanceDate;
+            document.getElementById('attendanceDateInfo').textContent = 'Today';
+        }
 
-if (role === 'bursar') {
-setTimeout(() => {
-populateFinanceFilterYears();
-loadFinanceDashboard();
-loadIncomeRecords();
-loadExpenseRecords();
-}, 500);
-}
+        if (role === 'bursar') {
+            setTimeout(() => {
+                populateFinanceFilterYears();
+                loadFinanceDashboard();
+                loadIncomeRecords();
+                loadExpenseRecords();
+            }, 500);
+        }
 
-const firstModuleBtn = document.querySelector('.module-btn');
-if (firstModuleBtn) firstModuleBtn.click();
-else {
-if (document.getElementById('dashboardModule')) document.getElementById('dashboardModule').style
-.display = 'block';
-loadDashboard();
-loadStaffDashboard();
-}
+        const firstModuleBtn = document.querySelector('.module-btn');
+        if (firstModuleBtn) firstModuleBtn.click();
+        else {
+            if (document.getElementById('dashboardModule')) document.getElementById('dashboardModule').style
+                .display = 'block';
+            loadDashboard();
+            loadStaffDashboard();
+        }
 
-if (document.getElementById('attendanceModule').style.display !== 'none') {
-renderAttendanceForDate(attendanceDate);
-}
+        if (document.getElementById('attendanceModule').style.display !== 'none') {
+            renderAttendanceForDate(attendanceDate);
+        }
 
-document.getElementById('loadAttendanceDateBtn').addEventListener('click', function() {
-const date = document.getElementById('attendanceDatePicker').value;
-if (date) {
-attendanceDate = date;
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('attendanceDateInfo').textContent = date === today ? 'Today' :
-date;
-renderAttendanceForDate(date);
-}
-});
+        document.getElementById('loadAttendanceDateBtn').addEventListener('click', function() {
+            const date = document.getElementById('attendanceDatePicker').value;
+            if (date) {
+                attendanceDate = date;
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('attendanceDateInfo').textContent = date === today ? 'Today' :
+                    date;
+                renderAttendanceForDate(date);
+            }
+        });
 
-initPasswordToggles();
+        initPasswordToggles();
 
-} catch (e) {
-document.getElementById('loginMessage').innerHTML = '<div class="error">' + escapeHtml(e.message) +
-'</div>';
-}
+        // 🔥 Set up auth state listener to handle school disable during session
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const currentTenant = getCurrentTenantId();
+                const enabled = await checkSchoolEnabled(currentTenant);
+                if (!enabled && currentTenant !== 'default_tenant') {
+                    // School was disabled while user was logged in
+                    await auth.signOut();
+                    try { localStorage.removeItem('tenantId'); } catch (_) {}
+                    _tenantId = 'default_tenant';
+                    showStartupPage();
+                    alert('⚠️ Your school has been disabled. You have been logged out.');
+                }
+            }
+        });
+
+    } catch (e) {
+        document.getElementById('loginMessage').innerHTML = '<div class="error">' + escapeHtml(e.message) +
+            '</div>';
+    }
 }
 
 // ==================================================================
@@ -17860,7 +18100,7 @@ loadChatbotData(linkedStudentId).catch(console.warn);
 };
 
 // ==================================================================
-//  ENTRANCE EXAMS ADMIN FUNCTIONS (updated with class field)
+//  ENTRANCE EXAMS ADMIN FUNCTIONS (updated with class field + edit support + attempt limit)
 // ==================================================================
 async function loadEntranceExams() {
 const container = document.getElementById('entranceExamsList');
@@ -17878,19 +18118,22 @@ if (exams.length === 0) {
 container.innerHTML = '<p>No entrance exams created yet. Click "Create Exam" to start.</p>';
 return;
 }
-let html = '<div class="table-wrapper"><table><thead><tr><th>Title</th><th>Class</th><th>Questions</th><th>Time Limit</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody>';
+let html = '<div class="table-wrapper"><table><thead><tr><th>Title</th><th>Class</th><th>Questions</th><th>Time Limit</th><th>Max Attempts</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody>';
 for (const exam of exams) {
 const assignedCount = exam.assignedTo ? exam.assignedTo.length : 0;
 const classLabel = exam.class || 'All Classes';
+const maxAttempts = exam.maxAttempts || 3;
 html += `<tr>
 <td>${escapeHtml(exam.title)}</td>
 <td>${escapeHtml(classLabel)}</td>
 <td>${exam.questions ? exam.questions.length : 0}</td>
 <td>${exam.timeLimit || 15} min</td>
+<td>${maxAttempts}</td>
 <td>${assignedCount} admission(s)</td>
 <td>
 <div class="actions-cell">
 <button class="assign-exam-btn act-btn edit" data-id="${exam.id}">Assign</button>
+<button class="edit-entrance-exam-btn act-btn edit" data-id="${exam.id}">✎ Edit</button>
 <button class="delete-exam-btn act-btn delete" data-id="${exam.id}">Delete</button>
 </div>
 </td>
@@ -17911,6 +18154,15 @@ if (confirm('Delete this entrance exam? All submissions will be removed.')) {
 const examId = this.dataset.id;
 await db.collection('entrance_exams').doc(examId).delete();
 loadEntranceExams();
+}
+};
+});
+container.querySelectorAll('.edit-entrance-exam-btn').forEach(btn => {
+btn.onclick = function() {
+const examId = this.dataset.id;
+const exam = exams.find(e => e.id === examId);
+if (exam) {
+openEditEntranceExamModal(exam);
 }
 };
 });
@@ -17990,21 +18242,38 @@ console.error('Error:', error);
 }
 
 // ==================================================================
-//  QUIZ / ENTRANCE EXAM START FUNCTIONS (updated with student info)
+//  QUIZ / ENTRANCE EXAM START FUNCTIONS (updated with attempt tracking)
 // ==================================================================
 function startQuiz(quiz) {
 const user = auth.currentUser;
 if (!user) { alert('Please log in to take this quiz.'); return; }
 
-db.collection('quiz_submissions')
-.where('quizId', '==', quiz.id)
-.where('userId', '==', user.uid)
-.get()
-.then(snap => {
-if (!snap.empty) {
-alert('You have already submitted this quiz. You cannot take it again.');
+const studentId = linkedStudentId || (currentStudentDoc ? currentStudentDoc.id : '');
+if (!studentId) {
+alert('No student linked to your account. Please contact the administrator.');
 return;
 }
+
+// Check attempts
+db.collection('quiz_submissions')
+.where('quizId', '==', quiz.id)
+.where('studentId', '==', studentId)
+.get()
+.then(async snap => {
+const attempts = snap.size;
+const maxAttempts = quiz.maxAttempts || 3;
+
+if (attempts >= maxAttempts) {
+alert(`You have reached the maximum of ${maxAttempts} attempts for this quiz. You cannot take it again.`);
+return;
+}
+
+// Check if already submitted (any attempt)
+if (!snap.empty) {
+const confirmMsg = `You have already taken this quiz ${attempts} time(s) out of ${maxAttempts}. Do you want to take another attempt? (${maxAttempts - attempts} remaining)`;
+if (!confirm(confirmMsg)) return;
+}
+
 currentQuizTaking = {
 quizId: quiz.id,
 questions: quiz.questions || [],
@@ -18012,11 +18281,15 @@ answers: new Array(quiz.questions ? quiz.questions.length : 0).fill(null),
 currentIndex: 0,
 startTime: Date.now(),
 timeLimit: quiz.timeLimit || 15,
-quizTitle: quiz.title || 'Quiz'
+quizTitle: quiz.title || 'Quiz',
+attemptNumber: attempts + 1,
+maxAttempts: maxAttempts
 };
 document.getElementById('takeQuizTitle').textContent = '📝 ' + quiz.title;
 document.getElementById('takeQuizMeta').textContent =
-`⏱️ ${quiz.timeLimit || 15} min • ${quiz.questions ? quiz.questions.length : 0} questions`;
+`⏱️ ${quiz.timeLimit || 15} min • ${quiz.questions ? quiz.questions.length : 0} questions • Attempt ${attempts + 1} of ${maxAttempts}`;
+document.getElementById('takeQuizAttemptsInfo').textContent =
+`📊 Attempt ${attempts + 1} of ${maxAttempts} (${maxAttempts - attempts - 1} remaining)`;
 document.getElementById('takeQuizMessage').innerHTML = '';
 window.renderQuizQuestion();
 openModal('takeQuizModal');
@@ -18037,11 +18310,11 @@ window.submitQuiz();
 }, 1000);
 })
 .catch(err => {
-alert('Error checking submissions: ' + err.message);
+alert('Error checking attempts: ' + err.message);
 });
 }
 
-function startEntranceExam(exam) {
+function startEntranceExam(exam, attemptNumber = 1) {
 const user = auth.currentUser;
 if (!user) { alert('Please log in to take this exam.'); return; }
 
@@ -18054,15 +18327,32 @@ return;
 }
 }
 
-db.collection('entrance_exam_submissions')
-.where('examId', '==', exam.id)
-.where('studentId', '==', currentStudentDoc ? currentStudentDoc.id : '')
-.get()
-.then(snap => {
-if (!snap.empty) {
-alert('You have already submitted this exam. You cannot take it again.');
+const studentId = currentStudentDoc ? currentStudentDoc.id : '';
+if (!studentId) {
+alert('No student linked to your account. Please contact the administrator.');
 return;
 }
+
+// Check attempts
+db.collection('entrance_exam_submissions')
+.where('examId', '==', exam.id)
+.where('studentId', '==', studentId)
+.get()
+.then(async snap => {
+const attempts = snap.size;
+const maxAttempts = exam.maxAttempts || 3;
+
+if (attempts >= maxAttempts) {
+alert(`You have reached the maximum of ${maxAttempts} attempts for this exam. You cannot take it again.`);
+return;
+}
+
+// Check if already submitted (any attempt)
+if (!snap.empty) {
+const confirmMsg = `You have already taken this exam ${attempts} time(s) out of ${maxAttempts}. Do you want to take another attempt? (${maxAttempts - attempts} remaining)`;
+if (!confirm(confirmMsg)) return;
+}
+
 currentEntranceExamTaking = {
 examId: exam.id,
 questions: exam.questions || [],
@@ -18070,13 +18360,17 @@ answers: new Array(exam.questions ? exam.questions.length : 0).fill(null),
 currentIndex: 0,
 startTime: Date.now(),
 timeLimit: exam.timeLimit || 15,
-studentId: currentStudentDoc ? currentStudentDoc.id : '',
+studentId: studentId,
 studentName: currentStudentDoc ? currentStudentDoc.name : '',
-examTitle: exam.title || 'Entrance Exam'
+examTitle: exam.title || 'Entrance Exam',
+attemptNumber: attempts + 1,
+maxAttempts: maxAttempts
 };
 document.getElementById('takeEntranceExamTitle').textContent = '📋 ' + exam.title;
 document.getElementById('takeEntranceExamMeta').textContent =
-`⏱️ ${exam.timeLimit || 15} min • ${exam.questions ? exam.questions.length : 0} questions`;
+`⏱️ ${exam.timeLimit || 15} min • ${exam.questions ? exam.questions.length : 0} questions • Attempt ${attempts + 1} of ${maxAttempts}`;
+document.getElementById('takeEntranceExamAttemptsInfo').textContent =
+`📊 Attempt ${attempts + 1} of ${maxAttempts} (${maxAttempts - attempts - 1} remaining)`;
 document.getElementById('takeEntranceExamMessage').innerHTML = '';
 window.renderEntranceExamQuestion();
 openModal('takeEntranceExamModal');
@@ -18097,7 +18391,7 @@ window.submitEntranceExam();
 }, 1000);
 })
 .catch(err => {
-alert('Error checking submissions: ' + err.message);
+alert('Error checking attempts: ' + err.message);
 });
 }
 
@@ -18111,6 +18405,7 @@ ${submission.correct} out of ${submission.total} correct (MCQ only)
 <div style="margin-bottom:10px; font-size:0.8rem;">
 <strong>Time taken:</strong> ${Math.floor(submission.timeTaken / 60)}m ${submission.timeTaken % 60}s
 </div>
+${submission.attemptNumber ? `<div style="margin-bottom:10px; font-size:0.8rem; color:#6c7a89;">Attempt ${submission.attemptNumber} of ${submission.maxAttempts || 3}</div>` : ''}
 <h4 style="font-size:0.95rem;">Detailed Results</h4>
 ${submission.results.map((r, i) => `
 <div class="quiz-result-detail" style="font-size:0.75rem;">
